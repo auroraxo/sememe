@@ -45,6 +45,19 @@ The fidelity claim was tested against two independent references rather than ass
 
 **Limits of this evidence:** it covers one Anchor program's instruction data on one sample of mainnet traffic. Account and event layouts are untested, `repr(C)`/`packed` account types are not decoded yet, the mainnet sample is small and self-harvested (not 1,000 transactions), and byte-exact agreement with a reference codec shows layout fidelity — not that any real workflow has been migrated or that anyone outside this machine uses sememe. Run `npm test` (26 tests) and `SEMEME_ORACLE_PATH=<dir>/node_modules node tools/crosscheck.mjs --store <store>` to reproduce.
 
+## Compared against my own existing Whirlpool decoder
+
+`tools/decoder-parity.mjs` runs sememe's stored-IDL codec and `solana-tx-remix`'s own first-party Whirlpool decoder path (`src/args.mjs`) over the same 26 real mainnet payloads and compares them field by field. That decoder is the one this repository is supposed to make replaceable, so it is the honest baseline.
+
+Measured on 27.10. (reproduce: `node tools/decoder-parity.mjs --store <store> --tx-remix <dir> --generated <dir>`):
+
+- **118 of 118 fields both paths decode agree, 0 value disagreements.**
+- **0 fields only one side has** — no silent drift in the other direction either.
+- **17 fields the first-party path refuses to decode** (it stops at `option` and defined-type arguments and emits `__optionRemaining`/`__unsupportedDecoder` instead of a value); sememe decodes them, e.g. `remaining_accounts_info: {"__option":"None"}` vs `{"__optionRemaining":"AA=="}`. These are the `option`/`defined`-typed arguments of 17 of 66 Whirlpool instructions (`swap_v2`, `decrease_liquidity_v2`, `open_position`, `lock_position`, …).
+- The first-party path finds schemas for 65 of 66 instructions (19 have no generated schema file at all).
+
+So the first comparison is exact where both paths overlap, and sememe additionally decodes what that path declines to decode. That clears this repository's own stated gate for the next step; **it is not yet a migration** — `solana-tx-remix` still runs its old path, no transaction has been diffed at 1,000 scale, and no outside user is involved.
+
 ## Free and paid
 
 - Free, MIT: all acquisition channels, normalization, fingerprint store, checks, decode and encode APIs, CLI, daemon, lock files, and fully offline resolution. No account or quota.
@@ -59,5 +72,5 @@ The largest risk is coverage. If on-chain acquisition works for fewer than half 
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
-2. **Whirlpool pull + content fingerprint has landed, and the instruction decoder now decodes real mainnet bytes byte-exactly.** Next replace one real decoder path in my own Whirlpool workflow (`solana-tx-remix` has its own hand-written decoder path) with the stored artifact, measure its decoded output against the existing path, then expand to 41 paths and 1,000 transactions only if the first comparison is exact. The selected-sample threshold does not validate other program families.
+2. **Whirlpool pull + content fingerprint has landed, and the instruction decoder now decodes real mainnet bytes byte-exactly.** The first comparison against my own existing decoder path (`solana-tx-remix`) was run and is exact: 118/118 shared fields agree, 0 value disagreements, plus 17 `option`/`defined` fields the old path cannot decode. Next migrate that one path onto the stored artifact, diff its output on the same transactions, then expand to 41 paths and 1,000 transactions only if the migrated comparison stays exact. The selected-sample threshold does not validate other program families.
 3. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.
