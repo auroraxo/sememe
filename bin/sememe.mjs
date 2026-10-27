@@ -6,8 +6,11 @@ import { decodePayload } from '../src/decode.mjs';
 
 const usage = `usage:
   sememe pull <program-id> [--store <directory>] [--rpc <https-url>]
-  sememe decode <program-id> <payload> [--store <directory>]
-      payload: base58 or hex instruction data (discriminator + args)`;
+  sememe decode <program-id> <payload> [--store <directory>] [--trailing report|error]
+      payload: base58 or hex instruction data (discriminator + args)
+      --trailing report (default): decode the IDL-described prefix and report
+          the bytes the IDL does not explain under "trailing"; --trailing error
+          refuses the payload instead.`;
 
 const [command, program, ...args] = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -30,7 +33,23 @@ try {
     const payload = args.shift();
     if (!payload) throw Error('decode needs an instruction payload');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
-    console.log(JSON.stringify(await decodePayload(store, program, payload), null, 2));
+    const trailing = option('--trailing', undefined);
+    if (trailing !== undefined && trailing !== 'report' && trailing !== 'error') {
+      throw Error('--trailing must be "report" or "error"');
+    }
+    const decoded = await decodePayload(store, program, payload,
+      trailing === undefined ? {} : { trailing });
+    console.log(JSON.stringify(decoded, null, 2));
+    // Unexplained bytes are a completeness finding, not a crash: report them
+    // on stderr so scripted callers notice without losing the decode result.
+    if (decoded.trailing.count > 0 && trailing !== 'error') {
+      console.error(JSON.stringify({
+        note: `${decoded.trailing.count} byte(s) after ${decoded.instruction} are not described by the stored IDL`,
+        consumed: decoded.consumed,
+        bytes: decoded.bytes,
+        trailing: decoded.trailing,
+      }));
+    }
   } else {
     console.error(usage);
     process.exitCode = 2;

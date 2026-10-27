@@ -573,9 +573,28 @@ function instructionByName(idl, name) {
 
 /**
  * Decode one instruction payload (discriminator + args) using the IDL.
- * Strict: every byte must be consumed unless allowTrailing is set.
+ *
+ * The stored IDL describes the bytes it knows; it does not have to describe
+ * every byte in the buffer. `trailing` chooses what happens to bytes the IDL
+ * does not explain:
+ *   'report' (default) decode the described prefix and return the unexplained
+ *             bytes under `trailing` — surfaced, never silently dropped.
+ *   'error'  refuse the whole payload.
+ * `allowTrailing: false` is accepted as an alias for `{ trailing: 'error' }`.
+ *
+ * 'report' is the default because it matches the program being decoded: Anchor
+ * deserialises instruction args with Borsh `deserialize` over a slice, which
+ * reads what the struct needs and does not require the slice to be exhausted.
+ * Two real mainnet Whirlpool `swap_v2` payloads carry 7 bytes beyond the stored
+ * IDL, both in transactions that succeeded on-chain (slot 462101502, and the
+ * 43-byte form of the same instruction at slot 462101506) — refusing them
+ * rejected 2 of 50 harvested payloads that the deployed program accepted.
  */
-export function decodeInstructionData(idl, data, { allowTrailing = false } = {}) {
+export function decodeInstructionData(idl, data, { allowTrailing, trailing } = {}) {
+  const policy = trailing ?? (allowTrailing === false ? 'error' : 'report');
+  if (policy !== 'report' && policy !== 'error') {
+    throw new CodecError(`unknown trailing policy ${JSON.stringify(trailing)}`, null);
+  }
   if (!(data instanceof Uint8Array)) throw new CodecError('instruction data must be a Uint8Array/Buffer', null);
   const ctx = context(idl);
   const index = instructionIndex(idl);
@@ -604,7 +623,11 @@ export function decodeInstructionData(idl, data, { allowTrailing = false } = {})
     }
     assign(args, argument.name, decodeAt(argument.type, cursor, ctx, `${instruction.name}.${argument.name}`, 0), instruction.name);
   }
-  if (cursor.remaining !== 0 && !allowTrailing) {
+  const trailingCount = cursor.remaining;
+  const trailingHex = trailingCount > 0
+    ? Buffer.from(data.subarray(cursor.offset)).toString('hex')
+    : '';
+  if (trailingCount > 0 && policy === 'error') {
     throw new CodecError(
       `trailing bytes after ${instruction.name}: consumed ${cursor.offset} of ${data.length}`, instruction.name);
   }
@@ -614,6 +637,10 @@ export function decodeInstructionData(idl, data, { allowTrailing = false } = {})
     args,
     consumed: cursor.offset,
     total: data.length,
+    // Bytes the IDL does not explain, as count + hex. Present (0, '') when the
+    // payload is fully described, so `trailing.count === 0` is a usable
+    // completeness assertion and `count > 0` is an IDL-drift signal.
+    trailing: { count: trailingCount, hex: trailingHex },
   };
 }
 

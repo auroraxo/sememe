@@ -19,7 +19,9 @@ const b58 = (s) => {
 
 // The real Whirlpool on-chain IDL, pulled by `sememe pull` (receipt in the
 // store). Used by the decode tests so they exercise production data, not a
-// hand-written stand-in. Skipped when the store is absent (fresh checkout CI).
+// hand-written stand-in. Falls back to the committed snapshot
+// test/fixtures/whirlpool-idl.json when there is no live store, so these run
+// on a fresh checkout and in CI instead of silently skipping.
 const STORE = process.env.SEMEME_TEST_STORE
   ?? path.join(os.tmpdir(), 'sememe-user-zero');
 const WHIRLPOOL = 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc';
@@ -27,10 +29,23 @@ async function whirlpoolIdl() {
   const receipts = await (await import('node:fs/promises')).readdir(path.join(STORE, 'receipts'))
     .catch(() => []);
   const mine = receipts.filter((name) => name.startsWith(`${WHIRLPOOL}-`)).sort().pop();
-  if (!mine) return null;
-  const receipt = JSON.parse(await readFile(path.join(STORE, 'receipts', mine), 'utf8'));
-  const fingerprint = receipt.fingerprint.replace('sha256:', '');
-  return JSON.parse(await readFile(path.join(STORE, 'objects', `${fingerprint}.json`), 'utf8'));
+  if (mine) {
+    const receipt = JSON.parse(await readFile(path.join(STORE, 'receipts', mine), 'utf8'));
+    const fingerprint = receipt.fingerprint.replace('sha256:', '');
+    return JSON.parse(await readFile(path.join(STORE, 'objects', `${fingerprint}.json`), 'utf8'));
+  }
+  // No live store: use the committed snapshot, but only if it still
+  // fingerprints to the provenance it claims.
+  const snapshot = JSON.parse(await readFile(new URL('./fixtures/whirlpool-idl.json', import.meta.url), 'utf8'));
+  const receipt = JSON.parse(await readFile(new URL('./fixtures/whirlpool-receipt.json', import.meta.url), 'utf8'));
+  const { canonicalJson } = await import('../src/pull.mjs');
+  const { createHash } = await import('node:crypto');
+  const actual = createHash('sha256').update(`${canonicalJson(snapshot)}\n`).digest('hex');
+  const claimed = receipt.fingerprint.replace('sha256:', '');
+  if (actual !== claimed) {
+    throw new Error(`committed IDL fingerprint mismatch: receipt ${claimed}, actual ${actual}`);
+  }
+  return snapshot;
 }
 const idl = await whirlpoolIdl();
 
@@ -111,11 +126,24 @@ test('rejects malformed bytes instead of guessing', () => {
   const foreign = Buffer.from(base);
   foreign[0] = 0xff;
   assert.throws(() => decodeInstructionData(synthetic, foreign), /unknown instruction discriminator/);
-  // 2. trailing bytes
-  assert.throws(() => decodeInstructionData(synthetic, Buffer.concat([base, Buffer.from([0])])),
-    /trailing bytes/);
+  // 2. trailing bytes: reported by default (they exist on-chain and the
+  // deployed program accepts them), refused only when explicitly asked.
+  assert.throws(() => decodeInstructionData(synthetic, Buffer.concat([base, Buffer.from([0])]),
+    { trailing: 'error' }), /trailing bytes/);
+  assert.throws(() => decodeInstructionData(synthetic, Buffer.concat([base, Buffer.from([0])]),
+    { allowTrailing: false }), /trailing bytes/);
+  // legacy alias: allowTrailing:true keeps its old meaning (do not throw).
   assert.doesNotThrow(() => decodeInstructionData(synthetic,
     Buffer.concat([base, Buffer.from([0])]), { allowTrailing: true }));
+  const reported = decodeInstructionData(synthetic, Buffer.concat([base, Buffer.from([0])]));
+  assert.deepEqual(reported.trailing, { count: 1, hex: '00' });
+  assert.equal(reported.consumed, base.length);
+  // the described part still round-trips; only the unexplained tail is extra
+  assert.equal(encodeInstructionData(synthetic, reported.instruction, reported.args).equals(base), true);
+  assert.throws(() => decodeInstructionData(synthetic, base, { trailing: 'nope' }),
+    /unknown trailing policy/);
+  // default decode of a fully described payload reports nothing extra
+  assert.deepEqual(decodeInstructionData(synthetic, base).trailing, { count: 0, hex: '' });
   // 3. truncated input
   assert.throws(() => decodeInstructionData(synthetic, base.subarray(0, base.length - 1)), /truncated/);
   // 4. invalid option tag (0/1 only)

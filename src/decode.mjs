@@ -68,12 +68,18 @@ export async function findStoredIdl(storeDir, program) {
  * Decode one instruction payload.
  * Returns the decoded instruction plus provenance and a byte-exactness check:
  * re-encoding the decoded value must reproduce the input bytes.
+ *
+ * `trailing` selects what happens to bytes the stored IDL does not explain:
+ * 'report' (default) decodes the described prefix and reports the rest under
+ * `trailing`; 'error' refuses the payload. See src/codec.mjs for why 'report'
+ * is the default and what real mainnet bytes motivated it.
  */
-export async function decodePayload(storeDir, program, payloadInput, { allowTrailing = false } = {}) {
+export async function decodePayload(storeDir, program, payloadInput, { allowTrailing, trailing } = {}) {
   const { idl, receipt, receiptName, objectPath } = await findStoredIdl(storeDir, program);
   const bytes = parsePayload(payloadInput);
-  const decoded = decodeInstructionData(idl, bytes, { allowTrailing });
+  const decoded = decodeInstructionData(idl, bytes, { allowTrailing, trailing });
   const reencoded = encodeInstructionData(idl, decoded.instruction, decoded.args);
+  const described = bytes.subarray(0, decoded.consumed);
   return {
     program,
     instruction: decoded.instruction,
@@ -81,7 +87,13 @@ export async function decodePayload(storeDir, program, payloadInput, { allowTrai
     args: toJsonSafe(decoded.args),
     bytes: bytes.length,
     consumed: decoded.consumed,
+    // True when the re-encoded bytes equal the whole input. With unexplained
+    // trailing bytes this is false by construction, so the described prefix is
+    // checked separately: `describedRoundTripByteExact` says the IDL-described
+    // part reproduces exactly, `trailing.count` says how much was unexplained.
     roundTripByteExact: reencoded.equals(bytes),
+    describedRoundTripByteExact: reencoded.equals(described),
+    trailing: decoded.trailing,
     idl: { fingerprint: receipt.fingerprint, slot: receipt.slot, source: receipt.source, receipt: receiptName },
     object: objectPath,
   };
