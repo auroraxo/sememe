@@ -1,17 +1,12 @@
 {
-  "preregistration": {
-    "id": "sememe-onchain-idl-coverage-2026-10-27",
-    "created": "2026-10-27T10:47+01:00",
-    "created_before_measurement": true,
-    "rpc_calls_made_before_this_file": 0,
-    "purpose": "Preregistered set of 20 real Solana programs for measuring whether an on-chain IDL/schema can be pulled. Selected and cited from first-party sources BEFORE any measurement.",
-    "denominator": 20,
-    "denominator_excluding_controls": 18,
+  "provenance": {
+    "role": "retrospective first-party source annotations for the 20 IDs in ../programs-20.json",
+    "written_after_batch_measurement": true,
+    "not_a_pre_registered_selection_algorithm": true,
+    "sample_frozen_before_batch": "681936b (../programs-20.json)",
+    "exploratory_whirlpool_rpc_before_freeze": true,
     "selection_method_doc": "research/selection-method.md",
-    "snapshots": {
-      "protocol_rank_source": "~/github_repos/solana-radar/radar.sqlite (DefiLlama api.llama.fi protocols where chains include 'Solana'), file mtime 2026-10-27T07:52:49+01:00",
-      "protocol_tvl_is_global_not_solana_only": true
-    }
+    "limitation": "family-clustered convenience sample, not population estimate; source links may drift"
   },
   "programs": [
     {
@@ -320,7 +315,11 @@
   ],
   "expected_reporting": {
     "primary_metric": "pulled_usable_onchain_idl / 20",
-    "secondary_metrics": ["pulled_usable_onchain_idl / 18 (controls excluded)", "per-stratum breakdown", "per-channel breakdown"],
+    "secondary_metrics": [
+      "pulled_usable_onchain_idl / 18 (controls excluded)",
+      "per-stratum breakdown",
+      "per-channel breakdown"
+    ],
     "definition_of_pull_must_be_recorded_with_results": true,
     "below_50_percent_action": "If <50% (i.e. <10/20 or <9/18), README hypothesis must be explicitly revised; no cherry-picking allowed; every one of the 20 programs stays in the denominator unless a program id is proven wrong on-chain."
   }

@@ -1,0 +1,366 @@
+{
+  "timestamp": "2026-10-27T10:25:21.414Z",
+  "rpcUrl": "https://api.mainnet-beta.solana.com",
+  "count": 20,
+  "usable": 15,
+  "unknown": 0,
+  "notUsable": 5,
+  "coveragePct": 75,
+  "interpretation": "at least 50% in this sample; still no proof of demand",
+  "rows": [
+    {
+      "name": "Whirlpool",
+      "id": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+      "source": "https://raw.githubusercontent.com/orca-so/whirlpools/HEAD/programs/whirlpool/src/lib.rs",
+      "status": "usable",
+      "usableSource": "metadata",
+      "slot": 462035811,
+      "metadata": "9fQgUeE2BpGXLHopvZhDKTskXV2druezgX6hpmscbya5",
+      "anchor": "2KFqE4RWoPVbvodo8vbggCFeHPS8TDvgpwp79ALMrcyn",
+      "canonical": {
+        "state": "usable",
+        "instructions": 66,
+        "fingerprint": "cec62435575a53a26cea475b3de5f5aeed0bfb36b53c4cd31a37ed5b3cae4081"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 66,
+        "fingerprint": "7afddfe8766bd24d30ff9ee5b12c7ee89bff5bc3b7b0396620e021a97a7ef63f"
+      }
+    },
+    {
+      "name": "Kamino Lend",
+      "id": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "source": "https://raw.githubusercontent.com/Kamino-Finance/klend/HEAD/programs/klend/src/lib.rs",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "7foczkk5NMzePs7cnpXnWbwSXNMw4n66MN2PFNB4kfdt",
+      "anchor": "8qLKwp1fk8WyqmzarkuMeZEX3AzL4VDSmA2UZTKT2aCJ",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 66,
+        "fingerprint": "838837c76e4454563f206461411259c6573daddb1e269dee8cc94347ccfdc367"
+      }
+    },
+    {
+      "name": "OpenBook v2",
+      "id": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+      "source": "https://raw.githubusercontent.com/openbook-dex/openbook-v2/HEAD/programs/openbook-v2/src/lib.rs",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "8fvgxrtyd72Jmx7rJHGsSqLgxbnWxQtCC1GWxYBf7qjE",
+      "anchor": "6HsCgDXQq6JZ7VsgHzmB6hqpTh7ZZhqQRktDru9TXn9L",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 29,
+        "fingerprint": "d949b2bc4fc649ce4da4b2734f7625f02ac0497d08467556809059483fbf782f"
+      }
+    },
+    {
+      "name": "Marinade liquid staking",
+      "id": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+      "source": "https://raw.githubusercontent.com/marinade-finance/liquid-staking-program/HEAD/programs/marinade-finance/src/lib.rs",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "5U2QTBdF6n7z2R3eJwjtndDTc7vW66k6cQ4CcAS8EJyA",
+      "anchor": "9jWC3EixD3D7ChMrrSRw3opnGHQ8YxZGJqGkzcup3tAn",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 29,
+        "fingerprint": "65934fb1343212eb6d3aefaceea7ff8abbfc3ef1892e2fd200593bf836eb2d22"
+      }
+    },
+    {
+      "name": "Raydium AMM v4",
+      "id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+      "source": "https://raw.githubusercontent.com/raydium-io/raydium-amm/HEAD/program/src/lib.rs",
+      "status": "not_usable",
+      "usableSource": null,
+      "slot": 462035811,
+      "metadata": "8Y54cTDJ8HsxcspCmtGBHPDscaaEWLgvK8jCJZm4twGp",
+      "anchor": "C2Di4S9JkWFaBFXKYCse7QTSeYefkwRf1rKMhjWTwY1T",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "missing"
+      }
+    },
+    {
+      "name": "Raydium CLMM",
+      "id": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+      "source": "https://raw.githubusercontent.com/raydium-io/raydium-clmm/HEAD/programs/amm/src/lib.rs",
+      "status": "usable",
+      "usableSource": "metadata",
+      "slot": 462035811,
+      "metadata": "4wQuz7ZDMMxihw8qwm6zt7fNzRNdEvHMAT1eyPHNhWri",
+      "anchor": "FbDNAPsgm8Y5jWXQkXjpfN6Bp8xHeRkhMmsstAooPyY9",
+      "canonical": {
+        "state": "usable",
+        "instructions": 37,
+        "fingerprint": "4a9312026c17b55dd6d52ac516c0cd6b8268618dc3b9eab917f179ebd9a26600"
+      },
+      "legacy": {
+        "state": "missing"
+      }
+    },
+    {
+      "name": "Raydium CP-Swap",
+      "id": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+      "source": "https://raw.githubusercontent.com/raydium-io/raydium-cp-swap/HEAD/programs/cp-swap/src/lib.rs",
+      "status": "usable",
+      "usableSource": "metadata",
+      "slot": 462035811,
+      "metadata": "FHuJXL7cEttfHk4sXdTAXVaRymBdKfVs7ZH6cMgA1ihk",
+      "anchor": "3HD1FNEKoNh5aYfvw3VrNWy6WwrEtS6JYx1RmFTE7DMC",
+      "canonical": {
+        "state": "usable",
+        "instructions": 20,
+        "fingerprint": "c84ee49873ecdc89e0f330951ebbc82938b9c7880f2282c3753629531fe198a5"
+      },
+      "legacy": {
+        "state": "missing"
+      }
+    },
+    {
+      "name": "Pump.fun bonding curve",
+      "id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "source": "https://raw.githubusercontent.com/pump-fun/pump-public-docs/HEAD/docs/PUMP_PROGRAM_README.md",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "A6Y3keWVgXiJcWXYhGYYEauYaepb9NzrF6PChVeKdDoj",
+      "anchor": "AYgC53tU5BbP2NAnv5nConJxAdpQZctvmZK88pu69xRs",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 47,
+        "fingerprint": "ec3618ee8538826982b4f1fdb6487998596344c0cf8e38d336b5842dd1f46b6a"
+      }
+    },
+    {
+      "name": "PumpSwap",
+      "id": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+      "source": "https://raw.githubusercontent.com/pump-fun/pump-public-docs/HEAD/idl/pump_amm.json",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "EB4BfHDFEUqTmRsUGqUusgk7B37LT9GyG8TTqM6eS1jN",
+      "anchor": "5fLnXNNoZcZt9Qku6HARM3un3Ttm2cGsR7gN9Zp1R7h3",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 27,
+        "fingerprint": "e16ac8008908911575241a25cad33bed8d2da2153f0d726790065fd467b90ff4"
+      }
+    },
+    {
+      "name": "Jupiter v6",
+      "id": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+      "source": "https://raw.githubusercontent.com/jup-ag/instruction-parser/HEAD/src/constants.ts",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "FDDfotwLyeLhUQ62ugzgTjwTvF3r64tPRVsKwsqRrbbC",
+      "anchor": "C88XWfp26heEmDkmfSzeXP7Fd7GQJ2j9dDTUsyiZbUTa",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 19,
+        "fingerprint": "1c70d6c96e01648411ff1579a35853d966407a4dff5020a5d33e92e6923c9e67"
+      }
+    },
+    {
+      "name": "Jupiter Lend",
+      "id": "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9",
+      "source": "https://raw.githubusercontent.com/jup-ag/jupiter-lend/HEAD/README.md",
+      "status": "not_usable",
+      "usableSource": null,
+      "slot": 462035811,
+      "metadata": "2dqrzUvnqyA9NFGbvga6Fhv3bwmzGQcmsAQWwr2jQvND",
+      "anchor": "8jeCsePvLjyFvaLEUYXXo3hxdL9Een5T2MHWqiVcZu3G",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "missing"
+      }
+    },
+    {
+      "name": "Jupiter Liquidity",
+      "id": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
+      "source": "https://raw.githubusercontent.com/jup-ag/jupiter-lend/HEAD/README.md",
+      "status": "not_usable",
+      "usableSource": null,
+      "slot": 462035811,
+      "metadata": "7fmNiA8BTTCx8L3HN4vGY1NTVEYx33k2Dh7Tjr2uH92n",
+      "anchor": "o69Q5Fk9G4GyJMGRXjYjxTYVZhedg9B8JPn5wdT54je",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "missing"
+      }
+    },
+    {
+      "name": "Meteora DLMM",
+      "id": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+      "source": "https://raw.githubusercontent.com/MeteoraAg/dlmm-sdk/HEAD/idls/dlmm.json",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "92tHjQkDJsRwZgbQioBWudc8N7YeQCveW1agp9U12uGY",
+      "anchor": "7UZRobkzaKVm1RbCH5WdFaYCGzCRjnu3prziHAsYiSyr",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 76,
+        "fingerprint": "57ee0b91fb1505f9af4be8d073ecdea65adc395bae49c96a707a263b257eca84"
+      }
+    },
+    {
+      "name": "Meteora DAMM v1",
+      "id": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+      "source": "https://raw.githubusercontent.com/MeteoraAg/damm-v1-sdk/HEAD/programs/dynamic-amm/src/lib.rs",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "fJuFLrG9ucYr9usUqeosQHa3Hk93DUH3o6hXj1wtHTA",
+      "anchor": "CxthXv8iiNpX29cuiYgSs7rZSSveWfgQKDtvTCp8bxia",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 26,
+        "fingerprint": "eec18cf72af8c1e8ae0a1def70d8df625ff0448a11c7fe44a1fd25de871d8184"
+      }
+    },
+    {
+      "name": "Meteora DAMM v2",
+      "id": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "source": "https://raw.githubusercontent.com/MeteoraAg/damm-v2/HEAD/programs/cp-amm/src/lib.rs",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "AttDGqRuUVMnkSBwxEEBGcG4PBoXscEFhzUyQiSvSUtU",
+      "anchor": "F1hSvutXSc9iAvB9bQPmjNDwiN2tCXzazTEEvDgNCBMa",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 38,
+        "fingerprint": "0a46fba854959a8f64c0b052a2656e163c1b61751b8e91cfa4b584bf17c0f6d3"
+      }
+    },
+    {
+      "name": "Meteora DBC",
+      "id": "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN",
+      "source": "https://raw.githubusercontent.com/MeteoraAg/dynamic-bonding-curve/HEAD/programs/dynamic-bonding-curve/src/lib.rs",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "GjDv9cL7q4cRCNhLe9WbVnAcHqCoa4x1XDphiFsQu6TC",
+      "anchor": "B8daPXJqt9sv94r1s9GM13sNH6CSak6UtYHV2yyDGbtf",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 28,
+        "fingerprint": "2ac53765b597e3f15c840a2a349bc9b6393a55d4130912f8d19dbd8c054b1a4f"
+      }
+    },
+    {
+      "name": "Meteora Vault",
+      "id": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+      "source": "https://raw.githubusercontent.com/MeteoraAg/vault-sdk/HEAD/programs/vault/src/lib.rs",
+      "status": "usable",
+      "usableSource": "anchor",
+      "slot": 462035811,
+      "metadata": "C8EUVqg8ZzcjV6yEZxB9b24tLEJoeLNtJY77DZHuvidR",
+      "anchor": "ActKRY9gHqKUGy9snXsUYnA4pPASKUsqeje1v1HABaaT",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 14,
+        "fingerprint": "43df05a8858eb665971ed17bfd5739ede11a77ffcc72700d738e97b1d6c7c3c4"
+      }
+    },
+    {
+      "name": "Drift v2",
+      "id": "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+      "source": "https://raw.githubusercontent.com/drift-labs/protocol-v2/HEAD/programs/drift/src/lib.rs",
+      "status": "usable",
+      "usableSource": "metadata",
+      "slot": 462035811,
+      "metadata": "7DuBKBbixzCJEFgvAxpt7MCUuSwuY854iYJ4BLpzPEVt",
+      "anchor": "8BKPjRu7Hvd6Y2J67EdLx9MsrZFQwEMVwYg7NeVbAPF8",
+      "canonical": {
+        "state": "usable",
+        "instructions": 3,
+        "fingerprint": "73df9a2e50d94783eb2086efcbe765c1ffcfe20fbc7661178dd5246649e59610"
+      },
+      "legacy": {
+        "state": "usable",
+        "instructions": 241,
+        "fingerprint": "2f2c57bb908f83fbded2b8fe6d8ca05d14b41e42f0617c2e2d2d523a0de1d992"
+      }
+    },
+    {
+      "name": "SPL Token",
+      "id": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "source": "https://raw.githubusercontent.com/solana-program/token/HEAD/interface/src/lib.rs",
+      "status": "not_usable",
+      "usableSource": null,
+      "slot": 462035811,
+      "metadata": "Az5tgYWruEoJpLfyaauAkuRTxbW2mpvoidiwuq4mHxXN",
+      "anchor": "4nmzuuebvZ9EVghi2khvz9SyxUNvuXXdAzWtG5N7avYf",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "missing"
+      }
+    },
+    {
+      "name": "Token-2022",
+      "id": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "source": "https://raw.githubusercontent.com/solana-program/token-2022/HEAD/interface/src/lib.rs",
+      "status": "not_usable",
+      "usableSource": null,
+      "slot": 462035811,
+      "metadata": "8GHhnGA5PDsgJY7SgXmDXnRSbvteSQq4jDixpPGWR3qH",
+      "anchor": "AiJmxqFSfSmPTXK9DDLcmnYnrEBZiXcUPbPA2ema6cXU",
+      "canonical": {
+        "state": "missing"
+      },
+      "legacy": {
+        "state": "missing"
+      }
+    }
+  ]
+}
