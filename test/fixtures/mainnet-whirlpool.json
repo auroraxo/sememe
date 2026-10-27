@@ -1,13 +1,34 @@
 {
- "source": "mainnet-beta getTransaction harvest 2026-10-27",
+ "source": "mainnet-beta getTransaction harvest 2026-10-27 (own run, public RPC)",
  "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
  "records": [
+  {
+   "name": "close_position_with_token_extensions",
+   "signature": "49EbE3Lm7aCQ61Pbqooy74H7rd3odG41tpQtsWg4rgQhEY759GCmApPpYsZdivsciQsd26rUciRhrv6rvnmfE9dH",
+   "slot": 462101513,
+   "dataBase58": "Hcrp3dcPCJ",
+   "dataHex": "01b6873b9b1963df"
+  },
+  {
+   "name": "collect_fees",
+   "signature": "49EbE3Lm7aCQ61Pbqooy74H7rd3odG41tpQtsWg4rgQhEY759GCmApPpYsZdivsciQsd26rUciRhrv6rvnmfE9dH",
+   "slot": 462101513,
+   "dataBase58": "UXoBbVng98R",
+   "dataHex": "a498cf631eba13b6"
+  },
   {
    "name": "collect_fees_v2",
    "signature": "2FYzJfX5MpTokSVQzkzY7K7zEPTX8aJyvg6EMdoYyoBwMni1ZV3uCSD8e479rWEimPe69SkE6bfmsnyVE5iFV9oW",
    "slot": 462090307,
    "dataBase58": "3eAETRMr8nJVm",
    "dataHex": "cf755fbfe5b4e20f00"
+  },
+  {
+   "name": "decrease_liquidity",
+   "signature": "49EbE3Lm7aCQ61Pbqooy74H7rd3odG41tpQtsWg4rgQhEY759GCmApPpYsZdivsciQsd26rUciRhrv6rvnmfE9dH",
+   "slot": 462101513,
+   "dataBase58": "8xY8jsAzTgXjZ6cm91SUgSU4QBXZmoiZmHmn7muN9JNPPAauD6cpK4b",
+   "dataHex": "a026d06f685b2c017b9cce43420000000000000000000000fbb2e701a72503004ad0500500000000"
   },
   {
    "name": "decrease_liquidity_v2",
@@ -22,6 +43,20 @@
    "slot": 462090304,
    "dataBase58": "59p8WydnSZtRpCjA5ENEgUpTw1pjQW2dojbbggcddW4vt4EMXmu3NVffiG",
    "dataHex": "f8c69e91e17587c8001fad21000000003ff8642e00000000000000000000000000000000000000000101"
+  },
+  {
+   "name": "swap",
+   "signature": "2KPJToWEjUEpvrqTRFLncVU9WxvYbycv4KBnKqUkkhrXXYBac5jHuXHuV3Z7cD8upvsmwoieohQLY5yieinD5VbX",
+   "slot": 462101517,
+   "dataBase58": "59p8WydnSZtS9rwwCMJGdgxzCLV19PTzUvWPkrrGrpYENdUpx3PVcopdps",
+   "dataHex": "f8c69e91e17587c80f1e0000000000000000000000000000000000000000000000000000000000000100"
+  },
+  {
+   "name": "swap",
+   "signature": "3a8JA4rZMV6XWmPcwCRPsncpShL1WU3cGcfTziXuPppsAhZ9X4xaw3nS4vHsnu46pfaJNGQ3VFx55kUMc5RQ6R9V",
+   "slot": 462101515,
+   "dataBase58": "59p8WydnSZtSDsSazLQzFADS1j9dj2QRsfEPsNJ5u9nQt9D81JUG4C84tY",
+   "dataHex": "f8c69e91e17587c8122ca501000000000000000000000000eda359cf47e7457f02000000000000000101"
   },
   {
    "name": "swap",
@@ -74,6 +109,20 @@
   },
   {
    "name": "swap_v2",
+   "signature": "3uYTBhb8rveUfK43JT8FajeKT6iYGVyajS9tGetJ4EM8KpFbkPghXXMceHQ95TfHLCzY89BYoPEbD2iGT6xHgQTp",
+   "slot": 462101506,
+   "dataBase58": "4AoQRYXBdnC7QPL2JeqtPQCMW7fs86Aq4ayRrfy1bWgokYPZezcuJjuS2KZ",
+   "dataHex": "2b04ed0b1ac91e620736060000000000000000000000000000000000000000000000000000000000010000"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "64h1g914fg1eAaEtCMrQfixpRAse9PWd3uWv5XREfscchL5a9BhUezttZyBAXoHaLbq58NXqxaiWW6SDMM8wzguc",
+   "slot": 462101502,
+   "dataBase58": "Xk6GiwEVwuACCB5Cnsu5AnoY8Y3ZvdERz8WF9pDEQe9wpVTk7XTNDz65PoxjZ51xaWL7",
+   "dataHex": "2b04ed0b1ac91e62115f1190000000000000000000000000af331ba8327fbb35b1c4feff0000000001000000000000000000"
+  },
+  {
+   "name": "swap_v2",
    "signature": "iDg3wzpJpbLnutVesL9WdhA3eVSVQcNmMaQ9jiSbyWFYArxUHtXxkUHKCC5Tm8fAsBWSG5dkSY479mBn2eNx21Z",
    "slot": 462090305,
    "dataBase58": "4AoQRYXBdnC8iEbuaEm9kzzt4TYeXbtaLf89YtDk9UrPUtz6PDxa59tH6AK",
@@ -88,10 +137,31 @@
   },
   {
    "name": "swap_v2",
+   "signature": "ezUYBopnsKYsfyEZHNvsMYZZuFxZ81Symz6j2ZveDpKtk3qDE2xkSd4nmeWuW7JKkGyCqDZTbPNNosKWyj2UaZa",
+   "slot": 462106920,
+   "dataBase58": "4AoQRYXBdnCAfeu4iE7G2i652iFm1hYfFC8yGN7wmSW9eLpTktUz9CYQiwR",
+   "dataHex": "2b04ed0b1ac91e6227ea5e0800000000000000000000000000000000000000000000000000000000010100"
+  },
+  {
+   "name": "swap_v2",
    "signature": "7vBaLsrivnnAtgA9szx8Qy14LYH7VmQ7m2APwbtFnqprHFbWBxF3zh93NBdVicK37ig7zx4bs9rMYevf5WHTxcf",
    "slot": 462090296,
    "dataBase58": "4AoQRYXBdnCBXHuW2M5B6RgZC8dgVmgcGQ17KYQrDHywDkLC1iLX7J5Bwsd",
    "dataHex": "2b04ed0b1ac91e62307e1f0500000000000000000000000000000000000000000000000000000000010000"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "3nJj4MyLXb7fSCnhoQYMU2MDw6PeJSwSJ1q66wU1Benhf2uThYaXdbLBiRjAGBDPx9duC8pkwSzLEQoCQoUoi2Mv",
+   "slot": 462106345,
+   "dataBase58": "7xyvrq5sWf6qBT4tg8Wchme9QMzrjuNCsMyTak2SBVZKm45bCuvy2pFGLUvYjGo8cD8",
+   "dataHex": "2b04ed0b1ac91e6231e0600900000000000000000000000000000000000000000000000000000000010001010000000603"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "28qh3Ym2iSjLfApDu9493cFWTYw9bea5vBZs8SnVJgRpQRCMwXY4STQmvSuphRrcrJZhNC7EfJJ99swM9tRY7y3J",
+   "slot": 462106544,
+   "dataBase58": "4AoQRYXBdnCCE5sCXpvhuoRLHctTvxZMsV5DKved5c2ZSjqgRVagTUoim3u",
+   "dataHex": "2b04ed0b1ac91e62378a95e600000000000000000000000000000000000000000000000000000000010100"
   },
   {
    "name": "swap_v2",
@@ -116,10 +186,45 @@
   },
   {
    "name": "swap_v2",
+   "signature": "UThiggn87fWzXiDvMSKWwrmGamfCWZgE2gFWpqwvCduPjyKAhoxLuem6GSyFiqPHLrB2zngNTjZAVXxrQtNEDg4",
+   "slot": 462101505,
+   "dataBase58": "4AoQRYXBdnCDtMzuruuocVAzhFrZa4THS2kohzb1TGh5zHJ8tRySLt1YweF",
+   "dataHex": "2b04ed0b1ac91e62482d7a3300000000000000000000000000000000000000000000000000000000010100"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "5wFJJbYY1NtWXGRLt8ZJvHqLbrfd6q2mmCW77aivdPmfVrwuEmWHWuWLzNGDRXobiwULTvbwxwThqXJtQPWU8KCX",
+   "slot": 462101511,
+   "dataBase58": "7xyvrq5sWf6vMnqTu39Vi9ZsGr6f4TTeDkKQQkEix577xG12VZ86mFryqUnGFjwktRF",
+   "dataHex": "2b04ed0b1ac91e62497cf902000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000602"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "2muC6TyWMu5o4WfS2KzW3xZPvfnVGFgar495zK1avQQGomzFEtG1vxn3AVmT2fQxF95FiS13m7DSi4fx2eABF47E",
+   "slot": 462106258,
+   "dataBase58": "4AoQRYXBdnCG8TtyvcZFzNpit4gw8CKZTfoFZiJvUo2R4dNkb35AKtJ2DKd",
+   "dataHex": "2b04ed0b1ac91e625ea8900f000000000100000000000000af331ba8327fbb35b1c4feff00000000010000"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "28qh3Ym2iSjLfApDu9493cFWTYw9bea5vBZs8SnVJgRpQRCMwXY4STQmvSuphRrcrJZhNC7EfJJ99swM9tRY7y3J",
+   "slot": 462106544,
+   "dataBase58": "4AoQRYXBdnCHSk1xbtXBbrKu84MiwzEDk8KEf8MTeNZPK6cxGcVva4Hgynw",
+   "dataHex": "2b04ed0b1ac91e626bd6bd36fe010000000000000000000000000000000000000000000000000000010100"
+  },
+  {
+   "name": "swap_v2",
    "signature": "4nUssbu3Yvj6WLHL2gVnsqa1H4gTX2KvfQ8HfarQ9XSwbztaZyJJHGyqvAbXG8yn22AKdTv9RrCSk5SR2fjYABqo",
    "slot": 462090298,
    "dataBase58": "7xyvrq5sWf74Uyqdso1dEzK6JiXfPDcrXAxTttiAb5JH8ysHt4YViezqt1av3UNT6vD",
    "dataHex": "2b04ed0b1ac91e626e880a0d0000000073f2130200000000b12ca2dd6169297d0200000000000000010001010000000602"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "3zz6sNJnED3FDc3rvXVfqDvxwcoWCcGAuoZ5r4KbaCBPEL33WUMRqzx11TrT1UsBB8RFAn2dPmeCKTuF1maSfYaK",
+   "slot": 462106346,
+   "dataBase58": "7xyvrq5sWf7BiTbgoB5Vfq9b1xRpFXXCmprQHc1BBoqARTpigtxAdX7rMNyqo37e5Vt",
+   "dataHex": "2b04ed0b1ac91e628f82610900000000000000000000000000000000000000000000000000000000010001010000000603"
   },
   {
    "name": "swap_v2",
@@ -137,6 +242,13 @@
   },
   {
    "name": "swap_v2",
+   "signature": "28qh3Ym2iSjLfApDu9493cFWTYw9bea5vBZs8SnVJgRpQRCMwXY4STQmvSuphRrcrJZhNC7EfJJ99swM9tRY7y3J",
+   "slot": 462106544,
+   "dataBase58": "4AoQRYXBdnCQfRPKVGVZxhdVhKW8mTYusCLgCgDZMdy1pdKKXRceMvB2E8o",
+   "dataHex": "2b04ed0b1ac91e62b42f1d4600000000000000000000000000000000000000000000000000000000010000"
+  },
+  {
+   "name": "swap_v2",
    "signature": "4889MeDiPWbfUVidFqJz3Aryf7R8ubMa5xnmYyCax4Qq8JjKsPP4h6vuLYKzboLxb4gwSmQZ5aMTxgbJXzTGwoHE",
    "slot": 462090298,
    "dataBase58": "4AoQRYXBdnCQiLChvSE3A4HhzA97zDMNtHF9K7AVdRVzhuhWpJJmtxryw7V",
@@ -144,10 +256,38 @@
   },
   {
    "name": "swap_v2",
+   "signature": "ezUYBopnsKYsfyEZHNvsMYZZuFxZ81Symz6j2ZveDpKtk3qDE2xkSd4nmeWuW7JKkGyCqDZTbPNNosKWyj2UaZa",
+   "slot": 462106920,
+   "dataBase58": "4AoQRYXBdnCR1DDpKHxdMrPW1VPsKkDuAAvJ3fDiCjTfatFSF4N3HgRWgco",
+   "dataHex": "2b04ed0b1ac91e62b79a8b0200000000000000000000000000000000000000000000000000000000010000"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "2ETkmFpLugiCBfAcDbWPkBGF8wWFgTptPy6KxfxsEWQ5SJ9enJiZYWgGJe3nzT4SPbLq68Cyhy4uoyS1h2R22XFn",
+   "slot": 462106928,
+   "dataBase58": "4AoQRYXBdnCSVNr4j2MXZJXhYAKatmVDKhxv3mLpiEdateUNt6cvZVHSUFZ",
+   "dataHex": "2b04ed0b1ac91e62c67e1e5107000000000000000000000000000000000000000000000000000000010000"
+  },
+  {
+   "name": "swap_v2",
    "signature": "2B61z5BhhoGfouZGfkqAfjz9sS33tGkvJEKoRaW9uRLrGvfkhHuxpfHdKPjiezc9tRnYXtF9y1zn7dpmdncjxW87",
    "slot": 462090304,
    "dataBase58": "7xyvrq5sWf7QTywv2KM7QyvmNWg9JnECepRBYa6NTjgi72T9Mc7ARTkCK6vN3C8HZS9",
    "dataHex": "2b04ed0b1ac91e62c9a5df01000000008d1aa50b0000000000000000000000000000000000000000000001010000000602"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "CKSMuS8nwJ22v4ukFwK4McnrwqnpD9EZRrRsRAmeT6qgybXdrenVxH6CwxnSNPuE3nzwyrgFYwg1aTnqPzrTYsV",
+   "slot": 462106268,
+   "dataBase58": "4AoQRYXBdnCTjuhZpucguseQy47jhRL4RFGEhDXtTCzQpvpfXncZy5rjU5m",
+   "dataHex": "2b04ed0b1ac91e62d3069720000000000100000000000000af331ba8327fbb35b1c4feff00000000010000"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "64h1g914fg1eAaEtCMrQfixpRAse9PWd3uWv5XREfscchL5a9BhUezttZyBAXoHaLbq58NXqxaiWW6SDMM8wzguc",
+   "slot": 462101502,
+   "dataBase58": "Xk6GiwEVwuDeDfxzyeJawWi9JfZwmoHZ1jP52cwSQxqMrGzx1T8sWwwMBuEa7mws4Bw5",
+   "dataHex": "2b04ed0b1ac91e62e0030000000000000000000000000000503b010001000000000000000000000001010000000000000000"
   },
   {
    "name": "swap_v2",
@@ -169,6 +309,34 @@
    "slot": 462090305,
    "dataBase58": "4AoQRYXBdnCX9MF1CNuh6ok1XdhS5P7GwHHRHNRE73gzrKkQC2kozHPpxUo",
    "dataHex": "2b04ed0b1ac91e62f5246c1400000000000000000000000000000000000000000000000000000000010000"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "VNNJJZsY9p5NuVHWmZLXemSLNF31an67a7WNYhL63igZfokqfRutKfmAcCCfn3g4pyx1iBzk71k5UqMvvrNmnAV",
+   "slot": 462106527,
+   "dataBase58": "7xyvrq5sWf7a7tokqZpyhhTjSXuSDGUBXbMaJBse71rtbFUAWL8BuU7s4enBjr59TyC",
+   "dataHex": "2b04ed0b1ac91e62f5aa881000000000000000000000000000000000000000000000000000000000010001010000000603"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "5YToe5grS9kZvZPdxEeTJsE1AMpUzu3yAymQyiVe5TUkjbSF2fp2sQTUkS9hoxftsd1JzoqhQLhbuLHBEtqtVVwK",
+   "slot": 462106527,
+   "dataBase58": "4AoQRYXBdnCXMccKKRHzDMfoAnao4tjj3KtJrUGGUdTE5Kr45cUpXPN71uy",
+   "dataHex": "2b04ed0b1ac91e62f742f74e00000000000000000000000000000000000000000000000000000000010100"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "ezUYBopnsKYsfyEZHNvsMYZZuFxZ81Symz6j2ZveDpKtk3qDE2xkSd4nmeWuW7JKkGyCqDZTbPNNosKWyj2UaZa",
+   "slot": 462106920,
+   "dataBase58": "4AoQRYXBdnCXsfGhoUd79P7PNufyHQ4kQSDJRTbKx15LjwNx54eRvTdW2CP",
+   "dataHex": "2b04ed0b1ac91e62fc740e0600000000000000000000000000000000000000000000000000000000010100"
+  },
+  {
+   "name": "swap_v2",
+   "signature": "23g1tApnzhNUgbEkQYaTgZDBF8GDKvGLP41rksghbtaUmPxnMvTnGAt8qdEjVtVcBjxX9C6M4rcE9Ne5vkUKyS3G",
+   "slot": 462101512,
+   "dataBase58": "4AoQRYXBdnCXxx1k5K2AmgKix4A24NrWYoGJ8Vqvn2FCyJGT1EdJmChjbDH",
+   "dataHex": "2b04ed0b1ac91e62fd5e000000000000000000000000000000000000000000000000000000000000010000"
   },
   {
    "name": "swap_v2",

@@ -1,0 +1,10 @@
+{
+ "address": "9fQgUeE2BpGXLHopvZhDKTskXV2druezgX6hpmscbya5",
+ "fingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
+ "instructionCount": 66,
+ "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+ "slot": 462039125,
+ "source": "metadata",
+ "vendoredAs": "test/fixtures/whirlpool-idl.json",
+ "vendoredNote": "Committed test snapshot of the on-chain Program Metadata IDL, so CI can run the real mainnet-payload regression without a live store. Byte-identical to the store object (sha256 above); regenerate with: sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store /tmp/sememe-user-zero"
+}
