@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: RFC stage (October 2026). No implementation yet.**
+**Status: RFC stage (October 2026). No product implementation or external users yet. A reproducible 20-program on-chain coverage *qualification* harness is in progress; the numeric result has not been established.**
 
 ## The idea
 
@@ -40,6 +40,6 @@ The largest risk is coverage. If on-chain acquisition works for fewer than half 
 
 ## Next qualification
 
-1. Measure on-chain acquisition across 20 real programs, including Whirlpool, Kamino, OpenBook, Marinade, Jupiter route targets, Raydium, and Pump.fun.
-2. If coverage clears the bar, build pull plus fingerprint storage for Whirlpool.
-3. Replace my 41 hand-rolled Whirlpool decoder paths and compare 1,000 real transactions with zero semantic diff.
+1. **Freeze the sample before measuring:** 20 distinct mainnet program IDs with a reproducible selection rule and links to first-party program-ID sources (including Whirlpool, Kamino, OpenBook, Marinade, Jupiter route targets, Raydium, and Pump.fun). Record exclusions, not just successful programs. Do not label unavailable RPC or an undecodable IDL as coverage.
+2. Run `npm ci && npm test`, then `node tools/measure.mjs programs-20.json coverage-result.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script requires exactly 20 unique IDs, queries canonical Program Metadata and legacy Anchor IDL accounts in a batched finalized RPC call, checks ownership/program binding and a nonempty instruction schema, and keeps RPC failures separate from missing/undecodable accounts. Account derivation is checked against independently pinned PDA fixtures from `auroraxo/idl-drift`; this is a measurement harness, **not** sememe's planned pull/store/decode implementation. Public endpoints may rate-limit or reject bulk account reads; an incomplete run does not count as zero coverage.
+3. If fewer than 10 of the 20 pass, revise the on-chain-first thesis, do not substitute a more favorable sample. If at least 10 pass, build pull plus fingerprint storage for Whirlpool and replace my 41 hand-rolled Whirlpool decoder paths; compare 1,000 real transactions with zero semantic diff. A favorable coverage fraction alone is not adoption.
