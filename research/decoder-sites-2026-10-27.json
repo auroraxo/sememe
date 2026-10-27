@@ -1,0 +1,5702 @@
+{
+ "generatedAt": "2026-10-27T23:43:36.917Z",
+ "reposScanned": 52,
+ "filesScanned": 19146,
+ "siteFiles": 652,
+ "siteClassPairs": 843,
+ "byClass": {
+  "generated-codec": 220,
+  "own-codec": 117,
+  "raw-discriminator": 121,
+  "vendored-idl": 50,
+  "decode-call": 14,
+  "account-layout": 320,
+  "event-decode": 1
+ },
+ "own": {
+  "repos": 22,
+  "siteFiles": 35,
+  "siteClassPairs": 42,
+  "byClass": {
+   "generated-codec": 6,
+   "own-codec": 2,
+   "raw-discriminator": 10,
+   "vendored-idl": 9,
+   "decode-call": 9,
+   "account-layout": 6,
+   "event-decode": 0
+  },
+  "perRepo": [
+   {
+    "repo": "solana-tx-remix",
+    "siteFiles": 18,
+    "siteClassPairs": 20,
+    "byClass": {
+     "generated-codec": 2,
+     "own-codec": 1,
+     "raw-discriminator": 5,
+     "vendored-idl": 8,
+     "decode-call": 4,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": [
+     "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+    ]
+   },
+   {
+    "repo": "sememe",
+    "siteFiles": 12,
+    "siteClassPairs": 16,
+    "byClass": {
+     "generated-codec": 2,
+     "own-codec": 1,
+     "raw-discriminator": 3,
+     "vendored-idl": 1,
+     "decode-call": 5,
+     "account-layout": 4,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": [
+     "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+    ]
+   },
+   {
+    "repo": "idl-drift",
+    "siteFiles": 2,
+    "siteClassPairs": 3,
+    "byClass": {
+     "generated-codec": 2,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 1,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": [
+     "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+    ]
+   },
+   {
+    "repo": "signerd",
+    "siteFiles": 2,
+    "siteClassPairs": 2,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 1,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 1,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "redact-check",
+    "siteFiles": 1,
+    "siteClassPairs": 1,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 1,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "aurora-node-auditor",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "auroraxo",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "bubble-mirror",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "cibrief",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "codebyaurora-site",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "declare-id-drift",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "docrot",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "docrot-api",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "docrot-check",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "greenscan",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "openclaw-agent-standard",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "openclaw-citizen",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "openclaw-secret-drop",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "openreceipts",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "openreceipts-action",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "reeflog",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   },
+   {
+    "repo": "solana-demand-dossier",
+    "siteFiles": 0,
+    "siteClassPairs": 0,
+    "byClass": {
+     "generated-codec": 0,
+     "own-codec": 0,
+     "raw-discriminator": 0,
+     "vendored-idl": 0,
+     "decode-call": 0,
+     "account-layout": 0,
+     "event-decode": 0
+    },
+    "programsWithStoredIdl": []
+   }
+  ]
+ },
+ "thirdParty": {
+  "repos": 18,
+  "siteFiles": 366,
+  "siteClassPairs": 394,
+  "note": "checkouts of other people's code on this disk; not my decoder sites",
+  "perRepo": [
+   {
+    "repo": "anchor",
+    "owner": "otter-sec",
+    "siteClassPairs": 98
+   },
+   {
+    "repo": "senzenn-idl-drift",
+    "owner": "senzenn",
+    "siteClassPairs": 59
+   },
+   {
+    "repo": "xorca",
+    "owner": "orca-so",
+    "siteClassPairs": 57
+   },
+   {
+    "repo": "klend",
+    "owner": "Kamino-Finance",
+    "siteClassPairs": 42
+   },
+   {
+    "repo": "yazses",
+    "owner": "MSKazemi",
+    "siteClassPairs": 39
+   },
+   {
+    "repo": "airflow-pr",
+    "owner": "apache",
+    "siteClassPairs": 20
+   },
+   {
+    "repo": "wormhole-sdk-ts-verify",
+    "owner": "wormhole-foundation",
+    "siteClassPairs": 18
+   },
+   {
+    "repo": "openbook-v2",
+    "owner": "openbook-dex",
+    "siteClassPairs": 14
+   },
+   {
+    "repo": "raydium-clmm",
+    "owner": "raydium-io",
+    "siteClassPairs": 12
+   },
+   {
+    "repo": "marinade-ts-sdk",
+    "owner": "marinade-finance",
+    "siteClassPairs": 9
+   },
+   {
+    "repo": "onre-sol",
+    "owner": "onre-finance",
+    "siteClassPairs": 6
+   },
+   {
+    "repo": "rfq-webhook-toolkit",
+    "owner": "jup-ag",
+    "siteClassPairs": 6
+   },
+   {
+    "repo": "raydium-cp-swap",
+    "owner": "raydium-io",
+    "siteClassPairs": 4
+   },
+   {
+    "repo": "minio-go",
+    "owner": "minio",
+    "siteClassPairs": 3
+   },
+   {
+    "repo": "raydium-amm",
+    "owner": "raydium-io",
+    "siteClassPairs": 3
+   },
+   {
+    "repo": "SolanaRepro",
+    "owner": "caiomodesti",
+    "siteClassPairs": 2
+   },
+   {
+    "repo": "liquid-staking-program",
+    "owner": "marinade-finance",
+    "siteClassPairs": 1
+   },
+   {
+    "repo": "rust-sdk",
+    "owner": "streamflow-finance",
+    "siteClassPairs": 1
+   }
+  ]
+ },
+ "ownForks": {
+  "repos": 7,
+  "siteFiles": 251,
+  "siteClassPairs": 407,
+  "note": "my GitHub account, but the code is a fork of someone else's repository",
+  "perRepo": [
+   {
+    "repo": "orca-whirlpools-recon",
+    "forkOf": "orca-so",
+    "siteClassPairs": 407
+   },
+   {
+    "repo": "MERLE",
+    "forkOf": "reclinerhead",
+    "siteClassPairs": 0
+   },
+   {
+    "repo": "WeatherFlow_PiConsole",
+    "forkOf": "peted-davis",
+    "siteClassPairs": 0
+   },
+   {
+    "repo": "awesome-raspberry-pi",
+    "forkOf": "thibmaek",
+    "siteClassPairs": 0
+   },
+   {
+    "repo": "flutter",
+    "forkOf": "flutter",
+    "siteClassPairs": 0
+   },
+   {
+    "repo": "vite",
+    "forkOf": "vitejs",
+    "siteClassPairs": 0
+   },
+   {
+    "repo": "withastro-docs",
+    "forkOf": "withastro",
+    "siteClassPairs": 0
+   }
+  ]
+ },
+ "reposWithDecoderSites": 24,
+ "store": {
+  "path": "/tmp/sememe-user-zero",
+  "programs": [
+   "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+  ]
+ },
+ "notes": [
+  "Two units are reported: `siteFiles` counts files holding at least one decoder artefact, `siteClassPairs` counts (file, class) pairs — the unit the workspace notes mean by \"~99 decoder sites\".",
+  "A class is counted when the file contains a concrete decoder artefact of that class; one file can hold several classes, so siteClassPairs >= siteFiles.",
+  "Counts are computed from the repositories on disk at scan time; they are not a claim about the whole ecosystem.",
+  "Only repos whose origin is under auroraxo/ or sprintberlin/ AND that are not forks of another account count as own sites.",
+  "Fork checkouts under my account (generated codecs of someone else's project) are reported separately as ownForks.",
+  "Replaceability today requires the program's verified on-chain IDL to be present in the sememe store.",
+  "The workspace notes estimate \"~99 decoder sites\" and \"41 to replace\"; this report is the computed counterpart and may disagree."
+ ],
+ "repos": [
+  {
+   "repo": "orca-whirlpools-recon",
+   "own": false,
+   "origin": "https://github.com/auroraxo/whirlpools.git",
+   "owner": "auroraxo",
+   "forkOf": "orca-so",
+   "siteFiles": 251,
+   "siteClassPairs": 407,
+   "byClass": {
+    "generated-codec": 187,
+    "own-codec": 102,
+    "raw-discriminator": 1,
+    "vendored-idl": 0,
+    "decode-call": 1,
+    "account-layout": 116,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "legacy-sdk/common/src/web3/transactions/compute-budget.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "legacy-sdk/whirlpool/src/utils/public/price-math.ts",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "legacy-sdk/whirlpool/tests/sdk/whirlpools/swap/swap-with-fallback.test.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "legacy-sdk/whirlpool/tests/sdk/whirlpools/utils/ata-creation-method.test.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "legacy-sdk/whirlpool/tests/utils/metaplex.ts",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/errors.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/events.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/token/account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/token/extensions.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/token/mint.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/whirlpool/position.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/whirlpool/tick_array/dynamic_tick_array.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/whirlpool/tick_array/fixed_tick_array.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/whirlpool/tick_array/tick.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/state/whirlpool/whirlpool.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/pinocchio/utils/account_load.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/state/fixed_tick_array.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/state/oracle.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/state/tick.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/whirlpool/src/state/tick_array.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/core_types/tick_array.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/adaptive_fee_tier.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/dynamic_tick_array.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/fee_tier.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/fixed_tick_array.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/lock_config.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/oracle.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/position.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/position_bundle.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/token_badge.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/whirlpool.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/whirlpools_config.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/accounts/whirlpools_config_extension.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/close_bundled_position.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/close_position.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/close_position_with_token_extensions.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/collect_fees.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/collect_fees_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/collect_protocol_fees.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/collect_protocol_fees_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/collect_reward.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/collect_reward_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/decrease_liquidity.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/decrease_liquidity_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/delete_position_bundle.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/delete_token_badge.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/idl_include.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/increase_liquidity.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/increase_liquidity_by_token_amounts_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/increase_liquidity_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_adaptive_fee_tier.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_config.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_config_extension.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_dynamic_tick_array.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_fee_tier.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_pool.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_pool_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_pool_with_adaptive_fee.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_position_bundle.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_position_bundle_with_metadata.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_reward.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_reward_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_tick_array.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/initialize_token_badge.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/lock_position.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/open_bundled_position.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/open_position.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/open_position_with_metadata.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/open_position_with_token_extensions.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/reposition_liquidity_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/reset_position_range.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_adaptive_fee_constants.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_collect_protocol_fees_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_config_extension_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_config_feature_flag.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_default_base_fee_rate.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_default_fee_rate.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_default_protocol_fee_rate.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_delegated_fee_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_fee_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_fee_rate.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_fee_rate_by_delegated_fee_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_initialize_pool_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_preset_adaptive_fee_constants.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_protocol_fee_rate.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_reward_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_reward_authority_by_super_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_reward_emissions.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_reward_emissions_super_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_reward_emissions_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_token_badge_attribute.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/set_token_badge_authority.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/swap.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/swap_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/transfer_locked_position.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/two_hop_swap.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/two_hop_swap_v2.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/instructions/update_fees_and_rewards.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/accounts_type.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/adaptive_fee_constants.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/adaptive_fee_variables.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/config_feature_flag.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/dynamic_tick.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/dynamic_tick_data.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/increase_liquidity_method.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/liquidity_decreased.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/liquidity_increased.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/liquidity_repositioned.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/lock_type.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/lock_type_label.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/pool_initialized.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/position_opened.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/position_reward_info.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/remaining_accounts_info.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/remaining_accounts_slice.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/reposition_liquidity_method.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/tick.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/token_badge_attribute.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/traded.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/generated/types/whirlpool_reward_info.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/adaptive_fee_tier.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/dynamic_tick_array.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/fee_tier.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/fixed_tick_array.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/lock_config.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/oracle.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/position.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/position_bundle.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/token_badge.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/utils.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/whirlpool.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/whirlpools_config.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/gpa/whirlpools_config_extension.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "rust-sdk/client/src/state/tick_array.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-sdk/whirlpool/src/tests/rpc.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/adaptiveFeeTier.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/dynamicTickArray.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/feeTier.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/fixedTickArray.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/lockConfig.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/oracle.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/position.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/positionBundle.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/tokenBadge.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/whirlpool.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/whirlpoolsConfig.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/accounts/whirlpoolsConfigExtension.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/closeBundledPosition.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/closePosition.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/closePositionWithTokenExtensions.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/collectFees.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/collectFeesV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/collectProtocolFees.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/collectProtocolFeesV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/collectReward.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/collectRewardV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/decreaseLiquidity.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/decreaseLiquidityV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/deletePositionBundle.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/deleteTokenBadge.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/idlInclude.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/increaseLiquidity.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/increaseLiquidityByTokenAmountsV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/increaseLiquidityV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeAdaptiveFeeTier.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeConfig.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeConfigExtension.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeDynamicTickArray.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeFeeTier.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializePool.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializePoolV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializePoolWithAdaptiveFee.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializePositionBundle.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializePositionBundleWithMetadata.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeReward.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeRewardV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeTickArray.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/initializeTokenBadge.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/lockPosition.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/openBundledPosition.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/openPosition.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/openPositionWithMetadata.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/openPositionWithTokenExtensions.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/repositionLiquidityV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/resetPositionRange.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setAdaptiveFeeConstants.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setCollectProtocolFeesAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setConfigExtensionAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setConfigFeatureFlag.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setDefaultBaseFeeRate.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setDefaultFeeRate.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setDefaultProtocolFeeRate.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setDelegatedFeeAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setFeeAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setFeeRate.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setFeeRateByDelegatedFeeAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setInitializePoolAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setPresetAdaptiveFeeConstants.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setProtocolFeeRate.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setRewardAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setRewardAuthorityBySuperAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setRewardEmissions.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setRewardEmissionsSuperAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setRewardEmissionsV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setTokenBadgeAttribute.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/setTokenBadgeAuthority.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/swap.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/swapV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/transferLockedPosition.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/twoHopSwap.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/twoHopSwapV2.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/instructions/updateFeesAndRewards.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/accountsType.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/adaptiveFeeConstants.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/adaptiveFeeVariables.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/configFeatureFlag.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/dynamicTick.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/dynamicTickData.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/increaseLiquidityMethod.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/liquidityDecreased.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/liquidityIncreased.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/liquidityRepositioned.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/lockType.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/lockTypeLabel.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/poolInitialized.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/positionOpened.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/positionRewardInfo.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/remainingAccountsInfo.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/remainingAccountsSlice.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/repositionLiquidityMethod.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/tick.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/tokenBadgeAttribute.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/traded.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/generated/types/whirlpoolRewardInfo.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/adaptiveFeeTier.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/dynamicTickArray.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/feeTier.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/fixedTickArray.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/lockConfig.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/oracle.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/position.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/positionBundle.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/tokenBadge.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/whirlpool.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/whirlpoolsConfig.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/gpa/whirlpoolsConfigExtension.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/src/state/tickArray.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/tests/gpa.test.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/client/tests/tickArray.test.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/whirlpool/src/token.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "ts-sdk/whirlpool/tests/openPosition.test.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "anchor",
+   "own": false,
+   "origin": "https://github.com/otter-sec/anchor.git",
+   "owner": "otter-sec",
+   "forkOf": null,
+   "siteFiles": 95,
+   "siteClassPairs": 98,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 3,
+    "vendored-idl": 27,
+    "decode-call": 1,
+    "account-layout": 67,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "cli/src/codama.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "cli/src/fetch/pmp.rs",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "cli/src/legacy_idl.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "docs-v2/src/content/docs/v1/fundamentals/_idl/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "docs-v2/src/content/docs/v1/fundamentals/_pda/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "docs-v2/src/content/docs/v2/programs/_meta.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "docs-v2/src/lib/docs-versions.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/attribute/account/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/attribute/program/src/declare_program/common.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/derive/accounts/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/derive/serde/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/error/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/src/accounts/account_loader.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/src/accounts/lazy_account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/src/event.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "lang/src/idl.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "lang/src/lazy.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/syn/src/codegen/accounts/__client_accounts.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/syn/src/idl/defined.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/account_loader_truncation.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/cpi_return_data.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/exit_owner.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/generics_test.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/idl_borsh.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/serialization.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/space.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "lang/tests/zero_copy.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "spl/src/stake.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/accountloader-realloc/programs/accountloader-realloc/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/anchor-cli-legacy-idl/tests/fixtures/fake_idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/auction-house/idls/mpl_token_metadata.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/chat/programs/chat/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/cpi-returns/programs/caller/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/cpi-returns/tests/cpi-return.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/declare-program/idls/amm_v3.json",
+     "classes": [
+      "account-layout",
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/declare-program/idls/constants_namespace.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/declare-program/idls/external.json",
+     "classes": [
+      "account-layout",
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/declare-program/idls/external_legacy.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/declare-program/idls/mpl_core_shape.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/declare-program/idls/pubkey_shadow.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/declare-program/programs/external/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/idl/idls/env_id.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/idl/idls/generics.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/idl/idls/idl.json",
+     "classes": [
+      "account-layout",
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/idl/idls/relations.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tests/idl/programs/idl/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/idl/tests/idl.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/misc/programs/misc/src/account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/misc/programs/misc-optional/src/account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/pyth/programs/pyth/src/pc.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/zero-copy/programs/zero-copy/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/zero-copy/programs/zero-copy/tests/compute_unit_test.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/zero-copy/programs/zero-cpi/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tests/zero-copy/tests/zero-copy.js",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/package.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/coder/borsh/idl.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/coder/borsh/index.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/coder/borsh/instruction.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/coder/index.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/coder/system/accounts.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/idl.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/index.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/program/namespace/views.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/src/utils/registry.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/tests/coder-accounts.spec.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/anchor/tests/coder-malformed-lengths.spec.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/borsh/package.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-associated-token-account/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-associated-token-account/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-binary-option/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-binary-option/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-binary-oracle-pair/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-binary-oracle-pair/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-feature-proposal/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-feature-proposal/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-governance/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-governance/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-memo/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-memo/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-name-service/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-name-service/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-record/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-record/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-stake-pool/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-stake-pool/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-stateless-asks/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-stateless-asks/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-token/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-token/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-token-lending/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-token-lending/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-token-swap/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "ts/packages/spl-token-swap/rollup.config.ts",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "senzenn-idl-drift",
+   "own": false,
+   "origin": "https://github.com/senzenn/idl-drift.git",
+   "owner": "senzenn",
+   "forkOf": null,
+   "siteFiles": 55,
+   "siteClassPairs": 59,
+   "byClass": {
+    "generated-codec": 4,
+    "own-codec": 0,
+    "raw-discriminator": 27,
+    "vendored-idl": 6,
+    "decode-call": 0,
+    "account-layout": 22,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [
+    "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+   ],
+   "files": [
+    {
+     "file": "crates/idl-drift/src/codama_convert.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/diff/mod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/diff/types.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/inspect.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/layout.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/main.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/model.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/onchain.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/src/shipstern.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/codama.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/cross_format.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/events.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/fixtures/amm_new.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/fixtures/amm_old.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/fixtures/codama_order_engine.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/fixtures/codama_tiny.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/types.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-drift/tests/zero_copy.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/classify.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/decode/error.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/decode/mod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/decode/tests.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/decode/zero_copy.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/reference/mod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/report.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/text.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/verify/accounts.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/verify/events.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/src/verify/instructions.rs",
+     "classes": [
+      "generated-codec",
+      "raw-discriminator",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/tests/cli.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "crates/idl-verify/tests/live.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/live/jupiter_vaults/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "fixtures/live/jupiter_vaults/reference.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/live/pump_fun/idl.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "fixtures/live/voltr_vault/idl.js-codama.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/live/voltr_vault/idl.json",
+     "classes": [
+      "account-layout",
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "fixtures/live/voltr_vault/reference.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/chained_cpi_event_envelope.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/dca.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/dynamic_bonding_curve.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/glow.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/invite_escrow.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/jupiter_log_scope_regression.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/limit_order_v1.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/limit_order_v2.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/loopscale.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/metaplex.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/okx_labs1.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/order_engine.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/perpetuals.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/pump_fun.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "fixtures/shipstern/squads_multisig_program.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "integration/scenarios/truncated_idl/new.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tools/reference/package-lock.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tools/reference/reference.mjs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "xorca",
+   "own": false,
+   "origin": "https://github.com/orca-so/xorca.git",
+   "owner": "orca-so",
+   "forkOf": null,
+   "siteFiles": 41,
+   "siteClassPairs": 57,
+   "byClass": {
+    "generated-codec": 15,
+    "own-codec": 13,
+    "raw-discriminator": 2,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 27,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "js-client/src/generated/accounts/pendingWithdraw.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/accounts/state.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/errors/xorcaStakingProgram.ts",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/instructions/initialize.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/instructions/set.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/instructions/stake.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/instructions/unstake.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/instructions/withdraw.ts",
+     "classes": [
+      "generated-codec",
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/types/accountDiscriminator.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/types/event.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/types/stateUpdateInstruction.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/types/tokenAccount.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/types/tokenAccountState.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "js-client/src/generated/types/tokenMint.ts",
+     "classes": [
+      "own-codec"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/accounts/pending_withdraw.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/accounts/state.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/instructions/initialize.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/instructions/set.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/instructions/stake.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/instructions/unstake.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/instructions/withdraw.rs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/types/account_discriminator.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/types/event.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/types/state_update_instruction.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/types/token_account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/types/token_account_state.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/generated/types/token_mint.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "rust-client/src/test_utils/mod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/assertions/account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/cpi/token/state.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/entrypoint.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/event.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/instructions/mod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/state/mod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/state/pending_withdraw.rs",
+     "classes": [
+      "raw-discriminator",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/state/state.rs",
+     "classes": [
+      "raw-discriminator",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program/src/util/account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program-test/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program-test/src/tests/bump_edge_cases.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program-test/src/utils/assert.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "solana-program-test/src/utils/types.rs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "klend",
+   "own": false,
+   "origin": "https://github.com/Kamino-Finance/klend",
+   "owner": "Kamino-Finance",
+   "forkOf": null,
+   "siteFiles": 42,
+   "siteClassPairs": 42,
+   "byClass": {
+    "generated-codec": 4,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 38,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "libs/klend-interface/src/instructions/admin.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/borrow.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/compound.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/ctoken_exchange_rate.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/deposit.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/flash.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/liquidate.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/obligation.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/orders.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/referrer.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/refresh.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/repay.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/withdraw.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/instructions/withdraw_queue.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/common.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/global_config.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/lending_market.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/mod.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/obligation.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/pod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/referral.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/reserve.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/state/withdraw_ticket.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/src/types.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/tests/integration/pyth.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/tests/integration/setup.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "libs/klend-interface/tests/integration/test_ctoken_exchange_rate.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/handlers/handler_enqueue_to_withdraw.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "programs/klend/src/lending_market/config_items.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/lending_market/kvault_ixs.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "programs/klend/src/lending_market/lending_operations.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/global_config.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/last_update.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/lending_market.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/obligation.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/referral.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/reserve.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/token_info.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/state/withdraw_ticket.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/utils/borrow_rate_curve.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/klend/src/utils/consts.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "programs/klend/src/utils/mod.rs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "yazses",
+   "own": false,
+   "origin": "https://github.com/MSKazemi/yazses.git",
+   "owner": "MSKazemi",
+   "forkOf": "auroraxo",
+   "siteFiles": 39,
+   "siteClassPairs": 39,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 39,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "paper/results/history/probes-decode-mechanism-base.en-test-clean-2026-08-24T15-41-44Z.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/history/probes-thread-determinism-base.en-test-clean-2026-08-24T15-57-24Z.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/history/probes-thread-determinism-base.en-test-clean-2026-08-24T17-26-09Z.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-cvfa-test10559-small.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-cvfa-test10559-steja-small.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test50-base.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test50-medium.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test50-small-repeat.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test50-small.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test871-base.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test871-large-v3-turbo.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test871-small-idle.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test871-small.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/persian-fleurs-test871-steja-small.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-arms-per-utterance-large-v3-test-other.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-base.en-test-clean.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-base.en-test-other.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-large-v3-test-other-no_context.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-large-v3-test-other.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-medium.en-test-clean-baseline-no_context.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-medium.en-test-other-baseline-no_context.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-small.en-test-clean-baseline-no_context.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-small.en-test-other-baseline-no_context.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-determinism-tiny.en-test-clean-baseline.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-mechanism-base.en-test-clean.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-mechanism-base.en-test-other.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-mechanism-large-v3-test-clean.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-mechanism-medium.en-test-other.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/decode-mechanism-small.en-test-other.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "paper/results/probes/thread-determinism-base.en-test-clean.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "src/yazses/eyeeval/provenance.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "src/yazses/eyeeval/tasks.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "tests/test_benchmark_results_are_archived.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "tests/test_checkdigit_algorithms.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "tests/test_checkdigit_guard.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "tests/test_fa_manifest.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "tests/test_learning_redacts_every_text_field.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "tests/test_morsevox_checkdigit.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "tests/test_redaction_fieldaware.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "airflow-pr",
+   "own": false,
+   "origin": "https://github.com/apache/airflow.git",
+   "owner": "apache",
+   "forkOf": "auroraxo",
+   "siteFiles": 20,
+   "siteClassPairs": 20,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 16,
+    "vendored-idl": 0,
+    "decode-call": 3,
+    "account-layout": 0,
+    "event-decode": 1
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "airflow-core/tests/unit/dag_processing/test_manager.py",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "airflow-core/tests/unit/models/test_dagrun.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "go-sdk/airflow/serialize_test.go",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/amazon/tests/unit/amazon/aws/hooks/test_s3.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/common/ai/tests/unit/common/ai/batch/test_openai.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/common/ai/tests/unit/common/ai/batch/test_results.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/common/ai/tests/unit/common/ai/tools/test_tracing.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/databricks/tests/system/databricks/example_databricks.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/databricks/tests/system/databricks/example_databricks_workflow.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/databricks/tests/unit/databricks/hooks/test_databricks_sql.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/databricks/tests/unit/databricks/operators/test_databricks.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "providers/google/tests/unit/google/cloud/operators/vertex_ai/test_feature_store.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "scripts/ci/prek/update_docker_gpg_keys.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "shared/observability/tests/observability/test_otel_utils.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "shared/observability/tests/observability/test_traces.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "task-sdk/src/airflow/sdk/coordinators/node/_bundle_reader.py",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "task-sdk/tests/task_sdk/execution_time/schema/test_integration.py",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "task-sdk/tests/task_sdk/execution_time/test_supervisor.py",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "ts-sdk/src/sdk/trigger-dag-run-execute.ts",
+     "classes": [
+      "event-decode"
+     ]
+    },
+    {
+     "file": "ts-sdk/tests/cli/fixtures/bundle-v1.min.mjs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "solana-tx-remix",
+   "own": true,
+   "origin": "https://github.com/auroraxo/solana-tx-remix.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 18,
+   "siteClassPairs": 20,
+   "byClass": {
+    "generated-codec": 2,
+    "own-codec": 1,
+    "raw-discriminator": 5,
+    "vendored-idl": 8,
+    "decode-call": 4,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [
+    "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+   ],
+   "files": [
+    {
+     "file": "idl/multi/aquifer/aquifer.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "idl/multi/bisonfi/bisonfi.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "idl/multi/dflow/dflow.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "idl/multi/jupiter-amm/amm.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "idl/multi/jupiter-order_engine/order_engine.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "idl/multi/jupiter-rfq_v2/rfq_v2.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "idl/multi/solfi/solfi.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "idl/multi/spl/token-2022.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "out/remix-2Apc8uSC.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "out/remix-3yB9Q1pq.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "out/remix-6754RLWd.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "out/remix-multi-3yB9Q1pq.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "out/remix-multi-4HZWSH28.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "src/args.mjs",
+     "classes": [
+      "own-codec",
+      "decode-call"
+     ]
+    },
+    {
+     "file": "src/remix-from-signature.mjs",
+     "classes": [
+      "generated-codec",
+      "decode-call"
+     ]
+    },
+    {
+     "file": "src/remix-multi.mjs",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "src/remix.mjs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "src/verify-recipe.mjs",
+     "classes": [
+      "decode-call"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "wormhole-sdk-ts-verify",
+   "own": false,
+   "origin": "https://github.com/wormhole-foundation/wormhole-sdk-ts.git",
+   "owner": "wormhole-foundation",
+   "forkOf": null,
+   "siteFiles": 18,
+   "siteClassPairs": 18,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 12,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 6,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "core/definitions/__tests__/governanceVaa.ts",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "package-lock.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Create_TokenBridge.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_getOriginalAsset_Real_Wrapped.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_getWrappedAsset_Real_Wrapped.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_hasWrappedAsset_Bogus.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_hasWrappedAsset_Real_Not_Wrapped.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_hasWrappedAsset_Real_Wrapped.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_isWrappedAsset_Bogus.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_isWrappedAsset_Real_Not_Wrapped.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/aptos/__tests__/integration/fixtures/TokenBridge_Tests_Get_Wrapped_Asset_Details_isWrappedAsset_Real_Wrapped.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/evm/__tests__/platform.ts",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "platforms/solana/package.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "platforms/solana/protocols/core/package.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "platforms/solana/protocols/core/src/utils/coder/idl.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "platforms/solana/protocols/core/src/utils/coder/instruction.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "platforms/solana/src/utils/anchor/idl.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "platforms/xrpl/__tests__/unit/address.test.ts",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "sememe",
+   "own": true,
+   "origin": "https://github.com/auroraxo/sememe.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 12,
+   "siteClassPairs": 16,
+   "byClass": {
+    "generated-codec": 2,
+    "own-codec": 1,
+    "raw-discriminator": 3,
+    "vendored-idl": 1,
+    "decode-call": 5,
+    "account-layout": 4,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [
+    "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+   ],
+   "files": [
+    {
+     "file": "package-lock.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "research/decoder-sites-2026-10-27.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "src/codec.mjs",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "src/decode.mjs",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "test/codec.test.mjs",
+     "classes": [
+      "raw-discriminator",
+      "decode-call"
+     ]
+    },
+    {
+     "file": "test/decode.test.mjs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "test/fixtures/mainnet-whirlpool.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "test/fixtures/whirlpool-idl.json",
+     "classes": [
+      "account-layout",
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "tools/crosscheck.mjs",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "tools/decoder-parity.mjs",
+     "classes": [
+      "decode-call"
+     ]
+    },
+    {
+     "file": "tools/decoder-sites.mjs",
+     "classes": [
+      "generated-codec",
+      "own-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "tools/measure.mjs",
+     "classes": [
+      "generated-codec"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "openbook-v2",
+   "own": false,
+   "origin": "https://github.com/openbook-dex/openbook-v2",
+   "owner": "openbook-dex",
+   "forkOf": null,
+   "siteFiles": 13,
+   "siteClassPairs": 14,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 1,
+    "decode-call": 0,
+    "account-layout": 13,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "idl/openbook_v2.json",
+     "classes": [
+      "account-layout",
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/lib.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/logs.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/pubkey_option.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/market.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/open_orders_account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/oracle.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/orderbook/bookside.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/orderbook/heap.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/orderbook/nodes.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/orderbook/ordertree.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/openbook-v2/src/state/raydium_internal.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "ts/client/src/openbook_v2.ts",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "raydium-clmm",
+   "own": false,
+   "origin": "https://github.com/raydium-io/raydium-clmm",
+   "owner": "raydium-io",
+   "forkOf": null,
+   "siteFiles": 9,
+   "siteClassPairs": 12,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 4,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 8,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "client/src/instructions/events_instructions_parse.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/amm/src/libraries/big_num.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/amm/src/libraries/tick_math.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "programs/amm/src/states/operation_account.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/amm/src/states/oracle.rs",
+     "classes": [
+      "raw-discriminator",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/amm/src/states/pool.rs",
+     "classes": [
+      "raw-discriminator",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/amm/src/states/pool_fee.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/amm/src/states/tick_array.rs",
+     "classes": [
+      "raw-discriminator",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/amm/src/states/tickarray_bitmap_extension.rs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "marinade-ts-sdk",
+   "own": false,
+   "origin": "https://github.com/marinade-finance/marinade-ts-sdk.git",
+   "owner": "marinade-finance",
+   "forkOf": "auroraxo",
+   "siteFiles": 8,
+   "siteClassPairs": 9,
+   "byClass": {
+    "generated-codec": 1,
+    "own-codec": 0,
+    "raw-discriminator": 1,
+    "vendored-idl": 2,
+    "decode-call": 0,
+    "account-layout": 5,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "package.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "src/index.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "src/marinade-state/marinade-state.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "src/marinade.ts",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "src/programs/idl/json/marinade_finance.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "src/programs/idl/json/marinade_referral.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "src/programs/marinade-finance-program.ts",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "src/util/anchor.ts",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "onre-sol",
+   "own": false,
+   "origin": "https://github.com/onre-finance/onre-sol.git",
+   "owner": "onre-finance",
+   "forkOf": null,
+   "siteFiles": 6,
+   "siteClassPairs": 6,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 4,
+    "decode-call": 0,
+    "account-layout": 2,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "programs/onreapp/src/instructions/offer/offer_state.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "scripts/cross_chain_transfer/cctp_v1/idl/message_transmitter.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "scripts/cross_chain_transfer/cctp_v1/idl/token_messenger_minter.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "scripts/cross_chain_transfer/cctp_v2/idl/message_transmitter_v2.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "scripts/cross_chain_transfer/cctp_v2/idl/token_messenger_minter_v2.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "trident-tests/fuzz_0/types.rs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "rfq-webhook-toolkit",
+   "own": false,
+   "origin": "https://github.com/jup-ag/rfq-webhook-toolkit.git",
+   "owner": "jup-ag",
+   "forkOf": null,
+   "siteFiles": 6,
+   "siteClassPairs": 6,
+   "byClass": {
+    "generated-codec": 3,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 1,
+    "decode-call": 0,
+    "account-layout": 2,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "idls/order_engine.json",
+     "classes": [
+      "vendored-idl"
+     ]
+    },
+    {
+     "file": "order-engine-sdk/src/fill.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "squads-sdk/src/lib.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "squads-sdk/src/unwrap.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "squads-sdk/src/wrap.rs",
+     "classes": [
+      "generated-codec"
+     ]
+    },
+    {
+     "file": "tests/package-lock.json",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "raydium-cp-swap",
+   "own": false,
+   "origin": "https://github.com/raydium-io/raydium-cp-swap",
+   "owner": "raydium-io",
+   "forkOf": null,
+   "siteFiles": 4,
+   "siteClassPairs": 4,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 4,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "client/src/instructions/events_instructions_parse.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/cp-swap/src/curve/calculator.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/cp-swap/src/states/oracle.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "programs/cp-swap/src/states/pool.rs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "idl-drift",
+   "own": true,
+   "origin": "https://github.com/auroraxo/idl-drift.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 2,
+   "siteClassPairs": 3,
+   "byClass": {
+    "generated-codec": 2,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 1,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [
+    "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+   ],
+   "files": [
+    {
+     "file": "src/index.mjs",
+     "classes": [
+      "generated-codec",
+      "account-layout"
+     ]
+    },
+    {
+     "file": "test/run.mjs",
+     "classes": [
+      "generated-codec"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "minio-go",
+   "own": false,
+   "origin": "https://github.com/minio/minio-go.git",
+   "owner": "minio",
+   "forkOf": "auroraxo",
+   "siteFiles": 3,
+   "siteClassPairs": 3,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 3,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "api-put-object_test.go",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "checksum.go",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "pkg/policy/bucket-policy_test.go",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "raydium-amm",
+   "own": false,
+   "origin": "https://github.com/raydium-io/raydium-amm.git",
+   "owner": "raydium-io",
+   "forkOf": "auroraxo",
+   "siteFiles": 3,
+   "siteClassPairs": 3,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 1,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 2,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "program/src/instruction.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "program/src/math.rs",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "program/src/state.rs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "SolanaRepro",
+   "own": false,
+   "origin": "https://github.com/caiomodesti/SolanaRepro.git",
+   "owner": "caiomodesti",
+   "forkOf": null,
+   "siteFiles": 2,
+   "siteClassPairs": 2,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 2,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "artifacts/9wr2AJzu2S7jDh4LNqsfY2ZFxNq3HAjNiP4MP5QD9SPngmXGQUytA2diwnAJrbVPASLY6HJLf5zCWZNc78turR2/bundle/metadata.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    },
+    {
+     "file": "artifacts/9wr2AJzu2S7jDh4LNqsfY2ZFxNq3HAjNiP4MP5QD9SPngmXGQUytA2diwnAJrbVPASLY6HJLf5zCWZNc78turR2/metadata.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "signerd",
+   "own": true,
+   "origin": "https://github.com/auroraxo/signerd.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 2,
+   "siteClassPairs": 2,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 1,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 1,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "package-lock.json",
+     "classes": [
+      "account-layout"
+     ]
+    },
+    {
+     "file": "probe-findings.json",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "liquid-staking-program",
+   "own": false,
+   "origin": "https://github.com/marinade-finance/liquid-staking-program.git",
+   "owner": "marinade-finance",
+   "forkOf": null,
+   "siteFiles": 1,
+   "siteClassPairs": 1,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 1,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "programs/marinade-finance/src/state/list.rs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "redact-check",
+   "own": true,
+   "origin": "https://github.com/auroraxo/redact-check.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 1,
+   "siteClassPairs": 1,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 1,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "test.mjs",
+     "classes": [
+      "raw-discriminator"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "rust-sdk",
+   "own": false,
+   "origin": "https://github.com/streamflow-finance/rust-sdk.git",
+   "owner": "streamflow-finance",
+   "forkOf": "auroraxo",
+   "siteFiles": 1,
+   "siteClassPairs": 1,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 1,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": [
+    {
+     "file": "programs/streamflow-sdk/src/state.rs",
+     "classes": [
+      "account-layout"
+     ]
+    }
+   ]
+  },
+  {
+   "repo": "MERLE",
+   "own": false,
+   "origin": "https://github.com/auroraxo/MERLE.git",
+   "owner": "auroraxo",
+   "forkOf": "reclinerhead",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "WeatherFlow_PiConsole",
+   "own": false,
+   "origin": "https://github.com/auroraxo/WeatherFlow_PiConsole.git",
+   "owner": "auroraxo",
+   "forkOf": "peted-davis",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "airflow",
+   "own": false,
+   "origin": "https://github.com/apache/airflow.git",
+   "owner": "apache",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "aurora-node-auditor",
+   "own": true,
+   "origin": "https://github.com/auroraxo/aurora-node-auditor.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "auroraxo",
+   "own": true,
+   "origin": "https://github.com/auroraxo/auroraxo.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "awesome-raspberry-pi",
+   "own": false,
+   "origin": "https://github.com/auroraxo/awesome-raspberry-pi.git",
+   "owner": "auroraxo",
+   "forkOf": "thibmaek",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "bubble-mirror",
+   "own": true,
+   "origin": "https://github.com/auroraxo/bubble-mirror.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "cibrief",
+   "own": true,
+   "origin": "https://github.com/auroraxo/cibrief.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "codebyaurora-site",
+   "own": true,
+   "origin": "https://github.com/auroraxo/codebyaurora-site.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "declare-id-drift",
+   "own": true,
+   "origin": "https://github.com/auroraxo/declare-id-drift.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "docrot",
+   "own": true,
+   "origin": "https://github.com/auroraxo/docrot.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "docrot-api",
+   "own": true,
+   "origin": "https://github.com/auroraxo/docrot-api.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "docrot-check",
+   "own": true,
+   "origin": "https://github.com/auroraxo/docrot-check.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "flutter",
+   "own": false,
+   "origin": "https://github.com/auroraxo/flutter.git",
+   "owner": "auroraxo",
+   "forkOf": "flutter",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "greenscan",
+   "own": true,
+   "origin": "https://github.com/auroraxo/greenscan.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "jup-ag-cli",
+   "own": false,
+   "origin": "https://github.com/jup-ag/cli.git",
+   "owner": "jup-ag",
+   "forkOf": "auroraxo",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "openclaw-agent-standard",
+   "own": true,
+   "origin": "https://github.com/sprintberlin/openclaw-agent-standard.git",
+   "owner": "sprintberlin",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "openclaw-citizen",
+   "own": true,
+   "origin": "https://github.com/sprintberlin/openclaw-citizen.git",
+   "owner": "sprintberlin",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "openclaw-secret-drop",
+   "own": true,
+   "origin": "https://github.com/sprintberlin/openclaw-secret-drop.git",
+   "owner": "sprintberlin",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "openreceipts",
+   "own": true,
+   "origin": "https://github.com/auroraxo/openreceipts.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "openreceipts-action",
+   "own": true,
+   "origin": "https://github.com/auroraxo/openreceipts-action.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "reeflog",
+   "own": true,
+   "origin": "https://github.com/auroraxo/reeflog.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "solana-demand-dossier",
+   "own": true,
+   "origin": "https://github.com/auroraxo/solana-demand-dossier.git",
+   "owner": "auroraxo",
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "solana-radar",
+   "own": false,
+   "origin": null,
+   "owner": null,
+   "forkOf": null,
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "staking-options",
+   "own": false,
+   "origin": "https://github.com/Dual-Finance/staking-options.git",
+   "owner": "Dual-Finance",
+   "forkOf": "auroraxo",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "vite",
+   "own": false,
+   "origin": "https://github.com/auroraxo/vite.git",
+   "owner": "auroraxo",
+   "forkOf": "vitejs",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "whirlpool-tx-replayer",
+   "own": false,
+   "origin": "https://github.com/orca-so/whirlpool-tx-replayer.git",
+   "owner": "orca-so",
+   "forkOf": "auroraxo",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  },
+  {
+   "repo": "withastro-docs",
+   "own": false,
+   "origin": "https://github.com/auroraxo/docs-1.git",
+   "owner": "auroraxo",
+   "forkOf": "withastro",
+   "siteFiles": 0,
+   "siteClassPairs": 0,
+   "byClass": {
+    "generated-codec": 0,
+    "own-codec": 0,
+    "raw-discriminator": 0,
+    "vendored-idl": 0,
+    "decode-call": 0,
+    "account-layout": 0,
+    "event-decode": 0
+   },
+   "programsWithStoredIdl": [],
+   "files": []
+  }
+ ]
+}
