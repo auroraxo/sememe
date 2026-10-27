@@ -31,15 +31,14 @@ function bodyDecode(bytes, compression) {
   return JSON.parse(decoded.toString('utf8'));
 }
 
-export function inspect(account, source, programId) {
-  if (!account) return { state: 'missing' };
+export function decodeAccount(account, source, programId) {
+  if (!account) throw Error('missing account');
   const expectedOwner = source === 'metadata' ? METADATA_PROGRAM.toBase58() : programId;
-  if (account.owner !== expectedOwner) return { state: 'wrong_owner', owner: account.owner };
-  if (!Array.isArray(account.data) || account.data[1] !== 'base64') return { state: 'invalid_encoding' };
+  if (account.owner !== expectedOwner) throw Error(`wrong owner: ${account.owner}`);
+  if (!Array.isArray(account.data) || account.data[1] !== 'base64') throw Error('invalid encoding');
   const bytes = Buffer.from(account.data[0], 'base64');
   let idl;
-  try {
-    if (source === 'metadata') {
+  if (source === 'metadata') {
       const seed = Buffer.alloc(16); seed.write('idl');
       if (bytes.length < 96 || bytes[0] !== 2 || !bytes.subarray(1,33).equals(new PublicKey(programId).toBuffer()) ||
           bytes[66] === 0 || !bytes.subarray(67,83).equals(seed) || bytes[83] !== 1 || bytes[85] > 1 || bytes[86] !== 0)
@@ -47,16 +46,25 @@ export function inspect(account, source, programId) {
       const len = bytes.readUInt32LE(87);
       if (len > MAX_BYTES || bytes.length < 96 + len) throw Error('invalid metadata length');
       idl = bodyDecode(bytes.subarray(96, 96 + len), bytes[84]);
-    } else {
-      if (bytes.length < 44 || !bytes.subarray(0,8).equals(ANCHOR_DISCRIMINATOR)) throw Error('invalid Anchor header');
-      const len = bytes.readUInt32LE(40);
-      if (len > MAX_BYTES || bytes.length < 44 + len) throw Error('invalid Anchor length');
-      idl = bodyDecode(bytes.subarray(44, 44 + len), 2);
-    }
-    if (!idl || typeof idl !== 'object' || !Array.isArray(idl.instructions) || !idl.instructions.length ||
-        idl.instructions.some(x => !x || typeof x.name !== 'string' || !x.name))
-      throw Error('no usable instruction schema');
-    if (idl.address && idl.address !== programId) throw Error('IDL declares another program');
+  } else if (source === 'anchor') {
+    if (bytes.length < 44 || !bytes.subarray(0,8).equals(ANCHOR_DISCRIMINATOR)) throw Error('invalid Anchor header');
+    const len = bytes.readUInt32LE(40);
+    if (len > MAX_BYTES || bytes.length < 44 + len) throw Error('invalid Anchor length');
+    idl = bodyDecode(bytes.subarray(44, 44 + len), 2);
+  } else throw Error(`unknown source: ${source}`);
+  if (!idl || typeof idl !== 'object' || !Array.isArray(idl.instructions) || !idl.instructions.length ||
+      idl.instructions.some(x => !x || typeof x.name !== 'string' || !x.name))
+    throw Error('no usable instruction schema');
+  if (idl.address && idl.address !== programId) throw Error('IDL declares another program');
+  return idl;
+}
+
+export function inspect(account, source, programId) {
+  if (!account) return { state: 'missing' };
+  const expectedOwner = source === 'metadata' ? METADATA_PROGRAM.toBase58() : programId;
+  if (account.owner !== expectedOwner) return { state: 'wrong_owner', owner: account.owner };
+  try {
+    const idl = decodeAccount(account, source, programId);
     const digest = createHash('sha256').update(JSON.stringify(idl)).digest('hex');
     return { state: 'usable', instructions: idl.instructions.length, fingerprint: digest };
   } catch (error) {
@@ -64,7 +72,7 @@ export function inspect(account, source, programId) {
   }
 }
 
-async function rpcAccounts(url, keys, fetcher = fetch, tries = 3) {
+export async function rpcAccounts(url, keys, fetcher = fetch, tries = 3) {
   const payload = { jsonrpc: '2.0', id: 1, method: 'getMultipleAccounts',
     params: [keys, { encoding: 'base64', commitment: 'finalized' }] };
   for (let attempt = 0; attempt < tries; attempt++) {

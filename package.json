@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Reproducible on-chain IDL coverage qualification; no product implementation",
+  "description": "Local Solana IDL pull prototype and reproducible coverage qualification",
+  "bin": {"sememe": "bin/sememe.mjs"},
   "scripts": {"test": "node --test"},
   "dependencies": {"@solana/web3.js": "1.98.4"}
 }

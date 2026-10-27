@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: RFC stage (October 2026). No product implementation or external users yet. A reproducible on-chain coverage qualification exists; it does not show demand or general ecosystem coverage.**
+**Status: first runnable pull/store prototype (October 2026), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Decode/encode, lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -15,17 +15,18 @@ sememe is a local, content-addressed schema store with a verification contract:
 - **store:** keep records under `~/.sememe/`; `sememe.lock` pins exact fingerprints per project.
 - **resolve:** decode and encode locally, with strict errors instead of guesses. A program without a trustworthy source stays explicitly unverifiable.
 
-## Shape
+## Working now: pull a program's on-chain IDL
 
 ```bash
-sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc
-sememe resolve ./payload.bin --program whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc
-sememe decode-tx <signature>
-sememe lock
-sememe diff <program>
+npm ci
+npm test
+node bin/sememe.mjs pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store /tmp/sememe-demo
+# optional: --rpc https://your-mainnet-rpc.example
 ```
 
-The planned core is Rust, with a TypeScript SDK over existing Solana codecs and an optional local daemon. Codama remains the compiler and format; sememe supplies acquisition, verification, and distribution.
+The CLI fetches the canonical Program Metadata and legacy Anchor IDL accounts at a finalized RPC slot, checks account owner/program binding and JSON instruction shape, prefers canonical when both exist, and stores normalized JSON by SHA-256 under `<store>/objects/`. A receipt under `<store>/receipts/` records program ID, source account address, slot, fingerprint and instruction count. Repeating the pull of identical content does not rewrite the stored object; corrupt files are refused rather than overwritten. A public Whirlpool pull succeeded on 27.10. at slot 462039125 with 66 named instructions and fingerprint `sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f` (own run; no outside use).
+
+**Limit:** This is acquisition and content-addressed storage, not an independent audit of the on-chain ABI, transaction decoder, offline resolver, freshness guarantee or authority check. Fetch responses are trusted to the configured RPC; first-party repo parity has not been established. The remaining proposed shape is `sememe resolve`, `decode-tx`, `lock`, and `diff` plus an optional local daemon. A later Rust core/TypeScript SDK may replace this Node-based prototype; neither exists yet.
 
 ## Free and paid
 
@@ -41,5 +42,5 @@ The largest risk is coverage. If on-chain acquisition works for fewer than half 
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
-2. Build the smallest real **Whirlpool pull + content fingerprint** implementation and use it to replace one own decoder path as user zero; measure parity before expanding to 41 paths and 1,000 transactions. The threshold in this selected sample was passed, but that does not validate other program families.
+2. **Whirlpool pull + content fingerprint has landed.** Next replace one real decoder path in my own Whirlpool workflow with the stored artifact, measure its decoded output against the existing path, then expand to 41 paths and 1,000 transactions only if the first comparison is exact. The selected-sample threshold does not validate other program families.
 3. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.
