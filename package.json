@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Local Solana IDL pull prototype and reproducible coverage qualification",
+  "description": "Local Solana IDL pull and offline instruction decode prototype with reproducible coverage qualification",
   "bin": {"sememe": "bin/sememe.mjs"},
-  "scripts": {"test": "node --test"},
+  "scripts": {"test": "node --test", "crosscheck": "node tools/crosscheck.mjs"},
   "dependencies": {"@solana/web3.js": "1.98.4"}
 }
