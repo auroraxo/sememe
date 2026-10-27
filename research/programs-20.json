@@ -1,0 +1,327 @@
+{
+  "preregistration": {
+    "id": "sememe-onchain-idl-coverage-2026-10-27",
+    "created": "2026-10-27T10:47+01:00",
+    "created_before_measurement": true,
+    "rpc_calls_made_before_this_file": 0,
+    "purpose": "Preregistered set of 20 real Solana programs for measuring whether an on-chain IDL/schema can be pulled. Selected and cited from first-party sources BEFORE any measurement.",
+    "denominator": 20,
+    "denominator_excluding_controls": 18,
+    "selection_method_doc": "research/selection-method.md",
+    "snapshots": {
+      "protocol_rank_source": "~/github_repos/solana-radar/radar.sqlite (DefiLlama api.llama.fi protocols where chains include 'Solana'), file mtime 2026-10-27T07:52:49+01:00",
+      "protocol_tvl_is_global_not_solana_only": true
+    }
+  },
+  "programs": [
+    {
+      "index": 1,
+      "program_id": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+      "name": "Orca Whirlpool",
+      "protocol_slug": "orca-dex",
+      "family": "whirlpool",
+      "stratum": "A-primary",
+      "selection_reason": "README/Workboard-mandated family (Whirlpool)",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/orca-so/whirlpools/blob/main/programs/whirlpool/src/lib.rs#L3",
+        "quote": "declare_id!(\"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\");"
+      },
+      "notes": "Single unconditional declare_id. Repo root contains Anchor.toml and idl/ dir."
+    },
+    {
+      "index": 2,
+      "program_id": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+      "name": "Kamino Lend (klend)",
+      "protocol_slug": "kamino-lend",
+      "family": "kamino",
+      "stratum": "A-primary",
+      "selection_reason": "README/Workboard-mandated family (Kamino)",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/Kamino-Finance/klend/blob/master/programs/klend/src/lib.rs#L30",
+        "quote": "#[cfg(not(feature = \"staging\"))]\ndeclare_id!(\"KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD\");"
+      },
+      "notes": "Mainnet id is the cfg(not(staging)) branch; staging id SLendK7y... is excluded. security_txt! present (project_url kamino.finance)."
+    },
+    {
+      "index": 3,
+      "program_id": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+      "name": "OpenBook v2",
+      "protocol_slug": "openbook",
+      "family": "openbook",
+      "stratum": "A-primary",
+      "selection_reason": "README/Workboard-mandated family (OpenBook)",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/openbook-dex/openbook-v2/blob/master/programs/openbook-v2/src/lib.rs#L8",
+        "quote": "declare_id!(\"opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb\");"
+      },
+      "notes": "Single unconditional declare_id."
+    },
+    {
+      "index": 4,
+      "program_id": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+      "name": "Marinade liquid staking",
+      "protocol_slug": "marinade-liquid-staking",
+      "family": "marinade",
+      "stratum": "A-primary",
+      "selection_reason": "README/Workboard-mandated family (Marinade)",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/marinade-finance/liquid-staking-program/blob/main/programs/marinade-finance/src/lib.rs#L20",
+        "quote": "declare_id!(\"MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD\");"
+      },
+      "notes": "Single unconditional declare_id."
+    },
+    {
+      "index": 5,
+      "program_id": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+      "name": "Jupiter Aggregator v6",
+      "protocol_slug": null,
+      "family": "jupiter",
+      "stratum": "A-primary",
+      "selection_reason": "README/Workboard-mandated family (Jupiter route targets); v6 is the router itself",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/jup-ag/instruction-parser/blob/main/src/constants.ts#L4",
+        "quote": "export const JUPITER_V6_PROGRAM_ID = new PublicKey(\n  \"JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4\"\n);"
+      },
+      "notes": "Same file's AMM_TYPES map independently corroborates whirlpool/raydium/marinade/serum/metora ids used here."
+    },
+    {
+      "index": 6,
+      "program_id": "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9",
+      "name": "Jupiter Lend (lending market)",
+      "protocol_slug": "jupiter-lend",
+      "family": "jupiter",
+      "stratum": "A-expansion",
+      "selection_reason": "Additional mainnet program published by mandated family Jupiter",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/jup-ag/jupiter-lend/blob/main/README.md#L36",
+        "quote": "| `lending` | `jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9` | lending.json | 0.1.9 |"
+      },
+      "notes": "README section: 'Mainnet program IDs of the `main` market, as recorded in the IDLs'."
+    },
+    {
+      "index": 7,
+      "program_id": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
+      "name": "Jupiter Lend (liquidity)",
+      "protocol_slug": "jupiter-lend",
+      "family": "jupiter",
+      "stratum": "A-expansion",
+      "selection_reason": "Second mainnet program of mandated family Jupiter",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/jup-ag/jupiter-lend/blob/main/README.md#L37",
+        "quote": "| `liquidity` | `jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC` | liquidity.json | 0.1.9 |"
+      },
+      "notes": "Same README table as index 6."
+    },
+    {
+      "index": 8,
+      "program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+      "name": "Raydium AMM v4",
+      "protocol_slug": "raydium-amm",
+      "family": "raydium",
+      "stratum": "A-primary",
+      "selection_reason": "README/Workboard-mandated family (Raydium)",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/raydium-io/raydium-amm/blob/master/program/src/lib.rs#L32",
+        "quote": "#[cfg(not(feature = \"devnet\"))]\nsolana_program::declare_id!(\"675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8\");"
+      },
+      "notes": "cfg(not(devnet)) branch; devnet id DRaya7Kj... excluded. security_txt source_code points at this repo."
+    },
+    {
+      "index": 9,
+      "program_id": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+      "name": "Raydium CLMM",
+      "protocol_slug": "raydium-amm",
+      "family": "raydium",
+      "stratum": "A-expansion",
+      "selection_reason": "Additional mainnet program published by mandated family Raydium",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/raydium-io/raydium-clmm/blob/master/programs/amm/src/lib.rs#L27",
+        "quote": "declare_id!(\"CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK\");"
+      },
+      "notes": "Second declare_id in file (DRayAUgE... at L25 is the devnet variant, same pattern as raydium-amm)."
+    },
+    {
+      "index": 10,
+      "program_id": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+      "name": "Raydium CP-Swap (CPMM)",
+      "protocol_slug": "raydium-amm",
+      "family": "raydium",
+      "stratum": "A-expansion",
+      "selection_reason": "Additional mainnet program published by mandated family Raydium",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/lib.rs#L25",
+        "quote": "declare_id!(\"CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C\");"
+      },
+      "notes": "Second declare_id (DRaycpLY... at L23 is devnet variant)."
+    },
+    {
+      "index": 11,
+      "program_id": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+      "name": "Pump.fun bonding-curve program",
+      "protocol_slug": "pumpswap",
+      "family": "pump",
+      "stratum": "A-primary",
+      "selection_reason": "README/Workboard-mandated family (Pump.fun)",
+      "evidence": {
+        "source": "first-party docs repo",
+        "url": "https://github.com/pump-fun/pump-public-docs/blob/main/docs/PUMP_PROGRAM_README.md#L10",
+        "quote": "Pump program is deployed at address `6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P` on both Mainnet and Devnet."
+      },
+      "notes": "First-party idl/pump.json in same repo carries \"address\": \"6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\" with 56 instructions (off-chain copy, not an on-chain source)."
+    },
+    {
+      "index": 12,
+      "program_id": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+      "name": "PumpSwap (pump AMM)",
+      "protocol_slug": "pumpswap",
+      "family": "pump",
+      "stratum": "A-expansion",
+      "selection_reason": "Additional mainnet program published by mandated family Pump.fun",
+      "evidence": {
+        "source": "first-party docs repo",
+        "url": "https://github.com/pump-fun/pump-public-docs/blob/main/docs/PUMP_SWAP_CREATOR_FEE_README.md#L96",
+        "quote": "on [Mainnet](https://solscan.io/account/pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA)"
+      },
+      "notes": "Corroborated by first-party idl/pump_amm.json \"address\": \"pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA\" (38 instructions)."
+    },
+    {
+      "index": 13,
+      "program_id": "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+      "name": "Drift v2",
+      "protocol_slug": "drift-staked-sol",
+      "family": "drift",
+      "stratum": "B-primary",
+      "selection_reason": "Highest-TVL non-mandated protocol in snapshot after stratum A exclusions (drift-staked-sol, ~285M USD TVL) with a first-party published program id",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/drift-labs/protocol-v2/blob/master/programs/drift/src/lib.rs#L65",
+        "quote": "declare_id!(\"dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH\");"
+      },
+      "uncertainty": "Grep returned the identical program id at L65 and L67 (two cfg branches); the devnet/staging gating was not verified line-by-line. Snapshot slug is drift-staked-sol (Drift's LST) but the cited program is Drift's flagship DEX program; Drift also has slug drift-trade.",
+      "notes": "Flagship Drift perpetuals/spot program."
+    },
+    {
+      "index": 14,
+      "program_id": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+      "name": "Meteora DLMM",
+      "protocol_slug": "meteora-dlmm",
+      "family": "meteora",
+      "stratum": "B-primary",
+      "selection_reason": "Next non-mandated snapshot protocol with a first-party published program id (meteora-dlmm, ~166M USD TVL)",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/MeteoraAg/dlmm-sdk/blob/main/idls/dlmm.json",
+        "quote": "\"address\": \"LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo\""
+      },
+      "notes": "Program source (declare_id) not present in dlmm-sdk; the official IDL file in the first-party repo carries the address."
+    },
+    {
+      "index": 15,
+      "program_id": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+      "name": "Meteora DAMM v1 (dynamic AMM)",
+      "protocol_slug": "meteora-damm-v1",
+      "family": "meteora",
+      "stratum": "B-expansion",
+      "selection_reason": "Additional mainnet program published by stratum-B family Meteora",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/MeteoraAg/damm-v1-sdk/blob/main/programs/dynamic-amm/src/lib.rs#L23",
+        "quote": "#[cfg(not(feature = \"staging\"))]\ndeclare_id!(\"Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB\");"
+      },
+      "notes": "cfg(not(staging)) branch; staging id ammbh4CQ... excluded. Also appears in jup-ag/instruction-parser AMM_TYPES as \"Meteora\"."
+    },
+    {
+      "index": 16,
+      "program_id": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "name": "Meteora DAMM v2 (cp-amm)",
+      "protocol_slug": "meteora-damm-v2",
+      "family": "meteora",
+      "stratum": "B-expansion",
+      "selection_reason": "Additional mainnet program published by stratum-B family Meteora",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/MeteoraAg/damm-v2/blob/main/programs/cp-amm/src/lib.rs#L42",
+        "quote": "declare_id!(\"cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG\");"
+      },
+      "notes": "Single declare_id in file."
+    },
+    {
+      "index": 17,
+      "program_id": "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN",
+      "name": "Meteora dynamic bonding curve",
+      "protocol_slug": null,
+      "family": "meteora",
+      "stratum": "B-expansion",
+      "selection_reason": "Additional mainnet program published by stratum-B family Meteora",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/MeteoraAg/dynamic-bonding-curve/blob/main/programs/dynamic-bonding-curve/src/lib.rs#L29",
+        "quote": "declare_id!(\"dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN\");"
+      },
+      "notes": "Single declare_id in file."
+    },
+    {
+      "index": 18,
+      "program_id": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+      "name": "Meteora dynamic vault",
+      "protocol_slug": null,
+      "family": "meteora",
+      "stratum": "B-expansion",
+      "selection_reason": "Additional mainnet program published by stratum-B family Meteora",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/MeteoraAg/vault-sdk/blob/main/programs/vault/src/lib.rs#L17",
+        "quote": "#[cfg(not(feature = \"staging\"))]\ndeclare_id!(\"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi\");"
+      },
+      "notes": "cfg(not(staging)) branch; staging id 6YRZW57X... excluded. jito-labs/vault-sdk mirrors the same two ids (fork), not used as source."
+    },
+    {
+      "index": 19,
+      "program_id": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+      "name": "SPL Token (classic)",
+      "protocol_slug": null,
+      "family": "spl-token",
+      "stratum": "control",
+      "role": "negative-control",
+      "selection_reason": "First-party SPL program; deliberately non-Anchor to detect Anchor-shaped bias in the 'pull' definition",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/solana-program/token/blob/main/interface/src/lib.rs#L17",
+        "quote": "solana_pubkey::declare_id!(\"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA\");"
+      },
+      "notes": "Native (non-Anchor) program whose instruction layouts are fixed by the SPL interface, not by an on-chain Anchor IDL account. A 'usable IDL pulled' verdict for this program must be manually verified: it would mean the harness accepted a non-IDL schema. Counted in the 20-denominator; report numerator both with and without controls."
+    },
+    {
+      "index": 20,
+      "program_id": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "name": "SPL Token-2022",
+      "protocol_slug": null,
+      "family": "spl-token-2022",
+      "stratum": "control",
+      "role": "negative-control",
+      "selection_reason": "First-party SPL program; deliberately non-Anchor to detect Anchor-shaped bias in the 'pull' definition",
+      "evidence": {
+        "source": "first-party repo",
+        "url": "https://github.com/solana-program/token-2022/blob/main/interface/src/lib.rs#L29",
+        "quote": "solana_address::declare_id!(\"TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb\");"
+      },
+      "notes": "Same reasoning as index 19. Same repo's interface/src/lib.rs L41 also restates the classic Token id."
+    }
+  ],
+  "expected_reporting": {
+    "primary_metric": "pulled_usable_onchain_idl / 20",
+    "secondary_metrics": ["pulled_usable_onchain_idl / 18 (controls excluded)", "per-stratum breakdown", "per-channel breakdown"],
+    "definition_of_pull_must_be_recorded_with_results": true,
+    "below_50_percent_action": "If <50% (i.e. <10/20 or <9/18), README hypothesis must be explicitly revised; no cherry-picking allowed; every one of the 20 programs stays in the denominator unless a program id is proven wrong on-chain."
+  }
+}
