@@ -69,7 +69,14 @@ const results = {
   txRemixDecoder: 'solana-tx-remix src/args.mjs (decodeArgs + schemaForInstruction)',
   sememeDecoder: 'sememe src/codec.mjs (stored on-chain IDL)',
   perRecord: [],
-  totals: { records: 0, fieldsCompared: 0, agreed: 0, disagreed: 0, onlySememe: 0, onlyTxRemix: 0 },
+  // `disagreed` = both paths decoded the field and the values differ (a real
+  // conflict). `firstPartyRefuses` = the first-party path returned a marker
+  // such as __optionRemaining instead of a value — no comparable output exists,
+  // so it is not a disagreement and must not be counted as one.
+  totals: {
+    records: 0, fieldsCompared: 0, agreed: 0, disagreed: 0,
+    firstPartyRefuses: 0, onlySememe: 0, onlyTxRemix: 0,
+  },
   instructionLevel: [],
 };
 
@@ -98,7 +105,7 @@ for (const record of fixture.records ?? []) {
     if (theirValue && typeof theirValue === 'object' && !Array.isArray(theirValue)
         && Object.keys(theirValue).some((key) => key.startsWith('__'))) {
       perField.push({ field: name, status: 'tx-remix-unsupported', txRemix: JSON.stringify(theirValue)?.slice(0, 80), sememe: JSON.stringify(value)?.slice(0, 80) });
-      results.totals.disagreed++;
+      results.totals.firstPartyRefuses++;
       continue;
     }
     const sememeValue = normalize(value);
