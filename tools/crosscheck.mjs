@@ -24,6 +24,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { decodeInstructionData, encodeInstructionData, toJsonSafe } from '../src/codec.mjs';
 import { findStoredIdl } from '../src/decode.mjs';
+import { createComparator, oracleCodecs, camel, pick, structShape, enumShape, variantShape } from './lib/compare.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -51,21 +52,7 @@ catch {
 }
 
 const { idl } = await findStoredIdl(store, program);
-const typeByName = new Map((idl.types ?? []).map((entry) => [entry.name, entry.type]));
-const camel = (text) => text.replace(/_([a-z0-9])/g, (_, character) => character.toUpperCase());
-const pick = (object, name) => (object?.[name] !== undefined ? object[name] : object?.[camel(name)]);
-const structShape = (type) => (type && typeof type === 'object' && Array.isArray(type.fields)
-  && (type.kind === 'struct' || type.kind === undefined)) ? type.fields : null;
-const enumShape = (type) => (type && typeof type === 'object' && Array.isArray(type.variants)
-  && (type.kind === 'enum' || type.kind === undefined)) ? type.variants : null;
-const variantShape = (variant) => {
-  const fields = variant?.fields;
-  if (!fields || !fields.length) return { kind: 'unit' };
-  if (fields.every((field) => field && typeof field === 'object' && typeof field.name === 'string' && 'type' in field)) {
-    return { kind: 'named', fields };
-  }
-  return { kind: 'tuple', fields };
-};
+const comparator = createComparator({ idl, oracle, oracleRequire, program });
 const base58 = (input) => {
   const A = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
   let value = 0n;
@@ -76,87 +63,10 @@ const base58 = (input) => {
   return Buffer.from(bytes);
 };
 
-const diffs = [];
-const equal = (location, mine, theirs) => {
-  const a = typeof mine === 'bigint' ? mine.toString() : mine;
-  const b = typeof theirs === 'bigint' ? theirs.toString() : theirs;
-  if (Object.is(a, b)) return true;
-  if (typeof a === 'number' && typeof b === 'number' && Object.is(a, -0) && Object.is(b, 0)) return true;
-  diffs.push({ path: location, sememe: String(a).slice(0, 160), oracle: String(b).slice(0, 160) });
-  return false;
-};
+const compare = (instruction, mine, theirs) => comparator.compare(instruction, mine, theirs);
 
-function same(type, mine, theirs, location) {
-  if (typeof type === 'string') {
-    if (type === 'pubkey') {
-      let value = theirs;
-      if (value instanceof Uint8Array) {
-        try { value = new oracleRequire('@solana/kit').Address(value); } catch { value = Buffer.from(value).toString('hex'); }
-      }
-      return equal(location, mine, String(value));
-    }
-    if (type === 'bool') return equal(location, mine, theirs === true || theirs === 1);
-    return equal(location, mine, theirs);
-  }
-  if (Array.isArray(type)) {
-    if (!Array.isArray(theirs)) return equal(location, 'array', typeof theirs);
-    if (mine.length !== theirs.length) { diffs.push({ path: location, reason: `length ${mine.length} vs ${theirs.length}` }); return false; }
-    return mine.every((item, index) => same(type[0], item, theirs[index], `${location}[${index}]`));
-  }
-  if ('option' in type) {
-    if (!theirs || !('__option' in theirs)) return equal(location, 'option', JSON.stringify(theirs)?.slice(0, 80));
-    if (mine.__option !== theirs.__option) return equal(location, mine.__option, theirs.__option);
-    if (mine.__option === 'None') return true;
-    return same(type.option, mine.value, theirs.value, `${location}.value`);
-  }
-  if ('vec' in type) {
-    if (!Array.isArray(theirs)) return equal(location, 'vec', typeof theirs);
-    if (mine.length !== theirs.length) { diffs.push({ path: location, reason: `vec length ${mine.length} vs ${theirs.length}` }); return false; }
-    return mine.every((item, index) => same(type.vec, item, theirs[index], `${location}[${index}]`));
-  }
-  if ('array' in type) {
-    const [inner] = type.array;
-    if (!Array.isArray(theirs)) return equal(location, 'array', typeof theirs);
-    if (mine.length !== theirs.length) { diffs.push({ path: location, reason: `array length ${mine.length} vs ${theirs.length}` }); return false; }
-    return mine.every((item, index) => same(inner, item, theirs[index], `${location}[${index}]`));
-  }
-  if ('defined' in type) {
-    const name = typeof type.defined === 'string' ? type.defined : type.defined.name;
-    return same(typeByName.get(name), mine, theirs, name);
-  }
-  if (type.kind === 'type') return same(type.type, mine, theirs, location);
-  const fields = structShape(type);
-  if (fields) {
-    if (!theirs || typeof theirs !== 'object') return equal(location, 'struct', typeof theirs);
-    return fields.every((field) => {
-      const value = pick(theirs, field.name);
-      if (value === undefined) { diffs.push({ path: `${location}.${field.name}`, reason: 'missing in oracle output' }); return false; }
-      return same(field.type, mine[field.name], value, `${location}.${field.name}`);
-    });
-  }
-  const variants = enumShape(type);
-  if (variants) {
-    if (typeof theirs === 'number') {
-      const variant = variants[theirs];
-      if (!variant) return equal(location, mine.__kind, `index ${theirs}`);
-      return equal(location, mine.__kind, variant.name);
-    }
-    if (!theirs || typeof theirs !== 'object') return equal(location, 'enum', JSON.stringify(theirs)?.slice(0, 80));
-    if (mine.__kind !== theirs.__kind) return equal(location, mine.__kind, theirs.__kind);
-    const shape = variantShape(variants.find((variant) => variant.name === mine.__kind));
-    if (shape.kind === 'unit') return true;
-    if (shape.kind === 'tuple') {
-      return mine.fields.every((item, index) => same(shape.fields[index], item, theirs.fields?.[index], `${location}.fields[${index}]`));
-    }
-    return shape.fields.every((field) => {
-      const value = pick(theirs, field.name);
-      if (value === undefined) { diffs.push({ path: `${location}.${field.name}`, reason: 'missing in oracle output' }); return false; }
-      return same(field.type, mine[field.name], value, `${location}.${field.name}`);
-    });
-  }
-  return equal(location, JSON.stringify(mine)?.slice(0, 120), JSON.stringify(theirs)?.slice(0, 120));
-}
-
+// Deterministic pseudo-random inputs for the per-instruction encoder check.
+// The seed is fixed so a rerun produces the same vectors.
 let seed = 7;
 const random = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed; };
 function sample(type, depth = 0) {
@@ -185,7 +95,7 @@ function sample(type, depth = 0) {
   if ('array' in type) { const [inner, length] = type.array; return Array.from({ length }, () => sample(inner, depth + 1)); }
   if ('defined' in type) {
     const name = typeof type.defined === 'string' ? type.defined : type.defined.name;
-    return sample(typeByName.get(name), depth + 1);
+    return sample(comparator.typeByName.get(name), depth + 1);
   }
   if (type.kind === 'type') return sample(type.type, depth + 1);
   const fields = structShape(type);
@@ -208,27 +118,9 @@ const summary = {
   mainnet: { checked: 0, byteMismatch: [], valueMismatch: [], sememeError: [], unexplained: [] },
 };
 
-const compare = (instruction, mine, theirs) => {
-  const before = diffs.length;
-  for (const argument of instruction.args ?? []) {
-    const argumentType = (typeof argument.type === 'object' && argument.type.defined)
-      ? typeByName.get(argument.type.defined.name) : argument.type;
-    let target = pick(theirs, argument.name);
-    if (target === undefined) {
-      const shape = structShape(argumentType);
-      if (shape && shape.every((field) => pick(theirs, field.name) !== undefined)) target = theirs;
-      else { diffs.push({ path: `${instruction.name}.${argument.name}`, reason: 'argument absent in oracle output' }); continue; }
-    }
-    same(argumentType, mine.args[argument.name], target, `${instruction.name}.${argument.name}`);
-  }
-  return diffs.splice(before);
-};
-
 for (const instruction of idl.instructions) {
   const name = instruction.name;
-  const oracleName = camel(name);
-  const encoder = oracle[`get${oracleName[0].toUpperCase()}${oracleName.slice(1)}InstructionDataEncoder`];
-  const decoder = oracle[`get${oracleName[0].toUpperCase()}${oracleName.slice(1)}InstructionDataDecoder`];
+  const { encoder, decoder } = oracleCodecs(oracle, name);
   if (!encoder || !decoder) { summary.instructions.oracleError.push({ instruction: name, reason: 'no oracle codec' }); continue; }
   let input;
   try { input = {}; for (const argument of instruction.args ?? []) input[camel(argument.name)] = sample(argument.type); }
@@ -279,8 +171,7 @@ for (const record of fixture.records ?? []) {
       summary.mainnet.valueMismatch.push({ signature: record.signature, diffs: [{ path: 'instruction', sememe: mine.instruction, oracle: record.name }] });
       continue;
     }
-    const oracleName = camel(record.name);
-    const decoder = oracle[`get${oracleName[0].toUpperCase()}${oracleName.slice(1)}InstructionDataDecoder`];
+    const { decoder } = oracleCodecs(oracle, record.name);
     if (!decoder) { summary.mainnet.oracleError = summary.mainnet.oracleError ?? []; continue; }
     const theirs = decoder().decode(bytes);
     const instruction = idl.instructions.find((entry) => entry.name === mine.instruction);

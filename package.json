@@ -5,6 +5,6 @@
   "type": "module",
   "description": "Local Solana IDL pull and offline instruction decode prototype with reproducible coverage qualification",
   "bin": {"sememe": "bin/sememe.mjs"},
-  "scripts": {"test": "node --test", "crosscheck": "node tools/crosscheck.mjs"},
+  "scripts": {"test": "node --test", "crosscheck": "node tools/crosscheck.mjs", "txdiff": "node tools/tx-diff.mjs", "harvest": "node tools/harvest.mjs"},
   "dependencies": {"@solana/web3.js": "1.98.4"}
 }
