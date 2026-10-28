@@ -6,6 +6,11 @@ import path from 'node:path';
 import { PublicKey } from '@solana/web3.js';
 import { addresses, decodeAccount, rpcAccounts } from '../tools/measure.mjs';
 
+// Re-exported from its own module so a consumer can verify a fingerprint
+// without importing this file (and therefore without @solana/web3.js).
+export { canonicalJson } from './canonical.mjs';
+import { canonicalJson } from './canonical.mjs';
+
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
 const validId = (input) => {
   if (typeof input !== 'string') throw Error('program id must be a string');
@@ -15,15 +20,8 @@ const validId = (input) => {
 };
 
 // This fingerprint describes JSON content, not freshness, chain authenticity, or ABI parity.
-export function canonicalJson(value) {
-  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value).sort().map(k => `${JSON.stringify(k)}:${canonicalJson(value[k])}`).join(',')}}`;
-  }
-  const encoded = JSON.stringify(value);
-  if (encoded === undefined) throw Error('non-JSON value');
-  return encoded;
-}
+// The canonical form itself lives in src/canonical.mjs (dependency-free);
+// re-exported above for callers that import it from here.
 
 async function writeOnce(destination, content) {
   try {

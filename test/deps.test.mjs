@@ -13,7 +13,7 @@ const SRC = path.join(HERE, '..', 'src');
  * decodes instructions from a sememe store — so these must import nothing
  * outside `node:` builtins and their own files.
  */
-const DECODE_CORE = ['base58.mjs', 'codec.mjs', 'decode.mjs'];
+const DECODE_CORE = ['base58.mjs', 'canonical.mjs', 'codec.mjs', 'decode.mjs'];
 
 /**
  * The acquisition path may depend on a package: `pull.mjs` derives the

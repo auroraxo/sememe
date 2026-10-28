@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus a first offline decoder, both runnable (October 2026), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus a first offline decoder, both runnable (October 2026), with one own repository migrated onto it (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -65,7 +65,25 @@ Measured on 27.10. (reproduce: `node tools/decoder-parity.mjs --store <store> --
 - **36 field instances the first-party path refuses to decode** (it stops at `option` and defined-type arguments and emits `__optionRemaining`/`__unsupportedDecoder` instead of a value); sememe decodes them, e.g. `remaining_accounts_info: {"__option":"None"}` vs `{"__optionRemaining":"AA=="}`. These are the `option`/`defined`-typed arguments of 17 of 66 Whirlpool instructions (`swap_v2`, `decrease_liquidity_v2`, `open_position`, `lock_position`, …). The count is instances across payloads, not distinct fields.
 - The first-party path finds schemas for 65 of 66 instructions (19 have no generated schema file at all).
 
-So the first comparison is exact where both paths overlap, and sememe additionally decodes what that path declines to decode. That clears this repository's own stated gate for the next step; **it is not yet a migration** — `solana-tx-remix` still runs its old path, no transaction has been diffed at 1,000 scale, and no outside user is involved.
+So the first comparison is exact where both paths overlap, and sememe additionally decodes what that path declines to decode. That clears this repository's own stated gate for the next step.
+
+## One own decoder path is migrated
+
+`solana-tx-remix` now decodes its single-program Whirlpool arguments from a stored sememe artifact instead of from the generated codecs (`solana-tx-remix` commits, 28.10). This is the migration the paragraph above said had *not* happened yet; the rest of it — other decoder paths, 1,000 transactions, an outside user — still has not.
+
+What was actually measured, on that repository's own flagship recipe `out/remix-6754RLWd.ts` (7 Whirlpool instructions, one real mainnet transaction):
+
+- **The recipe verifies on a fresh clone.** It was `SKIP` in CI for want of an external codec directory; it now passes, all 18 negative controls still failing as declared.
+- **The two decoders cross-check each other**: 7 instructions, 24 fields compared, 17 exact agreements, 7 fields the generated path refuses, **0 disagreements**, and 7/7 instruction names agreeing.
+- **The bytes now name themselves.** Relabelling `SWAP_V2` as `SWAP` (bytes untouched) was `PASS` for the old verifier and is `FAIL` for the new one — the old one looked the layout up *by* the label, so a false label found a false layout.
+- **The artifact is verified, not trusted**: `sha256(canonicalJson(idl) + '\n')` must equal the receipt's fingerprint, re-checked before every decode. Tampering with the stored object is caught and reported as a failure rather than silently falling back to the other decoder — the first version of the verifier did exactly that (found the damage, then printed `PASS`), which was caught by tampering with the store on purpose.
+
+Two enabling changes were needed on this side, both landed and tested:
+
+- **The decode core has no npm dependencies.** `src/base58.mjs` replaces the only third-party import in the decode path (`@solana/web3.js`, used solely to base58 32 raw bytes), and `src/canonical.mjs` holds `canonicalJson` so a consumer can re-check a fingerprint without pulling in the acquisition path. A consumer repository with no `package.json` and no `node_modules` can import the decoder directly — which is what makes the migration above possible without vendoring a copy that could drift. `test/deps.test.mjs` keeps that property: the decode core must import nothing outside `node:` builtins and its own files, and everything else in `src/` must stay within an explicit allowlist. Parity with `@solana/web3.js` is checked on 202 vectors.
+- **`canonicalJson` moved out of the pull path** and is still re-exported from `src/pull.mjs`, so nothing that imports it from there changed.
+
+Honest limits: `solana-tx-remix` is my own repository, so this is one consumer I wrote, not an outside user. It is one program (Whirlpool) and one recipe (7 instructions, one transaction), not 1,000 transactions. The emitter half of that repository still needs the generated codecs — only the verifier was migrated. Nothing here shows ecosystem coverage or demand.
 
 ## Free and paid
 
@@ -81,5 +99,5 @@ The largest risk is coverage. If on-chain acquisition works for fewer than half 
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
-2. **Whirlpool pull + content fingerprint has landed, and the instruction decoder now decodes real mainnet bytes.** The first comparison against my own existing decoder path (`solana-tx-remix`) was run and is exact: 226/226 shared fields agree, 0 value disagreements, plus 36 field instances the old path declines to decode. Next migrate that one path onto the stored artifact, diff its output on the same transactions, then expand to the remaining own decoder paths and 1,000 transactions only if the migrated comparison stays exact. The selected-sample threshold does not validate other program families. The `41 paths` figure above is an unverified note estimate; the computed scan in [research/decoder-sites-2026-10-27.json](research/decoder-sites-2026-10-27.json) reports **42 (file, class) decoder sites across 35 files in 5 own repositories**, of which 36 sit in `solana-tx-remix` + `sememe` — the counting unit matters and the two numbers are not interchangeable.
+2. **Whirlpool pull + content fingerprint has landed, the instruction decoder decodes real mainnet bytes, and one own decoder path is migrated onto the stored artifact** (see "One own decoder path is migrated" above): `solana-tx-remix`'s verifier decodes Whirlpool arguments from the pinned IDL, cross-checks it against its old generated-codec path (7 instructions, 24 fields, 0 disagreements), and its flagship recipe now verifies on a fresh clone. Still to do, in order: migrate the remaining own decoder paths and the *emitter* half of `solana-tx-remix`; diff on 1,000 transactions; then seek an outside user. The selected-sample threshold does not validate other program families. The `41 paths` figure above is an unverified note estimate; the computed scan in [research/decoder-sites-2026-10-27.json](research/decoder-sites-2026-10-27.json) reports **42 (file, class) decoder sites across 35 files in 5 own repositories**, of which 36 sit in `solana-tx-remix` + `sememe` — the counting unit matters and the two numbers are not interchangeable.
 3. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.
