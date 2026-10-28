@@ -28,11 +28,15 @@ Two real extraction bugs were found and fixed during implementation (covered by 
 
 ## Re-derivation and compactness
 
-The full harvest of 75,685 transactions across 243 blocks is an 18 MB file (`/tmp/harvest-1000.json`). To keep the repository small while retaining full reproducibility:
+The full harvest of 40,013 transactions across 148 blocks is a 10 MB file (`/tmp/harvest-1000b.json`). To keep the repository small while retaining full reproducibility:
 
-- `test/fixtures/harvest-whirlpool-2026-10-28.json` (323 KB) preserves every transaction that carries a Whirlpool payload (684 transactions, 793 payloads), along with the slot range and metadata.
+- `test/fixtures/harvest-whirlpool-2026-10-28.json` (508 KB) preserves every transaction that carries a Whirlpool payload (1,029 transactions, 1,119 payloads), along with the slot range and metadata.
 - Any caller with RPC access can re-derive the payloads from the pinned signature list using:
   ```
   node tools/harvest.mjs --from-signatures test/fixtures/harvest-whirlpool-2026-10-28.json --out rederived.json
   ```
-- `tools/tx-diff.mjs` consumes this fixture and produces the full diff against `@orca-so/whirlpools-client` in ~2 seconds.
+- `tools/tx-diff.mjs` consumes this fixture and produces the full diff against `@orca-so/whirlpools-client` in under 2 seconds.
+
+## Final results
+
+The first run (243 blocks, 75,685 transactions, 793 payloads) was superseded by a second, larger run with signature paging (148 blocks from 3,309 paged signatures, 40,013 transactions, 1,119 payloads from 1,029 payload-bearing transactions) which is what the committed fixture contains. Both runs agreed on the decoding results: zero errors, zero disagreements, zero byte mismatches.
