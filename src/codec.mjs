@@ -3,6 +3,10 @@
 // Design rules:
 // - The byte layout is read from the IDL itself; no generated code and no
 //   third-party codec library is involved (sememe's independence claim).
+//   The only non-`node:` import used to be `@solana/web3.js`, and it was
+//   used solely to base58-encode 32 raw pubkey bytes; `src/base58.mjs`
+//   does that now, so the decode core runs in a repository with no npm
+//   dependencies at all.
 // - Decode is strict: unknown discriminators, unknown variants, invalid option
 //   tags, invalid bool bytes, out-of-range numbers and trailing bytes are
 //   errors instead of silent coercion.
@@ -14,7 +18,7 @@
 // Supported IDL shapes: spec 0.1.0 (Anchor on-chain) plus the legacy forms
 // {"defined": "Name"}, ["u8", 32] and {"kind": "type"} aliases.
 
-import { PublicKey } from '@solana/web3.js';
+import { encodeBase58, decodeBase58 } from './base58.mjs';
 
 const MAX_DEPTH = 32;
 // Instruction data is bounded by transaction size; a hostile length prefix
@@ -110,7 +114,7 @@ function decodePrimitive(name, cur, path) {
       if (byte === 1) return true;
       throw new CodecError(`invalid bool byte ${byte} (must be 0 or 1)`, path);
     }
-    case 'pubkey': return new PublicKey(cur.take(32, 'pubkey')).toBase58();
+    case 'pubkey': return encodeBase58(cur.take(32, 'pubkey'));
     case 'string': {
       const length = readLittle(cur, 4, false, path);
       try { return utf8Decoder.decode(cur.take(length, 'utf-8 string')); }
@@ -145,8 +149,17 @@ function encodePrimitive(name, value, path) {
         return Buffer.from(value);
       }
       if (typeof value !== 'string') throw new CodecError(`expected a base58 pubkey, got ${describe(value)}`, path);
-      try { return Buffer.from(new PublicKey(value).toBytes()); }
-      catch (error) { throw new CodecError(`invalid pubkey: ${error.message}`, path); }
+      try {
+        const decoded = decodeBase58(value);
+        // `PublicKey` enforced exactly this: a base58 string that decodes to 32 bytes.
+        if (decoded.length !== 32) {
+          throw new CodecError(`invalid pubkey: expected 32 bytes, got ${decoded.length}`, path);
+        }
+        return Buffer.from(decoded);
+      } catch (error) {
+        if (error instanceof CodecError) throw error;
+        throw new CodecError(`invalid pubkey: ${error.message}`, path);
+      }
     }
     case 'string': {
       if (typeof value !== 'string') throw new CodecError(`expected a string, got ${describe(value)}`, path);

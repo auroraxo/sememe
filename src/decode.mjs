@@ -9,22 +9,12 @@
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { decodeInstructionData, encodeInstructionData, toJsonSafe } from './codec.mjs';
+import { decodeBase58 } from './base58.mjs';
 
-const BASE58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-
-export function decodeBase58(input) {
-  if (typeof input !== 'string' || input.length === 0) throw Error('base58 payload must be a non-empty string');
-  let value = 0n;
-  for (const character of input) {
-    const index = BASE58.indexOf(character);
-    if (index < 0) throw Error(`invalid base58 character ${JSON.stringify(character)}`);
-    value = value * 58n + BigInt(index);
-  }
-  const bytes = [];
-  while (value > 0n) { bytes.unshift(Number(value & 0xffn)); value >>= 8n; }
-  for (const character of input) { if (character === '1') bytes.unshift(0); else break; }
-  return Buffer.from(bytes);
-}
+// Kept as a re-export: callers of `src/decode.mjs` import `decodeBase58`
+// from here, and the implementation now lives in `src/base58.mjs` so the
+// decode core has no third-party import at all.
+export { decodeBase58 } from './base58.mjs';
 
 export function decodeHex(input) {
   const cleaned = input.replace(/^0x/, '');
