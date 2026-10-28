@@ -21,6 +21,14 @@
 // Usage:
 //   node tools/harvest.mjs --program <program-id> --count 1000 --out <file.json>
 //   node tools/harvest.mjs --from-signatures <file.json> --out <rederived.json>
+//   node tools/harvest.mjs --from-signatures <file.json> --out <rederived.json> --verify <file.json>
+//
+// `--verify` compares the re-derivation against the fixture it claims to
+// reproduce and exits non-zero unless EVERY pinned transaction came back with
+// byte-identical payloads. A public RPC rate-limits: a run that fetched 37 of
+// 40 transactions writes a file and exits 0, which looks exactly like a
+// reproduction unless something compares them. Re-deriving is only useful if
+// "reproduced" and "partially fetched" cannot be confused.
 //
 // Public RPC only. Failed transactions are kept and marked: their instruction
 // bytes are still the bytes that were submitted.
@@ -29,6 +37,7 @@ import { writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { extractPayloads } from './lib/payloads.mjs';
 import { pinnedSignaturesOf } from './lib/pinned.mjs';
+import { compareReDerived, isCompleteReproduction } from './lib/rederive-verify.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -45,6 +54,7 @@ const count = Number(option('--count', '1000'));
 const rpcUrl = option('--rpc', 'https://api.mainnet-beta.solana.com');
 const outPath = option('--out', null);
 const fromSignatures = option('--from-signatures', null);
+const verifyPath = option('--verify', null);
 const blocks = Number(option('--blocks', '0'));
 const beforeSlot = option('--before-slot', null);
 
@@ -305,6 +315,33 @@ const document = {
 };
 
 await writeFile(outPath, `${JSON.stringify(document, null, 1)}\n`);
+
+let verification = null;
+if (verifyPath) {
+  const reference = JSON.parse(await readFile(verifyPath, 'utf8'));
+  verification = compareReDerived(reference, document);
+  const complete = isCompleteReproduction(verification);
+  console.log(JSON.stringify({
+    verify: verifyPath,
+    complete,
+    pinned: verification.pinned,
+    fetched: verification.fetched,
+    missing: verification.missing.length,
+    missingExample: verification.missing[0] ?? null,
+    payloadSetsChecked: verification.payloadSetsChecked,
+    payloadSetsMatched: verification.payloadSetsMatched,
+    mismatched: verification.mismatched.length,
+    mismatchExample: verification.mismatched[0] ?? null,
+  }, null, 2));
+  if (!complete) {
+    console.error(
+      `re-derivation incomplete: ${verification.missing.length} of ${verification.pinned} pinned transactions missing, `
+      + `${verification.mismatched.length} payload sets differ — not a reproduction`,
+    );
+    process.exit(1);
+  }
+  console.error(`re-derivation complete: ${verification.payloadSetsChecked}/${verification.pinned} payload sets byte-identical`);
+}
 
 console.log(JSON.stringify({
   out: path.resolve(outPath),

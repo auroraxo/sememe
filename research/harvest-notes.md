@@ -53,6 +53,21 @@ Two defects were found and fixed against the committed fixture on 2026-10-28, bo
 
 Fixes: `tools/lib/pinned.mjs` resolves the list from the transaction records (the payload set) first, falls back to a declared `signatures` array, and **throws** when a document pins nothing instead of returning an empty list. `tools/harvest.mjs` pins the transactions it read, and refuses to write an empty harvest. The committed fixture now carries an explicit `signatures` array with one entry per transaction it keeps. Covered by `test/pinned.test.mjs` (5 tests): the committed fixture pins exactly the transactions it carries (both directions, no partial list), transaction records win over a declared list, and a document that pins nothing is refused rather than resolving to empty.
 
+## A partial fetch is not a reproduction
+
+A public RPC rate-limits, so a re-derivation can come back incomplete: 37 of 40 transactions fetched, the rest marked `missing` with the RPC error. That run still writes a file and still exits 0, which is indistinguishable from a reproduction unless something compares the two.
+
+`tools/lib/rederive-verify.mjs` makes the comparison explicit, and `--verify` wires it into the CLI:
+
+```
+node tools/harvest.mjs --from-signatures test/fixtures/harvest-whirlpool-2026-10-28.json \
+  --out rederived.json --verify test/fixtures/harvest-whirlpool-2026-10-28.json
+```
+
+It reports `pinned`, `fetched`, `missing`, `payloadSetsChecked`, `payloadSetsMatched` and `mismatched`, and exits non-zero unless every pinned transaction came back with byte-identical payloads. `payloadBytesMatched` is a claim about the whole pinned set, not about what happened to arrive — a partial fetch that matches perfectly on the transactions it got still does not claim byte-exactness. Covered by `test/rederive-verify.test.mjs` (5 tests), including the negative controls: a rate-limited fetch, a changed payload byte, and a dropped payload each fail the comparison.
+
+Measured on 2026-10-28 against live mainnet: a 15-transaction subset re-derived completely (15/15 fetched, 17 payloads, all byte-identical, exit 0), and a tampered payload made the same command exit 1 with `payload 0 dataHex differs`.
+
 ## Final results
 
 The first run (243 blocks, 75,685 transactions, 793 payloads) was superseded by a second, larger run with signature paging (148 blocks from 3,309 paged signatures, 40,013 transactions, 1,119 payloads from 1,029 payload-bearing transactions) which is what the committed fixture contains. Both runs agreed on the decoding results: zero errors, zero disagreements, zero byte mismatches.
