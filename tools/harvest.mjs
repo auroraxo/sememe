@@ -28,6 +28,7 @@
 import { writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { extractPayloads } from './lib/payloads.mjs';
+import { pinnedSignaturesOf } from './lib/pinned.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -240,11 +241,27 @@ let transactions, usedSlots, tip, pinnedSignatures, blockErrors;
 if (fromSignatures) {
   const pinnedFile = JSON.parse(await readFile(fromSignatures, 'utf8'));
   if (pinnedFile.program !== program) throw Error(`pinned file is for program ${pinnedFile.program}, not ${program}`);
-  ({ transactions } = await harvestBySignatures(pinnedFile.signatures ?? []));
+  // Resolve the pinned list through lib/pinned.mjs: it reads the top-level
+  // `signatures` array or the transaction records, and REFUSES a document that
+  // pins nothing — silently re-deriving zero transactions would look like a
+  // successful run while proving nothing.
+  const pinned = pinnedSignaturesOf(pinnedFile);
+  const rederived = await harvestBySignatures(pinned);
+  transactions = rederived.transactions;
+  usedSlots = rederived.usedSlots;
+  tip = rederived.tip;
+  pinnedSignatures = pinned;
 } else {
   const harvest = await harvestByBlocks(count);
   ({ transactions, usedSlots, tip } = harvest);
-  pinnedSignatures = harvest.pinned;
+  // The pinned list of a block harvest is the set of transactions it actually
+  // read, not the getSignaturesForAddress page that selected the blocks. The
+  // page and the transaction set differ (a CPI-only transaction of the target
+  // program never appears in the callee's signature page), so pinning the
+  // page would make a re-derived harvest a different — smaller — sample.
+  pinnedSignatures = transactions
+    .filter((entry) => entry.signature)
+    .map((entry) => ({ signature: entry.signature, slot: entry.slot }));
   blockErrors = harvest.errored;
 }
 
@@ -255,6 +272,12 @@ const slots = present.map((entry) => entry.slot).filter((slot) => Number.isSafeI
 const signatures = pinnedSignatures
   ?? transactions.filter((entry) => entry.signature).map((entry) => ({ signature: entry.signature, slot: entry.slot }));
 
+// A harvest that pinned nothing must not be written as if it had measured
+// something: empty input is an error, not a result.
+if (!signatures.length) {
+  console.error(`no pinned signatures in ${fromSignatures ?? 'the signature page'} — refusing to write an empty harvest`);
+  process.exit(1);
+}
 const document = {
   source: `mainnet-beta harvest (own run, public RPC) — ${new Date().toISOString()}`,
   program,

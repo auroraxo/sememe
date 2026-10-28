@@ -30,12 +30,28 @@ Two real extraction bugs were found and fixed during implementation (covered by 
 
 The full harvest of 40,013 transactions across 148 blocks is a 10 MB file (`/tmp/harvest-1000b.json`). To keep the repository small while retaining full reproducibility:
 
-- `test/fixtures/harvest-whirlpool-2026-10-28.json` (508 KB) preserves every transaction that carries a Whirlpool payload (1,029 transactions, 1,119 payloads), along with the slot range and metadata.
+- `test/fixtures/harvest-whirlpool-2026-10-28.json` (662 KB) preserves every transaction that carries a Whirlpool payload (1,029 transactions, 1,119 payloads), along with the slot range, the metadata, and an explicit `signatures` array.
 - Any caller with RPC access can re-derive the payloads from the pinned signature list using:
   ```
   node tools/harvest.mjs --from-signatures test/fixtures/harvest-whirlpool-2026-10-28.json --out rederived.json
   ```
 - `tools/tx-diff.mjs` consumes this fixture and produces the full diff against `@orca-so/whirlpools-client` in under 2 seconds.
+
+## Which signature list re-derives a harvest (and the bug found here)
+
+There are two candidate lists in a harvest document, and they are **not** the same set:
+
+- `transactions` — the transactions the harvest actually read, i.e. the payload set.
+- `signatures` — the `getSignaturesForAddress` page that selected which blocks to read.
+
+Measured on this repo's own harvest: **only 298 of the 1,029 payload-bearing transactions appear in that page**. The reason is the CPI placement finding above: a transaction that reaches Whirlpool only through a CPI does not list Whirlpool in its own account keys, so it never shows up in `getSignaturesForAddress(whirlpool)`. The page is a *sampling frame* for blocks, not a description of the payloads.
+
+Two defects were found and fixed against the committed fixture on 2026-10-28, both of the "looks successful, measures nothing" class:
+
+1. The fixture had no top-level `signatures` array at all, so the documented `--from-signatures` command resolved to an empty list, harvested zero transactions, and then crashed on `usedSlots.length`. The command was in `README.md` and in these notes — i.e. the published reproducibility claim did not work.
+2. The harvester pinned `harvest.pinned`, the signature *page*, rather than the transactions it read. A file re-derived that way would re-derive a different, smaller sample while reporting a successful run.
+
+Fixes: `tools/lib/pinned.mjs` resolves the list from the transaction records (the payload set) first, falls back to a declared `signatures` array, and **throws** when a document pins nothing instead of returning an empty list. `tools/harvest.mjs` pins the transactions it read, and refuses to write an empty harvest. The committed fixture now carries an explicit `signatures` array with one entry per transaction it keeps. Covered by `test/pinned.test.mjs` (5 tests): the committed fixture pins exactly the transactions it carries (both directions, no partial list), transaction records win over a declared list, and a document that pins nothing is refused rather than resolving to empty.
 
 ## Final results
 
