@@ -1,0 +1,229 @@
+{
+ "source": "@coral-xyz/anchor BorshInstructionCoder/BorshEventCoder over the on-chain Meteora Vault IDL (no stored discriminators); sighash computed by anchor-ts at runtime",
+ "packageVersion": "0.29.0",
+ "capturedAt": "2026-10-29",
+ "instructions": {
+  "initialize": [
+   175,
+   175,
+   109,
+   31,
+   13,
+   152,
+   155,
+   237
+  ],
+  "enableVault": [
+   145,
+   82,
+   241,
+   156,
+   26,
+   154,
+   233,
+   211
+  ],
+  "setOperator": [
+   238,
+   153,
+   101,
+   169,
+   243,
+   131,
+   36,
+   1
+  ],
+  "initializeStrategy": [
+   208,
+   119,
+   144,
+   145,
+   178,
+   57,
+   105,
+   252
+  ],
+  "removeStrategy": [
+   185,
+   238,
+   33,
+   91,
+   134,
+   210,
+   97,
+   26
+  ],
+  "removeStrategy2": [
+   138,
+   104,
+   208,
+   148,
+   126,
+   35,
+   195,
+   14
+  ],
+  "collectDust": [
+   246,
+   149,
+   21,
+   82,
+   160,
+   74,
+   254,
+   240
+  ],
+  "addStrategy": [
+   64,
+   123,
+   127,
+   227,
+   192,
+   234,
+   198,
+   20
+  ],
+  "depositStrategy": [
+   246,
+   82,
+   57,
+   226,
+   131,
+   222,
+   253,
+   249
+  ],
+  "withdrawStrategy": [
+   31,
+   45,
+   162,
+   5,
+   193,
+   217,
+   134,
+   188
+  ],
+  "withdraw2": [
+   80,
+   6,
+   111,
+   73,
+   174,
+   211,
+   66,
+   132
+  ],
+  "deposit": [
+   242,
+   35,
+   198,
+   137,
+   82,
+   225,
+   242,
+   182
+  ],
+  "withdraw": [
+   183,
+   18,
+   70,
+   156,
+   148,
+   109,
+   161,
+   34
+  ],
+  "withdrawDirectlyFromStrategy": [
+   201,
+   141,
+   146,
+   46,
+   173,
+   116,
+   198,
+   22
+  ]
+ },
+ "events": {
+  "AddLiquidity": [
+   31,
+   94,
+   125,
+   90,
+   227,
+   52,
+   61,
+   186
+  ],
+  "RemoveLiquidity": [
+   116,
+   244,
+   97,
+   232,
+   103,
+   31,
+   152,
+   58
+  ],
+  "StrategyDeposit": [
+   205,
+   53,
+   91,
+   239,
+   34,
+   136,
+   73,
+   47
+  ],
+  "StrategyWithdraw": [
+   120,
+   76,
+   208,
+   95,
+   221,
+   210,
+   229,
+   189
+  ],
+  "ClaimReward": [
+   148,
+   116,
+   134,
+   204,
+   22,
+   171,
+   85,
+   95
+  ],
+  "PerformanceFee": [
+   28,
+   70,
+   231,
+   223,
+   81,
+   109,
+   239,
+   167
+  ],
+  "ReportLoss": [
+   154,
+   36,
+   158,
+   196,
+   32,
+   163,
+   123,
+   126
+  ],
+  "TotalAmount": [
+   92,
+   200,
+   122,
+   145,
+   211,
+   203,
+   49,
+   205
+  ]
+ }
+}

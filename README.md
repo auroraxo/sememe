@@ -209,6 +209,27 @@ Covered by `test/marinade.test.mjs` (6 tests) and pinned fixtures (`marinade-liq
 
 **Remaining limits after five programs:** still no outside user; no Marinade *account* decoding yet (the account branch covers Whirlpool/OpenBook/Kamino); the derivation is still Anchor-specific; and this harvest recorded **0 event payloads** — Marinade's 26 events were verified as discriminators against anchor-ts but none appeared in the sampled traffic, so the event path on this program is confirmed by the oracle, not by real bytes.
 
+## Sixth program: Meteora Vault (a yield vault, and a measured interface drift)
+
+Meteora Vault (`24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi` — strategy rotation over token vaults, a fifth program family: not a swap AMM, lending market, order book or staking program) is one of the five programs in the strict coverage table that can only decode because the tool reconstructs the missing discriminators. Its on-chain IDL was pulled on 2026-10-29 at slot 463051650 (legacy `anchor:idl` account, fingerprint `sha256:945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94`): **14 instructions, 8 events, 0 discriminators** — same premise, fifth family.
+
+**The interface drift finding (new):** the independent published copy (`idl.ts` shipped in MeteoraAg/vault-sdk) is version **0.9.5**, while the on-chain account is **0.7.2**. The inventories are not identical: the on-chain copy carries `collectDust` and `withdraw2`, which the published copy dropped; the published copy carries 7 instructions the on-chain account never heard of (`claimRewards`, `getUnlockedAmount`, `initializeIdleVault`, `migrateVault`, `transferAdmin`, `transferFeeVault`, `updateLockedProfitDegradation`). Every on-chain **event** name exists in the published copy. This is pinned as a measured fact in `test/meteora-vault.test.mjs` so a future pull that changes the drift fails loudly — "same interface" is not asserted where it is not true.
+
+**Two independent confirmations:**
+
+- **Is the rule right?** anchor-ts (0.29.0) computes Anchor's sighash at runtime from the same IDL in code this repo shares nothing with. Fixture `test/fixtures/meteora-vault-anchor-ts-discriminators.json` records its 14 instruction + 8 event discriminators; the derived values match **14/14 and 8/8, byte for byte**.
+- **Does real traffic only use names both copies know?** **1,290/1,290 payloads named by both sources, 0 disagreements**, and the two instructions actually observed (`withdraw`, `deposit`) exist in both interface copies — the drift above is inventory drift, not a name under shipped bytes.
+
+**Measured on real traffic:** a harvest of **325,087 mainnet transactions** across 428 finalized blocks (slots 463049519..463051719) yielded **603 payload-bearing transactions with 1,290 payloads**:
+
+- **1,290/1,290 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/1,290** — the discriminator index built from the published bytes alone is empty.
+- Instructions observed: `withdraw` (654), `deposit` (636). Honest limit: vault traffic is two high-volume flows, not a tour of all 14 instructions; **0 event payloads**, so the event path on this program is confirmed by the oracle (8/8 against anchor-ts), not by real bytes — same limit as Marinade.
+
+Covered by `test/meteora-vault.test.mjs` (7 tests) and pinned fixtures (`meteora-vault-idl.json`, `meteora-vault-anchor-ts-discriminators.json`, `meteora-vault-published-idl.json`, `harvest-meteora-vault-2026-10-29.json`); measurement in [research/coverage-meteora-vault-2026-10-29.json](research/coverage-meteora-vault-2026-10-29.json). Falsification: disabling the derivation fill fails 2 of the 7 new tests (byte-exact round-trip and the anchor-ts comparison), restoring it passes.
+
+**Remaining limits after six programs:** still no outside user; the derivation is still Anchor-specific; **one of the five derivation-only programs remains individually unproven against real payloads (Meteora DAMM v1)** — Kamino Lend, OpenBook v2, Marinade and Meteora Vault now each are; no event bytes observed on this program.
+
 ## Accounts: state, not just calls (three programs, 39 real accounts)
 
 Every proof above ends instructions/events and says the same remaining limit: *accounts are still undecoded*. That limit is now closed for the same three programs.
@@ -262,7 +283,7 @@ The strict figure **has now been measured** over the same frozen 20 IDs and the 
 | **decodable from published bytes alone** (the program stored its own discriminators) | **10/20** | **50%** |
 | decodable after Anchor's rule fills a missing discriminator | 15/20 | 75% |
 
-The middle row is the honest headline: **half** of the sample's usable programs publish an interface that decodes as-is; the other five (Kamino Lend, OpenBook v2, Marinade, Meteora DAMM v1, Meteora Vault) publish names and layouts but no wire discriminators, and only become decodable because the tool can reconstruct them from the name. That reconstruction is verified per program, but it is the tool's inference, not the program's published interface — and it is Anchor-specific. See [frozen 20 IDs](programs-20.json), [raw classification with slot and account addresses](coverage-result.json), and [selection/chronology limitations](research/selection-method.md). The 20 IDs were committed before the full batch run, but the detailed selection-method note came later; one exploratory Whirlpool RPC check preceded the freeze. Do not call the whole study blind or fully preregistered.
+The middle row is the honest headline: **half** of the sample's usable programs publish an interface that decodes as-is; the other five (Kamino Lend, OpenBook v2, Marinade, Meteora DAMM v1, Meteora Vault) publish names and layouts but no wire discriminators, and only become decodable because the tool can reconstruct them from the name. That reconstruction is verified per program, but it is the tool's inference, not the program's published interface — and it is Anchor-specific. **Four of the five are now individually proven against real mainnet payloads** (Kamino Lend 1,432/1,432, OpenBook v2 600/600, Marinade 623/623, Meteora Vault 1,290/1,290, each byte-exact with 0 without derivation); Meteora DAMM v1 remains. See [frozen 20 IDs](programs-20.json), [raw classification with slot and account addresses](coverage-result.json), and [selection/chronology limitations](research/selection-method.md). The 20 IDs were committed before the full batch run, but the detailed selection-method note came later; one exploratory Whirlpool RPC check preceded the freeze. Do not call the whole study blind or fully preregistered.
 
 ## Next qualification
 
