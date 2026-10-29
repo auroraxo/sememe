@@ -2,7 +2,7 @@
 import os from 'node:os';
 import path from 'node:path';
 import { pull } from '../src/pull.mjs';
-import { decodePayload } from '../src/decode.mjs';
+import { decodePayload, decodeStoredAccount } from '../src/decode.mjs';
 
 const usage = `usage:
   sememe pull <program-id> [--store <directory>] [--rpc <https-url>]
@@ -10,7 +10,11 @@ const usage = `usage:
       payload: base58 or hex instruction data (discriminator + args)
       --trailing report (default): decode the IDL-described prefix and report
           the bytes the IDL does not explain under "trailing"; --trailing error
-          refuses the payload instead.`;
+          refuses the payload instead.
+  sememe account <program-id> <account-data> [--store <directory>] [--name <account-type>]
+      account-data: base64 account bytes (as getMultipleAccounts returns them)
+          or hex. Without --name the account's 8-byte discriminator picks the
+          account type from the stored IDL.`;
 
 const [command, program, ...args] = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -45,6 +49,27 @@ try {
     if (decoded.trailing.count > 0 && trailing !== 'error') {
       console.error(JSON.stringify({
         note: `${decoded.trailing.count} byte(s) after ${decoded.name} are not described by the stored IDL`,
+        consumed: decoded.consumed,
+        bytes: decoded.bytes,
+        trailing: decoded.trailing,
+      }));
+    }
+  } else if (command === 'account') {
+    if (!program) throw Error('account needs a program id');
+    const data = args.shift();
+    if (!data) throw Error('account needs the account data (base64 or hex)');
+    const store = option('--store', path.join(os.homedir(), '.sememe'));
+    const name = option('--name', undefined);
+    const trailing = option('--trailing', undefined);
+    if (trailing !== undefined && trailing !== 'report' && trailing !== 'error') {
+      throw Error('--trailing must be "report" or "error"');
+    }
+    const decoded = await decodeStoredAccount(store, program, data,
+      name === undefined ? { trailing } : { name, trailing });
+    console.log(JSON.stringify(decoded, null, 2));
+    if (decoded.trailing.count > 0 && trailing !== 'error') {
+      console.error(JSON.stringify({
+        note: `${decoded.trailing.count} byte(s) after the described struct are not described by the stored IDL`,
         consumed: decoded.consumed,
         bytes: decoded.bytes,
         trailing: decoded.trailing,

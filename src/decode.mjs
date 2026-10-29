@@ -17,6 +17,9 @@ import {
 } from './codec.mjs';
 import { decodeBase58 } from './base58.mjs';
 import { withDerivedDiscriminators } from './discriminators.mjs';
+import {
+  withDerivedAccountDiscriminators, identifyAccount, decodeAccountData,
+} from './account.mjs';
 
 // Kept as a re-export: callers of `src/decode.mjs` import `decodeBase58`
 // from here, and the implementation now lives in `src/base58.mjs` so the
@@ -59,6 +62,48 @@ export async function findStoredIdl(storeDir, program) {
   const idl = JSON.parse(await readFile(objectPath, 'utf8'));
   if (!Array.isArray(idl.instructions)) throw Error(`stored object for ${program} has no instructions`);
   return { idl, receipt, receiptName, objectPath };
+}
+
+/**
+ * Decode one account's data with the locally stored, verified IDL.
+ *
+ * Same provenance guarantee as decodePayload: the receipt binds the program id
+ * to a fingerprinted object, so decoding is offline and reproducible.
+ * `name` skips identification (useful when the caller already knows); without
+ * it the account's discriminator picks the type.
+ */
+export async function decodeStoredAccount(storeDir, program, dataInput, { name, trailing } = {}) {
+  const { idl: storedIdl, receipt, receiptName, objectPath } = await findStoredIdl(storeDir, program);
+  const { idl, filled, conflicts } = withDerivedAccountDiscriminators(storedIdl);
+  const bytes = typeof dataInput === 'string'
+    ? (dataInput.startsWith('data:') || /[^0-9a-fA-F]/.test(dataInput.trim())
+      ? Buffer.from(dataInput.trim().replace(/^base64,/, ''), 'base64')
+      : decodeHex(dataInput))
+    : Buffer.from(dataInput);
+  const identified = name ? { name } : identifyAccount(idl, bytes);
+  if (!identified) {
+    throw Error(`no account type in the stored IDL matches the first 8 bytes of these ${bytes.length} byte(s)`);
+  }
+  const decoded = decodeAccountData(idl, bytes, identified.name, trailing ? { trailing } : {});
+  return {
+    program,
+    account: decoded.name,
+    args: decoded.args,
+    bytes: decoded.total,
+    consumed: decoded.consumed,
+    roundTripByteExact: decoded.roundTripByteExact,
+    discriminator: decoded.discriminator,
+    // True when the account bytes actually carry the discriminator the IDL
+    // names. False means the caller forced a type name onto bytes that
+    // belong to a different (or corrupted) account.
+    discriminatorMatches: decoded.hasDiscriminator,
+    trailing: decoded.trailing,
+    discriminator: decoded.discriminator,
+    discriminatorSource: filled > 0 ? (conflicts.length ? 'stored+derived' : 'derived') : 'stored',
+    discriminatorDerivation: { filledAccounts: filled, conflicts: conflicts.length },
+    idl: { fingerprint: receipt.fingerprint, slot: receipt.slot, source: receipt.source, receipt: receiptName },
+    object: objectPath,
+  };
 }
 
 /**

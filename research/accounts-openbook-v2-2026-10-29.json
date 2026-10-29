@@ -1,0 +1,48 @@
+{
+ "program": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+ "harvestFile": "test/fixtures/accounts-openbook-v2-2026-10-29.json",
+ "harvestedAt": "2026-10-29T16:52:08.563Z",
+ "idl": {
+  "fingerprint": "sha256:d12a2e16314b418a173cc6da755746396e2b15caf9e28ccb4913aa335050913f",
+  "slot": 462964115,
+  "source": "anchor"
+ },
+ "accountDiscriminators": {
+  "derived": 6,
+  "conflicts": 0,
+  "conflictList": []
+ },
+ "accounts": 4,
+ "identified": 4,
+ "decoded": 4,
+ "byteExact": 4,
+ "trailing": 0,
+ "trailingBytes": 0,
+ "refusals": [],
+ "byType": {
+  "EventHeap": {
+   "n": 1,
+   "byteExact": 1,
+   "trailing": 0
+  },
+  "Market": {
+   "n": 1,
+   "byteExact": 1,
+   "trailing": 0
+  },
+  "OpenOrdersAccount": {
+   "n": 1,
+   "byteExact": 1,
+   "trailing": 0
+  },
+  "BookSide": {
+   "n": 1,
+   "byteExact": 1,
+   "trailing": 0
+  }
+ },
+ "crossCheck": {
+  "compared": 4,
+  "disagreements": []
+ }
+}

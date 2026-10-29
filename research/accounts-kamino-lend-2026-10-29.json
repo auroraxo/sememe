@@ -1,0 +1,45 @@
+{
+ "program": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+ "harvestFile": "test/fixtures/accounts-kamino-lend-2026-10-29.json",
+ "harvestedAt": "2026-10-29T17:13:49.123Z",
+ "idl": {
+  "fingerprint": "sha256:8a9a5d124ac3a2b50ef096f1fff56557367ee9cb8d08a17bde8a61dd373da4b5",
+  "slot": 462964117,
+  "source": "anchor"
+ },
+ "accountDiscriminators": {
+  "derived": 10,
+  "conflicts": 0,
+  "conflictList": []
+ },
+ "accounts": 8,
+ "identified": 8,
+ "decoded": 8,
+ "byteExact": 8,
+ "trailing": 0,
+ "trailingBytes": 0,
+ "refusals": [],
+ "byType": {
+  "Obligation": {
+   "n": 2,
+   "byteExact": 2,
+   "trailing": 0
+  },
+  "UserMetadata": {
+   "n": 2,
+   "byteExact": 2,
+   "trailing": 0
+  },
+  "Reserve": {
+   "n": 2,
+   "byteExact": 2,
+   "trailing": 0
+  },
+  "LendingMarket": {
+   "n": 2,
+   "byteExact": 2,
+   "trailing": 0
+  }
+ },
+ "crossCheck": null
+}

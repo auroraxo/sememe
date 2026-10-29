@@ -1,0 +1,168 @@
+{
+ "harvestedAt": "2026-10-29",
+ "source": "anchor-ts BorshAccountsCoder (0.29.0 legacy IDLs, 0.30.1 new-format IDL), normalised to sememe JSON shape",
+ "programs": {
+  "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc": {
+   "31KrYUDzgEQhEgr1JSNVfHAknWACcF97CtUaU8enKQsy": {
+    "account": "Whirlpool",
+    "valueSha256": "c4aa51144a26da1262374115eaf0de36ec9852190141f375242115a9311cadeb"
+   },
+   "4GXVcXkrStPmtw5jyVhZNGv2wbYhRVzkaantbSk5q7jG": {
+    "account": "Oracle",
+    "valueSha256": "404300ddffb1ffc9380f1815fc84db22ff1922b3ef2c921ab42828c7cd635293"
+   },
+   "7ME7zsYEjMWXDxqR2qKSgBGxDLQVgyuZaZnNNGZxh3jE": {
+    "account": "DynamicTickArray",
+    "valueSha256": "16ab7b455a9e8be2e9a474a22655f8e4bdfbe4a841004739950a5b1924222234"
+   },
+   "81DB9ngt4CZ82UPPCpiEPQtvzuCz2VWggEiFyP79Y2Ys": {
+    "account": "DynamicTickArray",
+    "valueSha256": "dcaee26ae24d8cdb8ca6da64ee40ba3bfa42026364179e7c300f20b96965cc96"
+   },
+   "BZhTVmuzrzGdpR1vbyXBTUH9gVAbA6K4VGQTZgnnbzg7": {
+    "account": "DynamicTickArray",
+    "valueSha256": "1362cbbd0dd34e6f45b0fc6728154ee5d742162a57cbe266666caeb925d91903"
+   },
+   "BraJq2Gk1eojuY6Jg2GKyYShXmvgLuoTkpKPBT4T6U7V": {
+    "account": "DynamicTickArray",
+    "valueSha256": "ea52a2318964415b63426e3fae34d208ad1a4cfa72fc93c691217b5ba12dc98c"
+   },
+   "CbWQBsWUZywFVVGFeytxWwCvzAeyEt1ExGJpx4udELGR": {
+    "account": "TickArray",
+    "valueSha256": "13a8ceb4f76b48fe0e79efb1cb9d5014a54dab1df299c79395d2c5aba66cc546"
+   },
+   "GK1CsJsqXwKwvHqHeqXfAcaY9bULvniHFtkPdakimUeD": {
+    "account": "DynamicTickArray",
+    "valueSha256": "a03cf25657b54cb2eba8e10dcb23e41e708f610df9895d3dd2d5477bf3714d77"
+   },
+   "qU3qrrbXyLckXxkX5qp3ELxezyyQaneqP3N5j7kBF8C": {
+    "account": "DynamicTickArray",
+    "valueSha256": "6694b9098efcab777325a139c576146f9ed61dbe5caa5d4c6de3680f7f3e1def"
+   },
+   "58iQRQbAKgPU2ADzRLS4QJxBS2RsdUTEd567dPpMcLHe": {
+    "account": "Whirlpool",
+    "valueSha256": "1c0fc1a3389311422c9e189b5647006d45aa1e3878e394d8dda7da9c900ca22e"
+   },
+   "7zCEjVwziN4tDw8mtZsZdCpjW6RQZHRDP8ahLCorb5n9": {
+    "account": "DynamicTickArray",
+    "valueSha256": "407a6fa7d4ce02dcfc70326bc22c2921b5f1e8d02108580a1053d2658c7f257d"
+   },
+   "DW6vjqQQ6rBYiB8XmcUdyStvKNc8GzoKYu2RRuXspWPK": {
+    "account": "DynamicTickArray",
+    "valueSha256": "4136edae1934f2c29cc47aa254c2048b3e5e86a63bd5d3bc2d106a58dfa261ac"
+   },
+   "26UY4D6pBHgxYdPWuBP3sfyc4jJf6qQjPDxCJPhtUx3H": {
+    "account": "Whirlpool",
+    "valueSha256": "674bcd148322b688b32fe4f49e330148817c2f4b30aaf93b7ebbdf1d5e819365"
+   },
+   "5irW2Ny4e3GFELpdhPqX26zidmY5JiQ7fXRacTiAArnY": {
+    "account": "Oracle",
+    "valueSha256": "4935a52fd75c9c6bedb648f8e6e80590026dfdf665ef572ce70d7026a35eb1f7"
+   },
+   "7gKNEqHH7rhcLWq7uLXpPruzFZQo9SDfW5CR4YecG7cN": {
+    "account": "DynamicTickArray",
+    "valueSha256": "5c8226c0b25e5f66badbac03fdb537f0056458a4d1c46eb4e6863cee07cda6de"
+   },
+   "F5LHSwqss8amLQKk4V3yCAfVy8h7NpeHrcBsDdwHzfkj": {
+    "account": "DynamicTickArray",
+    "valueSha256": "94cdbe73de75886b54333a12d22849cd83ce550202fd112112d294ba01ddf26e"
+   },
+   "GePe2mha8rCb88jcFPNJJQ3hCYmmxaqXbecG7ooYdHXi": {
+    "account": "DynamicTickArray",
+    "valueSha256": "908d7a1aec7d0a71ddf3a36bbcd96ee503374d83ceed639cbf4c7ec932400aa7"
+   },
+   "326kPG1Ey81bPmK6FRHfRote14gC23jTBbAiuzA9AqCy": {
+    "account": "DynamicTickArray",
+    "valueSha256": "af903e8c58002f4669722fce181d8ab808a72e2d99054429cac42320685eac58"
+   },
+   "3x478ZMCNf7UamVPM7FDGYZzasEepHi6oaBF27tYCohR": {
+    "account": "DynamicTickArray",
+    "valueSha256": "a7064c0785dce52dd355b09807f2de2c98138f2d93b7a48bdc55d1c29a1be889"
+   },
+   "DBbY2T6MFf6w7Mua9SmWh5G5Mu8dK8WfUtTjSaCisLxJ": {
+    "account": "DynamicTickArray",
+    "valueSha256": "56e191c8aa712cdd8de4b35a02bfccc3cb174a0b0d3a28fbdcfda6e11d1dfdbf"
+   },
+   "DGk2R8sSwDwYfcu4NoyNHLUhmHzq1d4sfN4AAN3HRB3J": {
+    "account": "DynamicTickArray",
+    "valueSha256": "d3bb7ca27c42cf6008df7004669a9b1af14d8fbab9e1779da5293e6c50b4eaf8"
+   },
+   "Gmc6MFn7MM7FS6fubMpvf1t1axkswozZnZGmcvtVeiyW": {
+    "account": "DynamicTickArray",
+    "valueSha256": "13d9ef27e76e6e7ccf289293d64a7fbe014659cc5fc724a575818dac2190c709"
+   },
+   "HrytwiH74JoEcjRyeTTomP1y7cKXKUctGPUuGrh8dYkT": {
+    "account": "DynamicTickArray",
+    "valueSha256": "4dc6b0fb65f20f55d55752949a5b2860e4cfc87d15c96daacfc58e6dbca1e367"
+   },
+   "Hw2xQiZunHwJx4swKyoNh1e9a64MbPmUJua8WEhKAfnx": {
+    "account": "DynamicTickArray",
+    "valueSha256": "ece0107789d6327ffd7df25d780117c2e96bd8936befae21d4fb25f90f517ac6"
+   },
+   "7emQoPr6giEwk7qXdNVKaVNak56JNYgsJoWCE32Ufqtj": {
+    "account": "DynamicTickArray",
+    "valueSha256": "8c8de044d5a65e46f74fe1c44f2c4fde5df39aaee4d75405d7ffe242af1214d4"
+   },
+   "9YC2VdcDqvyzfhu6gA5e2z3TE8Msw9DNAaiacNKQWZds": {
+    "account": "DynamicTickArray",
+    "valueSha256": "a0bbddaac0afb52a13e09c9015b5f729fc8a9daeb0eabff110d776b4b1ec3c4b"
+   },
+   "6j6mdENfUJAPmVbfLs5Cq2nRhKiqFGegH9G8bMYuhSTj": {
+    "account": "Oracle",
+    "valueSha256": "e3f18338442f31833f7201b09aa67647fed639196937a70c8cf1700e8a057469"
+   }
+  },
+  "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb": {
+   "NNDqH7pdetS4AufzSQPs1oAVA8SghkaeZw6cw9AbFFz": {
+    "account": "EventHeap",
+    "valueSha256": "e91924c4cdc00d2a2818ff6efe852261cfbb7eb34e649657290ab3fee46189ee"
+   },
+   "iscXZbk8NZdrA1WhMcM1gHvdMoawJprYDgWzkZVtg4e": {
+    "account": "Market",
+    "valueSha256": "017cb7734822d6167bb97b3992f1af86afaa2cd532a19bb11fa4f292cf75ad11"
+   },
+   "vUHAZPVDVNF8BneUbbijJ4UeH4G4cCermGDM3DuU2AS": {
+    "account": "OpenOrdersAccount",
+    "valueSha256": "f317f0890bde02789f11dad56c78d5ace318b74db3a584c9b1270ba2d9b5b9f2"
+   },
+   "6aiAK74QKZLCjWqfc32VjoaaBQdM6VnHY3xm9JHQRzBe": {
+    "account": "BookSide",
+    "valueSha256": "85aea6fadb52dbce90541cb68594731ed604ac825136f1bca9a24531b96161c0"
+   }
+  },
+  "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD": {
+   "FqUqPtqnDneeAhtcMQKVbwDx5iZvQFiX95vMobDWUMFD": {
+    "account": "Obligation",
+    "valueSha256": "04058ea4586f01375d5c5aaa4f7c1275778eb0be339965de89d34c9cd28a0da6"
+   },
+   "93twBAQZCzYmNe4rrdZuQdjxCHoxkP9MFuNLQEwkTBGi": {
+    "account": "UserMetadata",
+    "valueSha256": "b91861dc72259d2caf144b7d32977a1d063adf90fee9713227f3befd277597e3"
+   },
+   "d4A2prbA2whesmvHaL88BH6Ewn5N4bTSU2Ze8P6Bc4Q": {
+    "account": "Reserve",
+    "valueSha256": "0820d7b58ab3b81874810f76061a823fefac5102f8ae872291fccdd95bf1d602"
+   },
+   "7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF": {
+    "account": "LendingMarket",
+    "valueSha256": "9b7b1e76c2dca743ef9fa426eea5c27b8ffccdd588df1019c4516a39a9f39a1f"
+   },
+   "9dAj2Aq3e8K1GKP1a61smvSkMQs8haehzeLjHyvf1D3T": {
+    "account": "Reserve",
+    "valueSha256": "f9c60a76fe9993a41a261fddccad4c87054e9d4d1afc817ea142c10e543a60a2"
+   },
+   "HMNm3ZrAvG4zKVv5zpMDA6DKduc612156RUsdAAZf4TC": {
+    "account": "LendingMarket",
+    "valueSha256": "463b703ef2e6297e158fbfd730ac69c45444f42174955e4bbae151f1f727708a"
+   },
+   "4mqWAPiNseJzsLHxG6JhgJ4spWSCXcFioHCbhHXQkRsj": {
+    "account": "UserMetadata",
+    "valueSha256": "2d7fb469ac49c2fd177319d1e13885dc147105f04173bd5c75c4ca4edcde2bb4"
+   },
+   "6pCHU7ZCYZGW384fPGHnKWLeyvEbK8iHTLv4CWm1pwny": {
+    "account": "Obligation",
+    "valueSha256": "09051304fe9b6f770e56b105aceaf764316199ac6274c9abd5cea2e77af7f1b3"
+   }
+  }
+ }
+}

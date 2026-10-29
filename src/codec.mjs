@@ -818,6 +818,23 @@ export function encodeInstructionData(idl, name, args) {
   return Buffer.concat(parts);
 }
 
+/**
+ * Decode a type from the front of `bytes` and report how much was consumed,
+ * without requiring the buffer to be exhausted. Used where a struct describes
+ * a prefix of a larger buffer (account data with trailing bytes, instruction
+ * payloads the IDL does not fully explain).
+ */
+export function decodeTypePartial(type, bytes, ctx, path = 'value') {
+  const cursor = new Cursor(bytes);
+  const value = decodeAt(type, cursor, ctx, path, 0);
+  return { value, consumed: cursor.offset };
+}
+
+/** Encode a value back into the bytes of `type` (inverse of decodeType). */
+export function encodeType(type, value, ctx, path = 'value') {
+  return encodeAt(type, value, ctx, path, 0);
+}
+
 /** Deep-copy a decoded value into JSON-safe form: bigint -> decimal string. */
 export function toJsonSafe(value) {
   if (typeof value === 'bigint') return value.toString();

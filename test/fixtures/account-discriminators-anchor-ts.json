@@ -1,0 +1,43 @@
+{
+ "source": "@coral-xyz/anchor 0.29.0 BorshAccountsCoder.accountDiscriminator",
+ "note": "independent computation of sha256(account:<Name>) by anchor-ts, produced 2026-10-29",
+ "programs": {
+  "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc": {
+   "AdaptiveFeeTier": "931090742f92952e",
+   "DynamicTickArray": "11d8f68ee1c7da38",
+   "FeeTier": "384b9f4c8e44be69",
+   "LockConfig": "6a2fee9f7c0ca0c0",
+   "Oracle": "8bc283b38cb3e5f4",
+   "Position": "aabc8fe47a40f7d0",
+   "PositionBundle": "81a9af41b95f2064",
+   "TickArray": "4561bdbe6e0742bb",
+   "TokenBadge": "74dbcce5f974ff96",
+   "Whirlpool": "3f95d10ce1806309",
+   "WhirlpoolsConfig": "9d1431e0d957c1fe",
+   "WhirlpoolsConfigExtension": "0263d7a3f01a993a"
+  },
+  "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb": {
+   "Market": "dbbed53700e3c69a",
+   "OpenOrdersAccount": "ffc24e7b1069d0a5",
+   "OpenOrdersIndexer": "c35380d5cc5b1396",
+   "StubOracle": "e0fbfe63b1ae8904",
+   "BookSide": "482ce18db2826139",
+   "EventHeap": "773b3d13a55439af"
+  },
+  "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD": {
+   "UserState": "48b155f94ca7ba7e",
+   "GlobalConfig": "95089ccaa0fcb0d9",
+   "LendingMarket": "f6723262489d1c78",
+   "Obligation": "a8ce8d6a584caca7",
+   "ReferrerState": "c251d9670c130c42",
+   "ReferrerTokenState": "270fd04d20c36938",
+   "ShortUrl": "1c59ae19e27c7ed4",
+   "UserMetadata": "9dd6dceb6287ab1c",
+   "Reserve": "2bf2ccca1af73b7f",
+   "WithdrawTicket": "ed17a43a35f8f05e"
+  },
+  "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4": {
+   "TokenLedger": "9cf709bc366c554d"
+  }
+ }
+}

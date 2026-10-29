@@ -1,0 +1,45 @@
+{
+ "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+ "harvestFile": "test/fixtures/accounts-whirlpool-2026-10-29.json",
+ "harvestedAt": "2026-10-29T16:48:31.962Z",
+ "idl": {
+  "fingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
+  "slot": 462964026,
+  "source": "metadata"
+ },
+ "accountDiscriminators": {
+  "derived": 0,
+  "conflicts": 0,
+  "conflictList": []
+ },
+ "accounts": 27,
+ "identified": 27,
+ "decoded": 27,
+ "byteExact": 27,
+ "trailing": 0,
+ "trailingBytes": 0,
+ "refusals": [],
+ "byType": {
+  "Whirlpool": {
+   "n": 3,
+   "byteExact": 3,
+   "trailing": 0
+  },
+  "Oracle": {
+   "n": 3,
+   "byteExact": 3,
+   "trailing": 0
+  },
+  "DynamicTickArray": {
+   "n": 20,
+   "byteExact": 20,
+   "trailing": 0
+  },
+  "TickArray": {
+   "n": 1,
+   "byteExact": 1,
+   "trailing": 0
+  }
+ },
+ "crossCheck": null
+}
