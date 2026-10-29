@@ -146,3 +146,28 @@ test('deriving twice yields identical bytes: the fill is deterministic', () => {
   assert.deepEqual(verifyDerivedDiscriminators(first.idl).conflicts, [],
     'a filled IDL must not conflict with itself');
 });
+
+test('every derived Kamino discriminator matches Kamino\'s own generated client', async () => {
+  // The strongest available check for an IDL that stores nothing: Kamino's
+  // published SDK ships one hardcoded discriminator per instruction, computed
+  // by Anchor at codegen time. They are an independent source — this repo
+  // never sees them during the derivation. If the rule were wrong anywhere,
+  // the bytes would diverge here.
+  const sdk = JSON.parse(await readFile(
+    new URL('./fixtures/kamino-sdk-discriminators.json', import.meta.url), 'utf8'));
+  const entries = Object.entries(sdk.instructions);
+  assert.equal(entries.length, 66, 'all 66 instructions have an SDK discriminator');
+
+  const { filled } = withDerivedDiscriminators(storedIdl);
+  assert.equal(filled.instructions, 66, 'all 66 were filled by the derivation');
+
+  const { globalDiscriminator } = await import('../src/discriminators.mjs');
+  const mismatches = [];
+  for (const [name, bytes] of entries) {
+    const derived = globalDiscriminator(name);
+    if (!derived.every((byte, index) => byte === bytes[index])) {
+      mismatches.push({ name, sdk: bytes.slice(), derived });
+    }
+  }
+  assert.deepEqual(mismatches, [], 'derivation and Kamino codegen agree on every instruction');
+});

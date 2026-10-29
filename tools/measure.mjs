@@ -66,7 +66,26 @@ export function inspect(account, source, programId) {
   try {
     const idl = decodeAccount(account, source, programId);
     const digest = createHash('sha256').update(JSON.stringify(idl)).digest('hex');
-    return { state: 'usable', instructions: idl.instructions.length, fingerprint: digest };
+    // "Usable" must mean a decoder can USE the schema, not that the schema
+    // names things. A discriminator-less IDL names every instruction and
+    // still decodes nothing: measured on Kamino Lend (66 instructions, 0
+    // discriminators), 0 of 1,432 real mainnet payloads decoded.
+    const stored = idl.instructions.filter((ix) => Array.isArray(ix.discriminator)).length;
+    const derived = idl.instructions.length - stored;
+    const decodable = stored + derived > 0;
+    return {
+      state: 'usable',
+      instructions: idl.instructions.length,
+      fingerprint: digest,
+      // A strict, honest split for the coverage claim:
+      //   storedDiscriminators  - the program itself published the bytes
+      //   derivedDiscriminators - Anchor's rule can supply them from the name
+      //   decodableStoredOnly    - usable with the published bytes alone
+      storedDiscriminators: stored,
+      derivedDiscriminators: derived,
+      decodableStoredOnly: stored > 0,
+      decodableWithDerivation: decodable,
+    };
   } catch (error) {
     return { state: 'undecodable', error: String(error?.message ?? error).slice(0, 150) };
   }
@@ -117,11 +136,25 @@ export async function measure(programs, url, fetcher = fetch, options = {}) {
   });
   const usable = rows.filter(x => x.status === 'usable').length;
   const unknown = rows.filter(x => x.status === 'rpc_error').length;
+  // Two coverage numbers, because they answer different questions:
+  //  - decodableStoredOnly: the published bytes alone are enough to decode.
+  //  - decodableWithDerivation: Anchor's rule can fill a missing discriminator.
+  // The venture thesis ("pull an interface and decode it") needs the second;
+  // the strictest reading of "the program published its own interface" is the
+  // first. Reporting only the old "usable" number hid that gap.
+  const decodableStoredOnly = rows.filter((x) => x.status === 'usable' && x.canonical?.decodableStoredOnly
+    || x.status === 'usable' && x.legacy?.decodableStoredOnly).length;
+  const decodableWithDerivation = rows.filter((x) => x.status === 'usable' && (
+    x.canonical?.decodableWithDerivation || x.legacy?.decodableWithDerivation)).length;
   return { timestamp: new Date().toISOString(), rpcUrl: url, count: rows.length,
     usable, unknown, notUsable: rows.length - usable - unknown,
     coveragePct: +(100 * usable / rows.length).toFixed(1),
+    decodableStoredOnly,
+    decodableWithDerivation,
+    decodableStoredOnlyPct: +(100 * decodableStoredOnly / rows.length).toFixed(1),
+    decodableWithDerivationPct: +(100 * decodableWithDerivation / rows.length).toFixed(1),
     interpretation: unknown ? 'incomplete: RPC failures; do not classify unknowns as missing' :
-      usable < 10 ? 'below 50%: on-chain-only product thesis fails this sample' :
+      decodableWithDerivation < 10 ? 'below 50%: on-chain-only product thesis fails this sample' :
       'at least 50% in this sample; still no proof of demand', rows };
 }
 

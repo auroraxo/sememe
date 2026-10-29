@@ -1,0 +1,666 @@
+{
+ "note": "Instruction discriminators taken from Kamino's own generated client (@kamino-finance/klend-sdk, package/src/@codegen/klend/instructions/*.ts). Independent of the on-chain IDL, which stores none.",
+ "program": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+ "instructions": {
+  "abortObligationOwnershipTransfer": [
+   103,
+   217,
+   83,
+   65,
+   164,
+   5,
+   195,
+   227
+  ],
+  "acceptObligationOwnership": [
+   249,
+   130,
+   70,
+   176,
+   151,
+   187,
+   239,
+   6
+  ],
+  "approveObligationOwnershipTransfer": [
+   61,
+   227,
+   231,
+   46,
+   196,
+   124,
+   60,
+   161
+  ],
+  "borrowObligationLiquidity": [
+   121,
+   127,
+   18,
+   204,
+   73,
+   245,
+   225,
+   65
+  ],
+  "borrowObligationLiquidityV2": [
+   161,
+   128,
+   143,
+   245,
+   171,
+   199,
+   194,
+   6
+  ],
+  "calculateCtokenExchangeRate": [
+   32,
+   253,
+   220,
+   13,
+   19,
+   165,
+   131,
+   188
+  ],
+  "cancelWithdrawTicket": [
+   180,
+   83,
+   122,
+   44,
+   120,
+   211,
+   47,
+   22
+  ],
+  "cloneReserveConfig": [
+   244,
+   5,
+   198,
+   113,
+   17,
+   10,
+   71,
+   33
+  ],
+  "deleteReferrerStateAndShortUrl": [
+   153,
+   185,
+   99,
+   28,
+   228,
+   179,
+   187,
+   150
+  ],
+  "depositAndWithdraw": [
+   141,
+   153,
+   39,
+   15,
+   64,
+   61,
+   88,
+   84
+  ],
+  "depositObligationCollateral": [
+   108,
+   209,
+   4,
+   72,
+   21,
+   22,
+   118,
+   133
+  ],
+  "depositObligationCollateralV2": [
+   137,
+   145,
+   151,
+   94,
+   167,
+   113,
+   4,
+   145
+  ],
+  "depositReserveLiquidity": [
+   169,
+   201,
+   30,
+   126,
+   6,
+   205,
+   102,
+   68
+  ],
+  "depositReserveLiquidityAndObligationCollateral": [
+   129,
+   199,
+   4,
+   2,
+   222,
+   39,
+   26,
+   46
+  ],
+  "depositReserveLiquidityAndObligationCollateralV2": [
+   216,
+   224,
+   191,
+   27,
+   204,
+   151,
+   102,
+   175
+  ],
+  "enqueueToWithdraw": [
+   134,
+   113,
+   160,
+   207,
+   90,
+   75,
+   213,
+   219
+  ],
+  "fillBorrowOrder": [
+   102,
+   4,
+   167,
+   76,
+   131,
+   170,
+   93,
+   19
+  ],
+  "fillBorrowOrderV2": [
+   197,
+   85,
+   193,
+   139,
+   40,
+   94,
+   194,
+   143
+  ],
+  "flashBorrowReserveLiquidity": [
+   135,
+   231,
+   52,
+   167,
+   7,
+   52,
+   212,
+   193
+  ],
+  "flashRepayReserveLiquidity": [
+   185,
+   117,
+   0,
+   203,
+   96,
+   245,
+   180,
+   186
+  ],
+  "idlMissingTypes": [
+   130,
+   80,
+   38,
+   153,
+   80,
+   212,
+   182,
+   253
+  ],
+  "initFarmsForReserve": [
+   218,
+   6,
+   62,
+   233,
+   1,
+   33,
+   232,
+   82
+  ],
+  "initGlobalConfig": [
+   140,
+   136,
+   214,
+   48,
+   87,
+   0,
+   120,
+   255
+  ],
+  "initLendingMarket": [
+   34,
+   162,
+   116,
+   14,
+   101,
+   137,
+   94,
+   239
+  ],
+  "initObligation": [
+   251,
+   10,
+   231,
+   76,
+   27,
+   11,
+   159,
+   96
+  ],
+  "initObligationFarmsForReserve": [
+   136,
+   63,
+   15,
+   186,
+   211,
+   152,
+   168,
+   164
+  ],
+  "initReferrerStateAndShortUrl": [
+   165,
+   19,
+   25,
+   127,
+   100,
+   55,
+   31,
+   90
+  ],
+  "initReferrerTokenState": [
+   116,
+   45,
+   66,
+   148,
+   58,
+   13,
+   218,
+   115
+  ],
+  "initReserve": [
+   138,
+   245,
+   71,
+   225,
+   153,
+   4,
+   3,
+   43
+  ],
+  "initUserMetadata": [
+   117,
+   169,
+   176,
+   69,
+   197,
+   23,
+   15,
+   162
+  ],
+  "initiateObligationOwnershipTransfer": [
+   127,
+   42,
+   81,
+   218,
+   147,
+   171,
+   76,
+   153
+  ],
+  "liquidateObligationAndRedeemReserveCollateral": [
+   177,
+   71,
+   154,
+   188,
+   226,
+   133,
+   74,
+   55
+  ],
+  "liquidateObligationAndRedeemReserveCollateralV2": [
+   162,
+   161,
+   35,
+   143,
+   30,
+   187,
+   185,
+   103
+  ],
+  "markObligationForDeleveraging": [
+   164,
+   35,
+   182,
+   19,
+   0,
+   116,
+   243,
+   127
+  ],
+  "recoverInvalidTicketCollateral": [
+   28,
+   48,
+   176,
+   102,
+   159,
+   206,
+   210,
+   246
+  ],
+  "redeemFees": [
+   215,
+   39,
+   180,
+   41,
+   173,
+   46,
+   248,
+   220
+  ],
+  "redeemReserveCollateral": [
+   234,
+   117,
+   181,
+   125,
+   185,
+   142,
+   220,
+   29
+  ],
+  "refreshObligation": [
+   33,
+   132,
+   147,
+   228,
+   151,
+   192,
+   72,
+   89
+  ],
+  "refreshObligationFarmsForReserve": [
+   140,
+   144,
+   253,
+   21,
+   10,
+   74,
+   248,
+   3
+  ],
+  "refreshReserve": [
+   2,
+   218,
+   138,
+   235,
+   79,
+   201,
+   25,
+   102
+  ],
+  "refreshReservesBatch": [
+   144,
+   110,
+   26,
+   103,
+   162,
+   204,
+   252,
+   147
+  ],
+  "repayAndWithdrawAndRedeem": [
+   2,
+   54,
+   152,
+   3,
+   148,
+   96,
+   109,
+   218
+  ],
+  "repayObligationLiquidity": [
+   145,
+   178,
+   13,
+   225,
+   76,
+   240,
+   147,
+   72
+  ],
+  "repayObligationLiquidityV2": [
+   116,
+   174,
+   213,
+   76,
+   180,
+   53,
+   210,
+   144
+  ],
+  "requestElevationGroup": [
+   36,
+   119,
+   251,
+   129,
+   34,
+   240,
+   7,
+   147
+  ],
+  "rolloverFixedTermBorrow": [
+   85,
+   30,
+   155,
+   225,
+   224,
+   186,
+   141,
+   148
+  ],
+  "seedDepositOnInitReserve": [
+   254,
+   197,
+   228,
+   118,
+   183,
+   206,
+   62,
+   226
+  ],
+  "setBorrowOrder": [
+   177,
+   186,
+   45,
+   61,
+   235,
+   91,
+   68,
+   139
+  ],
+  "setBorrowOrderV2": [
+   87,
+   255,
+   30,
+   4,
+   156,
+   230,
+   167,
+   126
+  ],
+  "setObligationOrder": [
+   81,
+   1,
+   99,
+   156,
+   211,
+   83,
+   78,
+   46
+  ],
+  "socializeLoss": [
+   245,
+   75,
+   91,
+   0,
+   236,
+   97,
+   19,
+   3
+  ],
+  "socializeLossV2": [
+   238,
+   95,
+   98,
+   220,
+   187,
+   40,
+   204,
+   154
+  ],
+  "topupReserveRewards": [
+   63,
+   255,
+   130,
+   211,
+   110,
+   216,
+   88,
+   173
+  ],
+  "updateGlobalConfig": [
+   164,
+   84,
+   130,
+   189,
+   111,
+   58,
+   250,
+   200
+  ],
+  "updateGlobalConfigAdmin": [
+   184,
+   87,
+   23,
+   193,
+   156,
+   238,
+   175,
+   119
+  ],
+  "updateLendingMarket": [
+   209,
+   157,
+   53,
+   210,
+   97,
+   180,
+   31,
+   45
+  ],
+  "updateLendingMarketOwner": [
+   118,
+   224,
+   10,
+   62,
+   196,
+   230,
+   184,
+   89
+  ],
+  "updateObligationConfig": [
+   82,
+   152,
+   213,
+   69,
+   250,
+   0,
+   157,
+   188
+  ],
+  "updateReserveConfig": [
+   61,
+   148,
+   100,
+   70,
+   143,
+   107,
+   17,
+   13
+  ],
+  "withdrawObligationCollateral": [
+   37,
+   116,
+   205,
+   103,
+   243,
+   192,
+   92,
+   198
+  ],
+  "withdrawObligationCollateralAndRedeemReserveCollateral": [
+   75,
+   93,
+   93,
+   220,
+   34,
+   150,
+   218,
+   196
+  ],
+  "withdrawObligationCollateralAndRedeemReserveCollateralV2": [
+   235,
+   52,
+   119,
+   152,
+   149,
+   197,
+   20,
+   7
+  ],
+  "withdrawObligationCollateralV2": [
+   202,
+   249,
+   117,
+   114,
+   231,
+   192,
+   47,
+   138
+  ],
+  "withdrawProtocolFee": [
+   158,
+   201,
+   158,
+   189,
+   33,
+   93,
+   162,
+   103
+  ],
+  "withdrawQueuedLiquidity": [
+   66,
+   149,
+   187,
+   201,
+   74,
+   191,
+   174,
+   120
+  ],
+  "withdrawReferrerFees": [
+   171,
+   118,
+   121,
+   201,
+   233,
+   140,
+   23,
+   228
+  ]
+ }
+}
