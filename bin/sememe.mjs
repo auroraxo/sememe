@@ -44,7 +44,7 @@ try {
     // on stderr so scripted callers notice without losing the decode result.
     if (decoded.trailing.count > 0 && trailing !== 'error') {
       console.error(JSON.stringify({
-        note: `${decoded.trailing.count} byte(s) after ${decoded.instruction} are not described by the stored IDL`,
+        note: `${decoded.trailing.count} byte(s) after ${decoded.name} are not described by the stored IDL`,
         consumed: decoded.consumed,
         bytes: decoded.bytes,
         trailing: decoded.trailing,

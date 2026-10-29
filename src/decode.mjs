@@ -8,7 +8,13 @@
 
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { decodeInstructionData, encodeInstructionData, toJsonSafe } from './codec.mjs';
+import {
+  decodeData,
+  decodeInstructionData,
+  encodeInstructionData,
+  encodeEventData,
+  toJsonSafe,
+} from './codec.mjs';
 import { decodeBase58 } from './base58.mjs';
 
 // Kept as a re-export: callers of `src/decode.mjs` import `decodeBase58`
@@ -55,8 +61,8 @@ export async function findStoredIdl(storeDir, program) {
 }
 
 /**
- * Decode one instruction payload.
- * Returns the decoded instruction plus provenance and a byte-exactness check:
+ * Decode one program payload (instruction or Anchor event self-CPI).
+ * Returns the decoded instruction/event plus provenance and a byte-exactness check:
  * re-encoding the decoded value must reproduce the input bytes.
  *
  * `trailing` selects what happens to bytes the stored IDL does not explain:
@@ -67,13 +73,22 @@ export async function findStoredIdl(storeDir, program) {
 export async function decodePayload(storeDir, program, payloadInput, { allowTrailing, trailing } = {}) {
   const { idl, receipt, receiptName, objectPath } = await findStoredIdl(storeDir, program);
   const bytes = parsePayload(payloadInput);
-  const decoded = decodeInstructionData(idl, bytes, { allowTrailing, trailing });
-  const reencoded = encodeInstructionData(idl, decoded.instruction, decoded.args);
+  const decoded = decodeData(idl, bytes, { allowTrailing, trailing });
+  let reencoded;
+  if (decoded.kind === 'instruction') {
+    reencoded = encodeInstructionData(idl, decoded.instruction, decoded.args);
+  } else {
+    reencoded = encodeEventData(idl, decoded.event, decoded.args, { tagged: decoded.tagged });
+  }
   const described = bytes.subarray(0, decoded.consumed);
   return {
     program,
-    instruction: decoded.instruction,
+    kind: decoded.kind,
+    instruction: decoded.kind === 'instruction' ? decoded.instruction : undefined,
+    event: decoded.kind === 'event' ? decoded.event : undefined,
+    name: decoded.kind === 'instruction' ? decoded.instruction : decoded.event,
     discriminator: decoded.discriminator,
+    tagged: decoded.tagged,
     args: toJsonSafe(decoded.args),
     bytes: bytes.length,
     consumed: decoded.consumed,

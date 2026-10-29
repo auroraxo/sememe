@@ -487,7 +487,10 @@ function minSize(type, ctx) {
     return inner === null || !Number.isSafeInteger(type[1]) ? null : inner * type[1];
   }
   if (!type || typeof type !== 'object') return null;
-  if ('option' in type) { const inner = minSize(type.option, ctx); return inner === null ? null : 1 + inner; }
+  // An option may encode as a single `None` tag: `1 + inner` is the cost of
+  // `Some`, not a lower bound, so using it here would refuse real payloads
+  // whose optionals are None (found on mainnet: Jupiter route_plan).
+  if ('option' in type) return 1;
   if ('vec' in type) return 4;
   if ('array' in type) {
     const parts = arrayParts(type);
@@ -513,11 +516,16 @@ function minSize(type, ctx) {
   }
   const variants = enumShape(type);
   if (variants) {
-    let largest = 1;
+    // Lower bound, not upper: an enum element costs 1 tag byte plus whatever
+    // ITS OWN variant carries. Taking the largest variant here made the vec
+    // pre-check demand the widest variant's bytes for every element, which
+    // refused decodable mainnet payloads (Jupiter route: "vector length 1
+    // needs 85 byte(s) but 25 remain" while the payload decodes byte-exact).
+    let smallest = null;
     for (const variant of variants) {
       const shape = variantFields(variant);
       if (!shape) return null;
-      let total = 1;
+      let total = 1; // variant tag
       if (shape.kind === 'tuple') {
         for (const fieldType of shape.fields) {
           const size = minSize(fieldType, ctx);
@@ -531,9 +539,9 @@ function minSize(type, ctx) {
           total += size;
         }
       }
-      largest = Math.max(largest, total);
+      if (smallest === null || total < smallest) smallest = total;
     }
-    return largest;
+    return smallest ?? 1;
   }
   return null;
 }
@@ -549,11 +557,11 @@ function context(idl) {
   return { types };
 }
 
-function discriminatorBytes(instruction) {
+function discriminatorBytes(instruction, kind = 'instruction') {
   const raw = instruction?.discriminator;
   if (!Array.isArray(raw) || raw.length === 0) return null;
   if (!raw.every((byte) => Number.isInteger(byte) && byte >= 0 && byte <= 255)) {
-    throw new CodecError(`instruction ${JSON.stringify(instruction?.name)} has a malformed discriminator`, null);
+    throw new CodecError(`${kind} ${JSON.stringify(instruction?.name)} has a malformed discriminator`, null);
   }
   return Buffer.from(raw);
 }
@@ -570,6 +578,137 @@ export function instructionIndex(idl) {
     index.set(key, instruction);
   }
   return index;
+}
+
+// --- Anchor event self-CPI ---------------------------------------------------
+//
+// `emit_cpi!` builds a real instruction to the program itself whose data is
+//   EVENT_IX_TAG_LE (8) ++ event_discriminator (8) ++ borsh(event fields)
+// and the program dispatches on the tag (anchor/lang/src/event.rs:
+// EVENT_IX_TAG = 0x1d9acb512ea545e4). These payloads arrive in a transaction
+// exactly like instructions — same account lists, same CPI stacks — so a
+// decoder that only knows instruction discriminators reports them as
+// "unknown instruction discriminator". Measured on mainnet Jupiter AMM v6:
+// 396 of 773 harvested payloads (51%) were event self-CPIs, all of them
+// carrying a discriminator the stored IDL does list under `events`.
+const EVENT_IX_TAG = Buffer.alloc(8);
+EVENT_IX_TAG.writeBigUInt64LE(0x1d9acb512ea545e4n);
+
+export const EVENT_IX_TAG_HEX = EVENT_IX_TAG.toString('hex');
+
+export function eventIndex(idl) {
+  const index = new Map();
+  for (const event of idl?.events ?? []) {
+    const bytes = discriminatorBytes(event, 'event');
+    if (!bytes) continue;
+    const key = bytes.toString('hex');
+    if (index.has(key)) {
+      throw new CodecError(`duplicate event discriminator ${key} (${index.get(key).name} / ${event.name})`, null);
+    }
+    index.set(key, event);
+  }
+  return index;
+}
+
+/** True when `data` is an Anchor event payload (tagged or bare-disc form). */
+export function isEventData(idl, data) {
+  if (!(data instanceof Uint8Array) || data.length < 8) return false;
+  const key = Buffer.from(data.subarray(0, 8)).toString('hex');
+  if (key === EVENT_IX_TAG_HEX) return data.length >= 16;
+  return eventIndex(idl).has(key);
+}
+
+function eventShape(idl, event, ctx, path) {
+  // spec 0.1.0 on-chain IDLs carry the body in `types` under the event name;
+  // older IDLs carry `fields` inline on the event itself.
+  if (Array.isArray(event.fields)) return { kind: 'struct', fields: event.fields };
+  const typedef = ctx.types.get(event.name);
+  if (!typedef) throw new CodecError(`event ${JSON.stringify(event.name)} has no type definition`, path);
+  return typedef.type;
+}
+
+/**
+ * Decode an Anchor event payload: the `emit_cpi!` form (tag + disc + body)
+ * and the bare log-disc form (disc + body).
+ *
+ * Same trailing policy as decodeInstructionData: 'report' returns the bytes
+ * the IDL does not explain instead of dropping them, 'error' refuses.
+ */
+export function decodeEventData(idl, data, { allowTrailing, trailing } = {}) {
+  const policy = trailing ?? (allowTrailing === false ? 'error' : 'report');
+  if (policy !== 'report' && policy !== 'error') {
+    throw new CodecError(`unknown trailing policy ${JSON.stringify(trailing)}`, null);
+  }
+  if (!(data instanceof Uint8Array)) throw new CodecError('event data must be a Uint8Array/Buffer', null);
+  const ctx = context(idl);
+  const index = eventIndex(idl);
+  let offset = 0;
+  const head = Buffer.from(data.subarray(0, 8)).toString('hex');
+  if (head === EVENT_IX_TAG_HEX) {
+    if (data.length < 16) throw new CodecError('truncated event CPI: no event discriminator after the tag', null);
+    offset = 8;
+  } else if (!index.has(head)) {
+    throw new CodecError(
+      `unknown event discriminator ${head} (${index.size} known in this IDL)`, null);
+  }
+  const discHex = Buffer.from(data.subarray(offset, offset + 8)).toString('hex');
+  const event = index.get(discHex);
+  if (!event) {
+    const hint = [...index.keys()].slice(0, 3).join(', ');
+    throw new CodecError(
+      `unknown event discriminator ${discHex} (${index.size} known` +
+      (hint ? `, e.g. ${hint}` : '') + ')', null);
+  }
+  const cursor = new Cursor(data);
+  cursor.offset = offset + 8;
+  const shape = eventShape(idl, event, ctx, event.name);
+  const body = decodeAt(shape, cursor, ctx, event.name, 0);
+  const trailingCount = cursor.remaining;
+  const trailingHex = trailingCount > 0
+    ? Buffer.from(data.subarray(cursor.offset)).toString('hex')
+    : '';
+  if (trailingCount > 0 && policy === 'error') {
+    throw new CodecError(
+      `trailing bytes after event ${event.name}: consumed ${cursor.offset} of ${data.length}`, event.name);
+  }
+  return {
+    kind: 'event',
+    event: event.name,
+    discriminator: Buffer.from(data.subarray(offset, offset + 8)).toString('hex'),
+    tagged: offset === 8,
+    args: toJsonSafe(body),
+    consumed: cursor.offset,
+    total: data.length,
+    trailing: { count: trailingCount, hex: trailingHex },
+  };
+}
+
+/** Encode an Anchor event payload back to bytes: tag ++ disc ++ body. */
+export function encodeEventData(idl, name, args, { tagged = true } = {}) {
+  const ctx = context(idl);
+  const event = (idl.events ?? []).find((candidate) => candidate.name === name);
+  if (!event) throw new CodecError(`unknown event ${JSON.stringify(name)}`, null);
+  const bytes = discriminatorBytes(event, 'event');
+  if (!bytes) throw new CodecError(`event ${JSON.stringify(name)} has no discriminator in this IDL`, null);
+  if (args === undefined || args === null) args = {};
+  const body = encodeAt(eventShape(idl, event, ctx, event.name), args, ctx, event.name, 0);
+  return Buffer.concat(tagged ? [EVENT_IX_TAG, bytes, body] : [bytes, body]);
+}
+
+/**
+ * Decode any program payload: instruction first, then Anchor event self-CPI.
+ * Instruction wins on an ambiguous discriminator, mirroring Anchor's own
+ * dispatch order (global instructions are matched before the event tag).
+ * Returns { kind: 'instruction' | 'event', ... }.
+ */
+export function decodeData(idl, data, options = {}) {
+  try {
+    return { kind: 'instruction', ...decodeInstructionData(idl, data, options) };
+  } catch (error) {
+    if (!(error instanceof CodecError) || !/unknown instruction discriminator/.test(error.message)) throw error;
+    if (!isEventData(idl, data)) throw error;
+    return decodeEventData(idl, data, options);
+  }
 }
 
 function instructionByName(idl, name) {

@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus a first offline decoder, both runnable (October 2026), with one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions and Anchor event self-CPIs, both runnable (October 2026), verified against two real mainnet programs (Whirlpool and Jupiter AMM v6), with one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -129,6 +129,24 @@ For every payload, the diff answers three separate questions:
 Because the public RPC rate-limits, a re-derivation can also come back **partial** — 37 of 40 transactions fetched — and still write a file and exit 0. `--verify <fixture>` closes that gap: it compares the re-derivation against the fixture and exits non-zero unless every pinned transaction returned byte-identical payloads (`tools/lib/rederive-verify.mjs`, 5 tests). Measured against live mainnet: a 15-transaction subset re-derived completely (15/15, 17 payloads, byte-identical, exit 0); the same command on a tampered payload exited 1 with `payload 0 dataHex differs`.
 
 **Remaining limits:** one Anchor program (Whirlpool); accounts and events are still untested; other own decoder paths remain to be migrated; no outside user has adopted sememe yet. But the "50 payloads, not 1,000 transactions" limit is closed: agreement holds across 1,119 real payloads from 1,029 transactions sampled from 40,013 mainnet transactions, with zero value or byte discrepancies.
+
+## Second real program: Jupiter AMM v6 (and two defects it exposed)
+
+Testing against only one program hid a whole class of defects: Whirlpool's enums are simple and its transactions rarely use Anchor event CPIs. On 2026-10-29, sememe pulled Jupiter AMM v6 (`JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4`) from mainnet (slot 462867554, 19 instructions, 6 events, fingerprint `sha256:37fa69c115f5883314374e01c4aa8f242778f7aebccd75f5064d6afb0277afee`), harvested **18,193 transactions** across **48 finalized blocks** (slots 462867935..462867982), and decoded every payload referencing the program (313 transactions, **773 payloads**).
+
+Initial run against the existing codec: **only 35 of 773 payloads decoded**. Two real defects were exposed and fixed:
+
+1. **Enum minSize lower bound was inverted:** `minSize` used the *largest* enum variant as the lower bound for an element in a vector. Jupiter's `Swap` enum has 204 variants; variant 47 (`WhirlpoolSwapV2`) needs 85 bytes, so the hostile-length pre-check required at least 85 bytes per element for every `route` instruction. Real payloads carry smaller variants (e.g. 1 byte for unit variants), so **342 payloads were rejected** with `"vector length 1 needs 85 byte(s) but 25 remain"` — even though the payloads themselves decode byte-exact. Fixed: `minSize` takes the *smallest* variant as the lower bound, and options bound at 1 byte (the `None` tag).
+2. **Anchor `emit_cpi!` event payloads arrive like instructions:** Anchor programs emit events through a self-CPI with instruction data `EVENT_IX_TAG_LE (8) ++ event_discriminator (8) ++ borsh(fields)`. In a transaction (top-level or CPI) these look identical to instructions, but the discriminator table did not know `EVENT_IX_TAG` (`0x1d9acb512ea545e4`, hex `e445a52e51cb9a1d`), so **396 payloads were rejected** with `"unknown instruction discriminator e445a52e51cb9a1d"`. Added `decodeEventData`, `encodeEventData`, `eventIndex`, and transparent dispatch in `decodeData`/`decodePayload`: instructions match first, event self-CPIs match second.
+
+**Measured after the fix (`tools/coverage.mjs`):**
+- **773/773 payloads decoded** (377 instructions + 396 Anchor event self-CPIs).
+- **773/773 round-trip byte-exact** (0 codec errors, 0 unknown discriminators, 0 trailing bytes).
+- Instructions observed: `route_v2` (153), `route` (102), `shared_accounts_route_v2` (39), `set_token_ledger` (30), `route_with_token_ledger` (26), `shared_accounts_route` (18), `create_idempotent_associated_token_account` (5), `shared_accounts_route_with_token_ledger` (4).
+- Events observed: `SwapEvent` (205), `SwapsEvent` (188), `FeeEvent` (3).
+- **Naming cross-check:** compared against the independent bitquery IDL in `solana-tx-remix/idl/multi/jupiter-amm/amm.json`: **768/768 shared discriminators agree on the name** with 0 name disagreements; the remaining 5 payloads are `create_idempotent_associated_token_account`, which is on-chain but absent from the older bitquery copy.
+
+Covered by `test/jupiter-v6.test.mjs` (9 tests) using real pinned mainnet fixtures. Whirlpool qualification re-run: 1,119/1,119 byte-exact, 33 trailing, 0 regressions. Runs: `npm test` (58 tests pass).
 
 ## Free and paid
 
