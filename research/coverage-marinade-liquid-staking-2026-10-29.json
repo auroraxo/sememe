@@ -1,0 +1,71 @@
+{
+  "program": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+  "store": "/tmp/sememe-marinade-store",
+  "harvest": {
+    "source": "mainnet-beta harvest (own run, public RPC) — 2026-10-29T19:09:25.981Z",
+    "harvestedAt": "2026-10-29T19:09:25.983Z",
+    "counts": {
+      "requested": 600,
+      "pinnedSignatures": 236290,
+      "fetched": 236290,
+      "missing": 0,
+      "transactionsWithTargetPayloads": 600,
+      "payloads": 623,
+      "failedOnChain": 90610,
+      "transactionsWithoutTarget": 235690
+    },
+    "slotRange": {
+      "oldest": 462439010,
+      "newest": 462984538
+    }
+  },
+  "idl": {
+    "instructions": 29,
+    "events": 26,
+    "discriminatorsDerived": {
+      "instructions": 29,
+      "events": 26
+    },
+    "derivationConflicts": []
+  },
+  "crossCheck": {
+    "source": "test/fixtures/marinade-finance-published-idl.json",
+    "instructions": 29,
+    "events": 26
+  },
+  "decode": {
+    "payloads": 623,
+    "instructions": 623,
+    "events": 0,
+    "byteExact": 623,
+    "trailing": 0,
+    "unknownDisc": 0,
+    "codecError": 0,
+    "trailingBytes": 0,
+    "errorSamples": []
+  },
+  "naming": {
+    "namedByBoth": 623,
+    "sememeOnly": 0,
+    "crossCheckOnly": 0,
+    "nameDisagreement": 0,
+    "disagreements": []
+  },
+  "byInstruction": {
+    "liquidUnstake": 164,
+    "deposit": 150,
+    "mergeStakes": 136,
+    "updateActive": 125,
+    "setValidatorScore": 24,
+    "updateDeactivated": 6,
+    "stakeReserve": 5,
+    "partialUnstake": 5,
+    "claim": 3,
+    "configLp": 1,
+    "withdrawStakeAccount": 1,
+    "removeLiquidity": 1,
+    "removeValidator": 1,
+    "addValidator": 1
+  },
+  "byEvent": {}
+}

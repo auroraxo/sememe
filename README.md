@@ -190,6 +190,25 @@ Covered by `test/openbook-v2.test.mjs` (6 tests) and pinned fixtures (`openbook-
 
 **Remaining limits after four programs:** still no outside user; both derivation checks (Kamino SDK, anchor-ts) are Anchor-specific — a non-Anchor program needs its own scheme; and the sample remains family-clustered. OpenBook's on-chain and published IDLs are also both legacy shapes, so the naming cross-check shares the Anchor rule on both sides; the byte-exact round-trip against 600 real payloads is what cannot be satisfied by a wrong discriminator.
 
+## Fifth program: Marinade liquid staking (a staking program, and a published SDK that stores nothing either)
+
+Marinade (`MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD`, liquid staking — a staking program, not a swap AMM, lending market or order book) is one of the five programs in the strict coverage table that can only decode because the tool reconstructs the missing discriminators. Its on-chain IDL was pulled on 2026-10-29 at slot 462985426 (legacy `anchor:idl` account, fingerprint `sha256:61ccc0c1a5995dd4aaaa0ec0108e88343642f8da4f74603c67472c8ae42ea14e`): **29 instructions, 26 events, 0 discriminators** — the same premise as Kamino Lend and OpenBook v2, now on a fourth program family.
+
+**Two independent confirmations, one per open question:**
+
+- **Is the rule right?** anchor-ts (0.29.0) computes Anchor's sighash at runtime from the same IDL in code this repo shares nothing with. Fixture `test/fixtures/marinade-anchor-ts-discriminators.json` records its 29 instruction + 26 event discriminators; the derived values match **29/29 and 26/26, byte for byte** — this time including the events (26 of them, four times the OpenBook event set).
+- **Is the interface the one the program ships?** the naming cross-check uses `marinade_finance.json` from `marinade-finance/marinade-ts-sdk`, an artifact fetched from GitHub that this machine's store never sees. **29/29 instruction names identical, 0 only-on-one-side**, and the coverage run reports **623/623 payloads named by both sources, 0 disagreements**.
+
+**Measured on real traffic:** a harvest of **236,290 mainnet transactions** across 560 finalized blocks (slots 462439010..462984538) yielded **600 payload-bearing transactions with 623 payloads**:
+
+- **623/623 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/623** — the discriminator index built from the published bytes alone is empty, exactly as for Kamino Lend and OpenBook v2.
+- Instructions observed (14 distinct): `liquidUnstake` (164), `deposit` (150), `mergeStakes` (136), `updateActive` (125), `setValidatorScore` (24), `updateDeactivated` (6), `stakeReserve` (5), `partialUnstake` (5), `claim` (3), `configLp` (1), `withdrawStakeAccount` (1), `removeLiquidity` (1), `removeValidator` (1), `addValidator` (1).
+
+Covered by `test/marinade.test.mjs` (6 tests) and pinned fixtures (`marinade-liquid-staking-idl.json`, `marinade-anchor-ts-discriminators.json`, `marinade-finance-published-idl.json`, `harvest-marinade-liquid-staking-2026-10-29.json`); measurement in [research/coverage-marinade-liquid-staking-2026-10-29.json](research/coverage-marinade-liquid-staking-2026-10-29.json). Suite: **114/114**. Falsification: flipping one byte of the derived discriminator fails 2 of the 6 new tests (the byte-exact round-trip and the anchor-ts comparison), restoring it passes.
+
+**Remaining limits after five programs:** still no outside user; no Marinade *account* decoding yet (the account branch covers Whirlpool/OpenBook/Kamino); the derivation is still Anchor-specific; and this harvest recorded **0 event payloads** — Marinade's 26 events were verified as discriminators against anchor-ts but none appeared in the sampled traffic, so the event path on this program is confirmed by the oracle, not by real bytes.
+
 ## Accounts: state, not just calls (three programs, 39 real accounts)
 
 Every proof above ends instructions/events and says the same remaining limit: *accounts are still undecoded*. That limit is now closed for the same three programs.
@@ -220,7 +239,7 @@ Types covered include `Whirlpool`, `Oracle`, `TickArray`, `DynamicTickArray` (Wh
 
 **What the byte-exactness gate actually proves is itself falsified:** dropping the struct's first field, or flipping a discriminator byte, must not produce "decoded + trailing 0 + byte-exact" — both are asserted to fail (`test/account.test.mjs`), and foreign program bytes must identify as nothing.
 
-Run: `npm test` (108 tests: 21 account + 5 store tests are new), plus `node tools/accounts.mjs --accounts test/fixtures/accounts-<program>-2026-10-29.json --store <store> --program <id>` to re-measure from a live pull.
+Run: `npm test` (the account commit brought the suite to 108; **114** after the fifth program above), plus `node tools/accounts.mjs --accounts test/fixtures/accounts-<program>-2026-10-29.json --store <store> --program <id>` to re-measure from a live pull.
 
 **Remaining limits:** still no outside user; **zero trailing bytes were observed**, so the report path for account bytes the IDL does not describe is implemented but unexercised by real data; `repr(C)`/`packed` (zero-copy) accounts are not decoded; account *discriminators* are derived for three Anchor programs — a non-Anchor program's account framing still needs its own scheme, exactly as for instructions; and 39 accounts from traffic of three programs is a convenience sample, not an inventory of what accounts exist on chain.
 
