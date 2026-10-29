@@ -1,0 +1,66 @@
+{
+  "program": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+  "store": "/tmp/sememe-ob",
+  "harvest": {
+    "source": null,
+    "harvestedAt": "2026-10-29T15:55:26.815Z",
+    "counts": {
+      "requested": 600,
+      "pinnedSignatures": 224894,
+      "fetched": 224894,
+      "missing": 0,
+      "transactionsWithTargetPayloads": 600,
+      "payloads": 600,
+      "failedOnChain": 82524,
+      "transactionsWithoutTarget": 224294
+    },
+    "slotRange": {
+      "oldest": 462476178,
+      "newest": 462929711
+    }
+  },
+  "idl": {
+    "instructions": 29,
+    "events": 8,
+    "discriminatorsDerived": {
+      "instructions": 29,
+      "events": 8
+    },
+    "derivationConflicts": []
+  },
+  "crossCheck": {
+    "source": "/tmp/ob-idl.json",
+    "instructions": 29,
+    "events": 8
+  },
+  "decode": {
+    "payloads": 600,
+    "instructions": 600,
+    "events": 0,
+    "byteExact": 600,
+    "trailing": 0,
+    "unknownDisc": 0,
+    "codecError": 0,
+    "trailingBytes": 0,
+    "errorSamples": []
+  },
+  "naming": {
+    "namedByBoth": 600,
+    "sememeOnly": 0,
+    "crossCheckOnly": 0,
+    "nameDisagreement": 0,
+    "disagreements": []
+  },
+  "byInstruction": {
+    "placeTakeOrder": 562,
+    "cancelOrder": 10,
+    "consumeEvents": 7,
+    "placeOrders": 7,
+    "settleFunds": 4,
+    "consumeGivenEvents": 3,
+    "cancelAllOrders": 3,
+    "deposit": 2,
+    "cancelAllAndPlaceOrders": 2
+  },
+  "byEvent": {}
+}

@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions and Anchor event self-CPIs, both runnable (October 2026), verified against three real mainnet programs (Whirlpool, Jupiter AMM v6 and Kamino Lend), with one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions and Anchor event self-CPIs, both runnable (October 2026), verified against four real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend and OpenBook v2), with one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -170,6 +170,25 @@ Covered by `test/klend-derived.test.mjs` (6 tests) using real pinned mainnet fix
 **A second, unrelated defect fixed along the way:** `tools/harvest.mjs` computed the slot range with `Math.min(...slots)`. A 142,981-transaction harvest collects far more slots than the call stack accepts, so the run died with `RangeError: Maximum call stack size exceeded` *after* all RPC work and before the file was written. The range is now reduced in a loop (`tools/lib/slot-range.mjs`).
 
 **Remaining limits:** three programs, still no outside user; accounts are still undecoded; the derivation is Anchor-specific (a non-Anchor program needs its own scheme); and the coverage measure's "usable" definition should be tightened to require a decodable schema, not just named instructions.
+
+## Fourth program: OpenBook v2, checked against anchor-ts's own sighash
+
+Kamino Lend left one weak spot: the derivation rule was verified against programs that *store* discriminators (Whirlpool, Jupiter) and then *applied* to a program that stores none (Kamino), whose own published SDK happens to hardcode them. A reader could still say: you checked your rule against yourself.
+
+OpenBook v2 (`opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb`, a central limit order book — a third program family after the swap AMMs and the lending market) closes that. Its on-chain IDL was pulled on 2026-10-29 at slot 462921401 (legacy `anchor:idl` account, fingerprint `sha256:d12a2e16314b418a173cc6da755746396e2b15caf9e28ccb4913aa335050913f`): **29 instructions, 8 events, 0 discriminators** — the same premise as Kamino Lend.
+
+**The oracle is an independent implementation of Anchor's sighash:** `@coral-xyz/anchor` (anchor-ts 0.29.0) computes `sha256("global:" + snake_case(name))[0..8]` at runtime from the same IDL, in code this repository shares nothing with. Fixture `test/fixtures/openbook-anchor-ts-discriminators.json` records its 29 instruction + 8 event discriminators; the derived values match **29/29 and 8/8, byte for byte** (`test/openbook-v2.test.mjs`). Events were also reproduced by the event rule, 8/8.
+
+**Measured on real traffic (`tools/coverage.mjs`):** a harvest of **224,894 transactions** across 900+ finalized blocks (slots 462476178..462929711) yielded **600 payload-bearing transactions with 600 payloads**:
+
+- **600/600 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/600** — the discriminator index built from the published bytes alone is empty, exactly as for Kamino Lend.
+- **Naming cross-check** against the independently published IDL (`openbook-dex/openbook-v2`, `idl/openbook_v2.json`, fetched from GitHub): **600/600 named by both, 0 disagreements**; instruction sets identical (29/29 both sides).
+- Instructions observed: `placeTakeOrder` (562), `cancelOrder` (10), `consumeEvents` (7), `placeOrders` (7), `settleFunds` (4), `consumeGivenEvents` (3), `cancelAllOrders` (3), `deposit` (2), `cancelAllAndPlaceOrders` (2).
+
+Covered by `test/openbook-v2.test.mjs` (6 tests) and pinned fixtures (`openbook-v2-idl.json`, `openbook-anchor-ts-discriminators.json`, `openbook-v2-published-idl.json`, `harvest-openbook-v2-2026-10-29.json`). Suite: **82/82**. Disabling the fill in `src/discriminators.mjs` fails the new tests (falsification), restoring it passes.
+
+**Remaining limits after four programs:** still no outside user; accounts are still undecoded; both derivation checks (Kamino SDK, anchor-ts) are Anchor-specific — a non-Anchor program needs its own scheme; and the sample remains family-clustered. OpenBook's on-chain and published IDLs are also both legacy shapes, so the naming cross-check shares the Anchor rule on both sides; the byte-exact round-trip against 600 real payloads is what cannot be satisfied by a wrong discriminator.
 
 ## Free and paid
 
