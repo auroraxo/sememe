@@ -1,0 +1,71 @@
+{
+  "program": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+  "store": "/tmp/sememe-third",
+  "harvest": {
+    "source": "mainnet-beta harvest (own run, public RPC) — 2026-10-29T14:31:40.472Z",
+    "harvestedAt": "2026-10-29T14:31:40.476Z",
+    "counts": {
+      "requested": 400,
+      "pinnedSignatures": 142981,
+      "fetched": 142981,
+      "missing": 0,
+      "transactionsWithTargetPayloads": 400,
+      "payloads": 1432,
+      "failedOnChain": 44756,
+      "transactionsWithoutTarget": 142581
+    },
+    "slotRange": {
+      "oldest": 462905866,
+      "newest": 462909439
+    }
+  },
+  "idl": {
+    "instructions": 66,
+    "events": 5,
+    "discriminatorsDerived": {
+      "instructions": 66,
+      "events": 5
+    },
+    "derivationConflicts": []
+  },
+  "crossCheck": {
+    "source": "/tmp/klend-cross.json",
+    "instructions": 66,
+    "events": 5
+  },
+  "decode": {
+    "payloads": 1432,
+    "instructions": 1432,
+    "events": 0,
+    "byteExact": 1432,
+    "trailing": 0,
+    "unknownDisc": 0,
+    "codecError": 0,
+    "trailingBytes": 0,
+    "errorSamples": []
+  },
+  "naming": {
+    "namedByBoth": 1432,
+    "sememeOnly": 0,
+    "crossCheckOnly": 0,
+    "nameDisagreement": 0,
+    "disagreements": []
+  },
+  "byInstruction": {
+    "refreshReserve": 520,
+    "refreshReservesBatch": 290,
+    "refreshObligation": 268,
+    "depositReserveLiquidityAndObligationCollateralV2": 54,
+    "depositReserveLiquidity": 51,
+    "borrowObligationLiquidityV2": 47,
+    "withdrawObligationCollateralAndRedeemReserveCollateralV2": 45,
+    "repayObligationLiquidityV2": 43,
+    "flashBorrowReserveLiquidity": 36,
+    "flashRepayReserveLiquidity": 36,
+    "redeemReserveCollateral": 33,
+    "initObligation": 5,
+    "initObligationFarmsForReserve": 3,
+    "initUserMetadata": 1
+  },
+  "byEvent": {}
+}
