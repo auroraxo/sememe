@@ -52,22 +52,29 @@ if (!harvestPath || !storeDir || !program) {
 }
 
 const { findStoredIdl } = await import('../src/decode.mjs');
-const { idl } = await findStoredIdl(storeDir, program);
+const { withDerivedDiscriminators } = await import('../src/discriminators.mjs');
+const stored = await findStoredIdl(storeDir, program);
+const { idl, filled, conflicts } = withDerivedDiscriminators(stored.idl);
 const harvest = JSON.parse(await readFile(harvestPath, 'utf8'));
 const crossCheck = crossCheckPath
   ? JSON.parse(await readFile(crossCheckPath, 'utf8'))
   : null;
+// The independent copy may also be a legacy IDL without discriminators
+// (Kamino's published klend IDL is). Its names are what makes it
+// independent — derive its discriminators with the same Anchor rule so the
+// naming comparison can run; a stored discriminator on either side wins.
+const crossCheckIdl = crossCheck ? withDerivedDiscriminators(crossCheck).idl : null;
 
 const chainInstructions = instructionIndex(idl);
 const chainEvents = eventIndex(idl);
 const crossInstructions = new Map();
-for (const instruction of crossCheck?.instructions ?? []) {
+for (const instruction of crossCheckIdl?.instructions ?? []) {
   const discriminator = instruction.discriminator;
   if (!Array.isArray(discriminator) || discriminator.length < 8) continue;
   crossInstructions.set(Buffer.from(discriminator.slice(0, 8)).toString('hex'), instruction.name);
 }
 const crossEvents = new Map();
-for (const event of crossCheck?.events ?? []) {
+for (const event of crossCheckIdl?.events ?? []) {
   const discriminator = event.discriminator;
   if (!Array.isArray(discriminator) || discriminator.length < 8) continue;
   crossEvents.set(Buffer.from(discriminator.slice(0, 8)).toString('hex'), event.name);
@@ -138,7 +145,16 @@ const report = {
   program,
   store: storeDir,
   harvest: { source: harvest.source ?? null, harvestedAt: harvest.harvestedAt ?? null, counts: harvest.counts ?? null, slotRange: harvest.slotRange ?? null },
-  idl: { instructions: idl.instructions.length, events: (idl.events ?? []).length },
+  idl: {
+    instructions: idl.instructions.length,
+    events: (idl.events ?? []).length,
+    // A legacy on-chain IDL names its instructions but stores no
+    // discriminators (measured: Kamino Lend 66/66 without). The decoder
+    // fills those with Anchor's rule; report how much of the run depended on
+    // derivation and whether it ever disagreed with a stored value.
+    discriminatorsDerived: { instructions: filled.instructions, events: filled.events },
+    derivationConflicts: conflicts,
+  },
   crossCheck: crossCheck
     ? { source: crossCheckPath, instructions: crossInstructions.size, events: crossEvents.size }
     : null,

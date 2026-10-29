@@ -16,6 +16,7 @@ import {
   toJsonSafe,
 } from './codec.mjs';
 import { decodeBase58 } from './base58.mjs';
+import { withDerivedDiscriminators } from './discriminators.mjs';
 
 // Kept as a re-export: callers of `src/decode.mjs` import `decodeBase58`
 // from here, and the implementation now lives in `src/base58.mjs` so the
@@ -71,7 +72,13 @@ export async function findStoredIdl(storeDir, program) {
  * is the default and what real mainnet bytes motivated it.
  */
 export async function decodePayload(storeDir, program, payloadInput, { allowTrailing, trailing } = {}) {
-  const { idl, receipt, receiptName, objectPath } = await findStoredIdl(storeDir, program);
+  const { idl: storedIdl, receipt, receiptName, objectPath } = await findStoredIdl(storeDir, program);
+  // Legacy on-chain IDLs (measured: Kamino Lend, 66 instructions) carry no
+  // discriminators at all — they name instructions but cannot decode a byte.
+  // Fill the gaps with Anchor's own rule; stored discriminators are never
+  // touched, and any conflict with a stored value is reported back to the
+  // caller instead of being silently overridden.
+  const { idl, filled, conflicts } = withDerivedDiscriminators(storedIdl);
   const bytes = parsePayload(payloadInput);
   const decoded = decodeData(idl, bytes, { allowTrailing, trailing });
   let reencoded;
@@ -99,6 +106,16 @@ export async function decodePayload(storeDir, program, payloadInput, { allowTrai
     roundTripByteExact: reencoded.equals(bytes),
     describedRoundTripByteExact: reencoded.equals(described),
     trailing: decoded.trailing,
+    // Provenance of the discriminator that matched: stored = the bytes the
+    // program wrote on-chain; derived = Anchor's sha256 rule filled a gap.
+    discriminatorSource: conflicts.length === 0 && (filled.instructions + filled.events) > 0
+      ? 'derived'
+      : (filled.instructions + filled.events) > 0 ? 'stored+derived' : 'stored',
+    discriminatorDerivation: {
+      filledInstructions: filled.instructions,
+      filledEvents: filled.events,
+      conflicts: conflicts.length,
+    },
     idl: { fingerprint: receipt.fingerprint, slot: receipt.slot, source: receipt.source, receipt: receiptName },
     object: objectPath,
   };

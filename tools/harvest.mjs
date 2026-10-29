@@ -38,6 +38,7 @@ import path from 'node:path';
 import { extractPayloads } from './lib/payloads.mjs';
 import { pinnedSignaturesOf } from './lib/pinned.mjs';
 import { compareReDerived, isCompleteReproduction } from './lib/rederive-verify.mjs';
+import { slotRange } from './lib/slot-range.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -310,7 +311,9 @@ const document = {
     failedOnChain: present.filter((entry) => entry.txErr).length,
     transactionsWithoutTarget: present.filter((entry) => !entry.payloads.length).length,
   },
-  slotRange: slots.length ? { oldest: Math.min(...slots), newest: Math.max(...slots) } : null,
+  // Reduced, not spread: a large harvest has hundreds of thousands of slots and
+  // Math.min(...slots) crashed with RangeError after all the RPC work was done.
+  slotRange: slotRange(slots),
   transactions,
 };
 
