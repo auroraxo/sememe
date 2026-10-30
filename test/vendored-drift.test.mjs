@@ -139,4 +139,103 @@ test('the committed report is the one the tool produces (no hand-edited numbers)
     stale,
     'summary.stale must equal the number of findings with missing instructions',
   );
+
+  // The event classification is pinned against the REAL Jupiter harvest, not
+  // against a synthetic fixture: 396 of the 773 harvested payloads are Anchor
+  // `emit_cpi!` event self-CPIs, every one of them carries an event
+  // discriminator the on-chain copy lists, and NONE of them is unknown to both
+  // copies. Publishing `unknownToBoth: 396` would be a measurement bug that
+  // reads like a coverage finding.
+  const jupiter = committed.findings.find((f) => f.file?.includes('jupiter-amm'));
+  assert.ok(jupiter?.unnamedByVendored, 'the Jupiter finding must carry its traffic classification');
+  assert.equal(jupiter.unnamedByVendored.payloads, 773);
+  assert.equal(jupiter.unnamedByVendored.eventSelfCpiPayloads, 396);
+  assert.equal(jupiter.unnamedByVendored.unknownToBoth, 0);
+  assert.equal(jupiter.unnamedByVendored.unnamed, 5);
+  assert.deepEqual(
+    jupiter.unnamedByVendored.namedByOnChain,
+    ['create_idempotent_associated_token_account'],
+  );
+});
+
+// --- event self-CPI classification -------------------------------------------
+//
+// The tool splits payloads the vendored copy cannot name into three buckets:
+// named by the on-chain copy as an instruction, an Anchor `emit_cpi!` event
+// self-CPI, or unknown to both. Anchor event payloads are
+//   EVENT_IX_TAG (8 bytes) ++ event_discriminator (8 bytes) ++ borsh(body)
+// so the discriminator that identifies them sits at bytes 8..16, NOT at bytes
+// 0..8. Measured against the committed Jupiter AMM v6 harvest (773 payloads,
+// 396 tagged event self-CPIs) the tool looked up the TAG in the event table,
+// always missed, and published all 396 as `unknownToBoth` while
+// `eventSelfCpiPayloads` stayed 0 — contradicting this repository's own
+// decoder, which names all 396 (README "Anchor emit_cpi! event payloads").
+
+const EVENT_TAG = 'e445a52e51cb9a1d'; // EVENT_IX_TAG as the harvest stores it
+
+/** A store exactly as `sememe pull` writes it, holding one IDL with one event. */
+async function storeWithEvent(store, program, idl) {
+  const { canonicalJson } = await import('../src/canonical.mjs');
+  const { createHash } = await import('node:crypto');
+  await mkdir(path.join(store, 'objects'), { recursive: true });
+  await mkdir(path.join(store, 'receipts'), { recursive: true });
+  const bytes = Buffer.from(`${canonicalJson(idl)}\n`);
+  const fingerprint = createHash('sha256').update(bytes).digest('hex');
+  await writeFile(path.join(store, 'objects', `${fingerprint}.json`), bytes);
+  await writeFile(
+    path.join(store, 'receipts', `${program}-463000000-metadata-${fingerprint}.json`),
+    JSON.stringify({ program, fingerprint: `sha256:${fingerprint}`, slot: 463000000, source: 'metadata' }),
+  );
+}
+
+test('an Anchor event self-CPI payload is counted as an event, not as unknown to both', async () => {
+  const dir = await mkdtemp(path.join(tmpdir(), 'drift-event-'));
+  const store = await mkdtemp(path.join(tmpdir(), 'drift-event-store-'));
+  try {
+    const program = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4';
+    // The vendored copy knows only the instruction; the on-chain copy also
+    // carries the event. The payload is tag ++ event discriminator ++ body.
+    await writeFixture(dir, 'evt.json', {
+      address: program,
+      instructions: [instruction('route', '0000000000000001')],
+    });
+    await storeWithEvent(store, program, {
+      address: program,
+      instructions: [instruction('route', '0000000000000001')],
+      events: [{ name: 'SwapEvent', discriminator: [0x40, 0xc6, 0xcd, 0xe8, 0x26, 0x08, 0x71, 0xe2] }],
+    });
+    const harvest = {
+      transactions: [{
+        missing: false,
+        payloads: [
+          { dataHex: 'e445a52e51cb9a1d40c6cde8260871e200000000' }, // tagged event
+          { dataHex: '0000000000000001aabb' },                   // instruction both copies know
+          { dataHex: 'ffffffffffffffffdeadbeef' },                // genuinely unknown
+        ],
+      }],
+    };
+    const harvestPath = path.join(dir, 'harvest.json');
+    await writeFile(harvestPath, JSON.stringify(harvest));
+    const out = path.join(dir, 'report.json');
+    const res = await tool([
+      '--repo', dir, '--store', store,
+      '--harvest', harvestPath, '--program', program, '--out', out,
+    ]);
+    assert.equal(res.status, 0, res.stdout);
+    const report = JSON.parse(await readFile(out, 'utf8'));
+    const traffic = report.findings[0].unnamedByVendored;
+    assert.equal(traffic.payloads, 3);
+    assert.equal(
+      traffic.eventSelfCpiPayloads, 1,
+      'tag ++ event discriminator must resolve through the event table at bytes 8..16',
+    );
+    assert.equal(
+      traffic.unknownToBoth, 1,
+      'only the payload neither copy knows may be unknown to both',
+    );
+    assert.equal(traffic.unnamed, 0, 'the shared instruction is not unnamed');
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+    await rm(store, { recursive: true, force: true });
+  }
 });

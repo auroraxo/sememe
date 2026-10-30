@@ -326,6 +326,23 @@ The four programs with no on-chain IDL are not a gap in the store: they are nati
 
 The tool distinguishes three defects, because they are not the same defect: a **stale** copy (has an on-chain IDL, and it differs), an **unbound** copy (declares no program address, so it binds nothing — the `bisonfi.json` failure mode `solana-tx-remix` already documents), and a copy for a program that has no on-chain IDL at all.
 
+### The measurement tool misclassified 396 payloads as "unknown to both" (measured 2026-10-30)
+
+The traffic column of that report split payloads the vendored copy cannot name into three buckets: named by the on-chain copy as an instruction, an Anchor `emit_cpi!` event self-CPI, or unknown to both copies. The published numbers were **773 payloads, 5 unnamed by the vendored copy, 0 event self-CPIs, 396 unknown to both**.
+
+That was wrong, and it was wrong in the direction that looks like a coverage finding. Anchor event payloads are `EVENT_IX_TAG (8) ++ event_discriminator (8) ++ borsh(body)`, so the discriminator that identifies the event sits at bytes **8..16** — the tool looked up bytes **0..8**, which is the *tag*, in the event table. The tag is never an event discriminator, so the lookup always missed: all 396 tagged Jupiter payloads were published as "unknown to both copies" while the event bucket stayed empty, even though this repository's own decoder names every one of them (README above: *773/773 payloads decoded — 377 instructions + 396 Anchor event self-CPIs*). The measurement and the decoder contradicted each other, and the report was the wrong one.
+
+The fix looks up bytes 8..16 when the payload starts with the event tag, and the tag constant is now imported from the decoder (`EVENT_IX_TAG_HEX` in `src/codec.mjs`) instead of being written out a second time. Regenerated against the same committed harvest:
+
+| | payloads | unnamed by vendored | event self-CPIs | unknown to both |
+|---|---|---|---|---|
+| before | 773 | 5 | 0 | 396 |
+| after | 773 | 5 | **396** | **0** |
+
+The finding that mattered is unchanged: the vendored Jupiter copy still cannot name `create_idempotent_associated_token_account`, which appears in **5 real mainnet payloads**. What changed is that the other 396 payloads are no longer charged to a defect that does not exist — a decoder that names them was always in the room.
+
+The falsification is committed: `test/vendored-drift.test.mjs` pins the classification against the real committed harvest (396 event self-CPIs, 0 unknown to both, 5 unnamed by the vendored copy) and against a synthetic three-payload case (one tagged event, one shared instruction, one genuinely unknown). Against the pre-fix tool the synthetic test fails (`eventSelfCpiPayloads` 0 instead of 1) and the real-data assertions fail with it.
+
 ## A second consumer reads the artifact for every program it names
 
 `solana-tx-remix` migrated its single-program Whirlpool path first. Its multi-program path kept reading the vendored copies — and the measurement above is what that cost: `(unknown)` on a real Jupiter instruction, in a transaction that was otherwise described in full.

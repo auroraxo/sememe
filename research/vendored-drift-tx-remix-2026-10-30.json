@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T00:49:51.224Z",
+  "generatedAt": "2026-10-30T13:09:42.659Z",
   "store": "/tmp/sememe-pulse",
   "repos": [
     "/home/aurora/github_repos/solana-tx-remix"
@@ -71,8 +71,8 @@
         "namedByOnChain": [
           "create_idempotent_associated_token_account"
         ],
-        "eventSelfCpiPayloads": 0,
-        "unknownToBoth": 396
+        "eventSelfCpiPayloads": 396,
+        "unknownToBoth": 0
       }
     },
     {

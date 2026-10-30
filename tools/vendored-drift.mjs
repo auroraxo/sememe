@@ -29,6 +29,7 @@ import { readFile, readdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { findStoredIdl } from '../src/decode.mjs';
 import { withDerivedDiscriminators } from '../src/discriminators.mjs';
+import { EVENT_IX_TAG_HEX } from '../src/codec.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -199,7 +200,8 @@ for (const repo of repos) {
         if (transaction.missing) continue;
         for (const payload of transaction.payloads ?? []) {
           payloads++;
-          const disc = (payload.dataHex ?? '').slice(0, 16);
+          const dataHex = payload.dataHex ?? '';
+          const disc = dataHex.slice(0, 16);
           if (!disc) continue;
           if (!vendoredTable.has(disc)) {
             const chainInstruction = chainTable.get(disc);
@@ -209,7 +211,17 @@ for (const repo of repos) {
             } else {
               // Not an instruction the on-chain copy names either: either an
               // event self-CPI or something neither copy knows.
-              const asEvent = chainEventTable.get(disc);
+              //
+              // An `emit_cpi!` payload is
+              //   EVENT_IX_TAG (8) ++ event_discriminator (8) ++ borsh(body)
+              // so the discriminator that identifies the event sits at bytes
+              // 8..16. Looking up bytes 0..8 — the TAG — always misses: that
+              // published all 396 tagged Jupiter payloads as `unknownToBoth`
+              // while `eventSelfCpiPayloads` stayed 0, contradicting this
+              // repository's own decoder (which names all 396).
+              const head = disc;
+              const key = head === EVENT_IX_TAG_HEX ? dataHex.slice(16, 32) : head;
+              const asEvent = chainEventTable.get(key);
               if (asEvent) unnamedEventPayloads.push(asEvent);
               else unnamedEventPayloads.push(null);
             }
