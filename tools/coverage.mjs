@@ -52,7 +52,7 @@ if (!harvestPath || !storeDir || !program) {
 }
 
 const { findStoredIdl } = await import('../src/decode.mjs');
-const { withDerivedDiscriminators } = await import('../src/discriminators.mjs');
+const { withDerivedDiscriminators, snakeCase } = await import('../src/discriminators.mjs');
 const stored = await findStoredIdl(storeDir, program);
 const { idl, filled, conflicts } = withDerivedDiscriminators(stored.idl);
 const harvest = JSON.parse(await readFile(harvestPath, 'utf8'));
@@ -86,7 +86,8 @@ const decode = {
   errorSamples: [],
 };
 const naming = {
-  namedByBoth: 0, sememeOnly: 0, crossCheckOnly: 0, nameDisagreement: 0, disagreements: [],
+  namedByBoth: 0, sememeOnly: 0, crossCheckOnly: 0, nameDisagreement: 0,
+  caseOnlyDifference: 0, disagreements: [], caseDifferences: [],
 };
 const byInstruction = new Map();
 const byEvent = new Map();
@@ -133,8 +134,20 @@ for (const transaction of harvest.transactions ?? []) {
     if (theirs && mine) {
       naming.namedByBoth++;
       if (theirs !== mine.name) {
-        naming.nameDisagreement++;
-        if (naming.disagreements.length < 10) naming.disagreements.push([mine.name, theirs]);
+        // Two IDL copies may name the same wire bytes differently in case
+        // style alone (measured: Meteora DAMM v1 on-chain camelCase
+        // `claimFee` vs published snake_case `claim_fee`). Anchor's rule
+        // hashes snake_case(name), so a case-only difference is a cosmetic
+        // convention gap, NOT a disagreement about what these bytes are.
+        // Count them apart; a real disagreement is one that survives
+        // snake_casing.
+        if (snakeCase(theirs) === snakeCase(mine.name)) {
+          naming.caseOnlyDifference++;
+          if (naming.caseDifferences.length < 10) naming.caseDifferences.push([mine.name, theirs]);
+        } else {
+          naming.nameDisagreement++;
+          if (naming.disagreements.length < 10) naming.disagreements.push([mine.name, theirs]);
+        }
       }
     } else if (mine) naming.sememeOnly++;
     else if (theirs) naming.crossCheckOnly++;

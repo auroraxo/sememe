@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions and Anchor event self-CPIs, both runnable (October 2026), verified against four real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend and OpenBook v2), with one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against seven real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault and Meteora DAMM v1), with one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -230,6 +230,27 @@ Covered by `test/meteora-vault.test.mjs` (7 tests) and pinned fixtures (`meteora
 
 **Remaining limits after six programs:** still no outside user; the derivation is still Anchor-specific; **one of the five derivation-only programs remains individually unproven against real payloads (Meteora DAMM v1)** — Kamino Lend, OpenBook v2, Marinade and Meteora Vault now each are; no event bytes observed on this program.
 
+## Seventh program: Meteora DAMM v1 (last derivation-only program, and a case-style finding)
+
+Meteora DAMM v1 (`Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB` — Meteora's constant-product/stable AMM, a sixth program family) is the fifth and last program in the strict coverage table that can only decode because the tool reconstructs the missing discriminators. Its on-chain IDL was pulled on 2026-10-29 at slot 463068495 (legacy `anchor:idl` account, fingerprint `sha256:dd60d3d367986a1d2ad574df3ea5855c5a9801fdaa6fdea57b898deafb95fdba`): **26 instructions, 18 events, 0 discriminators** — same premise as Kamino Lend, OpenBook v2, Marinade and Meteora Vault.
+
+**Two new findings:**
+
+- **Case-style difference between interface copies is not a disagreement.** The on-chain copy names instructions in camelCase (`claimFee`, `removeBalanceLiquidity`), the published `MeteoraAg/damm-v1-sdk` copy in snake_case (`claim_fee`, `remove_balance_liquidity`). Anchor's rule hashes `snake_case(name)`, so the two copies produce identical wire bytes while differing in spelling convention. `tools/coverage.mjs` now counts these apart: `caseOnlyDifference` (cosmetic) versus `nameDisagreement` (survives snake_casing, therefore a real conflict). Before this fix the DAMM run reported 13 false "name disagreements" that were 13× `claimFee`/`claim_fee`. Measured now: **643/643 named by both copies, 0 real disagreements, 13 case-only differences.**
+- **The published copy stores its own discriminators, and the rule reproduces them.** Unlike the on-chain account, the published `idl.json` carries discriminator arrays written by the program's own IDL generator: **30/30 instructions and 19/19 events match the Anchor rule byte for byte**, computed from names this repository never touched. That is confirmation of the rule from a second source that *stores* rather than *derives*.
+
+**Measured on real traffic:** a harvest of **152,097 mainnet transactions** across finalized blocks (slots 463065616..463068621) yielded **602 payload-bearing transactions with 643 payloads**:
+
+- **643/643 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/643** — the discriminator index built from the published bytes alone is empty.
+- **Two independent oracles agree:** anchor-ts (0.29.0) computes the sighash at runtime — **26/26 instructions + 18/18 events byte-exact**; the published sdk's own stored discriminators — **30/30 + 19/19 byte-exact**.
+- Instructions observed: `swap` (630), `claimFee` (13). Honest limit: two flows in the traffic, not a tour of all 26 instructions; **0 event payloads**, so the event path on this program is confirmed by both oracles (18/18 each), not by real bytes — same limit as Marinade and Meteora Vault.
+- **Inventory drift pinned:** the published copy (0.5.7) carries 4 instructions the on-chain 0.5.2 account does not (`claim_protocol_fee2`, `close_operator_account`, `create_operator_account`, `zap_protocol_fee`); every on-chain instruction exists in the published copy after snake_casing.
+
+Covered by `test/meteora-damm-v1.test.mjs` (7 tests) and pinned fixtures (`meteora-damm-v1-idl.json`, `meteora-damm-v1-anchor-ts-discriminators.json`, `meteora-damm-v1-published-idl.json`, `harvest-meteora-damm-v1-2026-10-29.json`); measurement in [research/coverage-meteora-damm-v1-2026-10-29.json](research/coverage-meteora-damm-v1-2026-10-29.json). Suite: **128/128**. Falsification: disabling the derivation fill fails 2 of the 7 new tests (byte-exact round-trip and the anchor-ts comparison), restoring it passes.
+
+**Remaining limits after seven programs:** all five derivation-only programs are now individually proven against real mainnet payloads (**Kamino Lend 1,432/1,432, OpenBook v2 600/600, Marinade 623/623, Meteora Vault 1,290/1,290, Meteora DAMM v1 643/643**, each byte-exact with 0 decodable without derivation); still no outside user; the derivation is still Anchor-specific; no event bytes observed on the last three programs.
+
 ## Accounts: state, not just calls (three programs, 39 real accounts)
 
 Every proof above ends instructions/events and says the same remaining limit: *accounts are still undecoded*. That limit is now closed for the same three programs.
@@ -260,7 +281,7 @@ Types covered include `Whirlpool`, `Oracle`, `TickArray`, `DynamicTickArray` (Wh
 
 **What the byte-exactness gate actually proves is itself falsified:** dropping the struct's first field, or flipping a discriminator byte, must not produce "decoded + trailing 0 + byte-exact" — both are asserted to fail (`test/account.test.mjs`), and foreign program bytes must identify as nothing.
 
-Run: `npm test` (the account commit brought the suite to 108; **114** after the fifth program above), plus `node tools/accounts.mjs --accounts test/fixtures/accounts-<program>-2026-10-29.json --store <store> --program <id>` to re-measure from a live pull.
+Run: `npm test` (the account commit brought the suite to 108; **114** after the fifth program, **128** after the seventh), plus `node tools/accounts.mjs --accounts test/fixtures/accounts-<program>-2026-10-29.json --store <store> --program <id>` to re-measure from a live pull.
 
 **Remaining limits:** still no outside user; **zero trailing bytes were observed**, so the report path for account bytes the IDL does not describe is implemented but unexercised by real data; `repr(C)`/`packed` (zero-copy) accounts are not decoded; account *discriminators* are derived for three Anchor programs — a non-Anchor program's account framing still needs its own scheme, exactly as for instructions; and 39 accounts from traffic of three programs is a convenience sample, not an inventory of what accounts exist on chain.
 
@@ -283,7 +304,7 @@ The strict figure **has now been measured** over the same frozen 20 IDs and the 
 | **decodable from published bytes alone** (the program stored its own discriminators) | **10/20** | **50%** |
 | decodable after Anchor's rule fills a missing discriminator | 15/20 | 75% |
 
-The middle row is the honest headline: **half** of the sample's usable programs publish an interface that decodes as-is; the other five (Kamino Lend, OpenBook v2, Marinade, Meteora DAMM v1, Meteora Vault) publish names and layouts but no wire discriminators, and only become decodable because the tool can reconstruct them from the name. That reconstruction is verified per program, but it is the tool's inference, not the program's published interface — and it is Anchor-specific. **Four of the five are now individually proven against real mainnet payloads** (Kamino Lend 1,432/1,432, OpenBook v2 600/600, Marinade 623/623, Meteora Vault 1,290/1,290, each byte-exact with 0 without derivation); Meteora DAMM v1 remains. See [frozen 20 IDs](programs-20.json), [raw classification with slot and account addresses](coverage-result.json), and [selection/chronology limitations](research/selection-method.md). The 20 IDs were committed before the full batch run, but the detailed selection-method note came later; one exploratory Whirlpool RPC check preceded the freeze. Do not call the whole study blind or fully preregistered.
+The middle row is the honest headline: **half** of the sample's usable programs publish an interface that decodes as-is; the other five (Kamino Lend, OpenBook v2, Marinade, Meteora DAMM v1, Meteora Vault) publish names and layouts but no wire discriminators, and only become decodable because the tool can reconstruct them from the name. That reconstruction is verified per program, but it is the tool's inference, not the program's published interface — and it is Anchor-specific. **All five are now individually proven against real mainnet payloads** (Kamino Lend 1,432/1,432, OpenBook v2 600/600, Marinade 623/623, Meteora Vault 1,290/1,290, Meteora DAMM v1 643/643, each byte-exact with 0 decodable without derivation). See [frozen 20 IDs](programs-20.json), [raw classification with slot and account addresses](coverage-result.json), and [selection/chronology limitations](research/selection-method.md). The 20 IDs were committed before the full batch run, but the detailed selection-method note came later; one exploratory Whirlpool RPC check preceded the freeze. Do not call the whole study blind or fully preregistered.
 
 ## Next qualification
 

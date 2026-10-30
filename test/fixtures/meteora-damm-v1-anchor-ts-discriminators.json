@@ -1,0 +1,449 @@
+{
+ "source": "@coral-xyz/anchor BorshInstructionCoder/BorshEventCoder over the on-chain Meteora DAMM v1 IDL (no stored discriminators); sighash computed by anchor-ts at runtime",
+ "packageVersion": "0.29.0",
+ "capturedAt": "2026-10-29",
+ "instructions": {
+  "initializePermissionedPool": [
+   77,
+   85,
+   178,
+   157,
+   50,
+   48,
+   212,
+   126
+  ],
+  "initializePermissionlessPool": [
+   118,
+   173,
+   41,
+   157,
+   173,
+   72,
+   97,
+   103
+  ],
+  "initializePermissionlessPoolWithFeeTier": [
+   6,
+   135,
+   68,
+   147,
+   229,
+   82,
+   169,
+   113
+  ],
+  "enableOrDisablePool": [
+   128,
+   6,
+   228,
+   131,
+   55,
+   161,
+   52,
+   169
+  ],
+  "swap": [
+   248,
+   198,
+   158,
+   145,
+   225,
+   117,
+   135,
+   200
+  ],
+  "removeLiquiditySingleSide": [
+   84,
+   84,
+   177,
+   66,
+   254,
+   185,
+   10,
+   251
+  ],
+  "addImbalanceLiquidity": [
+   79,
+   35,
+   122,
+   84,
+   173,
+   15,
+   93,
+   191
+  ],
+  "removeBalanceLiquidity": [
+   133,
+   109,
+   44,
+   179,
+   56,
+   238,
+   114,
+   33
+  ],
+  "addBalanceLiquidity": [
+   168,
+   227,
+   50,
+   62,
+   189,
+   171,
+   84,
+   176
+  ],
+  "setPoolFees": [
+   102,
+   44,
+   158,
+   54,
+   205,
+   37,
+   126,
+   78
+  ],
+  "overrideCurveParam": [
+   98,
+   86,
+   204,
+   51,
+   94,
+   71,
+   69,
+   187
+  ],
+  "getPoolInfo": [
+   9,
+   48,
+   220,
+   101,
+   22,
+   240,
+   78,
+   200
+  ],
+  "bootstrapLiquidity": [
+   4,
+   228,
+   215,
+   71,
+   225,
+   253,
+   119,
+   206
+  ],
+  "createMintMetadata": [
+   13,
+   70,
+   168,
+   41,
+   250,
+   100,
+   148,
+   90
+  ],
+  "createLockEscrow": [
+   54,
+   87,
+   165,
+   19,
+   69,
+   227,
+   218,
+   224
+  ],
+  "lock": [
+   21,
+   19,
+   208,
+   43,
+   237,
+   62,
+   255,
+   87
+  ],
+  "claimFee": [
+   169,
+   32,
+   79,
+   137,
+   136,
+   232,
+   70,
+   137
+  ],
+  "createConfig": [
+   201,
+   207,
+   243,
+   114,
+   75,
+   111,
+   47,
+   189
+  ],
+  "closeConfig": [
+   145,
+   9,
+   72,
+   157,
+   95,
+   125,
+   61,
+   85
+  ],
+  "initializePermissionlessConstantProductPoolWithConfig": [
+   7,
+   166,
+   138,
+   171,
+   206,
+   171,
+   236,
+   244
+  ],
+  "initializePermissionlessConstantProductPoolWithConfig2": [
+   48,
+   149,
+   220,
+   130,
+   61,
+   11,
+   9,
+   178
+  ],
+  "initializeCustomizablePermissionlessConstantProductPool": [
+   145,
+   24,
+   172,
+   194,
+   219,
+   125,
+   3,
+   190
+  ],
+  "updateActivationPoint": [
+   150,
+   62,
+   125,
+   219,
+   171,
+   220,
+   26,
+   237
+  ],
+  "withdrawProtocolFees": [
+   11,
+   68,
+   165,
+   98,
+   18,
+   208,
+   134,
+   73
+  ],
+  "setWhitelistedVault": [
+   12,
+   148,
+   94,
+   42,
+   55,
+   57,
+   83,
+   247
+  ],
+  "partnerClaimFee": [
+   57,
+   53,
+   176,
+   30,
+   123,
+   70,
+   52,
+   64
+  ]
+ },
+ "events": {
+  "AddLiquidity": [
+   31,
+   94,
+   125,
+   90,
+   227,
+   52,
+   61,
+   186
+  ],
+  "RemoveLiquidity": [
+   116,
+   244,
+   97,
+   232,
+   103,
+   31,
+   152,
+   58
+  ],
+  "BootstrapLiquidity": [
+   121,
+   127,
+   38,
+   136,
+   92,
+   55,
+   14,
+   247
+  ],
+  "Swap": [
+   81,
+   108,
+   227,
+   190,
+   205,
+   208,
+   10,
+   196
+  ],
+  "SetPoolFees": [
+   245,
+   26,
+   198,
+   164,
+   88,
+   18,
+   75,
+   9
+  ],
+  "PoolInfo": [
+   207,
+   20,
+   87,
+   97,
+   251,
+   212,
+   234,
+   45
+  ],
+  "TransferAdmin": [
+   228,
+   169,
+   131,
+   244,
+   61,
+   56,
+   65,
+   254
+  ],
+  "OverrideCurveParam": [
+   247,
+   20,
+   165,
+   248,
+   75,
+   5,
+   54,
+   246
+  ],
+  "PoolCreated": [
+   202,
+   44,
+   41,
+   88,
+   104,
+   220,
+   157,
+   82
+  ],
+  "PoolEnabled": [
+   2,
+   151,
+   18,
+   83,
+   204,
+   134,
+   92,
+   191
+  ],
+  "MigrateFeeAccount": [
+   223,
+   234,
+   232,
+   26,
+   252,
+   105,
+   180,
+   125
+  ],
+  "CreateLockEscrow": [
+   74,
+   94,
+   106,
+   141,
+   49,
+   17,
+   98,
+   109
+  ],
+  "Lock": [
+   220,
+   183,
+   67,
+   215,
+   153,
+   207,
+   56,
+   234
+  ],
+  "ClaimFee": [
+   75,
+   122,
+   154,
+   48,
+   140,
+   74,
+   123,
+   163
+  ],
+  "CreateConfig": [
+   199,
+   152,
+   10,
+   19,
+   39,
+   39,
+   157,
+   104
+  ],
+  "CloseConfig": [
+   249,
+   181,
+   108,
+   89,
+   4,
+   150,
+   90,
+   174
+  ],
+  "WithdrawProtocolFees": [
+   30,
+   240,
+   207,
+   196,
+   139,
+   239,
+   79,
+   28
+  ],
+  "PartnerClaimFees": [
+   135,
+   131,
+   10,
+   94,
+   119,
+   209,
+   202,
+   48
+  ]
+ }
+}

@@ -1,0 +1,92 @@
+{
+  "program": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+  "store": "/tmp/sememe-damm-store",
+  "harvest": {
+    "source": "mainnet-beta harvest (own run, public RPC) — 2026-10-30T00:01:56.651Z",
+    "harvestedAt": "2026-10-30T00:01:56.653Z",
+    "counts": {
+      "requested": 600,
+      "pinnedSignatures": 152097,
+      "fetched": 152097,
+      "missing": 0,
+      "transactionsWithTargetPayloads": 602,
+      "payloads": 643,
+      "failedOnChain": 66453,
+      "transactionsWithoutTarget": 151495
+    },
+    "slotRange": {
+      "oldest": 463065616,
+      "newest": 463068621
+    }
+  },
+  "idl": {
+    "instructions": 26,
+    "events": 18,
+    "discriminatorsDerived": {
+      "instructions": 26,
+      "events": 18
+    },
+    "derivationConflicts": []
+  },
+  "crossCheck": {
+    "source": "/tmp/damm-published-idl.json",
+    "instructions": 30,
+    "events": 19
+  },
+  "naming": {
+    "namedByBoth": 643,
+    "sememeOnly": 0,
+    "crossCheckOnly": 0,
+    "nameDisagreement": 0,
+    "caseOnlyDifference": 13,
+    "disagreements": [],
+    "caseDifferences": [
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ],
+      [
+        "claimFee",
+        "claim_fee"
+      ]
+    ]
+  },
+  "byInstruction": {
+    "swap": 630,
+    "claimFee": 13
+  },
+  "byEvent": {},
+  "note": "caseOnlyDifference counts payloads whose two interface copies differ in case style alone (on-chain camelCase vs published snake_case); nameDisagreement counts differences that survive snake_casing."
+}
