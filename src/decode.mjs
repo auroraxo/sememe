@@ -18,6 +18,8 @@ import {
   toJsonSafe,
 } from './codec.mjs';
 import { decodeBase58 } from './base58.mjs';
+import { findStoredIdl, findStoredIdls } from './store-read.mjs';
+import { unionDecode, UnionRefusal } from './union.mjs';
 import { withDerivedDiscriminators } from './discriminators.mjs';
 import {
   withDerivedAccountDiscriminators, identifyAccount, decodeAccountData,
@@ -46,71 +48,39 @@ export function parsePayload(input) {
 
 /** Find the newest stored IDL for a program id, verified against its receipt.
  *
- * The receipt is a claim; the recomputed hash is the check. Every step that can
- * lie on the way to a decode is refused with a named reason instead of being
- * tolerated:
- *   - a receipt whose program field is not the program asked for (a receipt
- *     swapped in from another program's file)
- *   - a receipt pointing at an object that is not in the store
- *   - an object that does not re-hash to the fingerprint the receipt claims
- *     (the defect measured 2026-10-30: before this check, a tampered object —
- *     valid JSON, one instruction renamed — was decoded happily and its
- *     tampered name reported as provenance)
- *   - an object declaring a different program than the receipt binds
- * An unreadable or tampered store must never become another source's names.
+ * The verification contract lives in `src/store-read.mjs`, shared by the
+ * single-source and the union reader: receipt program binding, object
+ * presence, re-hash against the receipt's fingerprint, address agreement.
+ * Any violation is refused with a named reason, never tolerated.
  */
-export async function findStoredIdl(storeDir, program) {
-  const receipts = path.join(storeDir, 'receipts');
-  let names;
-  try { names = await readdir(receipts); }
-  catch (error) {
-    if (error?.code === 'ENOENT') throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
+export { findStoredIdl, findStoredIdls } from './store-read.mjs';
+export { adopt } from './adopt.mjs';
+export { unionDecode, UnionRefusal } from './union.mjs';
+
+/**
+ * Decode one payload with BOTH verified store sources for the program.
+ *
+ * Primary = newest on-chain receipt (real slot), secondary = newest adopted
+ * published copy. Without an adopted copy this is exactly the plain
+ * single-source decode, labelled `view.verdict: 'single_source'` so callers
+ * can tell the difference instead of assuming a union happened.
+ *
+ * Refusals from `unionDecode` are re-thrown with `view` attached: the caller
+ * gets BOTH sources' verdicts in the failure, not just an error string.
+ */
+export async function decodeUnionPayload(storeDir, program, payloadInput, options = {}) {
+  const { primary, secondary } = await findStoredIdls(storeDir, program);
+  const bytes = parsePayload(payloadInput);
+  try {
+    const result = unionDecode({ program, primary, secondary, bytes });
+    if (options.trailing === 'error' && result.trailing.count > 0) {
+      throw new Error(`payload carries ${result.trailing.count} unexplained byte(s) after ${result.name}`);
+    }
+    return result;
+  } catch (error) {
+    if (error instanceof UnionRefusal) error.view = error.details?.view;
     throw error;
   }
-  const candidates = names.filter((name) => name.startsWith(`${program}-`));
-  if (!candidates.length) throw Error(`no stored IDL for program ${program} in ${storeDir}`);
-  candidates.sort();
-  const receiptName = candidates[candidates.length - 1];
-  let receipt;
-  try {
-    receipt = JSON.parse(await readFile(path.join(receipts, receiptName), 'utf8'));
-  } catch (error) {
-    throw Error(`store receipt ${receiptName} is unreadable: ${String(error?.message ?? error).slice(0, 140)}`);
-  }
-  if (receipt?.program !== program) {
-    throw Error(`store receipt ${receiptName} names program ${receipt?.program} — it is not a receipt for ${program}`);
-  }
-  const fingerprint = String(receipt.fingerprint).replace(/^sha256:/, '');
-  if (!/^[a-f0-9]{64}$/.test(fingerprint)) throw Error(`store receipt has a malformed fingerprint: ${receipt.fingerprint}`);
-  const objectPath = path.join(storeDir, 'objects', `${fingerprint}.json`);
-  let raw;
-  try { raw = await readFile(objectPath); }
-  catch (error) {
-    if (error?.code === 'ENOENT') {
-      throw Error(`store receipt ${receiptName} claims object ${fingerprint} but the store object is missing`);
-    }
-    throw Error(`store object ${fingerprint}.json is unreadable: ${String(error?.message ?? error).slice(0, 140)}`);
-  }
-  let idl;
-  try { idl = JSON.parse(raw); }
-  catch (error) {
-    throw Error(`store object ${fingerprint}.json is not JSON: ${String(error?.message ?? error).slice(0, 140)}`);
-  }
-  if (!Array.isArray(idl.instructions)) throw Error(`stored object for ${program} has no instructions`);
-  if (idl.address && idl.address !== program) {
-    throw Error(`stored object ${fingerprint} declares program ${idl.address}, not the receipt's ${program}`);
-  }
-  // `pull` writes sha256(canonicalJson(idl) + '\n'), so verify with the same
-  // canonicalizer rather than with JSON.stringify, whose key order is not the
-  // stored order. A receipt without this check is a filename, not provenance.
-  const actual = createHash('sha256').update(`${canonicalJson(idl)}\n`).digest('hex');
-  if (actual !== fingerprint) {
-    throw Error(
-      `stored object for ${program} re-hashes to sha256:${actual} but receipt ${receiptName} `
-      + `claims sha256:${fingerprint}: object and receipt disagree, refusing to decode`,
-    );
-  }
-  return { idl, receipt, receiptName, objectPath };
 }
 
 /**

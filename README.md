@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against seven real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault and Meteora DAMM v1), with one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -351,6 +351,96 @@ and a test fails if the committed file differs from what the tool computes
 (measured: one hand-edited number fails it, restoring passes). Suite: **154/154**
 (up from 140).
 
+## Working now: union decode — two verified sources, one payload, disagreement reported
+
+The pump.fun measurement above produced three numbers for the same 996 payloads:
+669 (on-chain copy alone), 880 (published copy alone), 914 (a hand-merged union
+inside a measurement tool). The union was the only view that described the deployed
+program, and it did not exist outside that tool. It does now:
+
+```bash
+sememe adopt 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P idl/pump.json --store <dir> --origin pump-fun/pump-public-docs
+sememe decode --union 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P <payload> --store <dir>
+```
+
+- **`adopt` stores a first-party published copy** content-addressed exactly like a
+  pull: canonical bytes, sha-256 fingerprint, write-once object, receipt. The
+  receipt says `source: published`, `slot: null` and carries the `origin` the
+  caller declared. That distinction is deliberate: `pull` gets its authority from
+  the chain, `adopt` is **provenance of bytes, not proof the bytes describe the
+  deployed program** — and the decode result must keep saying which source
+  answered.
+- **The adopted copy can never become the default source.** It sorts before every
+  real slot in the single-source reader's filename ordering, so plain
+  `sememe decode` reads exactly what it read before this feature existed — the
+  pre-existing 154 tests pass unchanged, and a test pins the selection
+  explicitly (falsified by mutation M4: letting the adopted receipt win turns it
+  red).
+- **Both sources are verified by the same reader** (`src/store-read.mjs`): receipt
+  program binding, object presence, re-hash against the receipt, address
+  agreement. A tampered adopted object is refused **by name in the union path
+  too** — not silently dropped in favour of the surviving source (falsified by
+  mutation M5).
+
+**The arbitration is decided by bytes, not by preference**, strongest evidence first:
+
+1. both sources decode the same name and args → `agree`;
+2. both decode, one re-encodes the **whole** payload and the other does not → the
+   full-round-trip source wins (`byte_evidence_full_roundtrip`);
+3. neither explains everything, one leaves **strictly fewer** unexplained bytes →
+   that source wins (`byte_evidence_fewer_unexplained_bytes`);
+4. evidence does not decide → the on-chain primary stands and the drift is
+   **reported with the differing field paths** — never absorbed;
+5. one source refuses → the other answers, but only with byte evidence behind it
+   (`primary_refused` / `secondary_refused`);
+6. **two different names for the same bytes → refusal**, not a coin flip
+   (`name_conflict`); the same for a secondary source that names bytes it cannot
+   reproduce (`union_fallback_refused`).
+
+**Measured, product path, the same 996 pump.fun payloads**
+(`node tools/union-coverage.mjs` →
+[research/union-coverage-2026-10-30.json](research/union-coverage-2026-10-30.json),
+recomputed in CI — a committed-report mismatch fails the suite):
+
+| verdict | payloads | what it means |
+|---|---|---|
+| `agree` | 546 | both sources decode identical arguments |
+| `fallback_secondary` | 246 | 245 payloads of the five stale on-chain instructions + the `SweepBondingCurveFeeEvent` payload the hand-merged union refused |
+| `primary_only` | 35 | the published copy's layout is taller than the bytes sent (truncated), the on-chain copy decodes them |
+| `layout_drift` | 88 | both decode, arguments differ — reported with field paths, winner chosen by byte evidence |
+| refused by both | 81 | the on-chain copy lacks the instruction entirely AND the published copy cannot decode these bytes |
+| **decoded** | **915/996 (91.9%)** | 915 re-encode their described prefix byte-exactly; **828 re-encode the WHOLE payload** |
+
+The **+1 over the hand-merged 914** is a real difference, not noise: that merge
+added *instructions* only, so the published-only event `SweepBondingCurveFeeEvent`
+(`742b4dbd117a482b`) was refused; the product union carries both sources whole.
+
+The 88 drifts are two real, measured disagreements — the reason the union exists:
+
+- **CreateEvent (1 payload):** the published copy declares `depth: u8`, the
+  on-chain copy does not. On-chain leaves 1 byte unexplained; the published copy
+  re-encodes the **whole** payload, so byte evidence picks it, and the winning
+  decode carries `depth`.
+- **TradeEvent (87 payloads):** the published copy declares an additional
+  `creator_fee_unclaimed: u64`. On-chain leaves 16 bytes unexplained, published
+  leaves 8 (the known 8-byte zero tail neither explains) — strictly-fewer-
+  unexplained-bytes picks the published copy, and the tail stays visible under
+  `drift.trailingBytes` instead of being laundered into a clean decode.
+
+**Falsification:** `bash tools/union-mutations.sh` breaks each rule on purpose —
+M1 name conflict, M2 fallback without byte evidence, M3a/M3b the two
+byte-evidence arbitration rules, M4 adopted-as-default, M5 tamper check — and
+requires exactly the named test to go red in every case, control run green. The
+measurements are pinned twice: `test/union-coverage.test.mjs` deep-equals the
+committed report against what the tool computes right now, and asserts each
+headline count with a message saying what a regression would mean. Suite:
+**169/169** (up from 154).
+
+**Limits, stated:** one program, one harvest window, both sources are mine (on-chain
+pull + first-party published copy), no outside user. Account decoding still reads a
+single receipt — union arbitration is not wired for accounts. An adopted receipt's
+`origin` is a declared label, not a verified origin.
+
 ## Free and paid
 
 - Free, MIT: all acquisition channels, normalization, fingerprint store, checks, decode and encode APIs, CLI, daemon, lock files, and fully offline resolution. No account or quota.
@@ -449,4 +539,5 @@ The falsification is a committed control: `solana-tx-remix`'s `neg/idl-name-stor
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
 2. **Whirlpool pull + content fingerprint has landed, the instruction decoder decodes real mainnet bytes, one own consumer reads the stored artifact for BOTH checking and producing, and the decoder is verified against an independent oracle across 1,000+ transactions** (see sections above): `solana-tx-remix` uses the pinned IDL for its single-program Whirlpool path (verifier + emitter), and `tools/tx-diff.mjs` verifies 1,119 real mainnet payloads from 1,029 transactions (sampled across 40,013 mainnet transactions in 148 finalized blocks) with 0 naming disagreements, 0 value disagreements, 0 byte mismatches, and 33 unexplained trailing-byte payloads (2.95%). Still to do, in order: migrate the remaining own decoder paths; then seek an outside user. The selected-sample threshold does not validate other program families. The `41 paths` figure above is an unverified note estimate; the computed scan in [research/decoder-sites-2026-10-27.json](research/decoder-sites-2026-10-27.json) reports **42 (file, class) decoder sites across 35 files in 5 own repositories**, of which 36 sit in `solana-tx-remix` + `sememe` — the counting unit matters and the two numbers are not interchangeable.
 3. **Account decoding has landed** (see "Accounts: state, not just calls"): 39 real mainnet accounts across three programs, 39/39 re-encoded byte-exact, values checked against anchor-ts, 29/29 account discriminators matching anchor-ts's own computation. Still open: `repr(C)`/`packed` accounts, non-Anchor account framing, and the report path for account bytes the IDL does not describe (no real data has exercised it yet — 0 trailing bytes observed).
-4. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.
+4. **Union decode has landed** (see "Working now: union decode"): `sememe adopt` puts a first-party published copy in the store, `sememe decode --union` answers from both verified sources with byte-evidence arbitration and a reported drift ledger — measured 915/996 decoded on real pump.fun traffic (the on-chain account alone decodes 669, the published copy alone 880). Still open: the same arbitration for account decoding (accounts still read a single receipt), adopting published copies for more than one program, and an honest label for a declared `origin` that no reader verifies.
+5. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.
