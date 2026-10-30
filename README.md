@@ -285,6 +285,72 @@ Run: `npm test` (the account commit brought the suite to 108; **114** after the 
 
 **Remaining limits:** still no outside user; **zero trailing bytes were observed**, so the report path for account bytes the IDL does not describe is implemented but unexercised by real data; `repr(C)`/`packed` (zero-copy) accounts are not decoded; account *discriminators* are derived for three Anchor programs — a non-Anchor program's account framing still needs its own scheme, exactly as for instructions; and 39 accounts from traffic of three programs is a convenience sample, not an inventory of what accounts exist on chain.
 
+## Eighth and ninth programs: Meteora DAMM v2 and pump.fun (and a tuple-struct codec fix)
+
+On 2026-10-30 `solana-tx-remix` carried three CPI labels that read `(unknown)` because
+the consumer assumed the programs published no on-chain IDL: **Meteora DAMM v2**
+(`cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG`, `cp-amm`) and **pump.fun**
+(`6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P`). One sememe pull per program
+falsified the assumption:
+
+| program | on-chain source | slot | instructions | events | stored discriminators |
+|---|---|---|---|---|---|
+| cp-amm | `anchor:idl` @ `F1hSvut...` | 463372654 | 38 | 23 | 38/38 ix, 23/23 ev (100%) |
+| pump.fun | `anchor:idl` @ `AYgC53t...` | 463372656 | 47 | 28 | 47/47 ix, 28/28 ev (100%) |
+
+Every stored value matches Anchor's derivation rule byte for byte (38/38, 47/47, 23/23,
+28/28), so no gaps had to be filled. Both programs are from the frozen 20-ID set
+(indexes 16 and 11) where they were previously classified "usable"; this measurement
+proves they actually decode real mainnet bytes.
+
+**Measured on real traffic:** two fresh mainnet harvests (2026-10-30, slots
+463380807..463380978) collected **2,890 payloads across 1,661 payload-bearing
+transactions** (cp-amm: 1,894 payloads / 809 tx from 22,272 transactions; pump.fun:
+996 payloads / 852 tx from 4,459 transactions):
+
+- **cp-amm decodes every payload:** **1,894/1,894 decoded (100%)**, 0 codec errors, 0
+  unknown discriminators; **1,888/1,894 round-trip byte-exact**, 6 payloads with
+  trailing bytes (all `swap`, 2 with 8 zero bytes, 4 with 1 zero byte) — the deployed
+  swap is slightly ahead of the on-chain IDL.
+- **pump.fun with the on-chain IDL alone:** **669/996 decoded (67.2%)**, 327 refused
+  (326 unknown instruction discriminators across five instructions, 1 unknown event
+  discriminator); **581 byte-exact**, 88 with trailing bytes.
+- **The published first-party IDL names the 326 missing instructions:**
+  `buy_exact_quote_in_v3` (107), `buy_v3` (2), `multi_hop_curve_swap` (1), `sell_v3`
+  (194), `sweep_creator_fee` (22) — all absent from the on-chain account, all present
+  in `pump-fun/pump-public-docs` `idl/pump.json`. The on-chain account is simply stale.
+- **Neither source alone describes the deployed program:** with the published copy,
+  **880/996 decode** (782 instructions + 98 events); the remaining 116 refusals come
+  from `buy` carrying a `partial_fill` argument the deployed program does not always
+  send. With the **union** of both, **914/996 decode (91.8%)**, 82 refused.
+- **Refusal does not predict on-chain failure:** of 116 refused payloads, **32 were
+  part of transactions that SUCCEEDED on-chain** (and 84 failed); of 880 decoded
+  payloads, **715 were from transactions that FAILED on-chain** (slippage, etc.). A
+  decoder refusal is evidence about the IDL, not about whether the program executed.
+- **TradeEvent has an unexplained tail:** every one of the 87 TradeEvents decoded
+  under the published IDL carries exactly **8 trailing zero bytes** (`count: 8, hex:
+  "0000000000000000"`) no declared field explains.
+
+**Codec defect found and fixed:** Anchor describes a Rust tuple struct (`pub struct
+OptionBool(pub bool)`) as `{"name":"OptionBool","type":{"fields":["bool"],"kind":"struct"}}`
+— bare types, no `{name, type}` pairs. sememe's struct branch demanded a `name` on
+every field and threw `OptionBool: malformed struct field` on **18 payloads** under
+the on-chain IDL and **145 payloads** under the published IDL before the fix. The fix
+adds tuple-struct support in both decode and encode, matching Anchor's own
+representation (`{"0": value}`). Falsification: `test/tuple-struct.test.mjs` fails
+against the pre-fix tree (1 pass / 3 fail; the 1 is the fixture-shape guard), passes
+4/4 post-fix. After the fix, on-chain decodes 651 → 669; published decodes 851 → 880.
+
+Covered by `test/tuple-struct.test.mjs` (4 tests) and `test/traffic-coverage.test.mjs`
+(10 tests); fixtures `test/fixtures/cp-amm-idl.json`, `pump-idl.json`,
+`pump-published-idl.json`, `harvest-cp-amm-2026-10-30.json`,
+`harvest-pump-2026-10-30.json`. The numbers above are reproduced, not written:
+`node tools/traffic-coverage.mjs` emits
+[research/traffic-coverage-2026-10-30.json](research/traffic-coverage-2026-10-30.json),
+and a test fails if the committed file differs from what the tool computes
+(measured: one hand-edited number fails it, restoring passes). Suite: **154/154**
+(up from 140).
+
 ## Free and paid
 
 - Free, MIT: all acquisition channels, normalization, fingerprint store, checks, decode and encode APIs, CLI, daemon, lock files, and fully offline resolution. No account or quota.

@@ -1,0 +1,190 @@
+// Reproducible traffic-coverage report for two programs and two interface sources.
+//
+//   node tools/traffic-coverage.mjs > research/traffic-coverage-2026-10-30.json
+//
+// Why a tool and not a hand-written note: the interesting number here — that the
+// on-chain IDL account and the first-party published copy DISAGREE about a deployed
+// program — is exactly the kind of claim that is easy to state favorably and hard
+// to keep honest. Everything below is computed from the committed fixtures.
+//
+// Four views of the same 996 pump.fun payloads, none of which is "the interface":
+//   on-chain alone, published alone, union of both, and what the chain actually
+//   accepted (txErr), so a reader can see that decode-refusal and on-chain failure
+//   are different questions.
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import {
+  decodeData, encodeInstructionData, encodeEventData,
+} from '../src/codec.mjs';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const read = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
+
+const pumpIdl = read('test/fixtures/pump-idl.json');
+const pumpPublished = read('test/fixtures/pump-published-idl.json');
+const cpAmmIdl = read('test/fixtures/cp-amm-idl.json');
+const pumpHarvest = read('test/fixtures/harvest-pump-2026-10-30.json');
+const cpAmmHarvest = read('test/fixtures/harvest-cp-amm-2026-10-30.json');
+
+const payloads = (h) => h.transactions.flatMap((tx) =>
+  (tx.payloads ?? []).map((p) => ({
+    bytes: Buffer.from(p.dataHex, 'hex'), failed: tx.txErr !== null,
+  })));
+
+function measure(idl, rows) {
+  const out = {
+    total: rows.length, decoded: 0, refused: 0, byteExact: 0,
+    withTrailing: 0, refusedReasons: {},
+  };
+  for (const row of rows) {
+    let d;
+    try { d = decodeData(idl, row.bytes, { trailing: 'report' }); } catch (e) {
+      out.refused++;
+      const key = String(e.message).slice(0, 60);
+      out.refusedReasons[key] = (out.refusedReasons[key] ?? 0) + 1;
+      continue;
+    }
+    out.decoded++;
+    if (d.trailing.count > 0) out.withTrailing++;
+    const re = d.kind === 'instruction'
+      ? encodeInstructionData(idl, d.instruction, d.args)
+      : encodeEventData(idl, d.event, d.args);
+    if (re.equals(row.bytes)) out.byteExact++;
+  }
+  out.decodedPct = Number((100 * out.decoded / out.total).toFixed(1));
+  return out;
+}
+
+/** Decode verdict × on-chain outcome: refusal is about the IDL, not the chain. */
+function crossTab(idl, rows) {
+  const cell = {};
+  for (const row of rows) {
+    let refused = false;
+    try { decodeData(idl, row.bytes, { trailing: 'report' }); } catch { refused = true; }
+    const key = `${refused ? 'refused' : 'decoded'}_${row.failed ? 'txFailed' : 'txSuccess'}`;
+    cell[key] = (cell[key] ?? 0) + 1;
+  }
+  return cell;
+}
+
+const onDiscs = new Set(pumpIdl.instructions.map((i) => Buffer.from(i.discriminator).toString('hex')));
+const pubDiscs = new Map(pumpPublished.instructions.map((i) => [Buffer.from(i.discriminator).toString('hex'), i.name]));
+
+// Instructions the deployed program executes but its own on-chain IDL account lacks.
+const staleOnChain = {};
+for (const row of payloads(pumpHarvest)) {
+  const disc = row.bytes.subarray(0, 8).toString('hex');
+  if (onDiscs.has(disc) || disc === 'e445a52e51cb9a1d') continue;
+  staleOnChain[disc] = (staleOnChain[disc] ?? 0) + 1;
+}
+
+// Union of both sources.
+const union = JSON.parse(JSON.stringify(pumpIdl));
+const unionAdded = [];
+for (const ix of pumpPublished.instructions) {
+  const disc = Buffer.from(ix.discriminator).toString('hex');
+  if (onDiscs.has(disc)) continue;
+  union.instructions.push(ix);
+  unionAdded.push(ix.name);
+}
+const onTypes = new Set(pumpIdl.types.map((t) => t.name));
+for (const t of pumpPublished.types) if (!onTypes.has(t.name)) union.types.push(t);
+
+// The unexplained tail on TradeEvent.
+const tradeTails = [];
+for (const row of payloads(pumpHarvest)) {
+  let d;
+  try { d = decodeData(pumpPublished, row.bytes, { trailing: 'report' }); } catch { continue; }
+  if (d.kind === 'event' && d.event === 'TradeEvent') tradeTails.push(d.trailing);
+}
+const tailShape = tradeTails.reduce((acc, t) => {
+  const key = `${t.count}:${t.hex}`;
+  acc[key] = (acc[key] ?? 0) + 1;
+  return acc;
+}, {});
+
+// cp-amm: bytes beyond what the IDL declares, and whether the chain accepted them.
+const overLong = {};
+for (const row of payloads(cpAmmHarvest)) {
+  let d;
+  try { d = decodeData(cpAmmIdl, row.bytes, { trailing: 'report' }); } catch { continue; }
+  if (d.kind !== 'instruction') continue;
+  const delta = row.bytes.length - d.consumed;
+  if (delta <= 0) continue;
+  const key = `${d.instruction} +${delta}B ${row.failed ? 'txFailed' : 'txSuccess'}`;
+  overLong[key] = (overLong[key] ?? 0) + 1;
+}
+
+const report = {
+  generatedAt: new Date().toISOString(),
+  note: 'generated by tools/traffic-coverage.mjs from committed fixtures — do not hand-edit',
+  pumpFun: {
+    program: pumpIdl.address,
+    sources: {
+      onChain: {
+        pulledFrom: 'anchor:idl @ AYgC53tU5BbP2NAnv5nConJxAdpQZctvmZK88pu69xRs',
+        slot: 463372656,
+        instructions: pumpIdl.instructions.length,
+        events: pumpIdl.events.length,
+      },
+      published: {
+        source: 'pump-fun/pump-public-docs idl/pump.json',
+        instructions: pumpPublished.instructions.length,
+        events: pumpPublished.events.length,
+      },
+    },
+    traffic: {
+      harvestedAt: pumpHarvest.harvestedAt,
+      slotRange: pumpHarvest.slotRange,
+      transactions: pumpHarvest.transactions.length,
+      payloads: payloads(pumpHarvest).length,
+    },
+    decode: {
+      onChainOnly: measure(pumpIdl, payloads(pumpHarvest)),
+      publishedOnly: measure(pumpPublished, payloads(pumpHarvest)),
+      union: measure(union, payloads(pumpHarvest)),
+    },
+    unionAddedInstructions: unionAdded.sort(),
+    staleOnChainAccount: {
+      note: 'discriminators executed by the deployed program but absent from its own on-chain IDL account; all are named by the published first-party copy',
+      instructions: Object.fromEntries(
+        Object.entries(staleOnChain).map(([d, n]) => [`${pubDiscs.get(d) ?? 'unknown'} (${d})`, n])),
+      totalPayloads: Object.values(staleOnChain).reduce((a, b) => a + b, 0),
+    },
+    decodeVsChainOutcome: crossTab(pumpPublished, payloads(pumpHarvest)),
+    tradeEventUnexplainedTail: {
+      payloads: tradeTails.length,
+      shape: tailShape,
+      verdict: 'exactly 8 zero bytes on every observed TradeEvent — no declared field explains them, and every value is zero, so this is NOT yet proof of a field',
+    },
+  },
+  cpAmm: {
+    program: cpAmmIdl.address,
+    onChain: {
+      pulledFrom: 'anchor:idl @ F1hSvutXSc9iAvB9bQPmjNDwiN2tCXzazTEEvDgNCBMa',
+      slot: 463372654,
+      instructions: cpAmmIdl.instructions.length,
+      events: cpAmmIdl.events.length,
+    },
+    traffic: {
+      harvestedAt: cpAmmHarvest.harvestedAt,
+      slotRange: cpAmmHarvest.slotRange,
+      transactions: cpAmmHarvest.transactions.length,
+      payloads: payloads(cpAmmHarvest).length,
+    },
+    decode: measure(cpAmmIdl, payloads(cpAmmHarvest)),
+    bytesBeyondTheIdl: overLong,
+    verdict: 'every payload decodes; 6 swap payloads carry bytes past what the IDL declares and all 6 were ACCEPTED on-chain, so the deployed program reads further than its own interface file',
+  },
+  limits: [
+    'two programs, both harvested in a single 12-block window on 2026-10-30',
+    'no outside user; these are my own harvests and my own decoder',
+    'the published copy and the on-chain account disagree; neither is verified against the deployed program binary',
+    'decode refusal is a statement about an IDL, not about whether the program accepted the transaction (measured: 32 refused payloads sit in successful transactions)',
+    'the TradeEvent tail is always zero in this window, so it may be padding rather than a field',
+  ],
+};
+
+process.stdout.write(`${JSON.stringify(report, null, 1)}\n`);

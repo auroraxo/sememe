@@ -242,6 +242,23 @@ function structShape(type) {
   return null;
 }
 
+// A Rust tuple struct (`pub struct OptionBool(pub bool)`) is described by bare
+// TYPES in the fields array — no {name,type} pairs. Decoded shape follows Anchor's
+// own borsh coder: positional string keys {"0": value}, which is NOT an array and
+// NOT an unwrapped value, so a reader that guesses one of those disagrees with the
+// reference implementation on bytes that are identical either way.
+function isTupleStructFields(fields) {
+  if (!Array.isArray(fields) || fields.length === 0) return false;
+  return fields.every((field) =>
+    typeof field === 'string'
+    || (field && typeof field === 'object' && !('name' in field)));
+}
+
+function isNamedStructFields(fields) {
+  return Array.isArray(fields) && fields.length > 0 && fields.every((field) =>
+    field && typeof field === 'object' && typeof field.name === 'string' && 'type' in field);
+}
+
 function enumShape(type) {
   if (type && typeof type === 'object' && Array.isArray(type.variants)
       && (type.kind === 'enum' || type.kind === undefined)) return type.variants;
@@ -315,11 +332,19 @@ function decodeAt(type, cur, ctx, path, depth) {
 
   const fields = structShape(type);
   if (fields) {
+    if (isTupleStructFields(fields)) {
+      const out = {};
+      fields.forEach((fieldType, position) => {
+        const key = String(position);
+        assign(out, key, decodeAt(fieldType, cur, ctx, `${path}.${key}`, depth + 1), path);
+      });
+      return out;
+    }
+    if (!isNamedStructFields(fields)) {
+      throw new CodecError('malformed struct field', path);
+    }
     const out = {};
     for (const field of fields) {
-      if (!field || typeof field.name !== 'string' || !('type' in field)) {
-        throw new CodecError('malformed struct field', path);
-      }
       assign(out, field.name, decodeAt(field.type, cur, ctx, `${path}.${field.name}`, depth + 1), path);
     }
     return out;
@@ -413,6 +438,23 @@ function encodeAt(type, value, ctx, path, depth) {
 
   const fields = structShape(type);
   if (fields) {
+    if (isTupleStructFields(fields)) {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        throw new CodecError(`expected a tuple-struct object like {"0": …}, got ${describe(value)}`, path);
+      }
+      const expected = fields.map((_, position) => String(position));
+      const unknown = Object.keys(value).filter((key) => !expected.includes(key));
+      if (unknown.length) throw new CodecError(`unexpected field(s): ${unknown.join(', ')}`, path);
+      const parts = [];
+      for (const key of expected) {
+        if (!(key in value)) throw new CodecError(`missing field ${JSON.stringify(key)}`, path);
+        parts.push(encodeAt(fields[Number(key)], value[key], ctx, `${path}.${key}`, depth + 1));
+      }
+      return Buffer.concat(parts);
+    }
+    if (!isNamedStructFields(fields)) {
+      throw new CodecError('malformed struct field', path);
+    }
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
       throw new CodecError(`expected a struct object, got ${describe(value)}`, path);
     }
