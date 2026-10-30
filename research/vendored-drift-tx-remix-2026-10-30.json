@@ -1,0 +1,131 @@
+{
+  "generatedAt": "2026-10-30T00:49:51.224Z",
+  "store": "/tmp/sememe-pulse",
+  "repos": [
+    "/home/aurora/github_repos/solana-tx-remix"
+  ],
+  "files": 8,
+  "withOnChain": 4,
+  "unbound": 0,
+  "stale": 2,
+  "trafficBlind": 1,
+  "findings": [
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/aquifer/aquifer.json",
+      "program": "AQU1FRd7papthgdrwPTTq5JacJh8YtwEXaBfKU3bTz45",
+      "instructions": 2,
+      "discriminators": 0,
+      "onChainAvailable": false,
+      "onChainInstructions": null,
+      "missingOnChain": [],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": null
+    },
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/bisonfi/bisonfi.json",
+      "program": "BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi",
+      "instructions": 3,
+      "discriminators": 0,
+      "onChainAvailable": false,
+      "onChainInstructions": null,
+      "missingOnChain": [],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": null
+    },
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/dflow/dflow.json",
+      "program": "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+      "instructions": 17,
+      "discriminators": 17,
+      "onChainAvailable": true,
+      "onChainInstructions": 18,
+      "missingOnChain": [
+        "withdraw_fees"
+      ],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": null
+    },
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/jupiter-amm/amm.json",
+      "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+      "instructions": 17,
+      "discriminators": 17,
+      "onChainAvailable": true,
+      "onChainInstructions": 19,
+      "missingOnChain": [
+        "create_idempotent_associated_token_account",
+        "withdraw_token_account_excess_lamports"
+      ],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": {
+        "payloads": 773,
+        "unnamed": 5,
+        "namedByOnChain": [
+          "create_idempotent_associated_token_account"
+        ],
+        "eventSelfCpiPayloads": 0,
+        "unknownToBoth": 396
+      }
+    },
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/jupiter-order_engine/order_engine.json",
+      "program": "2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1",
+      "instructions": 1,
+      "discriminators": 1,
+      "onChainAvailable": true,
+      "onChainInstructions": 1,
+      "missingOnChain": [],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": null
+    },
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/jupiter-rfq_v2/rfq_v2.json",
+      "program": "fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5",
+      "instructions": 1,
+      "discriminators": 1,
+      "onChainAvailable": true,
+      "onChainInstructions": 1,
+      "missingOnChain": [],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": null
+    },
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/solfi/solfi.json",
+      "program": "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+      "instructions": 1,
+      "discriminators": 0,
+      "onChainAvailable": false,
+      "onChainInstructions": null,
+      "missingOnChain": [],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": null
+    },
+    {
+      "repo": "/home/aurora/github_repos/solana-tx-remix",
+      "file": "idl/multi/spl/token-2022.json",
+      "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+      "instructions": 44,
+      "discriminators": 1,
+      "onChainAvailable": false,
+      "onChainInstructions": null,
+      "missingOnChain": [],
+      "missingVendored": [],
+      "renamed": [],
+      "unnamedByVendored": null
+    }
+  ]
+}

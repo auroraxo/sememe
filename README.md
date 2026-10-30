@@ -306,6 +306,39 @@ The strict figure **has now been measured** over the same frozen 20 IDs and the 
 
 The middle row is the honest headline: **half** of the sample's usable programs publish an interface that decodes as-is; the other five (Kamino Lend, OpenBook v2, Marinade, Meteora DAMM v1, Meteora Vault) publish names and layouts but no wire discriminators, and only become decodable because the tool can reconstruct them from the name. That reconstruction is verified per program, but it is the tool's inference, not the program's published interface — and it is Anchor-specific. **All five are now individually proven against real mainnet payloads** (Kamino Lend 1,432/1,432, OpenBook v2 600/600, Marinade 623/623, Meteora Vault 1,290/1,290, Meteora DAMM v1 643/643, each byte-exact with 0 decodable without derivation). See [frozen 20 IDs](programs-20.json), [raw classification with slot and account addresses](coverage-result.json), and [selection/chronology limitations](research/selection-method.md). The 20 IDs were committed before the full batch run, but the detailed selection-method note came later; one exploratory Whirlpool RPC check preceded the freeze. Do not call the whole study blind or fully preregistered.
 
+## The stale copies in my own repositories, measured
+
+The claim this repository opens with — "vendored IDL files are snapshots without provenance, a fingerprint, or a freshness check" — was an assertion from notes. `tools/vendored-drift.mjs` turns it into a number for the IDL copies checked into my own repositories, by pulling the on-chain artifact for each program the copy names and comparing the two.
+
+Measured on 2026-10-30 (`research/vendored-drift-tx-remix-2026-10-30.json`):
+
+| vendored copy | instructions | on-chain | missing from the vendored copy |
+|---|---|---|---|
+| `solana-tx-remix/idl/multi/jupiter-amm/amm.json` | 17 | 19 | `create_idempotent_associated_token_account`, `withdraw_token_account_excess_lamports` |
+| `solana-tx-remix/idl/multi/dflow/dflow.json` | 17 | 18 | `withdraw_fees` |
+| `solana-tx-remix/idl/multi/jupiter-order_engine/order_engine.json` | 1 | 1 | — |
+| `solana-tx-remix/idl/multi/jupiter-rfq_v2/rfq_v2.json` | 1 | 1 | — |
+| `aquifer`, `bisonfi`, `solfi`, `spl/token-2022` | 2 / 3 / 1 / 44 | — | no on-chain Anchor IDL exists for these programs |
+
+**Every vendored copy that HAS an on-chain IDL is strictly stale.** That is the whole claim, measured rather than asserted — and the staleness is not academic: `create_idempotent_associated_token_account` appears in **real mainnet traffic**, so a decoder built on the vendored copy emitted `(unknown)` for a successful instruction, and `(unknown)` is the one state every label check deliberately skips.
+
+The four programs with no on-chain IDL are not a gap in the store: they are native or shank-origin programs that publish no Anchor IDL account at all. For those the checked-in file is the only description available, and it is kept.
+
+The tool distinguishes three defects, because they are not the same defect: a **stale** copy (has an on-chain IDL, and it differs), an **unbound** copy (declares no program address, so it binds nothing — the `bisonfi.json` failure mode `solana-tx-remix` already documents), and a copy for a program that has no on-chain IDL at all.
+
+## A second consumer reads the artifact for every program it names
+
+`solana-tx-remix` migrated its single-program Whirlpool path first. Its multi-program path kept reading the vendored copies — and the measurement above is what that cost: `(unknown)` on a real Jupiter instruction, in a transaction that was otherwise described in full.
+
+Both of that consumer's entry points now resolve labels through one resolver (`buildStoredResolver` in its `src/dispatch.mjs`) that layers the stored artifacts over the vendored copies. The overlay is additive per program, so the vendored copy still describes the programs the store does not cover.
+
+Two things it does not paper over, both measured:
+
+- A **stored** discriminator wins over a **derived** one, and the disagreement is reported. Jupiter AMM v6 stores `5368c096` for `create_idempotent_associated_token_account` where Anchor's rule derives `bdbcecfa`; five real payloads carry `5368c096` and re-encode byte-exactly. The stored value is the one that survives contact with the chain.
+- Every reader of the store re-hashes the object against its receipt. The consumer's multi-program loader did not at first, and its acceptance harness caught the difference: a tampered Jupiter object (valid JSON, one instruction renamed) was **accepted** by the multi path while the single path refused the identical damage. One store with two readers must verify with one strength.
+
+The falsification is a committed control: `solana-tx-remix`'s `neg/idl-name-stored-only.ts` relabels the newly-named instruction to a name the stale vendored copy carries, and the verifier answers `bytes resolve to create_idempotent_associated_token_account ... recipe claims create_token_account` — exit 1.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
