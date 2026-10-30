@@ -51,15 +51,20 @@ async function temporaryStore(idl) {
   const store = await mkdtemp(path.join(os.tmpdir(), 'sememe-decode-test-'));
   await mkdir(path.join(store, 'objects'), { recursive: true });
   await mkdir(path.join(store, 'receipts'), { recursive: true });
-  const fingerprint = 'f'.repeat(64);
-  await writeFile(path.join(store, 'objects', `${fingerprint}.json`), JSON.stringify(idl));
+  // A store a reader can verify: object bytes and receipt fingerprint must be
+  // the same bytes `sememe pull` would write, or the integrity check refuses it.
+  const { canonicalJson } = await import('../src/canonical.mjs');
+  const { createHash } = await import('node:crypto');
+  const bytes = Buffer.from(canonicalJson(idl) + '\n');
+  const fingerprint = createHash('sha256').update(bytes).digest('hex');
+  await writeFile(path.join(store, 'objects', `${fingerprint}.json`), bytes);
   await writeFile(
     path.join(store, 'receipts', `${PROGRAM}-42-metadata-${fingerprint}.json`),
     JSON.stringify({ program: PROGRAM, fingerprint: `sha256:${fingerprint}`, slot: 42, source: 'metadata' }));
-  return store;
+  return { store, fingerprint };
 }
 const withStore = async (idl, fn) => {
-  const store = await temporaryStore(idl);
+  const { store } = await temporaryStore(idl);
   try { return await fn(store); } finally { await rm(store, { recursive: true, force: true }); }
 };
 
@@ -82,7 +87,7 @@ test('base58 payload decoding is exact and rejects bad input', () => {
 });
 
 test('decodePayload returns provenance, args and a byte-exact round trip', async () => {
-  const store = await temporaryStore(minimal);
+  const { store, fingerprint } = await temporaryStore(minimal);
   try {
     const payload = Buffer.from('01020304050607082a000000000000000100000000000000', 'hex');
     const result = await decodePayload(store, PROGRAM, payload.toString('base64')
@@ -91,13 +96,13 @@ test('decodePayload returns provenance, args and a byte-exact round trip', async
     assert.equal(result.discriminator, '0102030405060708');
     assert.deepEqual(result.args, { amount: '42', limit: '1' });
     assert.equal(result.roundTripByteExact, true);
-    assert.equal(result.idl.fingerprint, `sha256:${'f'.repeat(64)}`);
+    assert.equal(result.idl.fingerprint, `sha256:${fingerprint}`);
     assert.equal(result.consumed, result.bytes);
   } finally { await rm(store, { recursive: true, force: true }); }
 });
 
 test('decodePayload refuses an unknown program in the store', async () => {
-  const store = await temporaryStore(minimal);
+  const { store } = await temporaryStore(minimal);
   try {
     await assert.rejects(() => decodePayload(store, 'ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S', 'aa'),
       /no stored IDL for program/);
@@ -105,7 +110,7 @@ test('decodePayload refuses an unknown program in the store', async () => {
 });
 
 test('unknown discriminator and unexplained trailing bytes are never silent', async () => {
-  const store = await temporaryStore(minimal);
+  const { store } = await temporaryStore(minimal);
   try {
     await assert.rejects(() => decodePayload(store, PROGRAM, 'ffffffff0100000000000000'),
       /unknown instruction discriminator/);

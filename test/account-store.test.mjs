@@ -8,6 +8,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, mkdir, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { decodeStoredAccount, findStoredIdl } from '../src/decode.mjs';
@@ -19,10 +20,12 @@ const accounts = JSON.parse(
   await readFile(new URL('./fixtures/accounts-whirlpool-2026-10-29.json', import.meta.url), 'utf8'));
 
 const store = await mkdtemp(path.join(os.tmpdir(), 'sememe-account-store-'));
-const fingerprint = 'f'.repeat(64);
+const { canonicalJson } = await import('../src/canonical.mjs');
+const bytes = Buffer.from(canonicalJson(idl) + '\n');
+const fingerprint = createHash('sha256').update(bytes).digest('hex');
 await mkdir(path.join(store, 'objects'), { recursive: true });
 await mkdir(path.join(store, 'receipts'), { recursive: true });
-await writeFile(path.join(store, 'objects', `${fingerprint}.json`), JSON.stringify(idl));
+await writeFile(path.join(store, 'objects', `${fingerprint}.json`), bytes);
 await writeFile(path.join(store, 'receipts', `${PROGRAM}-42-metadata-${fingerprint}.json`),
   JSON.stringify({ program: PROGRAM, fingerprint: `sha256:${fingerprint}`, slot: 42, source: 'metadata' }));
 

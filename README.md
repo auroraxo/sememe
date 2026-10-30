@@ -337,6 +337,28 @@ Two things it does not paper over, both measured:
 - A **stored** discriminator wins over a **derived** one, and the disagreement is reported. Jupiter AMM v6 stores `5368c096` for `create_idempotent_associated_token_account` where Anchor's rule derives `bdbcecfa`; five real payloads carry `5368c096` and re-encode byte-exactly. The stored value is the one that survives contact with the chain.
 - Every reader of the store re-hashes the object against its receipt. The consumer's multi-program loader did not at first, and its acceptance harness caught the difference: a tampered Jupiter object (valid JSON, one instruction renamed) was **accepted** by the multi path while the single path refused the identical damage. One store with two readers must verify with one strength.
 
+### The producer's own reader was the weak one (measured 2026-10-30)
+
+The sentence above was true of `solana-tx-remix` and false of `sememe`. A probe against `sememe`'s own reader (`src/decode.mjs`, `findStoredIdl`) built a store from the committed Whirlpool snapshot, renamed one instruction in the object — still valid JSON, still a decodable IDL — and decoded a **real mainnet `swap_v2` payload** against it:
+
+```
+INTACT decode  -> swap_v2                       | fingerprint sha256:0b886e3...
+TAMPERED decode-> totally_honest_name            | roundTripByteExact true
+```
+
+The reader took the receipt's fingerprint as a label, printed it as the provenance of bytes it had never checked, and reported the tampered name as a decode result. `roundTripByteExact: true` is the sting: the damage was *only* in the name, so every byte-level check passed. The consumer refused the identical damage; the library that produced the store accepted it.
+
+Four checks now stand between a receipt and a decode (`src/decode.mjs`, `findStoredIdl`):
+
+1. the receipt's `program` field must be the program asked for (a receipt swapped in from another program's file is refused by name);
+2. the receipt's fingerprint must be a well-formed sha256;
+3. the object must exist, parse as JSON, and carry an instruction list;
+4. `sha256(canonicalJson(idl) + '\n')` must equal the claimed fingerprint — **the check that was missing**, plus a separate refusal when the object's own `address` names another program.
+
+Every one of the five is pinned by a test that asserts the refusal *and its reason*, in `test/store-integrity.test.mjs`. Each was falsified by mutation: removing the re-hash check, the program-binding check, the missing-object message, the address check or the unparsable-JSON message turns exactly one of them red, and restoring it turns it green. The pre-fix behaviour is reproducible from the same test file by deleting the re-hash block.
+
+The CLI now refuses too: `sememe decode` on a tampered store exits 1 with `object and receipt disagree, refusing to decode`, naming both hashes. Before the fix the same command printed the tampered instruction name and exited 0.
+
 The falsification is a committed control: `solana-tx-remix`'s `neg/idl-name-stored-only.ts` relabels the newly-named instruction to a name the stale vendored copy carries, and the verifier answers `bytes resolve to create_idempotent_associated_token_account ... recipe claims create_token_account` — exit 1.
 
 ## Next qualification
