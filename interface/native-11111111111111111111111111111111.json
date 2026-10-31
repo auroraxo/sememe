@@ -1,0 +1,226 @@
+{
+  "program": "11111111111111111111111111111111",
+  "label": "System Program",
+  "scheme": "native",
+  "source": {
+    "repo": "anza-xyz/solana-sdk",
+    "pin": "anza-xyz/solana-sdk@8db406e2edfafa25939ec782b77b5b6f30de164d",
+    "file": "system-interface/src/instruction.rs",
+    "enum": "SystemInstruction",
+    "fileSha256": "sha256:ec0770d89f170b7dbea5b58e147bf9b64647eac1e6b4562c07b20835c7c81c8c",
+    "vendoredAt": "vendor/anza-solana-sdk/8db406e2edfafa25939ec782b77b5b6f30de164d",
+    "derivation": "src/native-interface.mjs: declaration order = wire selector; struct-variant field order = wire order; tuple type = arg type; tuple arg names from the pinned SDK constructors"
+  },
+  "runtime": "anza-xyz/agave system-program: accepts variants 0..13 (12 = UpgradeNonceAccount, 13 = CreateAccountAllowPrefund)",
+  "selector": {
+    "width": 4,
+    "encoding": "u32 little-endian bincode enum tag"
+  },
+  "argEncoding": "bincode fixint: u32/u64 LE, pubkeys as 32 raw bytes, String as u64 length prefix + utf8",
+  "instructions": [
+    {
+      "selector": 0,
+      "name": "CreateAccount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "space",
+          "type": "u64"
+        },
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 1,
+      "name": "Assign",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 2,
+      "name": "Transfer",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "selector": 3,
+      "name": "CreateAccountWithSeed",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "base",
+          "type": "pubkey"
+        },
+        {
+          "name": "seed",
+          "type": "string"
+        },
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "space",
+          "type": "u64"
+        },
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 4,
+      "name": "AdvanceNonceAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "selector": 5,
+      "name": "WithdrawNonceAccount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "selector": 6,
+      "name": "InitializeNonceAccount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "authorized",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 7,
+      "name": "AuthorizeNonceAccount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "authorized",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 8,
+      "name": "Allocate",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "space",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "selector": 9,
+      "name": "AllocateWithSeed",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "base",
+          "type": "pubkey"
+        },
+        {
+          "name": "seed",
+          "type": "string"
+        },
+        {
+          "name": "space",
+          "type": "u64"
+        },
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 10,
+      "name": "AssignWithSeed",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "base",
+          "type": "pubkey"
+        },
+        {
+          "name": "seed",
+          "type": "string"
+        },
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 11,
+      "name": "TransferWithSeed",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "from_seed",
+          "type": "string"
+        },
+        {
+          "name": "from_owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "selector": 12,
+      "name": "UpgradeNonceAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "selector": 13,
+      "name": "CreateAccountAllowPrefund",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "lamports",
+          "type": "u64"
+        },
+        {
+          "name": "space",
+          "type": "u64"
+        },
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ]
+}

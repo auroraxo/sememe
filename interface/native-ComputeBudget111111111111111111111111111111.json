@@ -1,0 +1,72 @@
+{
+  "program": "ComputeBudget111111111111111111111111111111",
+  "label": "Compute Budget Program",
+  "scheme": "native",
+  "source": {
+    "repo": "anza-xyz/solana-sdk",
+    "pin": "anza-xyz/solana-sdk@8db406e2edfafa25939ec782b77b5b6f30de164d",
+    "file": "compute-budget-interface/src/lib.rs",
+    "enum": "ComputeBudgetInstruction",
+    "fileSha256": "sha256:e8e9164ed12d3cf110fe974f7967e73a173d7d461ae06bb824a4ff2d7cec2d1c",
+    "vendoredAt": "vendor/anza-solana-sdk/8db406e2edfafa25939ec782b77b5b6f30de164d",
+    "derivation": "src/native-interface.mjs: declaration order = wire selector; struct-variant field order = wire order; tuple type = arg type; tuple arg names from the pinned SDK constructors"
+  },
+  "runtime": "anza-xyz/agave compute-budget-instruction: borsh `try_from_slice_unchecked`; an unclaimed tag or the reserved Unused(0) is InvalidInstructionData — the runtime REJECTS tag 0, so the decoder refuses instead of naming it",
+  "selector": {
+    "width": 1,
+    "encoding": "u8"
+  },
+  "argEncoding": "bare little-endian integer, no bincode wrapper (runtime `to_instruction!`: data[0] = tag, then $num.to_le_bytes())",
+  "instructions": [
+    {
+      "selector": 0,
+      "name": "Unused",
+      "wire": "rejected",
+      "args": []
+    },
+    {
+      "selector": 1,
+      "name": "RequestHeapFrame",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "bytes",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "selector": 2,
+      "name": "SetComputeUnitLimit",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "units",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "selector": 3,
+      "name": "SetComputeUnitPrice",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "micro_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "selector": 4,
+      "name": "SetLoadedAccountsDataSizeLimit",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "bytes",
+          "type": "u32"
+        }
+      ]
+    }
+  ]
+}

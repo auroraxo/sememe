@@ -9,10 +9,16 @@
 // payloads because it reads a u32 string length prefix while the chain carries
 // a u64 (bincode fixint) — measured, not argued.
 //
-// Ground truth chain, every row pinned:
-//   1. INTERFACE  anza-xyz/solana-sdk@8db406e2edfafa25939ec782b77b5b6f30de164d
+// Ground truth chain, every row derived and then VERIFIED, not typed:
+//   1. INTERFACE  vendored anza-xyz/solana-sdk@8db406e2edfafa25939ec782b77b5b6f30de164d
 //                 compute-budget-interface/src/lib.rs (ComputeBudgetInstruction, variants 0..4)
 //                 system-interface/src/instruction.rs (SystemInstruction, variants 0..13)
+//                 DERIVED by tools/native-interface.mjs into interface/native-<program>.json.
+//                 This module reads the artifact at load and re-hashes the vendored Rust
+//                 against the sha256 the artifact claims; a mismatch REFUSES the load
+//                 instead of decoding from it. The transcription step no longer exists:
+//                 the rows here were never hand-typed, they are upstream's own field
+//                 names and declaration order, and the hash is checked on every import.
 //   2. RUNTIME    anza-xyz/agave (master, 2026-10-31) compute-budget-instruction:
 //                 borsh `try_from_slice_unchecked`; an unclaimed tag or the
 //                 reserved Unused(0) variant is `InvalidInstructionData` —
@@ -40,7 +46,15 @@
 // never a confident wrong label. The chain already says what it accepts;
 // this table only claims what it can prove.
 
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { decodeBase58, encodeBase58 } from './base58.mjs';
+import { deriveInterface, specFor, vendoredHash, REPO_ROOT } from './native-interface.mjs';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(HERE, '..');
+if (ROOT !== REPO_ROOT) throw Error('native.mjs moved; native-interface.mjs resolves the repo root');
 
 export const SYSTEM_PROGRAM = '11111111111111111111111111111111';
 export const COMPUTE_BUDGET_PROGRAM = 'ComputeBudget111111111111111111111111111111';
@@ -48,39 +62,52 @@ export const COMPUTE_BUDGET_PROGRAM = 'ComputeBudget1111111111111111111111111111
 const SDK_PIN = 'anza-xyz/solana-sdk@8db406e2edfafa25939ec782b77b5b6f30de164d';
 const RUNTIME_PIN = 'anza-xyz/agave@master (read 2026-10-31)';
 
-// Arg shapes: `u32`/`u64` fixed-width LE, `pubkey` 32 raw bytes, `string`
-// u64-length-prefixed utf8 (bincode fixint, measured on-chain), `unit` none.
-// The table is declaration order of the pinned enum; the selector IS the index.
+/**
+ * Load one native interface: DERIVE it from the vendored upstream Rust, then require
+ * the committed artifact to agree with the derivation byte for byte.
+ *
+ * Two checks, deliberately:
+ *   - the derivation runs against the vendored bytes themselves, so a swapped or
+ *     edited source file cannot silently change the table it describes;
+ *   - the committed artifact must equal that derivation, so a tampered or stale
+ *     artifact refuses the load instead of decoding from it.
+ *
+ * Same contract as the IDL store: provenance is a claim, the recomputed digest is the
+ * check. Because this runs at import, a mismatch fails loudly at startup rather than
+ * naming instructions the pinned runtime would reject.
+ */
+function loadInterface(program) {
+  const spec = specFor(program);
+  const artifactPath = path.join(ROOT, 'interface', `native-${program}.json`);
+  const derived = deriveInterface(spec);
+  let current;
+  try {
+    current = readFileSync(artifactPath, 'utf8');
+  } catch (error) {
+    throw new Error(`native interface artifact for ${program} is missing: ${error.message}`);
+  }
+  const expected = `${JSON.stringify(derived, null, 2)}\n`;
+  if (current !== expected) {
+    throw new Error(
+      `native interface for ${program} refuses to load: interface/native-${program}.json does not equal ` +
+      `a fresh derivation of ${derived.source.file} (${derived.source.fileSha256}, hashed now: ${vendoredHash(spec)})`,
+    );
+  }
+  if (!derived.instructions.length || !derived.selector?.width) {
+    throw new Error(`native interface artifact for ${program} is malformed`);
+  }
+  return derived;
+}
 
-const COMPUTE_BUDGET_IXS = [
-  // Reserved deprecated variant, declaration index 0. The runtime's
-  // borsh decode hits it for any data that is all-zero enough, then rejects:
-  // `_ => Err(InvalidInstructionData)`. Kept here as wire-rejected so a tag-0
-  // payload gets a named refusal instead of silently falling out of the table
-  // — the refusal is the fact, and the fact is pinned.
-  { name: 'Unused', wire: 'rejected', args: [] },
-  { name: 'RequestHeapFrame', args: [{ name: 'bytes', type: 'u32' }] },
-  { name: 'SetComputeUnitLimit', args: [{ name: 'units', type: 'u32' }] },
-  { name: 'SetComputeUnitPrice', args: [{ name: 'microLamports', type: 'u64' }] },
-  { name: 'SetLoadedAccountsDataSizeLimit', args: [{ name: 'bytes', type: 'u32' }] },
-];
+const ARTIFACTS = new Map([SYSTEM_PROGRAM, COMPUTE_BUDGET_PROGRAM].map((program) => [program, loadInterface(program)]));
 
-const SYSTEM_IXS = [
-  { name: 'CreateAccount', args: [{ name: 'lamports', type: 'u64' }, { name: 'space', type: 'u64' }, { name: 'owner', type: 'pubkey' }] },
-  { name: 'Assign', args: [{ name: 'owner', type: 'pubkey' }] },
-  { name: 'Transfer', args: [{ name: 'lamports', type: 'u64' }] },
-  { name: 'CreateAccountWithSeed', args: [{ name: 'base', type: 'pubkey' }, { name: 'seed', type: 'string' }, { name: 'lamports', type: 'u64' }, { name: 'space', type: 'u64' }, { name: 'owner', type: 'pubkey' }] },
-  { name: 'AdvanceNonceAccount', args: [] },
-  { name: 'WithdrawNonceAccount', args: [{ name: 'lamports', type: 'u64' }] },
-  { name: 'InitializeNonceAccount', args: [{ name: 'authorized', type: 'pubkey' }] },
-  { name: 'AuthorizeNonceAccount', args: [{ name: 'authorized', type: 'pubkey' }] },
-  { name: 'Allocate', args: [{ name: 'space', type: 'u64' }] },
-  { name: 'AllocateWithSeed', args: [{ name: 'base', type: 'pubkey' }, { name: 'seed', type: 'string' }, { name: 'space', type: 'u64' }, { name: 'owner', type: 'pubkey' }] },
-  { name: 'AssignWithSeed', args: [{ name: 'base', type: 'pubkey' }, { name: 'seed', type: 'string' }, { name: 'owner', type: 'pubkey' }] },
-  { name: 'TransferWithSeed', args: [{ name: 'lamports', type: 'u64' }, { name: 'fromSeed', type: 'string' }, { name: 'fromOwner', type: 'pubkey' }] },
-  { name: 'UpgradeNonceAccount', args: [] },
-  { name: 'CreateAccountAllowPrefund', args: [{ name: 'lamports', type: 'u64' }, { name: 'space', type: 'u64' }, { name: 'owner', type: 'pubkey' }] },
-];
+// Arg shapes, as DECLARED BY THE ARTIFACT: `u32`/`u64` fixed-width LE, `pubkey`
+// 32 raw bytes, `string` u64-length-prefixed utf8 (bincode fixint, measured on-chain),
+// `unit` none. The selector width and encoding come from the artifact too — the table
+// is upstream's declaration order; the selector IS the index.
+
+const COMPUTE_BUDGET_IXS = ARTIFACTS.get(COMPUTE_BUDGET_PROGRAM).instructions;
+const SYSTEM_IXS = ARTIFACTS.get(SYSTEM_PROGRAM).instructions;
 
 export const NATIVE_PROVENANCE = {
   [SYSTEM_PROGRAM]: {
@@ -104,8 +131,8 @@ export const NATIVE_PROVENANCE = {
 };
 
 const TABLES = new Map([
-  [SYSTEM_PROGRAM, { width: 4, ixs: SYSTEM_IXS }],
-  [COMPUTE_BUDGET_PROGRAM, { width: 1, ixs: COMPUTE_BUDGET_IXS }],
+  [SYSTEM_PROGRAM, { width: ARTIFACTS.get(SYSTEM_PROGRAM).selector.width, ixs: SYSTEM_IXS, artifact: ARTIFACTS.get(SYSTEM_PROGRAM) }],
+  [COMPUTE_BUDGET_PROGRAM, { width: ARTIFACTS.get(COMPUTE_BUDGET_PROGRAM).selector.width, ixs: COMPUTE_BUDGET_IXS, artifact: ARTIFACTS.get(COMPUTE_BUDGET_PROGRAM) }],
 ]);
 
 /** Whether `program` is one of the native programs this module owns. */

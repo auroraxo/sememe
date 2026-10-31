@@ -559,6 +559,38 @@ CLI: `sememe decode-native <program> <payload>` decodes with the pinned interfac
 
 Limits: Linux-mainnet measured only; the strict-20 coverage study does not include the native programs (they were never part of the sample, so no coverage number moved); the runtime acceptance rule is checked against the agave source at one point in time, not against a live validator; no outside user yet.
 
+### The rows are derived, not typed (2026-10-31, later the same day)
+
+Even a pinned, measured table is still a table someone typed — and this repository's whole
+premise is that a copy that can drift is the defect. The native tables were the last
+hand-transcribed rows in sememe. They are now DERIVED:
+
+- `vendor/anza-solana-sdk/<commit>/…` carries the two pinned interface files from upstream
+  (Apache-2.0, LICENSE included), fetched at the pinned commit; their sha256 is the pin.
+- `src/native-interface.mjs` parses each pinned `pub enum` — declaration order is the wire
+  selector, struct-variant field order is the wire order, the tuple type is the arg type —
+  and refuses on any surprise (wrong variant count, unknown type, duplicate name, an
+  undeclared unit variant). It is dependency-free like the rest of the decode core.
+- `tools/native-interface.mjs` writes the derived tables to `interface/native-<program>.json`;
+  `--check` fails when the committed artifact differs from a fresh derivation.
+- `src/native.mjs` RE-DERIVES at load and refuses to decode unless the committed artifact
+  equals the derivation byte for byte. Two callers, one derivation: an edited artifact and
+  a swapped vendored file both fail loudly at import, before a single byte is decoded.
+
+Falsification (`test/native-interface.test.mjs`, 7 tests, each a mutation in a temp copy of
+the repo): swap two rows in the artifact → load refused; change `SetComputeUnitLimit(u32)`
+to `(u64)` in the vendored Rust → load refused with both sha256s named; delete `vendor/` →
+load refused. Removing the load-time equality check turns the first two into silent passes.
+A separate pin asserts the three argument names a hand copy actually got wrong upstream —
+`micro_lamports`, `from_seed`, `from_owner` (the in-flight camelCase transcription had all
+three).
+
+The consumer's copy is gone too: `solana-tx-remix/src/native.mjs` is now a thin facade over
+this module (its own hand table removed), and its acceptance suite gained check 7, which
+re-measures every defect the hand table had against committed traffic — 63/63 seeded creates
+named and byte-exact (hand table: 0/63), variants 12/13 nameable, tag 0 refused, upstream
+argument names — plus a run of `native-interface.mjs --check`.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
