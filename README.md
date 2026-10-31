@@ -591,6 +591,18 @@ re-measures every defect the hand table had against committed traffic — 63/63 
 named and byte-exact (hand table: 0/63), variants 12/13 nameable, tag 0 refused, upstream
 argument names — plus a run of `native-interface.mjs --check`.
 
+## Harvesting from the local mailbox instead of RPC (2026-10-31)
+
+`tools/harvest-reeflog.mjs` writes the same document `tools/harvest.mjs` writes, but reads the instruction bytes from a local [reeflog](https://github.com/auroraxo/reeflog) mailbox (its account envelope carries `instructions[]` verbatim — program ids resolved against the canonical account list, data base58 as served) instead of paying `getSignaturesForAddress`/`getBlock`/`getTransaction`. The source is in the document (`rpc: none (local reeflog journal)`), and the row accounting keeps the debts the network harvester does not have: rows without an envelope and envelopes without instructions are counted separately, never dropped, and a journal with zero enriched rows exits non-zero instead of writing a zero-payload success document.
+
+**Zero RPC is enforced, not asserted:** `tools/lib/network-guard.mjs` replaces `globalThis.fetch` with a function that records the attempt and rejects; the harvester imports it *first* (pin: `test/harvest-reeflog.test.mjs` fails if the import order changes), and the run exits 1 if `guard.attempts` is ever non-empty.
+
+**Live proof** (`tools/e2e-reeflog-harvest.mjs`, report: [research/reeflog-harvest-e2e-report.json](research/reeflog-harvest-e2e-report.json)): a fresh 45-second mainnet window for Whirlpool — 456 journal events, 452 account envelopes held — harvested for **156 payloads across 137 transactions with 0 network attempts**. Two directions checked against independently fetched chain transactions: **10/10 sampled payload-bearing transactions byte-identical** (`JSON.stringify` of the payload records, same order, same key order), and **10/10 sampled no-target transactions corroborated** (the chain shows no Whirlpool instruction either — a real contradiction there would mean the extractor drops bytes, and it is a named check). 0 different, 0 unavailable.
+
+The equivalence is pinned by mutation, twice: swapping `dataBase58`/`dataHex` in `payloadsFromEnvelope` turns 2 unit tests red, and turns the live run red at `mailbox_bytes_equal_chain_bytes` (8 of 10 sampled different). A third defect this harness caught before any of it: the first version of the e2e requested `maxSupportedTransactionVersion: 0`, which rejects every v1 transaction with rpc error -32015 — the retry loop misreported those as rate limiting (2/12 sampled), while `harvest.mjs` has requested version 1 all along. The harness now reports permanent client errors as what they are.
+
+**Limits:** the mailbox is my own reeflog daemon, not a third-party producer; the sample is 10 + 10 transactions from one 45-second window; the envelope is fetched by reeflog's own `hydrate --accounts` pass (the cost moved to the mailbox, it did not disappear).
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.

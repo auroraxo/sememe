@@ -101,3 +101,55 @@ export function extractPayloads(transaction, target) {
   }
   return payloads;
 }
+
+/**
+ * The same payload records, read from a reeflog account envelope instead of a
+ * raw `getTransaction` response.
+ *
+ * reeflog's journal carries the transaction's instruction bytes in the
+ * envelope (`instructions`, `src/accounts.rs`): program ids already resolved
+ * against the canonical account list, base58 data verbatim, outer and inner
+ * instructions in the same order, `outer` naming the parent instruction of a
+ * CPI and `inner_index` its position inside it.
+ *
+ * This function exists so the BYTE-LEVEL EQUIVALENCE between the two sources
+ * can be tested, not assumed: `payloadsFromEnvelope(envelope, p)` must produce
+ * the same JSON as `extractPayloads(rawTransaction, p)` for the same
+ * transaction — same keys in the same insertion order, because callers
+ * compare payload sets with `JSON.stringify` (key order is observable).
+ *
+ * A malformed envelope yields fewer payloads, never wrong ones: an instruction
+ * whose `program_id` is not a string, or whose `data` is not a string, cannot
+ * be matched or decoded, so it is skipped — and the caller's counts then show
+ * the shortfall instead of a fabricated byte.
+ *
+ * @param {object} envelope the `accounts` envelope from a reeflog `tail` row
+ * @param {string} target program id to collect
+ * @returns {object[]} payload records identical in shape to extractPayloads
+ */
+export function payloadsFromEnvelope(envelope, target) {
+  const payloads = [];
+  const instructions = envelope?.instructions;
+  if (!Array.isArray(instructions)) return payloads;
+  for (const instruction of instructions) {
+    if (!instruction || instruction.program_id !== target) continue;
+    const data = typeof instruction.data === 'string' ? instruction.data : '';
+    if (instruction.inner === true) {
+      payloads.push({
+        ix: Number.isSafeInteger(instruction.outer) ? instruction.outer : 0,
+        depth: 1,
+        innerIndex: Number.isSafeInteger(instruction.inner_index) ? instruction.inner_index : 0,
+        dataBase58: data,
+        dataHex: toHex(data),
+      });
+    } else {
+      payloads.push({
+        ix: Number.isSafeInteger(instruction.outer) ? instruction.outer : 0,
+        depth: 0,
+        dataBase58: data,
+        dataHex: toHex(data),
+      });
+    }
+  }
+  return payloads;
+}

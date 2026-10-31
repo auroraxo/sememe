@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-10-31T20:08:54.542Z",
+  "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+  "rpc": "https://api.mainnet-beta.solana.com",
+  "daemonSeconds": 45,
+  "sampled": 10,
+  "minEqual": 5,
+  "noTargetSampled": 10,
+  "noTargetAgree": 10,
+  "noTargetContradict": 0,
+  "noTargetUnavailable": 0,
+  "equal": 10,
+  "different": 0,
+  "unavailable": 0,
+  "journalCounters": {
+    "accounts_held": 452,
+    "accounts_missing": 0,
+    "accounts_partial": 0,
+    "accounts_unreachable": 4,
+    "backfilled": 6,
+    "blind_window_ms": 0,
+    "confirmed": 0,
+    "error": 302,
+    "events": 456,
+    "finalized": 144,
+    "gaps": 1,
+    "gaps_open": 0,
+    "max_seq": 456,
+    "max_slot": 463810639,
+    "min_slot": 463810594,
+    "missing": 4,
+    "newest_signature": "5Ux1K5LS6Mf9C8JSemT5MhQLdT6P1X2QjenryBw13vGWiVwPfiuhaQv8hsWufRfv74Re31jN89coz2HzJNZ8K66o",
+    "oldest_signature": "27nR7nkWbpE4QxmewJza9rPSoGXqwryDW2RatanFPiGGf1yHCMQNr7abYcqssN5T7aMoishWF3Acs6yVcbiMDZ4X",
+    "payload_invalid": 0,
+    "payload_pending": 0,
+    "payload_unavailable": 0,
+    "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+    "reverted": 0,
+    "unsealed": 6,
+    "with_err": 310
+  },
+  "harvestCounts": {
+    "requested": 456,
+    "journalRows": 456,
+    "pinnedSignatures": 452,
+    "fetched": 452,
+    "missing": 0,
+    "transactionsWithTargetPayloads": 137,
+    "payloads": 156,
+    "failedOnChain": 308,
+    "transactionsWithoutTarget": 315,
+    "rowsWithoutEnvelope": 4,
+    "rowsWithoutInstructions": 0
+  },
+  "harvestMethod": "reeflog tail --cursor <fresh> over the local journal (envelope instructions, byte-verbatim)",
+  "networkAttempts": 0,
+  "differences": [],
+  "samples": [
+    {
+      "signature": "27nR7nkWbpE4QxmewJza9rPSoGXqwryDW2RatanFPiGGf1yHCMQNr7abYcqssN5T7aMoishWF3Acs6yVcbiMDZ4X",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 86
+    },
+    {
+      "signature": "5DcDAK9jQs7Jn2h15MRWRMVcbgi4ZNxfBT4Y6MdCx5NxKizaHqYY1RWv8fbQP7KfSLRFKKJ1Qwu6K4Kxo6B5d2C8",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 86
+    },
+    {
+      "signature": "2rpuBv2YHukHHH8WTgBgoh2tjRsbqm4Sg4XaQy3EHt5MsRPXvoAgbVDBxavLrScdYnDdFCo1pr7rhXFHrXnNw76m",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 86
+    },
+    {
+      "signature": "2CP7oASAqEfX4n2wLRNDStaH3CAx9dYUM8mMuLSEd4YVezMoqkAwMpBKaAvruTFk5U8qctkV3Ga3fuM5dUfqzXBj",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 86
+    },
+    {
+      "signature": "48pNArqCpWVEp9fNa5Uw38XdzK1AE3d38Nk1eLU3XXfFeQ1NeSQgN68wmorVbtm8iTjvMyBYqetAkQ81rBdL6mBX",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 86
+    },
+    {
+      "signature": "zcthtrS2E6NHVqwk4rocCnEk54PhfrnzLXdmbHzW2JVGsGyL8YUD8KZ3xv9HqJmLJXaxZWrQhpVaPWQhiZcSRi6",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 132
+    },
+    {
+      "signature": "54dtUb8HWt1BriLihQdg65uokYzzrJeNXzRPtN7qc66ng88zBU8PSoSPWWeDKWQEaJs2nVNqEWDMQqACi4ko5mKb",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 86
+    },
+    {
+      "signature": "B2rQjQXSapzVicLPv18iNL1rY5cP8gkAVWN9TvpffVQiVC2rNwmPQevmTAbhuHmve2oNwxiaRXSXYynPVSh9c8X",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 86
+    },
+    {
+      "signature": "4FgVp6TeKvkfoLm7L82Tzk3PrSDruoyMZDAi7uS2xnuDRZKQGJhSVHA4vyEhanU7obPrdVQmX7oXneHdFiquod2E",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 98
+    },
+    {
+      "signature": "3CmRmpigbFx5YHzQMLhzYW5XCR7LKXAS4UiizqqVtYk1g542WsdD98YUgR4hYHrx5DBtYsME1zpWTe7VrZtiaid5",
+      "verdict": "equal",
+      "payloads": 1,
+      "bytes": 80
+    }
+  ],
+  "checks": [
+    {
+      "name": "mailbox_harvest_yielded_payloads",
+      "pass": true,
+      "detail": "156 payloads from 452 transactions"
+    },
+    {
+      "name": "tool_made_zero_rpc_calls",
+      "pass": true,
+      "detail": "network attempts: 0"
+    },
+    {
+      "name": "mailbox_bytes_equal_chain_bytes",
+      "pass": true,
+      "detail": "10 equal (floor 5), 0 different, 0 unavailable (of 10 sampled)"
+    },
+    {
+      "name": "mailbox_agrees_when_it_records_no_payload",
+      "pass": true,
+      "detail": "10 corroborated as no-target (floor 5), 0 contradicted, 0 unavailable (of 10 sampled)"
+    },
+    {
+      "name": "no_contradiction_with_the_chain",
+      "pass": true,
+      "detail": "0 transaction(s) claimed payloads the chain does not show"
+    },
+    {
+      "name": "debt_is_reported_not_hidden",
+      "pass": true,
+      "detail": "rows 456, without envelope 4, without instructions 0"
+    },
+    {
+      "name": "document_shape_matches_the_network_harvester",
+      "pass": true,
+      "detail": "source: reeflog mailbox harvest (own local journal, zero RPC) — 2026-10-31T20:08:29.816Z"
+    }
+  ],
+  "verdict": "ALL PASS"
+}
