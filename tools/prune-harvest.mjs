@@ -24,8 +24,9 @@ const option = (name, fallback) => {
 
 const inPath = option('--in', null);
 const outPath = option('--out', null);
+const note = option('--note', null);
 if (!inPath || !outPath) {
-  console.error('usage: node tools/prune-harvest.mjs --in <raw.json> --out <pruned.json>');
+  console.error('usage: node tools/prune-harvest.mjs --in <raw.json> --out <pruned.json> [--note <text>]');
   process.exit(2);
 }
 
@@ -47,7 +48,7 @@ const pruned = {
   blocksUsed: raw.blocksUsed,
   slotsRejected: raw.slotsRejected,
   tipAtHarvest: raw.tipAtHarvest,
-  note: 'Real mainnet Meteora DAMM v1 payloads. The on-chain IDL of this program stores NO discriminators (26 instructions, 18 events, 0), so every payload below is undecodable without Anchor rule-based derivation. Fixture is reduced to the payload-bearing transactions; counts preserve the full harvest. Raw harvest covered 152,097 transactions; slotRange is the whole harvest.',
+  note: note ?? 'Real mainnet payloads, reduced to the payload-bearing transactions; counts preserve the full harvest.',
   signatures: kept.map((tx) => ({ signature: tx.signature, slot: tx.slot })),
   transactions: kept,
   payloadSlotRange: {

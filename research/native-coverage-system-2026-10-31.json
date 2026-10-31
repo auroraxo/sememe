@@ -1,0 +1,217 @@
+{
+  "program": "11111111111111111111111111111111",
+  "harvest": {
+    "file": "harvest-system-2026-10-31.json",
+    "harvestedAt": "2026-10-31T01:50:45.567Z",
+    "slotRange": {
+      "oldest": 463509855,
+      "newest": 463509862
+    },
+    "transactions": 956,
+    "payloads": 1828
+  },
+  "interface": {
+    "label": "System Program",
+    "interface": "anza-xyz/solana-sdk@8db406e2edfafa25939ec782b77b5b6f30de164d system-interface/src/instruction.rs SystemInstruction (variants 0..13, declaration order)",
+    "encoding": "u32le enum tag + bincode fixint args; string = u64 length prefix + utf8 (web3.js reads the same word as u32 length + u32 zero padding)",
+    "runtime": "anza-xyz/agave@master (read 2026-10-31), system-program: accepts variants 0..13 (12 = UpgradeNonceAccount, 13 = CreateAccountAllowPrefund)",
+    "corroboration": "@solana/web3.js@1.98.4 SYSTEM_INSTRUCTION_LAYOUTS (u32 index + ns64 + rustString header, byte-compatible with the u64 length word)",
+    "measured": "2026-10-31 mainnet harvest: 1.828 payloads; 63/63 CreateAccountWithSeed consume ONLY with the u64 string prefix",
+    "observed": {
+      "Transfer": 1026,
+      "CreateAccount": 643,
+      "AdvanceNonceAccount": 67,
+      "CreateAccountWithSeed": 63,
+      "Assign": 14,
+      "Allocate": 14,
+      "InitializeNonceAccount": 1
+    },
+    "program": "11111111111111111111111111111111"
+  },
+  "tableNames": [
+    "CreateAccount",
+    "Assign",
+    "Transfer",
+    "CreateAccountWithSeed",
+    "AdvanceNonceAccount",
+    "WithdrawNonceAccount",
+    "InitializeNonceAccount",
+    "AuthorizeNonceAccount",
+    "Allocate",
+    "AllocateWithSeed",
+    "AssignWithSeed",
+    "TransferWithSeed",
+    "UpgradeNonceAccount",
+    "CreateAccountAllowPrefund"
+  ],
+  "coverage": {
+    "decoded": 1828,
+    "refused": 0,
+    "roundTripByteExact": 1828,
+    "trailingPayloads": 0,
+    "byName": {
+      "CreateAccount": 643,
+      "Transfer": 1026,
+      "AdvanceNonceAccount": 67,
+      "CreateAccountWithSeed": 63,
+      "Allocate": 14,
+      "Assign": 14,
+      "InitializeNonceAccount": 1
+    },
+    "refusals": {}
+  },
+  "oracle": {
+    "oldTable": {
+      "path": "/home/aurora/github_repos/solana-tx-remix/src/native.mjs",
+      "named": 1765,
+      "namedShare": 0.9655361050328227
+    },
+    "web3": {
+      "path": null,
+      "error": "not requested"
+    },
+    "disagreements": [
+      {
+        "bytes": "03000000ece16a82fb4794ba518c0ab1cb469f007d541bdcf709f07fe7090558b7792c12160000000000000037777552584a4e4a796166787353644a764a5747356596b82d0100000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "03000000398356be72d18d0b4ce04302d372818d2f39f2067474a7da8eda8fa57d8e4aa92000000000000000706636664a586862344c6f6a6f594d504447676d58456456536b774c326e734520ec200000000000a50000000000000006ddf6e1ee758fde18425dbce46ccddab61afc4d83b90d27febdf928d8a18bfc",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb20000000000000007368374533346235675a5874786d48613851444b4b736d3131386536536e777538b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb2000000000000000736843724b4855524a6e6134364c386a544d7a7a334844595753556d6137656138b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb200000000000000073684854586336394a6157574a314e7166726379434c77677247634a3570776a38b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb2000000000000000736847396f685336465674724d667548754b596f6456683178354d77696f374738b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb200000000000000073684455734d773154486b396831414d5965573164384d736476564a5350707338b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb200000000000000073683674656b706631366966467069674e706f6f627a59736a53646a3363773338b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb2000000000000000736834756b5539743165376b557035587433416b796e70427a7558463659513638b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb20000000000000007368414a68743871455461374b5563687a4e48514c72676b513654454c69736538b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb2000000000000000736839444557675348504434674d726f32767846464a356b343444787543787238b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "030000003465ee903bade95ca5c4f60d6ae8adace1061d94f02a1f0ea89a875afb97b65d0c0000000000000039396138366266306431316220ec200000000000b60000000000000006ddf6e1ee758fde18425dbce46ccddab61afc4d83b90d27febdf928d8a18bfc",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "03000000b5e6b644e58e39a3b1249e159e67b0a1e8e843e7ff2fd578eb49147f0a2632680c0000000000000039396138366266306431316220ec200000000000b60000000000000006ddf6e1ee758fde18425dbce46ccddab61afc4d83b90d27febdf928d8a18bfc",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "030000003c05716b093f0fb921c411b31905ba3fcad28ad6a1036759e75d5a1842172e7f0c0000000000000039396138366266306431316220ec200000000000b60000000000000006ddf6e1ee758fde18425dbce46ccddab61afc4d83b90d27febdf928d8a18bfc",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000044a49ab2f3ea9e8d6a124cecb23aaa79e89e2fe7fbc31f6c6753ceaddb75eb180c0000000000000039396138366266306431316220ec200000000000b60000000000000006ddf6e1ee758fde18425dbce46ccddab61afc4d83b90d27febdf928d8a18bfc",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb20000000000000007368425444734676775756585547704453415a5a684142464c725756466b315a38b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "0300000060fefcf053d8ada9f4c355f14210be2a024d58dad94d23c6bf659c077c756ddb2000000000000000736847706d71566869624b467065447a44774239333457316750544d576e567938b6160000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "030000009d4d07d04d8599c83913cceadf0214d7c9f59e97c7c2e097dc536fae2f4fecab16000000000000004d33624d3633517238487a48695a6568574e7165326fb4f8610300000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "03000000f3a01eeaff4d6f844f9c210907e86edc395793ef0d67ca9fd10b6b3b73f0cec5160000000000000059394c4442476e543662386a33675a474b577677525a4a9faa0800000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      },
+      {
+        "bytes": "03000000062657ea2981e1179d9f1f239aea44923581b973df8b069b821dd7cbfe2083871600000000000000394832376e794757567a4b38565067356d714b7a39386048980000000000a50000000000000006ddf6e1d765a193d9cbe146ceeb79ac1cb485ed5f5b37913a8cf5857eff00a9",
+        "newName": "CreateAccountWithSeed",
+        "oldName": null,
+        "oldRefused": "not-named",
+        "newRefusal": null
+      }
+    ],
+    "disagreementCount": 63
+  }
+}

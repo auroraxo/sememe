@@ -33,7 +33,7 @@
  ],
  "slotsRejected": {},
  "tipAtHarvest": 463380818,
- "note": "Real mainnet Meteora DAMM v1 payloads. The on-chain IDL of this program stores NO discriminators (26 instructions, 18 events, 0), so every payload below is undecodable without Anchor rule-based derivation. Fixture is reduced to the payload-bearing transactions; counts preserve the full harvest. Raw harvest covered 152,097 transactions; slotRange is the whole harvest.",
+ "note": "Real mainnet pump.fun bonding-curve payloads. Fixture is reduced to the payload-bearing transactions; counts preserve the full harvest.",
  "signatures": [
   {
    "signature": "5HAKDDx2fHxEDKHC1PJWGe9UNSKeFWJcTTLLBNxFaN6sWWn6vnL7VgMwwzjt7y8K91SMH3HGwmhjSj3cnNJoTJZP",

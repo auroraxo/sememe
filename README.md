@@ -534,6 +534,31 @@ The CLI now refuses too: `sememe decode` on a tampered store exits 1 with `objec
 
 The falsification is a committed control: `solana-tx-remix`'s `neg/idl-name-stored-only.ts` relabels the newly-named instruction to a name the stale vendored copy carries, and the verifier answers `bytes resolve to create_idempotent_associated_token_account ... recipe claims create_token_account` — exit 1.
 
+## Native programs: the two every transaction carries, pinned from the runtime (2026-10-31)
+
+System and ComputeBudget have no IDL account to pull — their interface lives in the Solana runtime itself. Sememe decoded neither; its first consumer (`solana-tx-remix`) carried a hand-transcribed copy of both instruction tables instead, which is exactly the per-repository hand-build this repository exists to replace. The cost of that copy was not hypothetical, it was measured: over a real mainnet harvest, **the hand table could name 0 of 63 on-chain `CreateAccountWithSeed` payloads**, because it reads a 4-byte string length header while the chain carries a u64 (bincode fixint) length word — every later field sat 4 bytes off, so the payload never matched the declared shape.
+
+`src/native.mjs` now decodes both programs from a pinned interface, with the provenance chain written into the file: the upstream enum (anza-xyz/solana-sdk, pinned by commit), the runtime's acceptance rule (anza-xyz/agave: borsh `try_from_slice_unchecked`, where an unclaimed tag is `InvalidInstructionData`), and the corroboration (`@solana/web3.js`'s own layouts, read as the same u64 length word). Three facts the pins settle and a hand copy is free to get wrong:
+
+- **Tag 0 of ComputeBudget is wire-rejected.** The runtime refuses the reserved `Unused` variant; `@solana/web3.js@1.98.4` still *encodes* legacy `requestUnits` as tag 0 + (u32, u32). This decoder refuses tag 0 with `wire-rejected` instead of copying the SDK's opinion.
+- **System has 14 variants, not 12.** `UpgradeNonceAccount` (12) and `CreateAccountAllowPrefund` (13) exist upstream; a 12-entry table answers `null` on those bytes.
+- **The string header is u64.** web3.js writes it as u32 length + u32 zero padding; read as one word, that *is* the bincode fixint length. The defect was dropping the padding word, not a layout disagreement.
+
+Measured against real mainnet traffic (1,828 System payloads + 1,348 ComputeBudget payloads, harvested 2026-10-31, [reports](research/native-coverage-system-2026-10-31.json)):
+
+| decoder | System named | ComputeBudget named |
+|---|---|---|
+| hand-written table (the one being replaced) | 1,765 / 1,828 | 1,348 / 1,348 |
+| sememe pinned table | **1,828 / 1,828, all byte-exact re-encodes** | **1,348 / 1,348 (1,321 byte-exact)** |
+
+The 27 ComputeBudget payloads that are not byte-exact all carry trailing bytes after the declared argument. Chain adjudication (9 fetched directly, byte-identical to the harvest) shows the bytes are real and the runtime tolerates the remainder — every one sits in a transaction that failed at a *later* instruction. They decode with `trailing: { count: n }` reported, and are refused under `--trailing error`, the same contract the IDL decoder uses.
+
+Falsification: the new test file (`test/native.test.mjs`, 10 tests) was run against the old hand-written table, adapted to the same API surface with the table itself verbatim: **7/10 fail, 3/10 pass, and the three that pass are the designed ones** — the false-positive guard (a System `Transfer`, the one case the old table decoded correctly), the dependency-free import check, and the report test. Against the pre-module tree the file fails outright. A committed coverage report is re-derived from the committed fixture on every test run, so hand-editing the numbers goes red.
+
+CLI: `sememe decode-native <program> <payload>` decodes with the pinned interface; `sememe native-provenance [program]` prints the pinned sources, the encoding rules and the measured traffic.
+
+Limits: Linux-mainnet measured only; the strict-20 coverage study does not include the native programs (they were never part of the sample, so no coverage number moved); the runtime acceptance rule is checked against the agave source at one point in time, not against a live validator; no outside user yet.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.

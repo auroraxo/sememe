@@ -1,0 +1,54 @@
+{
+  "program": "ComputeBudget111111111111111111111111111111",
+  "harvest": {
+    "file": "harvest-compute-budget-2026-10-31.json",
+    "harvestedAt": "2026-10-31T01:54:12.166Z",
+    "slotRange": {
+      "oldest": 463510842,
+      "newest": 463510845
+    },
+    "transactions": 694,
+    "payloads": 1348
+  },
+  "interface": {
+    "label": "Compute Budget Program",
+    "interface": "anza-xyz/solana-sdk@8db406e2edfafa25939ec782b77b5b6f30de164d compute-budget-interface/src/lib.rs ComputeBudgetInstruction (variants 0..4, declaration order)",
+    "encoding": "1-byte tag + bare LE integer arg (runtime to_instruction! macro: data[0] = tag, then $num.to_le_bytes())",
+    "runtime": "anza-xyz/agave@master (read 2026-10-31), compute-budget-instruction: borsh try_from_slice_unchecked; unclaimed tag or Unused(0) => InvalidInstructionData",
+    "corroboration": "Lightprotocol/light-protocol compute_budget.rs (explicit per-variant index)",
+    "measured": "2026-10-31 mainnet harvest: 1.348 payloads, tags {2: 651, 3: 550, 4: 147}; tags 0 and 1 not observed on live mainnet — consistent with the runtime reject rule. 27 payloads carry trailing bytes after the declared arg; chain adjudication (9 fetched, byte-identical to the harvest) shows the runtime tolerates them (borsh try_from_slice_unchecked ignores the remainder), and every one sat in a transaction that failed at a LATER instruction",
+    "divergence": "@solana/web3.js@1.98.4 still ENCODES legacy requestUnits as tag 0 + (u32,u32) — the pre-2023 wire shape the runtime no longer parses; this module refuses tag 0 instead of copying the SDK",
+    "program": "ComputeBudget111111111111111111111111111111"
+  },
+  "tableNames": [
+    "RequestHeapFrame",
+    "SetComputeUnitLimit",
+    "SetComputeUnitPrice",
+    "SetLoadedAccountsDataSizeLimit"
+  ],
+  "coverage": {
+    "decoded": 1348,
+    "refused": 0,
+    "roundTripByteExact": 1321,
+    "trailingPayloads": 27,
+    "byName": {
+      "SetComputeUnitLimit": 651,
+      "SetComputeUnitPrice": 550,
+      "SetLoadedAccountsDataSizeLimit": 147
+    },
+    "refusals": {}
+  },
+  "oracle": {
+    "oldTable": {
+      "path": "/home/aurora/github_repos/solana-tx-remix/src/native.mjs",
+      "named": 1348,
+      "namedShare": 1
+    },
+    "web3": {
+      "path": null,
+      "error": "not requested"
+    },
+    "disagreements": [],
+    "disagreementCount": 0
+  }
+}

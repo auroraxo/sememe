@@ -2,7 +2,11 @@
 import os from 'node:os';
 import path from 'node:path';
 import { pull } from '../src/pull.mjs';
-import { decodePayload, decodeStoredAccount, decodeUnionPayload, adopt } from '../src/decode.mjs';
+import { decodePayload, decodeStoredAccount, decodeUnionPayload, adopt, parsePayload } from '../src/decode.mjs';
+import {
+  decodeNativeInstruction, nativeProvenance, nativePrograms,
+} from '../src/native.mjs';
+import { toJsonSafe } from '../src/codec.mjs';
 
 const usage = `usage:
   sememe pull <program-id> [--store <directory>] [--rpc <https-url>]
@@ -22,7 +26,15 @@ const usage = `usage:
   sememe account <program-id> <account-data> [--store <directory>] [--name <account-type>]
       account-data: base64 account bytes (as getMultipleAccounts returns them)
           or hex. Without --name the account's 8-byte discriminator picks the
-          account type from the stored IDL.`;
+          account type from the stored IDL.
+  sememe decode-native <program-id> <payload> [--trailing report|error]
+      payload: base58 or hex instruction data. For the NATIVE programs (System,
+      ComputeBudget) there is no IDL to pull: their interface is pinned from
+      the upstream runtime, and this decodes against that pin. The result names
+      the instruction, its arguments, and whether the bytes re-encode exactly.
+  sememe native-provenance [program-id]
+      print the pinned source, encoding rule and measured traffic for a native
+      program (or for all of them).`;
 
 const [rawCommand, rawProgram, ...rawArgs] = process.argv.slice(2);
 const command = rawCommand;
@@ -93,6 +105,37 @@ try {
         bytes: decoded.bytes,
         trailing: decoded.trailing,
       }));
+    }
+  } else if (command === 'decode-native') {
+    if (!program) throw Error('decode-native needs a program id');
+    const payload = args.shift();
+    if (!payload) throw Error('decode-native needs an instruction payload');
+    const trailing = option('--trailing', 'report');
+    if (trailing !== 'report' && trailing !== 'error') {
+      throw Error('--trailing must be "report" or "error"');
+    }
+    const decoded = decodeNativeInstruction(program, parsePayload(payload), { trailing });
+    console.log(JSON.stringify({
+      program,
+      kind: 'native-instruction',
+      name: decoded.name,
+      selector: decoded.selector,
+      selectorWidth: decoded.selectorWidth,
+      args: toJsonSafe(decoded.args),
+      bytes: decoded.bytes,
+      consumed: decoded.consumed,
+      trailing: decoded.trailing,
+      roundTripByteExact: decoded.roundTripByteExact,
+      interface: nativeProvenance(program),
+    }, null, 2));
+  } else if (command === 'native-provenance') {
+    const wanted = program;
+    if (wanted) {
+      const provenance = nativeProvenance(wanted);
+      if (!provenance) throw Error(`${wanted} is not a native program sememe pins`);
+      console.log(JSON.stringify(provenance, null, 2));
+    } else {
+      console.log(JSON.stringify(nativePrograms().map((id) => nativeProvenance(id)), null, 2));
     }
   } else if (command === 'account') {
     if (!program) throw Error('account needs a program id');
