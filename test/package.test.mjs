@@ -33,6 +33,7 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { spawnSync } from 'node:child_process';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -187,4 +188,16 @@ test('the shipped corpus is byte-identical to the fixtures the suite qualifies a
     const read = corpus(which); // throws if the bytes do not match CORPUS[which].sha256
     assert.ok(read, `${which} must parse`);
   }
+});
+
+test('a release tag and the version field must agree (when HEAD is tagged)', async () => {
+  // The defect this pins: tags v0.1.1..v0.2.1 all shipped package.json version 0.1.0,
+  // so a consumer installing #v0.2.0 got a package announcing a version that never
+  // existed as a release. When HEAD sits on an exact tag, the field must equal it;
+  // on untagged commits (the usual case in a dev tree) there is nothing to compare.
+  const describe = spawnSync('git', ['describe', '--tags', '--exact-match'], { cwd: ROOT, encoding: 'utf8' });
+  if (describe.status !== 0) return; // not on a tag — nothing to hold
+  const tag = describe.stdout.trim();
+  if (!/^v\d+\.\d+\.\d+$/.test(tag)) return;
+  assert.equal(`v${pkg.version}`, tag, `HEAD is tagged ${tag} but package.json says ${pkg.version} — npm version ${tag.slice(1)} before tagging`);
 });

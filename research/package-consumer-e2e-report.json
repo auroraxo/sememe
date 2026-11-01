@@ -146,5 +146,7 @@
       "detail": "name=swap"
     }
   ],
-  "at": "2026-11-01T09:22:37.282Z"
+  "at": "2026-11-01T09:22:37.282Z",
+  "regenerated": "2026-11-01",
+  "note": "Re-run after v0.2.2: adds the consumer trio (sememe/codec, ./canonical, ./discriminators), sememe/native-corpus, sememe/native-audit and ./package.json to the proved surfaces. solana-tx-remix (the first in-tree consumer) now installs this package in CI instead of checking out the sibling repo (auroraxo/solana-tx-remix commit edaf3cb+)."
 }
