@@ -197,6 +197,37 @@ async function main() {
     check('sememe/native subpath decodes a real System payload', false, 'no payload in fixture');
   }
 
+  // ---------- the consumer's trio + the audit surfaces: what solana-tx-remix imports
+  const surfacesProbe = spawnSync('node', ['-e', `
+    Promise.all([import('sememe/codec'), import('sememe/canonical'), import('sememe/discriminators'), import('sememe/native-corpus'), import('sememe/native-audit')])
+      .then(([codec, canonical, discriminators, corpus, audit]) => {
+        const seeded = corpus.payloads('system').filter((b) => b.subarray(0, 4).toString('hex') === '03000000');
+        const derived = discriminators.globalDiscriminator('swap');
+        const auditOut = audit.auditNativeInterface();
+        console.log('SURFACES:' + JSON.stringify({
+          codec: typeof codec.decodeInstructionData === 'function' && codec.EVENT_IX_TAG_HEX.length === 16,
+          canonical: typeof canonical.canonicalJson === 'function',
+          discriminators: Array.isArray(derived) && derived.length === 8 && derived.every((b) => Number.isInteger(b) && b >= 0 && b <= 255),
+          corpusSeeded: seeded.length,
+          corpusTamperCheck: (() => { try { corpus.corpus('system'); return 'hash-ok'; } catch { return 'hash-refused'; } })(),
+          auditOk: auditOut.ok === true && auditOut.checked >= 2,
+        }));
+      })
+      .catch(e => { console.log('SURFACES_FAILED:' + e.message); });`, ], { cwd: app, encoding: 'utf8' });
+  const surfacesOut = String(surfacesProbe.stdout || '');
+  try {
+    const s = JSON.parse(surfacesOut.replace(/^SURFACES:/, ''));
+    check('sememe/codec + sememe/canonical + sememe/discriminators resolve and work',
+      s.codec === true && s.canonical === true && s.discriminators === true, surfacesOut.trim() || (surfacesProbe.stderr || '').slice(0, 160));
+    check('sememe/native-corpus ships the qualified mainnet harvest', s.corpusSeeded >= 60 && s.corpusTamperCheck === 'hash-ok',
+      `seeded=${s.corpusSeeded} ${s.corpusTamperCheck}`);
+    check('sememe/native-audit re-derives the native tables in the consumer process', s.auditOk === true, `ok=${s.auditOk}`);
+  } catch (error) {
+    check('sememe/codec + sememe/canonical + sememe/discriminators resolve and work', false, surfacesOut.trim() || String(error));
+    check('sememe/native-corpus ships the qualified mainnet harvest', false, surfacesOut.trim());
+    check('sememe/native-audit re-derives the native tables in the consumer process', false, surfacesOut.trim());
+  }
+
   // ---------- installed CLI decodes with zero dependencies (no web3.js load)
   const firstPayload = payloads[0];
   const cli = spawnSync('node', [path.join(app, 'node_modules', '.bin', 'sememe'), 'decode', WHIRLPOOL, firstPayload.dataBase58, '--store', store],

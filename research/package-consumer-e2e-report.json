@@ -126,10 +126,25 @@
       "detail": "NATIVE:CreateAccount:true"
     },
     {
+      "name": "sememe/codec + sememe/canonical + sememe/discriminators resolve and work",
+      "pass": true,
+      "detail": "SURFACES:{\"codec\":true,\"canonical\":true,\"discriminators\":true,\"corpusSeeded\":63,\"corpusTamperCheck\":\"hash-ok\",\"auditOk\":true}"
+    },
+    {
+      "name": "sememe/native-corpus ships the qualified mainnet harvest",
+      "pass": true,
+      "detail": "seeded=63 hash-ok"
+    },
+    {
+      "name": "sememe/native-audit re-derives the native tables in the consumer process",
+      "pass": true,
+      "detail": "ok=true"
+    },
+    {
       "name": "installed CLI decodes without any dependency installed",
       "pass": true,
       "detail": "name=swap"
     }
   ],
-  "at": "2026-11-01T08:32:50.071Z"
+  "at": "2026-11-01T09:22:37.282Z"
 }
