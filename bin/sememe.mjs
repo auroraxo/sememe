@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import os from 'node:os';
 import path from 'node:path';
-import { pull } from '../src/pull.mjs';
+// `pull` is imported LAZILY (inside the branch): it is the only path that
+// needs @solana/web3.js. A consumer who installed the package for DECODING
+// only — the common case — must be able to run `sememe decode` without any
+// package installed at all, so the acquisition dependency is never loaded
+// unless a pull is actually requested.
 import { decodePayload, decodeStoredAccount, decodeUnionPayload, adopt, parsePayload } from '../src/decode.mjs';
 import {
   decodeNativeInstruction, nativeProvenance, nativePrograms,
@@ -68,6 +72,12 @@ try {
     if (!program) throw Error('pull needs a program id');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const rpc = option('--rpc', 'https://api.mainnet-beta.solana.com');
+    let pull;
+    try {
+      ({ pull } = await import('../src/pull.mjs'));
+    } catch (error) {
+      throw Error(`pull needs @solana/web3.js: install it next to sememe (npm i @solana/web3.js@1.98.4) — ${String(error?.message ?? error).slice(0, 120)}`);
+    }
     console.log(JSON.stringify(await pull(program, store, rpc), null, 2));
   } else if (command === 'adopt') {
     if (!program) throw Error('adopt needs a program id');

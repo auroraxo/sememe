@@ -4,7 +4,10 @@ import { createHash } from 'node:crypto';
 import { link, lstat, mkdir, open, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { PublicKey } from '@solana/web3.js';
-import { addresses, decodeAccount, rpcAccounts } from '../tools/measure.mjs';
+// Acquisition helpers live IN src/ since 2026-11-01: pull used to import
+// `../tools/measure.mjs`, which broke any consumer installing this package —
+// the file simply would not exist inside node_modules/sememe/src.
+import { addresses, decodeAccount, rpcAccounts } from './acquire.mjs';
 
 // Re-exported from its own module so a consumer can verify a fingerprint
 // without importing this file (and therefore without @solana/web3.js).

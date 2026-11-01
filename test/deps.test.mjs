@@ -16,14 +16,19 @@ const SRC = path.join(HERE, '..', 'src');
 const DECODE_CORE = ['base58.mjs', 'canonical.mjs', 'codec.mjs', 'decode.mjs'];
 
 /**
- * The acquisition path may depend on a package: `pull.mjs` derives the
+ * The acquisition path may depend on a package: `acquire.mjs` derives the
  * Program Metadata PDA and the legacy `anchor:idl` address, which needs
- * sha256 + ed25519 curve checks, and it needs them exactly ONCE per program.
- * A consumer that only decodes never pulls. Every other third-party import
+ * sha256 + ed25519 curve checks, and it needs them exactly ONCE per program;
+ * `pull.mjs` validates program ids with the same primitive (measured
+ * 2026-11-01: the move of the acquisition helpers into src/ tripped this
+ * allowlist on the first run — that is the gate working, and the entry was
+ * then declared here). A consumer that only decodes never loads either file.
+ * Every other third-party import
  * in `src/` is a defect, so the allowlist is explicit and per-file: adding a
  * new package anywhere fails this test until someone says why it is allowed.
  */
 const ALLOWED = new Map([
+  ['acquire.mjs', ['@solana/web3.js']],
   ['pull.mjs', ['@solana/web3.js']],
 ]);
 

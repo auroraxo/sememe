@@ -1,10 +1,59 @@
 {
-  "name": "sememe-qualification",
-  "version": "0.0.0",
-  "private": true,
+  "name": "sememe",
+  "version": "0.1.0",
+  "description": "Local, fingerprint-verified Solana program interfaces: pull an IDL once, then decode instructions, accounts and events offline. Zero dependencies on the decode path.",
+  "license": "MIT",
   "type": "module",
-  "description": "Local Solana IDL pull and offline instruction decode prototype with reproducible coverage qualification",
-  "bin": {"sememe": "bin/sememe.mjs"},
-  "scripts": {"test": "node --test", "crosscheck": "node tools/crosscheck.mjs", "txdiff": "node tools/tx-diff.mjs", "harvest": "node tools/harvest.mjs"},
-  "dependencies": {"@solana/web3.js": "1.98.4"}
+  "main": "./index.mjs",
+  "bin": {
+    "sememe": "bin/sememe.mjs"
+  },
+  "exports": {
+    ".": "./index.mjs",
+    "./native": "./src/native.mjs",
+    "./store": "./src/store-read.mjs",
+    "./pull": "./src/pull.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "src/",
+    "interface/",
+    "vendor/",
+    "bin/",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "crosscheck": "node tools/crosscheck.mjs",
+    "txdiff": "node tools/tx-diff.mjs",
+    "harvest": "node tools/harvest.mjs"
+  },
+  "peerDependencies": {
+    "@solana/web3.js": "^1.98.4"
+  },
+  "peerDependenciesMeta": {
+    "@solana/web3.js": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@solana/web3.js": "1.98.4"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auroraxo/sememe.git"
+  },
+  "keywords": [
+    "solana",
+    "anchor",
+    "idl",
+    "decoder",
+    "borsh",
+    "offline",
+    "instruction-decoding"
+  ]
 }

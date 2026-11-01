@@ -16,6 +16,25 @@ sememe is a local, content-addressed schema store with a verification contract:
 - **store:** keep records under `~/.sememe/`; `sememe.lock` pins exact fingerprints per project.
 - **resolve:** decode and encode locally, with strict errors instead of guesses. A program without a trustworthy source stays explicitly unverifiable.
 
+## Install (as a consumer, not a contributor)
+
+```bash
+npm install github:auroraxo/sememe#v0.1.0   # tagged release; no npm account needed
+```
+
+```js
+import { decodePayload } from 'sememe';
+
+const result = await decodePayload('./store', 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc', payload);
+// result.name, result.args, result.roundTripByteExact, result.idl.fingerprint
+```
+
+The decode path installs **zero runtime dependencies**: `sememe` itself has none on its entry, and every file it reaches imports only `node:` builtins. Three subpaths are exported: `sememe/native` (System + ComputeBudget, derived at import from the pinned upstream sources), `sememe/store` (read/verify receipts) and `sememe/pull` (acquisition).
+
+**Acquisition is the one path that needs a package**, because deriving the Program Metadata PDA needs ed25519: `npm install github:auroraxo/sememe#v0.1.0 @solana/web3.js`. `@solana/web3.js` is declared as an *optional peer* precisely so a decoder-only consumer is never asked to install it. The CLI refuses `sememe pull` without it, with that instruction, and still runs every other subcommand.
+
+Publishing to the npm registry itself is deliberately not done: this repository's tests, fixtures and qualification harness must not ship as a dependency of anything, and no registry name squatting is part of the plan. The git tag is the release artifact; `test/package.test.mjs` (the contract above) and `tools/e2e-package-consumer.mjs` (a real install into an empty directory) keep it honest.
+
 ## Working now: pull a program's on-chain IDL
 
 ```bash
