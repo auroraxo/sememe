@@ -17,7 +17,8 @@
     "./canonical": "./src/canonical.mjs",
     "./discriminators": "./src/discriminators.mjs",
     "./native-corpus": "./src/native-corpus.mjs",
-    "./native-audit": "./src/native-audit.mjs"
+    "./native-audit": "./src/native-audit.mjs",
+    "./package.json": "./package.json"
   },
   "files": [
     "index.mjs",
