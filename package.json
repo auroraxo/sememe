@@ -12,7 +12,10 @@
     ".": "./index.mjs",
     "./native": "./src/native.mjs",
     "./store": "./src/store-read.mjs",
-    "./pull": "./src/pull.mjs"
+    "./pull": "./src/pull.mjs",
+    "./codec": "./src/codec.mjs",
+    "./canonical": "./src/canonical.mjs",
+    "./discriminators": "./src/discriminators.mjs"
   },
   "files": [
     "index.mjs",
