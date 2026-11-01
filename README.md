@@ -622,6 +622,39 @@ The equivalence is pinned by mutation, twice: swapping `dataBase58`/`dataHex` in
 
 **Limits:** the mailbox is my own reeflog daemon, not a third-party producer; the sample is 10 + 10 transactions from one 45-second window; the envelope is fetched by reeflog's own `hydrate --accounts` pass (the cost moved to the mailbox, it did not disappear).
 
+## Tenth program: the Jupiter RFQ stack, and the first live "the wire changed shape" firing (2026-11-01)
+
+The suite already said what would count as a serious finding: in `test/decode.test.mjs` the unexplained-bytes guard reads *"a non-zero tail would mean the IDL is missing a real field, which is a different and more serious finding than padding."* Until now every observed tail was zero padding. **The Jupiter RFQ stack now fires that exact case — and the first measurement of it was wrong in a way worth recording.**
+
+**`rfq_v2` (`fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5`) — the path is whole.** 40 payloads across slots 463374166–463994162 (21,179 pinned transactions, 0 missing): **40/40 named `fill_exact_in`, 40/40 byte-exact round-trip, 0 payloads with a trailing byte.**
+
+**`order_engine` (`2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1`) — the live wire has two forms, and only one is described anywhere.**
+
+| wire form | payloads | described bytes | trailing | full round-trip |
+|---|---|---|---|---|
+| 32 bytes | 82 | 32/32 | 0 | 82/82 byte-exact |
+| 40 bytes | 59 | 32/32 (the described prefix) | **8, undeclared** | 0/59 |
+
+Both forms are `fill`, both are accepted by the same deployed program, and they **coexisted** in the overlapping window (slots 463951326–463985613). After the last 32-byte payload (slot 463985613) the wire carries **only** the 40-byte form — 45 consecutive payloads.
+
+The 8 extra bytes are structured, not padding: **a constant 4-byte tag `0x06942069` (little-endian, present in 59/59) plus 4 varying bytes that are pairwise distinct across all 59 payloads**. The described 32-byte prefix re-encodes byte-exact on every single one, so this is not a decoder bug on the three arguments the sources do describe.
+
+Why the gap is real and not stale-pull noise:
+
+- The program's **own on-chain IDL account** (`GJwPa6DAFzYKNddAgxwzKzuDgnE4NeaWkKPN9FFqkmkb`, owner = the program itself) declares `fill` with **three** arguments (`input_amount: u64`, `output_amount: u64`, `expire_at: i64` = 24 bytes). A fresh `sememe pull` at slot 464073733 returns **the same fingerprint** (`sha256:f13a31e6…`) as the receipt pinned at slot 463089384 — the description did not change.
+- The **first-party source** ([jup-ag/rfq-webhook-toolkit](https://github.com/jup-ag/rfq-webhook-toolkit) @ `3aa4fce`) declares the same three arguments in `programs/order-engine/src/lib.rs`, and `git log --all -S` finds no history with a fourth.
+- The **vendored copy** in `solana-tx-remix/idl/multi/jupiter-order_engine/order_engine.json` has the identical single instruction and the identical discriminator `[168,96,183,163,92,10,40,160]`.
+- The bytes are **accepted**: all 141 payload-bearing transactions succeeded on chain (`txErr: null`).
+- Hypotheses tested and **rejected**: tail equals a declared argument (BE/LE), equals `expire_at` (raw or ×1000), equals the slot (raw or ×1000), equals a window of the transaction signature, or is a price-like ratio of `output_amount`/`input_amount` (spread ~10×). The varying 4 bytes are client-emitted and not derivable from the payload, the signature, the slot, or the declared args.
+
+**The correction, stated plainly.** A first, narrower 30-block harvest saw only the 40-byte form (32 payloads, all with undeclared bytes) and I concluded *"every live fill carries 8 undeclared bytes"*. A 140-block scan **falsified that**: the 32-byte form is real and ran alongside the 40-byte form. The committed fixture is the wide scan, and every number above is derived from it. The difference matters for the product — the finding is not "the decoder misses a field", it is **"the deployed program's wire changed shape and no interface description followed"**. A decoder built only from the published interfaces now refuses 100% of the recent live traffic on this program.
+
+**What this changes in the product.** "Unexplained bytes" used to mean padding, and permissive `trailing: 'report'` was a courtesy. It is now a **live-drift signal**: `trailing.count` is the only place this surfaces, and it must not be normalized away. Two behaviours are pinned as measured, not as desired — permissive mode keeps **serving** both forms (the chain accepted them; refusing would be a decoder defect, not a safety property), and strict mode **refuses only** the 40-byte form instead of pretending a field exists that no source declares.
+
+The committed fixtures (`test/fixtures/harvest-{rfq-v2,order-engine}-2026-11-01.json` plus the two on-chain IDL receipts) make this re-measurable: `test/rfq-stack.test.mjs` (8 tests) re-derives every number above from the fixtures. If a future interface description accounts for the extra field, `trailing` drops to 0 and the test goes **red**, so the number gets re-measured instead of going quietly stale. The counter-test pins the fixture itself: editing the committed IDL to declare a 4th `u64` argument fails the suite, because "the interface now covers 40 bytes" is a **new claim that needs new evidence** (a re-pull of the on-chain account), not a fixture edit.
+
+**Limits:** 141 payloads from one program id in one slot range; the extra field's *name and type* are still unknown — what is measured is that 8 structured bytes exist, are stable per payload, and are undeclared by every available interface source. The upstream SDK decodes `fill` with 3 args, so if a 4th field exists it is one the SDK also does not name.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.

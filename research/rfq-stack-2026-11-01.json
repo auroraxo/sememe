@@ -1,0 +1,504 @@
+{
+ "measuredAt": "2026-11-01",
+ "method": "live mainnet blocks harvested via tools/harvest.mjs (getBlock over slots from getSignaturesForAddress), decoded offline against the on-chain Anchor IDL account; first-party source cross-checked at jup-ag/rfq-webhook-toolkit 3aa4fce; vendored copy cross-checked byte-identical in instruction set and discriminator",
+ "supersedes": "a first 30-block harvest (32 payloads, slots 464002211-464060980) that saw only the 40-byte form and suggested every fill carries undeclared bytes; this 140-block scan falsified that: the 32-byte form is real and coexisted with the 40-byte form",
+ "programs": {
+  "rfq_v2": {
+   "program": "fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5",
+   "idlSource": "on-chain anchor IDL account 34UvKvH4bmtoG7X3kLYVpfhpuvTTDdXkA93gN4pQ8Q8P",
+   "slotRange": {
+    "oldest": 463374166,
+    "newest": 463994162
+   },
+   "payloads": 40,
+   "namedFillExactIn": 40,
+   "roundTripByteExact": 40,
+   "payloadsWithTrailingBytes": 0,
+   "verdict": "the described interface covers the live wire completely"
+  },
+  "order_engine": {
+   "program": "2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1",
+   "idlSource": "on-chain anchor IDL account GJwPa6DAFzYKNddAgxwzKzuDgnE4NeaWkKPN9FFqkmkb (fresh pull at slot 464073733, fingerprint sha256:f13a31e663c13c0fe47aa4c5a147951eaf0cb5c4e3bb825da4b8ead4e8988c91 identical to the receipt pinned at slot 463089384)",
+   "declaredArgs": [
+    {
+     "name": "input_amount",
+     "type": "u64"
+    },
+    {
+     "name": "output_amount",
+     "type": "u64"
+    },
+    {
+     "name": "expire_at",
+     "type": "i64"
+    }
+   ],
+   "slotRange": {
+    "oldest": 463938110,
+    "newest": 464081342
+   },
+   "blocksUsed": 140,
+   "payloads": 141,
+   "namedFill": 141,
+   "allTxSucceededOnChain": true,
+   "wireForms": {
+    "form_32_bytes": {
+     "count": 82,
+     "trailingCount": 0,
+     "fullRoundTripByteExact": 82,
+     "slotSpan": [
+      463951326,
+      463985613
+     ],
+     "verdict": "exactly what every interface source declares"
+    },
+    "form_40_bytes": {
+     "count": 59,
+     "trailingCount": 8,
+     "describedPrefixRoundTrip": 59,
+     "fullRoundTripByteExact": 0,
+     "slotSpan": [
+      463938110,
+      464081342
+     ],
+     "distinctTails": 59,
+     "constantBytes4to7Hex": "69209406",
+     "constantBytes4to7AllMatch": true,
+     "varyingLow4Bytes": {
+      "distinct": 59,
+      "of": 59
+     },
+     "verdict": "8 bytes no interface source declares: a constant 4-byte tag (0x06942069 little-endian) plus 4 varying bytes"
+    }
+   },
+   "coexistence": "both forms are accepted by the same deployed program in the overlapping window; slots 463951326-463985613 contain both, and every payload after the last 32-byte payload (slot 463985613) is 40-byte (45 payloads)",
+   "hypothesisTestsRejected": [
+    "tail equals any declared argument (u64 BE, u64 LE, i64 LE)",
+    "tail low32 equals expire_at (raw or *1000, mod 2^32)",
+    "tail low32 equals slot (raw or *1000, mod 2^32)",
+    "tail equals an 8-byte window of the transaction signature",
+    "tail is a constant price-like ratio of output_amount/input_amount (spread ~10x)"
+   ],
+   "finding": "the deployed program accepts two wire forms of fill; the 40-byte form carries 8 undeclared bytes (constant tag + varying 4 bytes) that neither the on-chain IDL, nor the vendored IDL, nor the first-party repo/SDK describe; since slot 463985614 the wire carries ONLY the 40-byte form, so a strict decoder refuses all recent live traffic",
+   "openQuestions": [
+    "semantics of the varying 4 bytes (client-emitted; not derivable from payload, signature, slot, or declared args)",
+    "whether the deployed binary reads the extra field or ignores it via borsh slice semantics (both forms succeed)"
+   ],
+   "perPayload": [
+    {
+     "signature": "3cQfqyqaDEXykG83WX7yqMKgbmEKH8XeLLtZn1tZaczpfFZPft5tMEzAKwwprMCtH1xdQaEhyVPJZLQuehnT7E9n",
+     "slot": 464081342,
+     "tailHex": "253cefac69209406",
+     "tailU64LE": "474039499025759269",
+     "tailU64BE": "2683283001783129094"
+    },
+    {
+     "signature": "CnvV9UfMCcDT7mC1trSuYy4vueCBXJ6bQ8R6J19z4z9UHpXkSL9eFeC3AxURzUh48M8qFFEJ4WxQ37Lp1gUdpYs",
+     "slot": 464079090,
+     "tailHex": "85abedac69209406",
+     "tailU64LE": "474039499025656709",
+     "tailU64BE": "9632053552815838214"
+    },
+    {
+     "signature": "615C6yjRCBhUYTVLQhVX7KAd1uDqFkWyCv7x1X9GeueWgfYqDn4ykbTGyAfQEBtPJfDLhJtmUUJJ8dSSEHRoqRDL",
+     "slot": 464078281,
+     "tailHex": "5aabedac69209406",
+     "tailU64LE": "474039499025656666",
+     "tailU64BE": "6533577009184936966"
+    },
+    {
+     "signature": "5TBj714LT27kagRaMzuyzhcHFDH1FjrUgMF29cpA482G8929VGaZSvds95h8fz3og6156628Sjhb32jiwcGjX2eC",
+     "slot": 464077232,
+     "tailHex": "1c95edac69209406",
+     "tailU64LE": "474039499025650972",
+     "tailU64BE": "2059813729345770502"
+    },
+    {
+     "signature": "665WMsBo3LTczGKsRGAbbzp31R39YYpj1JQcMqTNndBv34e15N4WxaBhT9jmwMMePdUQQJT83HP7WdybVQEnGZiy",
+     "slot": 464060980,
+     "tailHex": "818bedac69209406",
+     "tailU64LE": "474039499025648513",
+     "tailU64BE": "9334815977409385478"
+    },
+    {
+     "signature": "LZQNNjksQXXqz7Qgv2AgCfLq3rbZAq1apMU8yzGhd2QpsaFBwoXdERUQwGNXAvkptgmow6Xd1jgJbxAP8h7PQdQ",
+     "slot": 464053881,
+     "tailHex": "ce99ecac69209406",
+     "tailU64LE": "474039499025586638",
+     "tailU64BE": "14887190268492157958"
+    },
+    {
+     "signature": "2KYHZRHJ7jj9uViZ68Yf3CfcQfhiC62fobse5dCAcme1Zt28p1PAyaTxYf8VkrYYD6DF7KiXazdyrAR5iwkYxWCA",
+     "slot": 464051159,
+     "tailHex": "fa3cfaac69209406",
+     "tailU64LE": "474039499026480378",
+     "tailU64BE": "18031562626489684998"
+    },
+    {
+     "signature": "4nNULA6qgbbxRLG3i1QmxG6y9QckuL8wVauorGSAJtk9hpW3v6WVSWrNE3pysVFn3RrErmv6gxfMMZJ13SNA28JR",
+     "slot": 464048375,
+     "tailHex": "3216e9ac69209406",
+     "tailU64LE": "474039499025356338",
+     "tailU64BE": "3609329078091420678"
+    },
+    {
+     "signature": "Qugu9gYZfXBJeroYJfsTxyxdUiVRB5ZfX15jwCj6oigDgt8rCGryhe5sArxkCd6DY9rwf24DrwMVJfU5Qiny76S",
+     "slot": 464046472,
+     "tailHex": "9d31f5ac69209406",
+     "tailU64LE": "474039499026149789",
+     "tailU64BE": "11327104658660430854"
+    },
+    {
+     "signature": "63TaKnaU4PBs47hHXvCzCdqoFqZ7Sore5yC7NZ28Kx7WBL4ydWGbLZRYedQabv2FkLmwS4vnJVwMQnY5oxJeAbmq",
+     "slot": 464044464,
+     "tailHex": "ab39efac69209406",
+     "tailU64LE": "474039499025758635",
+     "tailU64BE": "12338156177935340550"
+    },
+    {
+     "signature": "2HHA886qAVpWp1Kxha4MnAnQ5VszkSEnk5qKKVQzAHySy9chRGNrMWa7CRRDmUUB1CtsyoWHbMs3YXMSm7BYkZzz",
+     "slot": 464044424,
+     "tailHex": "e883edac69209406",
+     "tailU64LE": "474039499025646568",
+     "tailU64BE": "16754496363502277638"
+    },
+    {
+     "signature": "5wbYchV72Ty4aGEYJWJyYGUnDYRSHQgxC87iFJoQTzp2j1xQFBxwU1MAKd2PKKUkRZqSpUjQqZ4S14PkrKq5Ww41",
+     "slot": 464044186,
+     "tailHex": "647fe5ac69209406",
+     "tailU64LE": "474039499025121124",
+     "tailU64BE": "7241759254495925254"
+    },
+    {
+     "signature": "2NB8PZZGi6EujLKKnEkYpB9HSyESFKtdnD46CmU5Y9Y6igRydjdSAsgyhFbFR7YPkZkcQJVXvXuDrTt9XXi5fQij",
+     "slot": 464041737,
+     "tailHex": "ee88edac69209406",
+     "tailU64LE": "474039499025647854",
+     "tailU64BE": "17188249302613398534"
+    },
+    {
+     "signature": "33wbo5m34pyXUNiDMx26ZFWp44QYykRWJahDvzC2G88RqQeywN7U8WHhxi8LeRNqWVDAnhFpHun8WTdVW2exRw2j",
+     "slot": 464040492,
+     "tailHex": "a1b8edac69209406",
+     "tailU64LE": "474039499025660065",
+     "tailU64BE": "11653325360575058950"
+    },
+    {
+     "signature": "2ABxdQU3QJokJT6RTJtb1hnrGHBv3XW3ejsqFSDxUUVVVwhea9xa8vxjHanxVP1J92tRKCQ6EGdgKeuhT685R3cz",
+     "slot": 464034635,
+     "tailHex": "d3f7edac69209406",
+     "tailU64LE": "474039499025676243",
+     "tailU64BE": "15273937986004227078"
+    },
+    {
+     "signature": "53yRPM1Az2DDZXbEtozTHzuNetFK2fyVsadXpqzMb9oB7T7UZrPWyYSZkaYnDETUmxXDTTvD5KHhiVyboDsd75zZ",
+     "slot": 464034602,
+     "tailHex": "9d2ac8ac69209406",
+     "tailU64LE": "474039499023198877",
+     "tailU64BE": "11325084855800206342"
+    },
+    {
+     "signature": "bGFz9xufktFWUFKtH6LoxsHr7wsTM3GzoPPN6QxdoqxGSBABZYy5AQ1cdVexn8NBL2LYLatjvLx8wr3RrfqZvMG",
+     "slot": 464033663,
+     "tailHex": "53228bac69209406",
+     "tailU64LE": "474039499019199059",
+     "tailU64BE": "5990504026970559494"
+    },
+    {
+     "signature": "5VrFi4izTwwp6hrcquvdMS2pPNRZABX5kd7YJgsBHRDKaBfyhwTXVjJoXHzbt3cNvb6nVB6Evs6tEqaU9KgFgvHP",
+     "slot": 464030276,
+     "tailHex": "8a52efac69209406",
+     "tailU64LE": "474039499025765002",
+     "tailU64BE": "9967292449101485062"
+    },
+    {
+     "signature": "41siqaktSWpb2CgnN27yJt1rWgUZuaJwzC2GdNohExtSqYEY6CRfpMpKoGEH5BsSdNnt18fDgSAqHRWFNtUfzUbc",
+     "slot": 464027939,
+     "tailHex": "419dedac69209406",
+     "tailU64LE": "474039499025653057",
+     "tailU64BE": "4728196508562789382"
+    },
+    {
+     "signature": "5Qztfs3f6UhtRrK3agPr3JWgS8BBMhWjGgAd27eg5LvxuBdKQ3JaVAbjf68duqkS2m3zNepEAYnA3X1ZDB9ZzMpc",
+     "slot": 464026448,
+     "tailHex": "0fe9e1ac69209406",
+     "tailU64LE": "474039499024886031",
+     "tailU64BE": "1146695710756869126"
+    },
+    {
+     "signature": "36u5nxn1YKDChess6eApA19xNqdzuitJChWhy6HgEoWgQheu3VRHQox8C1ko3qkY3rve1fh6GgYURSU5DZ8f4bzd",
+     "slot": 464024506,
+     "tailHex": "3d85ecac69209406",
+     "tailU64LE": "474039499025581373",
+     "tailU64BE": "4433209633458394118"
+    },
+    {
+     "signature": "4vPHdK89wgBZdMZbar9sfU69MYaB6v1eaa2imsMynhZvPoVideZYVKBmm61aFsNEeFT39C7W1K5TGKugaaWLPjfB",
+     "slot": 464023855,
+     "tailHex": "1dcfedac69209406",
+     "tailU64LE": "474039499025665821",
+     "tailU64BE": "2148196872032916486"
+    },
+    {
+     "signature": "3R2eWMGQokqYyQjDMDYoUnqEmbk36WiLkWUsxGi9o16bNjkceD9ck7o8FSBYXa1WggEsp4vSBujrsNAf24Sc4fms",
+     "slot": 464021204,
+     "tailHex": "2ec0efac69209406",
+     "tailU64LE": "474039499025793070",
+     "tailU64BE": "3368956045050287110"
+    },
+    {
+     "signature": "NNrP8ZnbrY1rQCPzE3WhFkkJbnnU8KtZidJ6GLff29cn4o287jAzXwtvZyEtWNKCptXtXmmRyjDMABPpErZPwfA",
+     "slot": 464018387,
+     "tailHex": "3b93edac69209406",
+     "tailU64LE": "474039499025650491",
+     "tailU64BE": "4293036194568115206"
+    },
+    {
+     "signature": "3QuZ9EDWhYqBPf3Rzxy3y4UCMXTfFyJ5ZX2Y5NJz6bmhgUcZCUqAp4YQWRo1i5ens4w83SQRF7mEsdsu7MNsRSa6",
+     "slot": 464017428,
+     "tailHex": "480ce9ac69209406",
+     "tailU64LE": "474039499025353800",
+     "tailU64BE": "5191781397158728710"
+    },
+    {
+     "signature": "2LEw6C2E2Kw6M6VuVe7kBjDmmjHHhCR1MwEFGR9t9k96T7RokrDAGRJFqt2PTfXbty6GU3KEj6B8WPFttweCUVzf",
+     "slot": 464016479,
+     "tailHex": "950fe9ac69209406",
+     "tailU64LE": "474039499025354645",
+     "tailU64BE": "10741060563009311750"
+    },
+    {
+     "signature": "44yxj4P1pbBgM3DSyVqgHg89548uyGqFZVHuuELntwUcUz3zGDY8hhDW79JndyiedtSN448F772NnG1kYf8JAgpF",
+     "slot": 464015545,
+     "tailHex": "e756e5ac69209406",
+     "tailU64LE": "474039499025110759",
+     "tailU64BE": "16669763599419347974"
+    },
+    {
+     "signature": "2HveuJdofu1CPiu898dgyCTZGwKaiJwaGGcZ1Cb9PFjfsQCQdkSP7EMrrQhtYbjgzMYdcFqZbb9jTzsqq7ir66BK",
+     "slot": 464015305,
+     "tailHex": "5994edac69209406",
+     "tailU64LE": "474039499025650777",
+     "tailU64BE": "6455045490682663942"
+    },
+    {
+     "signature": "4U3TzkGhTPXsUPKUgCwkbWW5zNgjLnNEY4yz5AA6jz4tzEgeDgGwMGiz4UkjKz4mdLYaASPUn6RiREtFo3XMvXXu",
+     "slot": 464013656,
+     "tailHex": "1da2edac69209406",
+     "tailU64LE": "474039499025654301",
+     "tailU64BE": "2135530498080936966"
+    },
+    {
+     "signature": "2Zzi9TYLCiphMuadbpcaAbvV3CtGykLmb2oGmjqsFpZQJDZk7tRkc5Z6fU1XHCH1fzhjgFwrB4qMHf9Jg3yHHXrx",
+     "slot": 464013649,
+     "tailHex": "79c2c9ac69209406",
+     "tailU64LE": "474039499023303289",
+     "tailU64BE": "8773796766406448134"
+    },
+    {
+     "signature": "58VcfLupqtTpwhB47jhsyb9Wk8drhK3vQE8LtDhofWqcSeEM4968n8UUVxBvfLsrVgusz45JagF16iRFPaPdm2jz",
+     "slot": 464013594,
+     "tailHex": "5aaeedac69209406",
+     "tailU64LE": "474039499025657434",
+     "tailU64BE": "6534421434115068934"
+    },
+    {
+     "signature": "5cwXThyqmR7tukMeLCyjAcyr1vaKdJUiHcVJdGxJRx5PsmEa75yXtpje8Dtn1hqWM31a1Ysx4pn3PD4Nh9gdEAh5",
+     "slot": 464012006,
+     "tailHex": "3887ecac69209406",
+     "tailU64LE": "474039499025581880",
+     "tailU64BE": "4073484613222175750"
+    },
+    {
+     "signature": "3GVLjdqboNR13r83W5DhJSNTR4RZv4D6bHKZQP7z6h9aynWDTo9An5Zr2C24aVDkNBswtwBzF6xhGyFAkoDiC9hH",
+     "slot": 464011630,
+     "tailHex": "d26ee8ac69209406",
+     "tailU64LE": "474039499025313490",
+     "tailU64BE": "15163312822598800390"
+    },
+    {
+     "signature": "5BjeeeeZZSFNrjgccvoTw5H8YtZm56KKd8TVBaXSNgYQbyqV18zR6AUbZ59nqDkAuEWWGpiN7hUw4bPdwBmaZ2pt",
+     "slot": 464011492,
+     "tailHex": "eb6694ac69209406",
+     "tailU64LE": "474039499019806443",
+     "tailU64BE": "16962408514756580358"
+    },
+    {
+     "signature": "56g4xxwSprCvG7qJsAHqkRcKaGEjH1fYD6tuvXkb8tSRdY8uV1tR7Eq7RSaaoNYzvfWxSNe9aQCM1Lvr9dU1484B",
+     "slot": 464008339,
+     "tailHex": "895fedac69209406",
+     "tailU64LE": "474039499025637257",
+     "tailU64BE": "9898891830737540102"
+    },
+    {
+     "signature": "3BbRApYYptm4s5iBrsDR8HB4RELirzwJxnRP69puVHvkF2QD88u5mEBfGZP2cENDV7W36jHvC8L2v4FainUnkuVx",
+     "slot": 464002211,
+     "tailHex": "a544ecac69209406",
+     "tailU64LE": "474039499025564837",
+     "tailU64BE": "11908903539916706822"
+    },
+    {
+     "signature": "6iq86XVSwgRh8wudzBCR3tDrMvZwLX4vDAS4aYVfM5KF6jMJRPTqhiGovVk8xe2upNWQv5uP47kZuQJg1HQ4TcH",
+     "slot": 464001608,
+     "tailHex": "2558edac69209406",
+     "tailU64LE": "474039499025635365",
+     "tailU64BE": "2691162102107771910"
+    },
+    {
+     "signature": "87Z62332t5VtB7aTFqvguVfKMmE6PD5meJGNqFLHreY9rRqGfNtdvrN4e7zJ4Tm6oBx9wWFWgBig1mUmWcJ1Ya6",
+     "slot": 464000373,
+     "tailHex": "4a03edac69209406",
+     "tailU64LE": "474039499025613642",
+     "tailU64BE": "5333367708490699782"
+    },
+    {
+     "signature": "5gUZMtT4LwSV8cm257v9Ljoqw3Th1N7gVM4tYbxqoxD8G5LEUndKzWFR3x3WWkFKL41giffBfU1NtxcvnqBRYxd5",
+     "slot": 463999108,
+     "tailHex": "319ac7ac69209406",
+     "tailU64LE": "474039499023161905",
+     "tailU64BE": "3574388797583954950"
+    },
+    {
+     "signature": "24GdxM9e3creprb2sQWyN3WFr1BeXwRxEN3wSZT8yZxHtMzGTerJb7Ud5xucCRbibTjGMvPSFzYTktPzS82PGYJv",
+     "slot": 463995296,
+     "tailHex": "5f69edac69209406",
+     "tailU64LE": "474039499025639775",
+     "tailU64BE": "6875287630911673350"
+    },
+    {
+     "signature": "558aHZB1QRomLW1HY59s9C1Zp55xPfajxZYGCPthARtpCKKrNtXuhcsVRTyucy2E28SaJiCDqxVi9UFnuwUSrr7p",
+     "slot": 463994290,
+     "tailHex": "4b10edac69209406",
+     "tailU64LE": "474039499025616971",
+     "tailU64BE": "5409084477225866246"
+    },
+    {
+     "signature": "3adD4hZYtq3Xhp7adVsoa3AyKL4ydpc7opK3sHmy9RsT4CeePEEM2zjd2m65FT3KkwdebgfweWMmsceUndSY3y4U",
+     "slot": 463993654,
+     "tailHex": "3e76edac69209406",
+     "tailU64LE": "474039499025643070",
+     "tailU64BE": "4501046202357289990"
+    },
+    {
+     "signature": "3o2uNEGsaNc8okLQDPJqaHMSNUcp1FjbTWm728BWnsBPn2r4PiUoYBwNpMmK4q4AVZwwFfZKmLR7yZ8iqNkFZUw5",
+     "slot": 463993157,
+     "tailHex": "a176edac69209406",
+     "tailU64LE": "474039499025643169",
+     "tailU64BE": "11634748012112155654"
+    },
+    {
+     "signature": "4zGNcHm2Ek9vmnCrbdsbhnzGhD1nQvWSumz71DAvb8WuBxbJwoWyzRdus9G8NcFDQwZAhwTL8DmZUHt6GJac5R3A",
+     "slot": 463990669,
+     "tailHex": "c84eedac69209406",
+     "tailU64LE": "474039499025632968",
+     "tailU64BE": "14433735180522918918"
+    },
+    {
+     "signature": "66KrgQZwHHb2BeqPnyZr58i8q9FVS6tnX41a7ThRNBWYmvKw4xhgug8Z9Vh5MZBtRGaxB2PVLt9FjSjRJLe6eNtM",
+     "slot": 463990323,
+     "tailHex": "aacaecac69209406",
+     "tailU64LE": "474039499025599146",
+     "tailU64BE": "12306909156985574406"
+    },
+    {
+     "signature": "22siTuYZfZgRDHYAm7XRutKDjnAecXVv6L7w7tY5QRbby8qEfHWpkkroApSNQU7Rg86jVgeN4LXkFsnfyq6trheD",
+     "slot": 463985371,
+     "tailHex": "d271edac69209406",
+     "tailU64LE": "474039499025641938",
+     "tailU64BE": "15164162745087071238"
+    },
+    {
+     "signature": "4zxYKaL38Vis8JmX5Ekf5EgmPdq7E4B624rpwt7vv4Fhu8CKPpPaNJKAFt939V68LjuKbduQwcqPnZhkeUq8DKJJ",
+     "slot": 463982969,
+     "tailHex": "3c6fe6ac69209406",
+     "tailU64LE": "474039499025182524",
+     "tailU64BE": "4354952992863065094"
+    },
+    {
+     "signature": "4YJGDsr3G2t6JNsAhjWUANy6YCXw5fX3bAraBCiCQoE7hngdmPzgtpwCW6HABv9zftgQSeiAuJewmRE8LXTuiYSW",
+     "slot": 463979129,
+     "tailHex": "6247edac69209406",
+     "tailU64LE": "474039499025631074",
+     "tailU64BE": "7081890263817294854"
+    },
+    {
+     "signature": "stSERJ3coSuEgXEunDG61L5rSzs1LfXbp6KGw77UaGv72Ap9dGNTBMcKkkfqworXui7y9beZdSSWkBMSPQK56hb",
+     "slot": 463976609,
+     "tailHex": "c08ccbac69209406",
+     "tailU64LE": "474039499023420608",
+     "tailU64BE": "13874688493380211718"
+    },
+    {
+     "signature": "4peKanY3nFgNqA6FUr6M4nE3dWY1uxVDxSy4tgafBrPrFiYHMeausETrkeCM37JZqoMvLmzBUQtAgSFeQvcGbsqz",
+     "slot": 463975295,
+     "tailHex": "5965edac69209406",
+     "tailU64LE": "474039499025638745",
+     "tailU64BE": "6441816166777263110"
+    },
+    {
+     "signature": "5GBBJ1kbsEc4DrmqjcJ7Z3HNRJmtmpPL5yfo1iL8ZHXAkhnQTZnJxW7VfGzHo8Y24sUE3FshRuYc6FgttATfeBZt",
+     "slot": 463969212,
+     "tailHex": "98d1e1ac69209406",
+     "tailU64LE": "474039499024880024",
+     "tailU64BE": "11011830694511940614"
+    },
+    {
+     "signature": "5PTXsFTT8pN9a57ZpnjCRQyu325VKporgmQ6oFCDaRiGiKUCCSZ1wJDF8F2Fs6jafimFgjxw5cEBfXMNUy2bnhTz",
+     "slot": 463961074,
+     "tailHex": "b153edac69209406",
+     "tailU64LE": "474039499025634225",
+     "tailU64BE": "12777817892534129670"
+    },
+    {
+     "signature": "4Qq4KxqYZjSMbAZXefHCKzrzDDh8QF4sxcZ65hTF5mjHjNfQgV71vAKZQWfi2o7SambByMfmpyysU3VzRCWcj9QC",
+     "slot": 463953345,
+     "tailHex": "b18eecac69209406",
+     "tailU64LE": "474039499025583793",
+     "tailU64BE": "12794423816648430598"
+    },
+    {
+     "signature": "4WCxAxiKacBZACGzqmiShPQGAUuk3ZUmBxnsgUNHdK2rS6y4L5XnZK7MX5Tmwi97cs5a5rbMMzX1NxVGBo9DndWZ",
+     "slot": 463952059,
+     "tailHex": "a7aedeac69209406",
+     "tailU64LE": "474039499024674471",
+     "tailU64BE": "12082839682361103366"
+    },
+    {
+     "signature": "2LvKDKV5H6KfBnr9s6DuVDvKfpgxTFWFXkhoyW1rytzMAVmtPRT3eQA5QANkoNtvtDPw1d96MenncTWxhdmmMLqQ",
+     "slot": 463949065,
+     "tailHex": "16d5efac69209406",
+     "tailU64LE": "474039499025798422",
+     "tailU64BE": "1645484762650940422"
+    },
+    {
+     "signature": "2yRy5puXctTdrctqSKyAWHxChejPMjt8NRK5f3vcmKZGsV1qxbWQhYqpLy9CJrDdq3F3a1u9WGunia5CQCy1kNU4",
+     "slot": 463948923,
+     "tailHex": "b8c2ecac69209406",
+     "tailU64LE": "474039499025597112",
+     "tailU64BE": "13313463673702880262"
+    },
+    {
+     "signature": "3jtv49zh4K6Eo1ZXEDsxwbwRwaDCxhSt9ZhwXDppWUjZVA9bcxBBKM6QUfRchsqLa3UvM97xpntVLNdKsNVuWQrd",
+     "slot": 463944499,
+     "tailHex": "2473ecad69209406",
+     "tailU64LE": "474039499042353956",
+     "tailU64BE": "2626703237224371206"
+    },
+    {
+     "signature": "3b9ccQHMEurcqSwNjQW93ASC1bLnA8akM3TMgvy5AzJHx24dQzUktycx1HVatbAXEL4UHRBxW3YZkvRAr1kk82SJ",
+     "slot": 463940558,
+     "tailHex": "8481c9ac69209406",
+     "tailU64LE": "474039499023286660",
+     "tailU64BE": "9548134427337462790"
+    },
+    {
+     "signature": "2NcK7C9qfkhnCNKjr9xifxNi15tPLHfPzj7K7FZaLHaFfDDREJbqzGWLSjtRAPuEBB4F914ytVnD1p6BdHXmkSQN",
+     "slot": 463938110,
+     "tailHex": "db5fedac69209406",
+     "tailU64LE": "474039499025637339",
+     "tailU64BE": "15807614541847630854"
+    }
+   ]
+  }
+ }
+}
