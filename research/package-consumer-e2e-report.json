@@ -1,7 +1,7 @@
 {
   "what": "out-of-tree consumer installs the packed package and decodes real mainnet payloads through node_modules only",
   "pre": "c7689ab",
-  "tarball": "sememe-0.1.0.tgz",
+  "tarball": "sememe-0.2.2.tgz",
   "storeFingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
   "payloads": {
     "fingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
@@ -146,7 +146,5 @@
       "detail": "name=swap"
     }
   ],
-  "at": "2026-11-01T09:22:37.282Z",
-  "regenerated": "2026-11-01",
-  "note": "Re-run after v0.2.2: adds the consumer trio (sememe/codec, ./canonical, ./discriminators), sememe/native-corpus, sememe/native-audit and ./package.json to the proved surfaces. solana-tx-remix (the first in-tree consumer) now installs this package in CI instead of checking out the sibling repo (auroraxo/solana-tx-remix commit edaf3cb+)."
+  "at": "2026-11-01T09:44:21.516Z"
 }
