@@ -1,0 +1,101 @@
+{
+  "measuredAt": "2026-11-01T18:33:05.641Z",
+  "program": "2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1",
+  "rpc": "https://api.mainnet-beta.solana.com",
+  "rpcCallCount": 13,
+  "rpcFailures": 0,
+  "idlSurfaces": [
+    {
+      "source": "metadata",
+      "address": "DvgKwGWQMbDKxAh5tWGcVQa5gL9XfQUGBEce6w1brJPW",
+      "present": false
+    },
+    {
+      "source": "anchor",
+      "address": "GJwPa6DAFzYKNddAgxwzKzuDgnE4NeaWkKPN9FFqkmkb",
+      "present": true,
+      "fingerprint": "sha256:f13a31e663c13c0fe47aa4c5a147951eaf0cb5c4e3bb825da4b8ead4e8988c91",
+      "matchesReceiptFingerprint": true,
+      "declaredFillArgs": [
+        "input_amount:u64",
+        "output_amount:u64",
+        "expire_at:i64"
+      ]
+    }
+  ],
+  "refutedNeverPublishedRevision": true,
+  "programStateAccounts": {
+    "count": 1,
+    "counterHits": []
+  },
+  "programStateAccountsSearched": true,
+  "samples": [
+    {
+      "slot": 463938110,
+      "signature": "2NcK7C9qfkhnCNKjr9xifxNi15tPLHfPzj7K7FZaLHaFfDDREJbqzGWLSjtRAPuEBB4F914ytVnD1p6BdHXmkSQN",
+      "varyingU32": 2901237723,
+      "counterU64": "474039499025637339",
+      "transactionBalanceSurfaceHits": [],
+      "siblingInstructionHits": [],
+      "touchedAccountDataHits": [],
+      "accountsChecked": 14
+    },
+    {
+      "slot": 463982969,
+      "signature": "4zxYKaL38Vis8JmX5Ekf5EgmPdq7E4B624rpwt7vv4Fhu8CKPpPaNJKAFt939V68LjuKbduQwcqPnZhkeUq8DKJJ",
+      "varyingU32": 2900782908,
+      "counterU64": "474039499025182524",
+      "transactionBalanceSurfaceHits": [],
+      "siblingInstructionHits": [],
+      "touchedAccountDataHits": [],
+      "accountsChecked": 14
+    },
+    {
+      "slot": 464002211,
+      "signature": "3BbRApYYptm4s5iBrsDR8HB4RELirzwJxnRP69puVHvkF2QD88u5mEBfGZP2cENDV7W36jHvC8L2v4FainUnkuVx",
+      "varyingU32": 2901165221,
+      "counterU64": "474039499025564837",
+      "transactionBalanceSurfaceHits": [],
+      "siblingInstructionHits": [],
+      "touchedAccountDataHits": [],
+      "accountsChecked": 14
+    },
+    {
+      "slot": 464018387,
+      "signature": "NNrP8ZnbrY1rQCPzE3WhFkkJbnnU8KtZidJ6GLff29cn4o287jAzXwtvZyEtWNKCptXtXmmRyjDMABPpErZPwfA",
+      "varyingU32": 2901250875,
+      "counterU64": "474039499025650491",
+      "transactionBalanceSurfaceHits": [],
+      "siblingInstructionHits": [],
+      "touchedAccountDataHits": [],
+      "accountsChecked": 14
+    },
+    {
+      "slot": 464041737,
+      "signature": "2NB8PZZGi6EujLKKnEkYpB9HSyESFKtdnD46CmU5Y9Y6igRydjdSAsgyhFbFR7YPkZkcQJVXvXuDrTt9XXi5fQij",
+      "varyingU32": 2901248238,
+      "counterU64": "474039499025647854",
+      "transactionBalanceSurfaceHits": [],
+      "siblingInstructionHits": [],
+      "touchedAccountDataHits": [],
+      "accountsChecked": 14
+    },
+    {
+      "slot": 464081342,
+      "signature": "3cQfqyqaDEXykG83WX7yqMKgbmEKH8XeLLtZn1tZaczpfFZPft5tMEzAKwwprMCtH1xdQaEhyVPJZLQuehnT7E9n",
+      "varyingU32": 2901359653,
+      "counterU64": "474039499025759269",
+      "transactionBalanceSurfaceHits": [],
+      "siblingInstructionHits": [],
+      "touchedAccountDataHits": [],
+      "accountsChecked": 13
+    }
+  ],
+  "totals": {
+    "samples": 6,
+    "balanceSurfaceHits": 0,
+    "siblingInstructionHits": 0,
+    "touchedAccountDataHits": 0
+  },
+  "refutedValueOutsideInstructionBytes": true
+}
