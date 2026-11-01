@@ -1,0 +1,135 @@
+{
+  "what": "out-of-tree consumer installs the packed package and decodes real mainnet payloads through node_modules only",
+  "pre": "c7689ab",
+  "tarball": "sememe-0.1.0.tgz",
+  "storeFingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
+  "payloads": {
+    "fingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
+    "slot": 462039125,
+    "named": 1119,
+    "refused": 0,
+    "byteExact": 1086,
+    "trailing": 33,
+    "total": 1119,
+    "names": {
+      "swap": 162,
+      "swap_v2": 910,
+      "reposition_liquidity_v2": 12,
+      "increase_liquidity_v2": 15,
+      "open_position": 1,
+      "increase_liquidity_by_token_amounts_v2": 2,
+      "decrease_liquidity_v2": 6,
+      "collect_fees_v2": 8,
+      "reset_position_range": 2,
+      "open_position_with_token_extensions": 1
+    }
+  },
+  "checks": [
+    {
+      "name": "pre-package tree (c7689ab) is not importable as 'sememe'",
+      "pass": true,
+      "detail": "RED:ERR_MODULE_NOT_FOUND"
+    },
+    {
+      "name": "install pulls in exactly one package (zero dependencies)",
+      "pass": true,
+      "detail": "sememe"
+    },
+    {
+      "name": "installed tree has index.mjs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has src",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has interface",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has vendor",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has bin",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has LICENSE",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has README.md",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has no tools",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has no test",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has no research",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has no neg",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed tree has no package.test.mjs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "installed package re-verifies the store receipt",
+      "pass": true,
+      "detail": "slot 462039125"
+    },
+    {
+      "name": "every real mainnet payload decodes from the installed copy",
+      "pass": true,
+      "detail": "1119/1119 named, 0 refused"
+    },
+    {
+      "name": "re-encode is byte-exact on the described prefix",
+      "pass": true,
+      "detail": "1086 exact, 33 with reported trailing bytes"
+    },
+    {
+      "name": "instruction names come through",
+      "pass": true,
+      "detail": "swap_v2:910 swap:162 increase_liquidity_v2:15 reposition_liquidity_v2:12 collect_fees_v2:8"
+    },
+    {
+      "name": "tampered store object refused by the installed copy",
+      "pass": true,
+      "detail": "REFUSED:correct"
+    },
+    {
+      "name": "sememe/native subpath decodes a real System payload",
+      "pass": true,
+      "detail": "NATIVE:CreateAccount:true"
+    },
+    {
+      "name": "installed CLI decodes without any dependency installed",
+      "pass": true,
+      "detail": "name=swap"
+    }
+  ],
+  "at": "2026-11-01T08:32:50.071Z"
+}

@@ -72,7 +72,6 @@ async function main() {
   // ---------- build the tarball from git archive (the tree a tag would hold)
   const packDir = path.join(tmp, 'head');
   fs.mkdirSync(packDir);
-  run('git', ['archive', 'HEAD'], ROOT).stdout;
   spawnSync('bash', ['-c', `git archive HEAD | tar -x -C ${JSON.stringify(packDir)}`], { cwd: ROOT, encoding: 'utf8' });
   if (!fs.existsSync(path.join(packDir, 'index.mjs'))) throw Error('git archive did not produce the tree');
 
