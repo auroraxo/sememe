@@ -15,7 +15,9 @@
     "./pull": "./src/pull.mjs",
     "./codec": "./src/codec.mjs",
     "./canonical": "./src/canonical.mjs",
-    "./discriminators": "./src/discriminators.mjs"
+    "./discriminators": "./src/discriminators.mjs",
+    "./native-corpus": "./src/native-corpus.mjs",
+    "./native-audit": "./src/native-audit.mjs"
   },
   "files": [
     "index.mjs",
