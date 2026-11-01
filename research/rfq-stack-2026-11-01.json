@@ -498,7 +498,36 @@
      "tailU64LE": "474039499025637339",
      "tailU64BE": "15807614541847630854"
     }
-   ]
+   ],
+   "consumerImpact": {
+    "note": "the consumer repo solana-tx-remix vendors its own copy of this IDL; both copies behave identically on live traffic, so the gap is not a consumer-side vendoring defect",
+    "vendoredCopy": {
+     "path": "solana-tx-remix/idl/multi/jupiter-order_engine/order_engine.json",
+     "address": "2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1",
+     "args": [
+      "input_amount:u64",
+      "output_amount:u64",
+      "expire_at:i64"
+     ],
+     "named": 141,
+     "trailing0": 82,
+     "trailing8": 59,
+     "refused": 0
+    },
+    "onChainCopy": {
+     "address": "2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1",
+     "args": [
+      "input_amount:u64",
+      "output_amount:u64",
+      "expire_at:i64"
+     ],
+     "named": 141,
+     "trailing0": 82,
+     "trailing8": 59,
+     "refused": 0
+    },
+    "conclusion": "both interface sources name all 141 payloads and both leave the 40-byte form with 8 undeclared bytes; interface-only decoding of the recent live traffic is impossible for either source"
+   }
   }
  }
 }
