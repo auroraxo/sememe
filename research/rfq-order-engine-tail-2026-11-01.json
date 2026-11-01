@@ -1,0 +1,215 @@
+{
+  "derivedFrom": "test/fixtures/harvest-order-engine-2026-11-01.json",
+  "idl": "test/fixtures/order-engine-idl.json (on-chain receipt, slot 463089384)",
+  "note": "Every count below is derived from the committed fixture by this tool; re-run to reproduce. The verdict column is the count vs the payload total — no interpretation is recorded that the counts do not support.",
+  "fixture": {
+    "shortForm": "82 payloads of 32 bytes",
+    "longForm": "59 payloads of 40 bytes",
+    "discriminatorMatchesFill": true,
+    "tagConstant": [
+      "0x06942069"
+    ],
+    "tagDistinctValues": 1,
+    "varyingDistinctValues": 59,
+    "varyingZeroCount": 0,
+    "varyingMonotonicWithSlot": true
+  },
+  "hypotheses": [
+    {
+      "name": "crc32(prefix) as tail LE",
+      "claim": "the varying 4 bytes are crc32 over the 32 described bytes, little-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "crc32(prefix) as tail BE",
+      "claim": "the varying 4 bytes are crc32 over the 32 described bytes, big-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "sha256(prefix)[0..4] as tail BE",
+      "claim": "the varying 4 bytes are the first 4 bytes of sha256 over the 32 described bytes",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == input_amount mod 2^32",
+      "claim": "the varying 4 bytes re-encode the declared input_amount argument",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail BE == input_amount mod 2^32",
+      "claim": "same, big-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == output_amount mod 2^32",
+      "claim": "the varying 4 bytes re-encode the declared output_amount argument",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail BE == output_amount mod 2^32",
+      "claim": "same, big-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == expire_at mod 2^32",
+      "claim": "the varying 4 bytes re-encode the declared expire_at argument",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail BE == expire_at mod 2^32",
+      "claim": "same, big-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == slot",
+      "claim": "the varying 4 bytes are the transaction slot (fits u32 until slot 4294967296)",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail BE == slot",
+      "claim": "same, big-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == slot + K",
+      "claim": "the varying 4 bytes are the slot plus one constant offset (e.g. an expiry slot)",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail BE == slot + K",
+      "claim": "same, big-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == A*slot + B (mod 2^32)",
+      "claim": "the varying 4 bytes are an affine function of slot mod 2^32; A,B derived from payload 0 and the first payload with an invertible delta, never fitted to the verdict (derived A=2658922943, B=425550080)",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == A*expire_at + B (mod 2^32)",
+      "claim": "the varying 4 bytes are an affine function of expire_at mod 2^32; A,B derived from payload 0 and the first payload with an invertible delta, never fitted to the verdict (derived A=2809958112, B=376014848)",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == A*input_amount + B (mod 2^32)",
+      "claim": "the varying 4 bytes are an affine function of input_amount mod 2^32; A,B derived from payload 0 and the first payload with an invertible delta, never fitted to the verdict (derived A=2790741327, B=1249699200)",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE == A*output_amount + B (mod 2^32)",
+      "claim": "the varying 4 bytes are an affine function of output_amount mod 2^32; A,B derived from payload 0 and the first payload with an invertible delta, never fitted to the verdict (derived A=1836398787, B=3056848128)",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail LE is a unix-seconds timestamp near harvest time",
+      "claim": "the varying 4 bytes are a real-time timestamp in seconds (4 bytes hold ~2106)",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    },
+    {
+      "name": "tail BE is a unix-seconds timestamp near harvest time",
+      "claim": "same, big-endian",
+      "matches": 0,
+      "of": 59,
+      "verdict": "refuted"
+    }
+  ],
+  "bands": {
+    "leTopByteValues": [
+      172,
+      173
+    ],
+    "leHigh16Range": [
+      44171,
+      44524
+    ],
+    "leHigh16Distinct": 18,
+    "leLow16Distinct": 59
+  },
+  "distributions": {
+    "tailVaryingLe": {
+      "min": 2894799443,
+      "max": 2917954340,
+      "range": 23154897
+    },
+    "tailVaryingBe": {
+      "min": 266985900,
+      "max": 4198300332,
+      "range": 3931314432
+    },
+    "harvestSeconds": 1793534466,
+    "slots": {
+      "min": 463938110,
+      "max": 464081342,
+      "range": 143232
+    },
+    "expireAt": {
+      "min": 1793503185,
+      "max": 1793533835,
+      "range": 30650
+    },
+    "deltaTailLeMinusSlot": {
+      "distinct": 59
+    },
+    "deltaTailBeMinusSlot": {
+      "distinct": 59
+    }
+  },
+  "conclusions": [],
+  "refuted": [
+    "crc32(prefix) as tail LE",
+    "crc32(prefix) as tail BE",
+    "sha256(prefix)[0..4] as tail BE",
+    "tail LE == input_amount mod 2^32",
+    "tail BE == input_amount mod 2^32",
+    "tail LE == output_amount mod 2^32",
+    "tail BE == output_amount mod 2^32",
+    "tail LE == expire_at mod 2^32",
+    "tail BE == expire_at mod 2^32",
+    "tail LE == slot",
+    "tail BE == slot",
+    "tail LE == slot + K",
+    "tail BE == slot + K",
+    "tail LE == A*slot + B (mod 2^32)",
+    "tail LE == A*expire_at + B (mod 2^32)",
+    "tail LE == A*input_amount + B (mod 2^32)",
+    "tail LE == A*output_amount + B (mod 2^32)",
+    "tail LE is a unix-seconds timestamp near harvest time",
+    "tail BE is a unix-seconds timestamp near harvest time"
+  ]
+}

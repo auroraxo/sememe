@@ -1,0 +1,149 @@
+{
+  "derivedFrom": "test/fixtures/harvest-order-engine-2026-11-01.json",
+  "note": "Structural probe of the 8 undeclared tail bytes. All numbers derived from the committed fixture by this tool.",
+  "sample": {
+    "longPayloads": 59,
+    "transactionsWithSeveralLongFills": 0
+  },
+  "byteStats": [
+    {
+      "byteIndex": 32,
+      "distinct": 51,
+      "min": 15,
+      "max": 250,
+      "mostCommon": [
+        {
+          "value": 37,
+          "count": 2
+        },
+        {
+          "value": 90,
+          "count": 2
+        },
+        {
+          "value": 157,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "byteIndex": 33,
+      "distinct": 53,
+      "min": 3,
+      "max": 247,
+      "mostCommon": [
+        {
+          "value": 60,
+          "count": 2
+        },
+        {
+          "value": 171,
+          "count": 2
+        },
+        {
+          "value": 194,
+          "count": 2
+        }
+      ]
+    },
+    {
+      "byteIndex": 34,
+      "distinct": 17,
+      "min": 139,
+      "max": 250,
+      "mostCommon": [
+        {
+          "value": 237,
+          "count": 27
+        },
+        {
+          "value": 236,
+          "count": 8
+        },
+        {
+          "value": 239,
+          "count": 5
+        }
+      ]
+    },
+    {
+      "byteIndex": 35,
+      "distinct": 2,
+      "min": 172,
+      "max": 173,
+      "mostCommon": [
+        {
+          "value": 172,
+          "count": 58
+        },
+        {
+          "value": 173,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "byteIndex": 36,
+      "distinct": 1,
+      "min": 105,
+      "max": 105,
+      "mostCommon": [
+        {
+          "value": 105,
+          "count": 59
+        }
+      ]
+    },
+    {
+      "byteIndex": 37,
+      "distinct": 1,
+      "min": 32,
+      "max": 32,
+      "mostCommon": [
+        {
+          "value": 32,
+          "count": 59
+        }
+      ]
+    },
+    {
+      "byteIndex": 38,
+      "distinct": 1,
+      "min": 148,
+      "max": 148,
+      "mostCommon": [
+        {
+          "value": 148,
+          "count": 59
+        }
+      ]
+    },
+    {
+      "byteIndex": 39,
+      "distinct": 1,
+      "min": 6,
+      "max": 6,
+      "mostCommon": [
+        {
+          "value": 6,
+          "count": 59
+        }
+      ]
+    }
+  ],
+  "ordering": {
+    "leIncreasesWithSlot": "33/58",
+    "beIncreasesWithSlot": "25/58",
+    "correlationSlotVsLe": -0.171534,
+    "correlationSlotVsBe": -0.070836
+  },
+  "signatureBytes": {
+    "matchesSignatureFirst4Le": "0/59",
+    "matchesSignatureFirst4Be": "0/59",
+    "matchesSignatureLast4Le": "0/59"
+  },
+  "sameTx": {
+    "transactionsWithSeveralLongFills": 0,
+    "ofThoseWithIdenticalVaryingValue": 0
+  }
+}

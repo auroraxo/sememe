@@ -33,7 +33,9 @@
     "test": "node --test",
     "crosscheck": "node tools/crosscheck.mjs",
     "txdiff": "node tools/tx-diff.mjs",
-    "harvest": "node tools/harvest.mjs"
+    "harvest": "node tools/harvest.mjs",
+    "tail-hypotheses": "node tools/tail-hypotheses.mjs",
+    "tail-structure": "node tools/tail-structure.mjs"
   },
   "peerDependencies": {
     "@solana/web3.js": "^1.98.4"
