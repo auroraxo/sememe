@@ -670,6 +670,12 @@ The committed fixtures (`test/fixtures/harvest-{rfq-v2,order-engine}-2026-11-01.
 
 **Limits:** 141 payloads from one program id in one slot range; the extra field's *name and type* are still unknown — what is measured is that 8 structured bytes exist, are stable per payload, and are undeclared by every available interface source, and that the varying word is drawn from a narrow band that no interpretation recorded so far produces. The upstream SDK decodes `fill` with 3 args, so if a 4th field exists it is one the SDK also does not name.
 
+### Reported to the first party (2026-11-02): jup-ag/rfq-webhook-toolkit#96
+
+Both wire findings above were delivered to the first-party repository as [issue #96](https://github.com/jup-ag/rfq-webhook-toolkit/issues/96): the undeclared co-signer account (present in 141/141 fills, signs all of them, pays the fee in 31/141) and the 40-byte form with its constant `0x06942069` tail tag. The issue carries one-click reproductions for each claim (fill tx `3iTpfkc7…` for the account list, `3cQfqyqaD…` for the payload), the fixture and report paths, and the limits stated as limits: which of the three signers builds the 8 bytes is not proven, the 4 varying bytes stay unidentified, and the 19 refuted interpretations remain named. The earlier, separate stale-IDL address finding is tracked as [#95](https://github.com/jup-ag/rfq-webhook-toolkit/issues/95).
+
+This is delivery, not adoption: no response exists yet, and neither issue makes sememe's first outside user — that threshold stays "a third party imports the artifact and 1,000 transactions decode without disagreement."
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
