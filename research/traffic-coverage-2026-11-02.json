@@ -1,0 +1,314 @@
+{
+ "generatedAt": "2026-11-02T16:23:19.674Z",
+ "sample": {
+  "file": "test/fixtures/traffic-sample-2026-11-02.json",
+  "store": "test/fixtures/traffic-sample-store",
+  "capturedAt": "2026-11-02T15:50:21.969Z",
+  "slots": [
+   464551798,
+   464551797,
+   464551796,
+   464551795
+  ],
+  "blocksWithTraffic": 4,
+  "transactionsInBlocks": 2214,
+  "transactionsWithWatchedTraffic": 1872,
+  "method": "getBlock finalized full encoding:json maxSupportedTransactionVersion:1 rewards:false; contiguous newest finalized slots minus 2",
+  "selection": "contiguous newest finalized blocks — the store was not consulted when the sample was taken, so it carries no store-selection bias",
+  "measurementPath": "the product entry points (decodePayload / decodeUnionPayload / native decoder) against the committed store fixture"
+ },
+ "headline": {
+  "watchedPayloads": 12572,
+  "decoded": 6983,
+  "refused": 171,
+  "noInterface": 5418,
+  "coveredPct": 55.5,
+  "byteExact": 6712,
+  "byteExactPctOfDecoded": 96.1,
+  "note": "coverage = payloads an available interface could NAME. \"refused\" (interface present, bytes refused) and \"no-interface\" (no interface acquirable at all) are counted separately because they need different fixes."
+ },
+ "trafficOutsideTheWatchedList": {
+  "distinctPrograms": 181,
+  "instructions": 4842,
+  "transactions": 2737,
+  "note": "counted, bytes NOT stored (fixture size limit). NOT in the coverage denominator — reporting them separately keeps the denominator honest."
+ },
+ "refusalReasons": [
+  {
+   "reason": "no-interface: no stored IDL for program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA in test/fixtures/traffic-sample-store",
+   "count": 3804
+  },
+  {
+   "reason": "no-interface: no stored IDL for program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb in test/fixtures/traffic-sample-store",
+   "count": 1598
+  },
+  {
+   "reason": "idl: both stored sources refuse this payload — anchor @slot 464554569: unknown instruction discriminator e1f7501ed5",
+   "count": 152
+  },
+  {
+   "reason": "idl: both stored sources refuse this payload — anchor @slot 464554582: truncated input: need 1 byte(s) for bool at ",
+   "count": 18
+  },
+  {
+   "reason": "no-interface: no stored IDL for program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 in test/fixtures/traffic-sample-store",
+   "count": 9
+  },
+  {
+   "reason": "no-interface: no stored IDL for program jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC in test/fixtures/traffic-sample-store",
+   "count": 7
+  },
+  {
+   "reason": "idl: both stored sources refuse this payload — anchor @slot 464554569: unknown instruction discriminator 07051dc4f5",
+   "count": 1
+  }
+ ],
+ "outcomeVsChain": {
+  "decoded_txSuccess": 3414,
+  "decoded_txFailed": 3569,
+  "refused_txSuccess": 20,
+  "refused_txFailed": 151,
+  "noInterface_txSuccess": 4278,
+  "noInterface_txFailed": 1140
+ },
+ "programs": [
+  {
+   "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+   "name": "SPL Token",
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 3804,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "payloads": 3804,
+   "coveredPct": 0
+  },
+  {
+   "program": "ComputeBudget111111111111111111111111111111",
+   "name": "ComputeBudget",
+   "acquirable": false,
+   "decoded": 2532,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 2517,
+   "describedExact": 0,
+   "trailing": 15,
+   "payloads": 2532,
+   "coveredPct": 100
+  },
+  {
+   "program": "11111111111111111111111111111111",
+   "name": "System",
+   "acquirable": false,
+   "decoded": 2502,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 2502,
+   "describedExact": 0,
+   "trailing": 0,
+   "payloads": 2502,
+   "coveredPct": 100
+  },
+  {
+   "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "name": "Token-2022",
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 1598,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "payloads": 1598,
+   "coveredPct": 0
+  },
+  {
+   "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+   "name": "Pump.fun bonding curve",
+   "acquirable": true,
+   "decoded": 619,
+   "refused": 153,
+   "noInterface": 0,
+   "byteExact": 586,
+   "describedExact": 619,
+   "trailing": 33,
+   "payloads": 772,
+   "coveredPct": 80.2
+  },
+  {
+   "program": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+   "name": "PumpSwap",
+   "acquirable": true,
+   "decoded": 487,
+   "refused": 18,
+   "noInterface": 0,
+   "byteExact": 272,
+   "describedExact": 487,
+   "trailing": 215,
+   "payloads": 505,
+   "coveredPct": 96.4
+  },
+  {
+   "program": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+   "name": "Meteora DAMM v2",
+   "acquirable": true,
+   "decoded": 323,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 316,
+   "describedExact": 323,
+   "trailing": 7,
+   "payloads": 323,
+   "coveredPct": 100
+  },
+  {
+   "program": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+   "name": "Meteora DLMM",
+   "acquirable": true,
+   "decoded": 216,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 215,
+   "describedExact": 216,
+   "trailing": 1,
+   "payloads": 216,
+   "coveredPct": 100
+  },
+  {
+   "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+   "name": "Jupiter v6",
+   "acquirable": true,
+   "decoded": 145,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 145,
+   "describedExact": 145,
+   "trailing": 0,
+   "payloads": 145,
+   "coveredPct": 100
+  },
+  {
+   "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+   "name": "Whirlpool",
+   "acquirable": true,
+   "decoded": 58,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 58,
+   "describedExact": 58,
+   "trailing": 0,
+   "payloads": 58,
+   "coveredPct": 100
+  },
+  {
+   "program": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+   "name": "Meteora Vault",
+   "acquirable": true,
+   "decoded": 52,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 52,
+   "describedExact": 52,
+   "trailing": 0,
+   "payloads": 52,
+   "coveredPct": 100
+  },
+  {
+   "program": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+   "name": "Meteora DAMM v1",
+   "acquirable": true,
+   "decoded": 26,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 26,
+   "describedExact": 26,
+   "trailing": 0,
+   "payloads": 26,
+   "coveredPct": 100
+  },
+  {
+   "program": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+   "name": "Raydium CPMM",
+   "acquirable": true,
+   "decoded": 12,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 12,
+   "describedExact": 12,
+   "trailing": 0,
+   "payloads": 12,
+   "coveredPct": 100
+  },
+  {
+   "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+   "name": "Raydium CLMM",
+   "acquirable": true,
+   "decoded": 11,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 11,
+   "describedExact": 11,
+   "trailing": 0,
+   "payloads": 11,
+   "coveredPct": 100
+  },
+  {
+   "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+   "name": "Raydium AMM v4",
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 9,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "payloads": 9,
+   "coveredPct": 0
+  },
+  {
+   "program": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
+   "name": "Jupiter Liquidity",
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 7,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "payloads": 7,
+   "coveredPct": 0
+  }
+ ],
+ "acquisitionQueue": [
+  {
+   "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+   "name": "SPL Token",
+   "payloads": 3804,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "name": "Token-2022",
+   "payloads": 1598,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+   "name": "Raydium AMM v4",
+   "payloads": 9,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
+   "name": "Jupiter Liquidity",
+   "payloads": 7,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  }
+ ]
+}

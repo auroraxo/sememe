@@ -727,6 +727,64 @@ let swap_parameters = unwrap_or_return!(
 
 **Limits.** Two windows and one program id; 9 wide payloads total, so the *frequency* is not established (1.24% of `swap` payloads in 30.10., 1.05% in 02.11. — small samples on both sides). The 32-byte form did not appear in the fresh window, so it may be rarer now or slot-bound; that is stated, not resolved. The claim that the extra bytes are *tolerated* rests on the upstream source of the deployed program at one commit (`5398b5c`) — the deployed **binary** was not disassembled, and the on-chain IDL is not proof of what the binary does. No third party is involved; this is a measurement about a program's wire, not an adoption claim.
 
+## Coverage measured on unbiased traffic (2026-11-02)
+
+Every qualification above measured programs that were CHOSEN — usually programs
+already in the store. The sample and the store therefore shared a selection
+bias, and a favorable fraction measured against them is not a coverage number.
+This section measures the other way round.
+
+**The sample.** `tools/traffic-sample.mjs` takes the newest finalized mainnet
+blocks (four contiguous slots, 2,214 transactions) and inventories EVERY
+instruction in them, without asking the store anything. Programs outside the
+watched list are counted but their bytes are not stored (fixture size limit), so
+the denominator cannot silently shrink. The fixture is committed
+(`test/fixtures/traffic-sample-2026-11-02.json`, captured 2026-11-02T15:50Z),
+together with a store built for exactly this sample
+(`test/fixtures/traffic-sample-store/`: ten on-chain pulls plus three adopted
+first-party published copies).
+
+**The measurement.** `tools/traffic-coverage-report.mjs` runs every payload
+through the product's own entry points — `decodeUnionPayload`, `decodePayload`
+and the native decoder — and asks one question per payload: could sememe have
+NAMED it? The four outcomes are kept apart on purpose:
+
+| outcome | count | meaning |
+| --- | --- | --- |
+| decoded | 6,983 | an available interface named it |
+| refused | 171 | an interface exists and the bytes were refused (source lag) |
+| no-interface | 5,418 | no interface is acquirable for that program at all |
+
+**55.5% coverage** (6,983/12,572 watched payloads), with 6,712/6,983 = 96.1% of
+the decoded payloads re-encoding byte-exactly.
+
+**The finding is the split, not the fraction.** 99.7% of the no-interface gap
+sits on **SPL Token and Token-2022**, which together carry 43% of all watched
+traffic (5,402 payloads) and publish no IDL account at either address sememe
+can pull from — verified at capture time against the chain, not assumed. That
+is an ACQUISITION gap, not a decoder gap, and it has a different fix: the token
+programs ship a Rust interface crate upstream
+(`solana-program/token`, `solana-program/token-2022`), which is the same shape
+of source the System/ComputeBudget tables are already derived from. Programs
+that DO have an interface decode 6,983/7,154 = 97.6% of their traffic.
+
+**The union path is a coverage lever, not a decode nicety.** Adopting the
+first-party published copy `pump-fun/pump-public-docs` `idl/pump_amm.json` moved
+PumpSwap from 82.0% to 96.4% (487/505 decoded) in one step: its on-chain IDL is
+stale, and the published copy covers 9 of the 10 discriminators seen in the
+window. The tenth (`e445a52e51cb9a1d`, 226 payloads) is declared by neither
+copy.
+
+**Limits.** One four-block window (~20 seconds of mainnet), one RPC. The
+acquisability check ran at capture time and reflects that moment. Traffic
+outside the watched list (181 further programs, 4,842 instructions) is counted
+in the report but excluded from the denominator, because their bytes are not
+stored. A coverage number over one window is a window, not the ecosystem —
+this one can only be compared with another measurement of the same kind.
+Reproduce: `npm test` (the report is pinned twice — as a deep-equal against
+what the tool computes, and as explicit assertions), or
+`node tools/traffic-coverage-report.mjs`.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
