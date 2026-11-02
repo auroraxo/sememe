@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus the two token programs (SPL Token, Token-2022) whose wire tables are derived from the pinned upstream Rust crates because they publish no IDL at all — 5,401/5,402 real mainnet payloads named, lifting unbiased-traffic coverage from 55.5% to 98.5% (2026-11-02) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -577,6 +577,56 @@ Falsification: the new test file (`test/native.test.mjs`, 10 tests) was run agai
 
 CLI: `sememe decode-native <program> <payload>` decodes with the pinned interface; `sememe native-provenance [program]` prints the pinned sources, the encoding rules and the measured traffic.
 
+### The token tables are derived too (2026-11-02)
+
+The same argument applies to the two token programs, and the stake is higher:
+**SPL Token and Token-2022 publish no IDL account at either pullable address**,
+yet they carry 43% of real watched mainnet traffic. Their interface is the
+upstream Rust interface crate, and their wire rule lives in hand-written
+`pack()`/`unpack()` pairs rather than in a Borsh enum — so the derivation reads
+upstream's own text:
+
+- `vendor/spl-token/<commit>/…` and `vendor/spl-token-2022/<commit>/…` carry the pinned
+  interface files (Apache-2.0, LICENSE included) of `solana-program/token@737788ff` and
+  `solana-program/token-2022@5251dcc0`; their sha256 is the pin.
+- `src/token-interface.mjs` derives each variant's wire shape from the upstream TEXT: the
+  tag is the integer upstream `pack()` writes and `unpack()` matches (explicit tags, so
+  `WithdrawExcessLamports` is 38 and `UnwrapLamports` 45 — the declaration index would
+  say 25 and 26), the arg sequence is the pack arm's byte-write sequence, and the
+  `COption` encoding is upstream's own `pack_pubkey_option`/`pack_u64_option` (1 tag byte
+  + payload, not a bincode option wrapper). It refuses on any surprise: a tag in only one
+  of the two arms, an upstream byte write no pinned rule covers, a field upstream does not
+  declare, a variant upstream declares that this table does not name. The variant list
+  itself is derived from upstream's enum — so a new upstream instruction fails loudly
+  instead of decoding as "unknown".
+- `tools/token-interface.mjs` writes `interface/token-<program>.json` (28 variants for SPL
+  Token, 48 for Token-2022); `--check` fails when the committed artifact differs from a
+  fresh derivation.
+- `src/token.mjs` RE-DERIVES at load and refuses to decode unless the committed artifact
+  equals the derivation byte for byte — the same two-check contract as the native tables.
+  It ships as `sememe/token`; the CLI is `sememe decode-token <program> <payload>` and
+  `sememe token-provenance [program]`.
+
+Measured on the unbiased traffic sample (four contiguous finalized blocks, 12,572 watched
+payloads): the two token programs' 5,402 payloads went from **0 decoded** (no interface
+acquirable at all) to **5,401 decoded**, one refusal (a `spl-token-metadata` fallback
+instruction — a different upstream crate, refused by name rather than force-fitted) and
+422 payloads with explained trailing bytes. Overall coverage on that sample moved from
+**55.5% to 98.5%**; the denominator never moved, the product gained a decode path.
+
+Falsification (`test/token-interface.test.mjs`, 8 tests, each a mutation in a temp copy of
+the repo): swap two args in the artifact → load refused; edit the vendored Rust → load
+refused with both sha256s named; delete `vendor/spl-token-2022` → load refused. The
+measured-wire test pins the real numbers (a 1,000,000-amount Transfer, a TransferChecked
+amount-then-decimals pair, a SetAuthority byte that decodes to `MintTokens`) and pins the
+refusal reasons for an unknown tag, a truncated payload and an invalid option tag.
+
+Limits: Token-2022's 15 extension dispatch tags are named at the top level only — their
+sub-instruction bytes report as trailing, because the extension crates are separate
+interfaces this table does not vendor. The `spl-token-metadata` fallback crate is not
+vendored either, so its payloads refuse by name. Upstream's `Batch` (tag 255) unpacks but
+the processor refuses it — the table records the wire shape, not a runtime guarantee.
+
 Limits: Linux-mainnet measured only; the strict-20 coverage study does not include the native programs (they were never part of the sample, so no coverage number moved); the runtime acceptance rule is checked against the agave source at one point in time, not against a live validator; no outside user yet.
 
 ### The rows are derived, not typed (2026-10-31, later the same day)
@@ -745,28 +795,44 @@ together with a store built for exactly this sample
 first-party published copies).
 
 **The measurement.** `tools/traffic-coverage-report.mjs` runs every payload
-through the product's own entry points — `decodeUnionPayload`, `decodePayload`
-and the native decoder — and asks one question per payload: could sememe have
-NAMED it? The four outcomes are kept apart on purpose:
+through the product's own entry points — `decodeUnionPayload`, `decodePayload`,
+the native decoder and the token decoder — and asks one question per payload:
+could sememe have NAMED it? The four outcomes are kept apart on purpose.
 
-| outcome | count | meaning |
+**First run, same day, same sample (kept for the record):** decoded 6,983,
+refused 171, no-interface 5,418 — 55.5% coverage, with 99.7% of the gap on SPL
+Token + Token-2022, which publish no IDL account at either pullable address.
+That measurement named the fix, and the fix shipped the same day: the two token
+wire tables are now DERIVED from the pinned upstream Rust crates
+(`solana-program/token@737788ff`, `solana-program/token-2022@5251dcc0`, both
+Apache-2.0, both vendored with license + sha256 pin) — the System/ComputeBudget
+pattern, one level up: the wire rule lives in the crates' hand-written pack()
+and unpack() pairs, so the derivation reads the pack arm's byte-write sequence
+cross-checked against the unpack arm's tag set, and refuses any upstream write
+it cannot pin. The decoder ships as `sememe/token` (artifact + load-time
+derivation check, same two-check contract as the native tables).
+
+| outcome (current) | count | meaning |
 | --- | --- | --- |
-| decoded | 6,983 | an available interface named it |
-| refused | 171 | an interface exists and the bytes were refused (source lag) |
-| no-interface | 5,418 | no interface is acquirable for that program at all |
+| decoded | 12,384 | an available interface named it |
+| refused | 172 | an interface exists and the bytes were refused (source lag, incl. 1 token payload: a token-metadata fallback instruction, a different upstream crate, refused rather than force-fitted) |
+| no-interface | 16 | no interface is acquirable for that program at all (Raydium AMM v4: 9, Jupiter Liquidity: 7) |
 
-**55.5% coverage** (6,983/12,572 watched payloads), with 6,712/6,983 = 96.1% of
-the decoded payloads re-encoding byte-exactly.
+**98.5% coverage** (12,384/12,572 watched payloads), with 11,691/12,384 = 94.4%
+of the decoded payloads re-encoding byte-exactly. What the 693 non-byte-exact
+decodes are, measured: 419 legacy `GetAccountDataSize` payloads carry two extra
+bytes the legacy program itself ignores (upstream's own comment says so), and
+three Token-2022 extension dispatches carry their sub-instruction bytes, which
+this table reports as trailing instead of inventing a field for them. The
+trailing count is part of the result, not a failure hidden by it.
 
-**The finding is the split, not the fraction.** 99.7% of the no-interface gap
-sits on **SPL Token and Token-2022**, which together carry 43% of all watched
-traffic (5,402 payloads) and publish no IDL account at either address sememe
-can pull from — verified at capture time against the chain, not assumed. That
-is an ACQUISITION gap, not a decoder gap, and it has a different fix: the token
-programs ship a Rust interface crate upstream
-(`solana-program/token`, `solana-program/token-2022`), which is the same shape
-of source the System/ComputeBudget tables are already derived from. Programs
-that DO have an interface decode 6,983/7,154 = 97.6% of their traffic.
+**What the number means now.** The acquisition gap this measurement existed to
+expose is closed for the program family that carried it: the remaining
+no-interface traffic is 16 payloads on two AMM programs. "Refused" (172) is
+source lag in interfaces that exist — PumpSwap's undeclared discriminator form
+and pump.fun's unexplained event tail are the bulk of it, both already reported
+to the first parties. The denominator never moved: same sample, same product
+entry points, one new decode path derived from upstream.
 
 **The union path is a coverage lever, not a decode nicety.** Adopting the
 first-party published copy `pump-fun/pump-public-docs` `idl/pump_amm.json` moved
@@ -776,10 +842,16 @@ window. The tenth (`e445a52e51cb9a1d`, 226 payloads) is declared by neither
 copy.
 
 **Limits.** One four-block window (~20 seconds of mainnet), one RPC. The
-acquisability check ran at capture time and reflects that moment. Traffic
-outside the watched list (181 further programs, 4,842 instructions) is counted
-in the report but excluded from the denominator, because their bytes are not
-stored. A coverage number over one window is a window, not the ecosystem —
+acquisability check ran at capture time and reflects that moment. The token
+tables are derived from upstream's interface crates at one pin each; a tagged
+upstream release that changes a pack() arm refuses the load loudly instead of
+decoding stale. Token-2022 extension sub-instructions (the 15 extension
+dispatch tags) are named at the top level only; their sub-instruction bytes
+report as trailing. The spl-token-metadata fallback interface (8-byte
+discriminators, own crate) is not vendored — its payloads refuse by name.
+Traffic outside the watched list (181 further programs, 4,842 instructions) is
+counted in the report but excluded from the denominator, because their bytes are
+not stored. A coverage number over one window is a window, not the ecosystem —
 this one can only be compared with another measurement of the same kind.
 Reproduce: `npm test` (the report is pinned twice — as a deep-equal against
 what the tool computes, and as explicit assertions), or

@@ -1,0 +1,535 @@
+{
+  "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "label": "Token-2022",
+  "scheme": "native-token",
+  "source": {
+    "repo": "solana-program/token-2022",
+    "pin": "5251dcc07ecbcb721d6c4f0231090defadf00311",
+    "file": "interface/src/instruction.rs",
+    "enum": "TokenInstruction (explicit tags, not declaration order)",
+    "fileSha256": "sha256:672b3890cb58e5700a67f202491069ed44dffcbfa0e7d0b83a0cfbbb05b3a287",
+    "vendoredAt": "vendor/spl-token-2022/5251dcc07ecbcb721d6c4f0231090defadf00311",
+    "derivation": "src/token-interface.mjs: tag = the integer upstream pack() writes and unpack() matches; args = the pack arm's byte-write sequence; option encoding = upstream pack_pubkey_option/pack_u64_option (1 tag byte + payload)"
+  },
+  "runtime": "solana-program/token-2022 program at this pin: the pod_instruction unpack matches the same explicit tag set; an unknown tag is InvalidInstruction; tags 26/27/28/30/33/34/36/37/39/40/41/42/43/44/46 dispatch into extension processors on input[1..]; 255 (Batch) is refused by the processor",
+  "selector": {
+    "width": 1,
+    "encoding": "u8 enum tag (explicit, sparse)"
+  },
+  "argEncoding": "u8/u16/u64 LE; pubkey 32 raw bytes; COption = 1 tag byte (0 none / 1 some) + payload; utf8_rest = whole remainder; u16_vec = run of 2-byte extension-type ids; bytes = raw remainder",
+  "authorityType": [
+    {
+      "byte": 0,
+      "name": "MintTokens"
+    },
+    {
+      "byte": 1,
+      "name": "FreezeAccount"
+    },
+    {
+      "byte": 2,
+      "name": "AccountOwner"
+    },
+    {
+      "byte": 3,
+      "name": "CloseAccount"
+    },
+    {
+      "byte": 4,
+      "name": "TransferFeeConfig"
+    },
+    {
+      "byte": 5,
+      "name": "WithheldWithdraw"
+    },
+    {
+      "byte": 6,
+      "name": "CloseMint"
+    },
+    {
+      "byte": 7,
+      "name": "InterestRate"
+    },
+    {
+      "byte": 8,
+      "name": "PermanentDelegate"
+    },
+    {
+      "byte": 9,
+      "name": "ConfidentialTransferMint"
+    },
+    {
+      "byte": 10,
+      "name": "TransferHookProgramId"
+    },
+    {
+      "byte": 11,
+      "name": "ConfidentialTransferFeeConfig"
+    },
+    {
+      "byte": 12,
+      "name": "MetadataPointer"
+    },
+    {
+      "byte": 13,
+      "name": "GroupPointer"
+    },
+    {
+      "byte": 14,
+      "name": "GroupMemberPointer"
+    },
+    {
+      "byte": 15,
+      "name": "ScaledUiAmount"
+    },
+    {
+      "byte": 16,
+      "name": "Pause"
+    },
+    {
+      "byte": 17,
+      "name": "PermissionedBurn"
+    }
+  ],
+  "instructions": [
+    {
+      "tag": 0,
+      "name": "InitializeMint",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "mint_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "freeze_authority",
+          "type": "coption_pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 1,
+      "name": "InitializeAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 2,
+      "name": "InitializeMultisig",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "m",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 3,
+      "name": "Transfer",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 4,
+      "name": "Approve",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 5,
+      "name": "Revoke",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 6,
+      "name": "SetAuthority",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "authority_type",
+          "type": "authority_type"
+        },
+        {
+          "name": "new_authority",
+          "type": "coption_pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 7,
+      "name": "MintTo",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 8,
+      "name": "Burn",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 9,
+      "name": "CloseAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 10,
+      "name": "FreezeAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 11,
+      "name": "ThawAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 12,
+      "name": "TransferChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 13,
+      "name": "ApproveChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 14,
+      "name": "MintToChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 15,
+      "name": "BurnChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 16,
+      "name": "InitializeAccount2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 17,
+      "name": "SyncNative",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 18,
+      "name": "InitializeAccount3",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 19,
+      "name": "InitializeMultisig2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "m",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 20,
+      "name": "InitializeMint2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "mint_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "freeze_authority",
+          "type": "coption_pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 21,
+      "name": "GetAccountDataSize",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "extension_types",
+          "type": "u16_vec"
+        }
+      ]
+    },
+    {
+      "tag": 22,
+      "name": "InitializeImmutableOwner",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 23,
+      "name": "AmountToUiAmount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 24,
+      "name": "UiAmountToAmount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "ui_amount",
+          "type": "utf8_rest"
+        }
+      ]
+    },
+    {
+      "tag": 25,
+      "name": "InitializeMintCloseAuthority",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "close_authority",
+          "type": "coption_pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 26,
+      "name": "TransferFeeExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 27,
+      "name": "ConfidentialTransferExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 28,
+      "name": "DefaultAccountStateExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 29,
+      "name": "Reallocate",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "extension_types",
+          "type": "u16_vec"
+        }
+      ]
+    },
+    {
+      "tag": 30,
+      "name": "MemoTransferExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 31,
+      "name": "CreateNativeMint",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 32,
+      "name": "InitializeNonTransferableMint",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 33,
+      "name": "InterestBearingMintExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 34,
+      "name": "CpiGuardExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 35,
+      "name": "InitializePermanentDelegate",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "delegate",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 36,
+      "name": "TransferHookExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 37,
+      "name": "ConfidentialTransferFeeExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 38,
+      "name": "WithdrawExcessLamports",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 39,
+      "name": "MetadataPointerExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 40,
+      "name": "GroupPointerExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 41,
+      "name": "GroupMemberPointerExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 42,
+      "name": "ConfidentialMintBurnExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 43,
+      "name": "ScaledUiAmountExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 44,
+      "name": "PausableExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 45,
+      "name": "UnwrapLamports",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "coption_u64"
+        }
+      ]
+    },
+    {
+      "tag": 46,
+      "name": "PermissionedBurnExtension",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 255,
+      "name": "Batch",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "data",
+          "type": "bytes"
+        }
+      ]
+    }
+  ]
+}

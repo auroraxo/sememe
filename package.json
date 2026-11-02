@@ -1,7 +1,7 @@
 {
   "name": "sememe",
   "version": "0.2.2",
-  "description": "Local, fingerprint-verified Solana program interfaces: pull an IDL once, then decode instructions, accounts and events offline. Zero dependencies on the decode path.",
+  "description": "Local, fingerprint-verified Solana program interfaces: pull an IDL once, then decode instructions, accounts and events offline. Zero dependencies on the decode path. Ships the SPL Token + Token-2022 wire tables derived from the pinned upstream Rust crates.",
   "license": "MIT",
   "type": "module",
   "main": "./index.mjs",
@@ -18,7 +18,8 @@
     "./discriminators": "./src/discriminators.mjs",
     "./native-corpus": "./src/native-corpus.mjs",
     "./native-audit": "./src/native-audit.mjs",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./token": "./src/token.mjs"
   },
   "files": [
     "index.mjs",

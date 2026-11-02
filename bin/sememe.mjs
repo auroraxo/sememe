@@ -10,6 +10,9 @@ import { decodePayload, decodeStoredAccount, decodeUnionPayload, adopt, parsePay
 import {
   decodeNativeInstruction, nativeProvenance, nativePrograms,
 } from '../src/native.mjs';
+import {
+  decodeTokenInstruction, tokenProvenance, tokenPrograms,
+} from '../src/token.mjs';
 import { toJsonSafe } from '../src/codec.mjs';
 
 const usage = `usage:
@@ -38,7 +41,15 @@ const usage = `usage:
       the instruction, its arguments, and whether the bytes re-encode exactly.
   sememe native-provenance [program-id]
       print the pinned source, encoding rule and measured traffic for a native
-      program (or for all of them).`;
+      program (or for all of them).
+  sememe decode-token <program-id> <payload> [--trailing report|error]
+      payload: base58 or hex instruction data. For SPL TOKEN and TOKEN-2022
+      there is no IDL account to pull at either address: their interface is
+      pinned from the upstream Rust crates (pack/unpack wire rule), and this
+      decodes against that pin. Extension sub-instructions report as trailing.
+  sememe token-provenance [program-id]
+      print the pinned crate, encoding rule and variant count for a token
+      program (or for both).`; 
 
 const [rawCommand, rawProgram, ...rawArgs] = process.argv.slice(2);
 const command = rawCommand;
@@ -146,6 +157,41 @@ try {
       console.log(JSON.stringify(provenance, null, 2));
     } else {
       console.log(JSON.stringify(nativePrograms().map((id) => nativeProvenance(id)), null, 2));
+    }
+  } else if (command === 'decode-token') {
+    if (!program) throw Error('decode-token needs a program id');
+    const payload = args.shift();
+    if (!payload) throw Error('decode-token needs an instruction payload');
+    const trailing = option('--trailing', 'report');
+    if (trailing !== 'report' && trailing !== 'error') {
+      throw Error('--trailing must be "report" or "error"');
+    }
+    const decoded = decodeTokenInstruction(program, parsePayload(payload), { trailing });
+    if (decoded.refused === 'not-token') {
+      throw Error(`${program} is not a token program sememe pins — try decode-native or decode`);
+    }
+    console.log(JSON.stringify({
+      program,
+      kind: 'token-instruction',
+      name: decoded.name,
+      tag: decoded.tag,
+      selectorWidth: decoded.selectorWidth,
+      args: toJsonSafe(decoded.args),
+      authorityType: decoded.authorityType,
+      bytes: decoded.bytes,
+      consumed: decoded.consumed,
+      trailing: decoded.trailing,
+      roundTripByteExact: decoded.roundTripByteExact,
+      interface: tokenProvenance(program),
+    }, null, 2));
+  } else if (command === 'token-provenance') {
+    const wanted = program;
+    if (wanted) {
+      const provenance = tokenProvenance(wanted);
+      if (!provenance) throw Error(`${wanted} is not a token program sememe pins`);
+      console.log(JSON.stringify(provenance, null, 2));
+    } else {
+      console.log(JSON.stringify(tokenPrograms().map((id) => tokenProvenance(id)), null, 2));
     }
   } else if (command === 'account') {
     if (!program) throw Error('account needs a program id');

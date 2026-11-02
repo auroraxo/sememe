@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-02T16:23:19.674Z",
+ "generatedAt": "2026-11-02T20:12:54.030Z",
  "sample": {
   "file": "test/fixtures/traffic-sample-2026-11-02.json",
   "store": "test/fixtures/traffic-sample-store",
@@ -15,16 +15,16 @@
   "transactionsWithWatchedTraffic": 1872,
   "method": "getBlock finalized full encoding:json maxSupportedTransactionVersion:1 rewards:false; contiguous newest finalized slots minus 2",
   "selection": "contiguous newest finalized blocks — the store was not consulted when the sample was taken, so it carries no store-selection bias",
-  "measurementPath": "the product entry points (decodePayload / decodeUnionPayload / native decoder) against the committed store fixture"
+  "measurementPath": "the product entry points (decodePayload / decodeUnionPayload / native decoder / token decoder) against the committed store fixture"
  },
  "headline": {
   "watchedPayloads": 12572,
-  "decoded": 6983,
-  "refused": 171,
-  "noInterface": 5418,
-  "coveredPct": 55.5,
-  "byteExact": 6712,
-  "byteExactPctOfDecoded": 96.1,
+  "decoded": 12384,
+  "refused": 172,
+  "noInterface": 16,
+  "coveredPct": 98.5,
+  "byteExact": 11691,
+  "byteExactPctOfDecoded": 94.4,
   "note": "coverage = payloads an available interface could NAME. \"refused\" (interface present, bytes refused) and \"no-interface\" (no interface acquirable at all) are counted separately because they need different fixes."
  },
  "trafficOutsideTheWatchedList": {
@@ -34,14 +34,6 @@
   "note": "counted, bytes NOT stored (fixture size limit). NOT in the coverage denominator — reporting them separately keeps the denominator honest."
  },
  "refusalReasons": [
-  {
-   "reason": "no-interface: no stored IDL for program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA in test/fixtures/traffic-sample-store",
-   "count": 3804
-  },
-  {
-   "reason": "no-interface: no stored IDL for program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb in test/fixtures/traffic-sample-store",
-   "count": 1598
-  },
   {
    "reason": "idl: both stored sources refuse this payload — anchor @slot 464554569: unknown instruction discriminator e1f7501ed5",
    "count": 152
@@ -59,31 +51,35 @@
    "count": 7
   },
   {
+   "reason": "token-upstream: unknown-selector: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: tag 210 is not in the pinned Token-2022 interfa",
+   "count": 1
+  },
+  {
    "reason": "idl: both stored sources refuse this payload — anchor @slot 464554569: unknown instruction discriminator 07051dc4f5",
    "count": 1
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 3414,
-  "decoded_txFailed": 3569,
-  "refused_txSuccess": 20,
+  "decoded_txSuccess": 7681,
+  "decoded_txFailed": 4703,
+  "refused_txSuccess": 21,
   "refused_txFailed": 151,
-  "noInterface_txSuccess": 4278,
-  "noInterface_txFailed": 1140
+  "noInterface_txSuccess": 10,
+  "noInterface_txFailed": 6
  },
  "programs": [
   {
    "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
    "name": "SPL Token",
    "acquirable": false,
-   "decoded": 0,
+   "decoded": 3804,
    "refused": 0,
-   "noInterface": 3804,
-   "byteExact": 0,
+   "noInterface": 0,
+   "byteExact": 3385,
    "describedExact": 0,
-   "trailing": 0,
+   "trailing": 419,
    "payloads": 3804,
-   "coveredPct": 0
+   "coveredPct": 100
   },
   {
    "program": "ComputeBudget111111111111111111111111111111",
@@ -115,14 +111,14 @@
    "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
    "name": "Token-2022",
    "acquirable": false,
-   "decoded": 0,
-   "refused": 0,
-   "noInterface": 1598,
-   "byteExact": 0,
+   "decoded": 1597,
+   "refused": 1,
+   "noInterface": 0,
+   "byteExact": 1594,
    "describedExact": 0,
-   "trailing": 0,
+   "trailing": 3,
    "payloads": 1598,
-   "coveredPct": 0
+   "coveredPct": 99.9
   },
   {
    "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
@@ -282,20 +278,6 @@
   }
  ],
  "acquisitionQueue": [
-  {
-   "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-   "name": "SPL Token",
-   "payloads": 3804,
-   "acquirable": false,
-   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
-  },
-  {
-   "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
-   "name": "Token-2022",
-   "payloads": 1598,
-   "acquirable": false,
-   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
-  },
   {
    "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
    "name": "Raydium AMM v4",

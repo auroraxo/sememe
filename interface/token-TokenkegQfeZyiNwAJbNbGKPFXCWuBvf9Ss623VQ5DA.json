@@ -1,0 +1,334 @@
+{
+  "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "label": "SPL Token",
+  "scheme": "native-token",
+  "source": {
+    "repo": "solana-program/token",
+    "pin": "737788ff5bcc3f1f44cfb222f25483187650be76",
+    "file": "interface/src/instruction.rs",
+    "enum": "TokenInstruction (explicit tags, not declaration order)",
+    "fileSha256": "sha256:4f26ecac09a04fd307adb52024061996fff3b660c12693bb050313eedeed2fcc",
+    "vendoredAt": "vendor/spl-token/737788ff5bcc3f1f44cfb222f25483187650be76",
+    "derivation": "src/token-interface.mjs: tag = the integer upstream pack() writes and unpack() matches; args = the pack arm's byte-write sequence; option encoding = upstream pack_pubkey_option/pack_u64_option (1 tag byte + payload)"
+  },
+  "runtime": "solana-program/token program at this pin: unpack matches the same explicit tag set; an unknown tag is InvalidInstruction",
+  "selector": {
+    "width": 1,
+    "encoding": "u8 enum tag (explicit, sparse)"
+  },
+  "argEncoding": "u8/u16/u64 LE; pubkey 32 raw bytes; COption = 1 tag byte (0 none / 1 some) + payload; utf8_rest = whole remainder; u16_vec = run of 2-byte extension-type ids; bytes = raw remainder",
+  "authorityType": [
+    {
+      "byte": 0,
+      "name": "MintTokens"
+    },
+    {
+      "byte": 1,
+      "name": "FreezeAccount"
+    },
+    {
+      "byte": 2,
+      "name": "AccountOwner"
+    },
+    {
+      "byte": 3,
+      "name": "CloseAccount"
+    }
+  ],
+  "instructions": [
+    {
+      "tag": 0,
+      "name": "InitializeMint",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "mint_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "freeze_authority",
+          "type": "coption_pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 1,
+      "name": "InitializeAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 2,
+      "name": "InitializeMultisig",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "m",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 3,
+      "name": "Transfer",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 4,
+      "name": "Approve",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 5,
+      "name": "Revoke",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 6,
+      "name": "SetAuthority",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "authority_type",
+          "type": "authority_type"
+        },
+        {
+          "name": "new_authority",
+          "type": "coption_pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 7,
+      "name": "MintTo",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 8,
+      "name": "Burn",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 9,
+      "name": "CloseAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 10,
+      "name": "FreezeAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 11,
+      "name": "ThawAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 12,
+      "name": "TransferChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 13,
+      "name": "ApproveChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 14,
+      "name": "MintToChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 15,
+      "name": "BurnChecked",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 16,
+      "name": "InitializeAccount2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 17,
+      "name": "SyncNative",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 18,
+      "name": "InitializeAccount3",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "owner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 19,
+      "name": "InitializeMultisig2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "m",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "tag": 20,
+      "name": "InitializeMint2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "decimals",
+          "type": "u8"
+        },
+        {
+          "name": "mint_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "freeze_authority",
+          "type": "coption_pubkey"
+        }
+      ]
+    },
+    {
+      "tag": 21,
+      "name": "GetAccountDataSize",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 22,
+      "name": "InitializeImmutableOwner",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 23,
+      "name": "AmountToUiAmount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 24,
+      "name": "UiAmountToAmount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "ui_amount",
+          "type": "utf8_rest"
+        }
+      ]
+    },
+    {
+      "tag": 38,
+      "name": "WithdrawExcessLamports",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 45,
+      "name": "UnwrapLamports",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "coption_u64"
+        }
+      ]
+    },
+    {
+      "tag": 255,
+      "name": "Batch",
+      "wire": "accepted",
+      "args": []
+    }
+  ]
+}

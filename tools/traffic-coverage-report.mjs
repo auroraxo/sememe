@@ -17,8 +17,10 @@
 //     refused        the interface is available AND the bytes were refused
 //                   (unknown discriminator, truncated input, ...)
 //     no-interface  the program has NO interface sememe can acquire at all
-//     not-applicable native programs (System, ComputeBudget) are decoded by
-//                   the vendored-upstream path, not by an IDL
+//     not-applicable native programs (System, ComputeBudget) and the two
+//                   token programs (SPL Token, Token-2022 — no IDL account to
+//                   pull at all) are decoded by the vendored-upstream path,
+//                   not by an IDL
 //
 //   Collapsing "refused" and "no-interface" into one "uncovered" number is
 //   the coverage illusion this measurement exists to prevent: they have
@@ -42,6 +44,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { decodePayload, decodeUnionPayload } from '../src/decode.mjs';
 import { decodeNativeInstruction, isNativeProgram } from '../src/native.mjs';
+import { decodeTokenInstruction, isTokenProgram } from '../src/token.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
@@ -66,6 +69,21 @@ async function classify(program, hex) {
       };
     } catch (error) {
       return { outcome: 'refused', via: 'native-upstream', reason: String(error?.message ?? error).slice(0, 110) };
+    }
+  }
+
+  if (isTokenProgram(program)) {
+    try {
+      const decoded = decodeTokenInstruction(program, Buffer.from(hex, 'hex'), { trailing: 'report' });
+      return {
+        outcome: 'decoded',
+        via: 'token-upstream',
+        name: decoded.name,
+        byteExact: decoded.roundTripByteExact === true,
+        trailing: decoded.trailing?.count ?? 0,
+      };
+    } catch (error) {
+      return { outcome: 'refused', via: 'token-upstream', reason: String(error?.message ?? error).slice(0, 110) };
     }
   }
 
@@ -166,7 +184,7 @@ const report = {
     transactionsWithWatchedTraffic: sample.transactions.length,
     method: sample.meta.method,
     selection: 'contiguous newest finalized blocks — the store was not consulted when the sample was taken, so it carries no store-selection bias',
-    measurementPath: 'the product entry points (decodePayload / decodeUnionPayload / native decoder) against the committed store fixture',
+    measurementPath: 'the product entry points (decodePayload / decodeUnionPayload / native decoder / token decoder) against the committed store fixture',
   },
   headline: {
     watchedPayloads: total,

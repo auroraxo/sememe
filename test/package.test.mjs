@@ -72,7 +72,8 @@ test('every file the package ships imports only node: builtins or relative files
   // loads must have zero npm dependencies.
   const zeroDependency = ['index.mjs', 'src/account.mjs', 'src/adopt.mjs', 'src/base58.mjs', 'src/canonical.mjs',
     'src/codec.mjs', 'src/decode.mjs', 'src/discriminators.mjs', 'src/native-interface.mjs',
-    'src/native.mjs', 'src/store-read.mjs', 'src/store-write.mjs', 'src/union.mjs'];
+    'src/native.mjs', 'src/store-read.mjs', 'src/store-write.mjs', 'src/token-interface.mjs',
+    'src/token.mjs', 'src/union.mjs'];
   const files = zeroDependency.map((name) => path.join(ROOT, name));
   assert.ok(files.length >= 13, `expected the shipped sources, found ${files.length}`);
   const violations = [];
@@ -121,7 +122,7 @@ test('the package does not ship the qualification harness', async () => {
 });
 
 test('the documented subpaths resolve through the exports map', async () => {
-  for (const sub of ['./native', './store', './pull', './codec', './canonical', './discriminators', './native-corpus', './native-audit', './package.json']) {
+  for (const sub of ['./native', './token', './store', './pull', './codec', './canonical', './discriminators', './native-corpus', './native-audit', './package.json']) {
     assert.ok(pkg.exports[sub], `exports must declare "${sub}"`);
     // The map must point at a file that exists, otherwise the install succeeds
     // and the first import fails.

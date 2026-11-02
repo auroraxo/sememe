@@ -39,4 +39,6 @@ export { canonicalJson } from './src/canonical.mjs';
 // sources AT IMPORT TIME and refuses to load when the committed artifact
 // disagrees. That loud failure is right for the native decoder, but it must
 // not take the whole entry down for a consumer who only decodes an Anchor
-// instruction. Use `sememe/native` for those two programs.
+// instruction. Use `sememe/native` for those two programs. The same applies
+// to the two token programs (SPL Token, Token-2022) — `sememe/token` derives
+// their wire tables from the pinned upstream Rust crates the same way.
