@@ -1,0 +1,582 @@
+{
+  "generatedAt": "2026-11-02T06:57:03.483Z",
+  "program": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+  "declaredAccounts": 14,
+  "selection": {
+    "swapPayloads": 770,
+    "wide": 9,
+    "controls": 12,
+    "note": "controls = first 12 IDL-exact swaps by lexicographic signature across both fixtures"
+  },
+  "rpc": {
+    "calls": 22,
+    "failures": 0
+  },
+  "wireForms": {
+    "trailing1": 7,
+    "trailing8": 2,
+    "exact": 761,
+    "other": 0
+  },
+  "contrast": {
+    "wide": {
+      "n": 9,
+      "topLevel": 8,
+      "cpi": 1,
+      "distinctOuterPrograms": [
+        "4X3dGCFh63SyE2bNZdGUV7Rj5ukK1XgrxesoxyKQNiRN",
+        "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG"
+      ],
+      "distinctFeePayers": 7,
+      "accountCounts": [
+        14,
+        18
+      ],
+      "txErrs": [
+        "null"
+      ]
+    },
+    "control": {
+      "n": 12,
+      "topLevel": 8,
+      "cpi": 4,
+      "distinctOuterPrograms": [
+        "NinafKYvKDCH26v6uEpfDjyuDjjpbdfhiPjrJV6FTFs",
+        "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+        "fxckso1g4zPGWcoAtsgKsatficCCPSHAL1bWFMvSSzA"
+      ],
+      "distinctFeePayers": 10,
+      "accountCounts": [
+        14,
+        18,
+        47
+      ],
+      "txErrs": [
+        "null",
+        "{\"InstructionError\":[1,{\"Custom\":6002}]}",
+        "{\"InstructionError\":[3,{\"Custom\":6002}]}",
+        "{\"InstructionError\":[4,{\"Custom\":2}]}"
+      ]
+    }
+  },
+  "transactions": [
+    {
+      "source": "2026-10-30",
+      "signature": "3WBv1DmCkzdbbvyHN51fBmgcgxJjtzjQxPhkUbRdBKShwcxGi2AjYDq6JqHmN4yzH3mScYJj1Z1gRKw2pUCrXqZh",
+      "slot": 463380963,
+      "wireLen": 32,
+      "trailing": 8,
+      "trailingHex": "0000000000000000",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "2s7riB7vRbYTPQYbGe1tC1y4VGDPNuxh5fExYkZZwarr",
+      "signers": [
+        "2s7riB7vRbYTPQYbGe1tC1y4VGDPNuxh5fExYkZZwarr"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "2robPktHe8XV5DsKmXR2CajTqJsXr4HCj2Rbzjnaxs8Jm65JbsKfN135eno1zJYAtNApjMQVA6kt9tdKxGq57zW3",
+      "slot": 463380963,
+      "wireLen": 32,
+      "trailing": 8,
+      "trailingHex": "0000000000000000",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "FGBw5tyZqNvMyYgfFRUWH8LHva7fiaxZ5fh6gbX4v2r1",
+      "signers": [
+        "FGBw5tyZqNvMyYgfFRUWH8LHva7fiaxZ5fh6gbX4v2r1"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "1rbx2XuzpqGt88KcQ5vKGQSR7MW5KF6JWeWxeVWK77ePm5j5nhf1TgHGhZwqeKr4BgcvEpQo8fYhCQBKFW2cXar",
+      "slot": 463380962,
+      "wireLen": 25,
+      "trailing": 1,
+      "trailingHex": "00",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "GRNQotYATPfJ4VAFhEPWHSCNQTF63dm2VNqgZbe1HhxJ",
+      "signers": [
+        "GRNQotYATPfJ4VAFhEPWHSCNQTF63dm2VNqgZbe1HhxJ"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "2ccZEUQ2yicz5CHT4fnGjrPGNJt86rpiTgfh3uhKagyXwBhqBzNMJ8Ravm9MYRT5SB93VevBVZan4pvcfhgxhLhw",
+      "slot": 463380962,
+      "wireLen": 25,
+      "trailing": 1,
+      "trailingHex": "00",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "HboaYu2XYx2DVysLm3wPAYCvzVrXjqNR2w3vmYf8sUBj",
+      "signers": [
+        "HboaYu2XYx2DVysLm3wPAYCvzVrXjqNR2w3vmYf8sUBj"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "VzdwKCQEPJHybmeenGtbWcVG93Gp5b3gSQxK8LpRS6Ue5C81x8R1dKkRWaJvQ6nGChBx4DJTJ4NC7323XWbAPSP",
+      "slot": 463380961,
+      "wireLen": 25,
+      "trailing": 1,
+      "trailingHex": "00",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 1,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "AWpmvBFxNd2oGZufQD2v7RuPpFukj1d5bbDSToKFQvS1",
+      "signers": [
+        "AWpmvBFxNd2oGZufQD2v7RuPpFukj1d5bbDSToKFQvS1"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "3Jdif5UH4i8z7Nq5XD8yM6L3S5aEkw2RHreXVvyKCQqYuNH4iTqF5LvtozaNKCr2QZLNcgA73Nv4HWuACcoHF2jm",
+      "slot": 463380943,
+      "wireLen": 25,
+      "trailing": 1,
+      "trailingHex": "00",
+      "depth": 1,
+      "innerIndex": 0,
+      "topLevel": false,
+      "outerIxIndex": 4,
+      "outerProgram": "4X3dGCFh63SyE2bNZdGUV7Rj5ukK1XgrxesoxyKQNiRN",
+      "cpInvokesCpAmm": true,
+      "feePayer": "3U2tSmABCEnt9ePiRf2kyqgja3Bh58gtHjHvdWrZv7QF",
+      "signers": [
+        "3U2tSmABCEnt9ePiRf2kyqgja3Bh58gtHjHvdWrZv7QF"
+      ],
+      "signerCount": 1,
+      "accountCount": 18,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "61Hsv3sN12sn376T9YqJEXyntBErk4UhCcpxDmA1uDqtfx3KjULK1vpoMTMnJmakahHeYQeQCgmBf5WR9kzEomBv",
+      "slot": 464398809,
+      "wireLen": 25,
+      "trailing": 1,
+      "trailingHex": "00",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 6,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "3WkthPkwaG86ZZNCU24eUaMTh5SM7Gsos8guRmPrfEdm",
+      "signers": [
+        "3WkthPkwaG86ZZNCU24eUaMTh5SM7Gsos8guRmPrfEdm"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "5d1NxU1e9z2XA1aSsRqzcX3VQvQqknTDtRDjj8YYguvxThdiTcSfwKaJ8EyAEXZrSEMvjhfJVeK3ScpEy6ZmsCCf",
+      "slot": 464398791,
+      "wireLen": 25,
+      "trailing": 1,
+      "trailingHex": "00",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "GRNQotYATPfJ4VAFhEPWHSCNQTF63dm2VNqgZbe1HhxJ",
+      "signers": [
+        "GRNQotYATPfJ4VAFhEPWHSCNQTF63dm2VNqgZbe1HhxJ"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "49QNqKJk956yjEAPt8yz2dmRNAPe1URf6SW2rPFdLSQSfhm95DfeETmPrHS1jMaWpq8UVmLYRqiVvn3F4sabzTfN",
+      "slot": 464398791,
+      "wireLen": 25,
+      "trailing": 1,
+      "trailingHex": "00",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 2,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "GRNQotYATPfJ4VAFhEPWHSCNQTF63dm2VNqgZbe1HhxJ",
+      "signers": [
+        "GRNQotYATPfJ4VAFhEPWHSCNQTF63dm2VNqgZbe1HhxJ"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "18RS55kT5zGrRErAAQbbyUhHJtkzKVoDUVd2JhZAoVefe2Ep82p2z6Mz2eQaqLYuaPtXFhKXqiczwkdFSQqrueJ",
+      "slot": 463380940,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "ENhhAZ9cTMin7EDLTPx23XtoJn4AtG4PGYPQAoDNeHyN",
+      "signers": [
+        "ENhhAZ9cTMin7EDLTPx23XtoJn4AtG4PGYPQAoDNeHyN"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "1RRwDaNSHkis8i4PEPSvWLGYTaYyPoF2oMMyu5aPZzSLLDBuG8yYJM6uVSTMsGgeWRL4QyYZ6nbDpXUxRkFFqSj",
+      "slot": 464398793,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 1,
+      "innerIndex": 0,
+      "topLevel": false,
+      "outerIxIndex": 1,
+      "outerProgram": "fxckso1g4zPGWcoAtsgKsatficCCPSHAL1bWFMvSSzA",
+      "cpInvokesCpAmm": true,
+      "feePayer": "7dAyofNhhEmsLAjyETWnkJizGLvTD7Z4xTWsPSYAyjjH",
+      "signers": [
+        "7dAyofNhhEmsLAjyETWnkJizGLvTD7Z4xTWsPSYAyjjH"
+      ],
+      "signerCount": 1,
+      "accountCount": 18,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          1,
+          {
+            "Custom": 6002
+          }
+        ]
+      }
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "1ZzPHnRfP3XqbKy4H5Ym4zL1JLYCBqP2mCVa8E7yK7R6hZ3k5tUVZt9vvq8dhjmKFYYB4bNJ3CPLcqy4yke6PVg",
+      "slot": 463380961,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 5,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "FURrDAcbpHQVW3x4wzzNNKaJuQPqYN6aKHzbb211Dnzn",
+      "signers": [
+        "FURrDAcbpHQVW3x4wzzNNKaJuQPqYN6aKHzbb211Dnzn"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "21yDwb66MtkQu1YrB38VMYCJe6Hn5hoNLikmqFVYL1jCYEAuYHcdhiwbCS7KTHuBHU4JZig4WPKsCP4fHk53bZya",
+      "slot": 463380962,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 5,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "6iuhuVyE7PMTLraNud7FH64byeNgdxJm1NfJNVPd1dyS",
+      "signers": [
+        "6iuhuVyE7PMTLraNud7FH64byeNgdxJm1NfJNVPd1dyS"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "22T47J3guhDVmhW1T9M4xoZ4U4XQPYfkjNXzzvPMVfWUPomnHr3MXjjGD1Kd57Pr7K2v4tho4cY3rVwpWBduFrvp",
+      "slot": 463380959,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 4,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "5TQafeaouvEfADZQ1URLcw9Fy7KuNkek7AZZxUu5AP1F",
+      "signers": [
+        "5TQafeaouvEfADZQ1URLcw9Fy7KuNkek7AZZxUu5AP1F"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": null
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "22ZLgAL8ZA7YnMCR2BCzXTC4YeYH2c1ZLa41vqchD8T5cijorz9EUd33MirnUMn6Ejj87LYydPU4kkBPSUFjGsY7",
+      "slot": 463380943,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "B6PnzA5PdZvw6FKs9sQMK5NAAQSfMXZVDhzgtZyreB38",
+      "signers": [
+        "B6PnzA5PdZvw6FKs9sQMK5NAAQSfMXZVDhzgtZyreB38"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          3,
+          {
+            "Custom": 6002
+          }
+        ]
+      }
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "23i6XHPPh76N3KYgifAADCYC9rihwShF3Vr7NgLcpLeetXVb2uRJW827Bn62PC9u2szqT6QQx1M6VVyS3RbcZLbt",
+      "slot": 464398801,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "p2FFeVdwkbSkwAuYompWtN2mGYtfT69sTD3Q8yLKtoT",
+      "signers": [
+        "p2FFeVdwkbSkwAuYompWtN2mGYtfT69sTD3Q8yLKtoT"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          3,
+          {
+            "Custom": 6002
+          }
+        ]
+      }
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "23xeCDgzEx3ynySqDSg7xs7qxQ6fEbdDQgYSGseVBo7CjZBaqKdbBXVXU3kzBUu1uVh13CwYsFv7Lw3yuDxcuYzP",
+      "slot": 464398791,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 1,
+      "innerIndex": 0,
+      "topLevel": false,
+      "outerIxIndex": 1,
+      "outerProgram": "fxckso1g4zPGWcoAtsgKsatficCCPSHAL1bWFMvSSzA",
+      "cpInvokesCpAmm": true,
+      "feePayer": "7dAyofNhhEmsLAjyETWnkJizGLvTD7Z4xTWsPSYAyjjH",
+      "signers": [
+        "7dAyofNhhEmsLAjyETWnkJizGLvTD7Z4xTWsPSYAyjjH"
+      ],
+      "signerCount": 1,
+      "accountCount": 18,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          1,
+          {
+            "Custom": 6002
+          }
+        ]
+      }
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "2484t3FNy9tipEYqJgnCT5ugi4aWhg5ZvbVCfhHJrgmE8YnduWCH2PNBKWPaZfwK3doLggGAVRSLyekrN95TPyPN",
+      "slot": 463380963,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 1,
+      "innerIndex": 0,
+      "topLevel": false,
+      "outerIxIndex": 4,
+      "outerProgram": "NinafKYvKDCH26v6uEpfDjyuDjjpbdfhiPjrJV6FTFs",
+      "cpInvokesCpAmm": true,
+      "feePayer": "GxDC9e7SP9mzhDo4re5HbpLa2RW7gB9DtmThx4i4pXSq",
+      "signers": [
+        "GxDC9e7SP9mzhDo4re5HbpLa2RW7gB9DtmThx4i4pXSq"
+      ],
+      "signerCount": 1,
+      "accountCount": 47,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          4,
+          {
+            "Custom": 2
+          }
+        ]
+      }
+    },
+    {
+      "source": "2026-10-30",
+      "signature": "24JUoMWSLs9LWLj93mMhWifs977giApu2Pz9X7EXVTX5TTE3nUndPdsEMCMC1Qa6ZMYHcRedDQGQyeiuT66evbKv",
+      "slot": 463380964,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "G5DZV3XdoaiYdrmqepeDgUJAdc2UycLjWdFPorYoxpjX",
+      "signers": [
+        "G5DZV3XdoaiYdrmqepeDgUJAdc2UycLjWdFPorYoxpjX"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          3,
+          {
+            "Custom": 6002
+          }
+        ]
+      }
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "24WnGp1Q9yxLouRDMNeyf1RPV33nhSF5QGuFkgqoEUjMDfxUyYrmx3WDQnAvKoYCEoUuBVDPLMWPt3SioLExoU4E",
+      "slot": 464398806,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 0,
+      "innerIndex": null,
+      "topLevel": true,
+      "outerIxIndex": 3,
+      "outerProgram": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+      "cpInvokesCpAmm": false,
+      "feePayer": "58EgFnP8Hkj6Xs2RwJEisKNCWtE8xoChibvw3ZFamQcN",
+      "signers": [
+        "58EgFnP8Hkj6Xs2RwJEisKNCWtE8xoChibvw3ZFamQcN"
+      ],
+      "signerCount": 1,
+      "accountCount": 14,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          3,
+          {
+            "Custom": 6002
+          }
+        ]
+      }
+    },
+    {
+      "source": "2026-11-02",
+      "signature": "25KaUHaeiYwgobAKGjr9Q6hA2mHcVo1hUwNs8QkEqHp9XkQcAuxqEAkz4dym6FfmQgiKQWbZfytDGXL9AyQLFK21",
+      "slot": 464398795,
+      "wireLen": 24,
+      "trailing": 0,
+      "trailingHex": "",
+      "depth": 1,
+      "innerIndex": 0,
+      "topLevel": false,
+      "outerIxIndex": 1,
+      "outerProgram": "fxckso1g4zPGWcoAtsgKsatficCCPSHAL1bWFMvSSzA",
+      "cpInvokesCpAmm": true,
+      "feePayer": "7dAyofNhhEmsLAjyETWnkJizGLvTD7Z4xTWsPSYAyjjH",
+      "signers": [
+        "7dAyofNhhEmsLAjyETWnkJizGLvTD7Z4xTWsPSYAyjjH"
+      ],
+      "signerCount": 1,
+      "accountCount": 18,
+      "declaredAccounts": 14,
+      "txErr": {
+        "InstructionError": [
+          1,
+          {
+            "Custom": 6002
+          }
+        ]
+      }
+    }
+  ]
+}

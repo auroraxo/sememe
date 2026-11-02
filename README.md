@@ -330,7 +330,8 @@ transactions** (cp-amm: 1,894 payloads / 809 tx from 22,272 transactions; pump.f
 - **cp-amm decodes every payload:** **1,894/1,894 decoded (100%)**, 0 codec errors, 0
   unknown discriminators; **1,888/1,894 round-trip byte-exact**, 6 payloads with
   trailing bytes (all `swap`, 2 with 8 zero bytes, 4 with 1 zero byte) — the deployed
-  swap is slightly ahead of the on-chain IDL.
+  swap accepts bytes its own interface file does not declare. That residual is now
+  measured rather than noted: see *Three wire forms, one interface* below.
 - **pump.fun with the on-chain IDL alone:** **669/996 decoded (67.2%)**, 327 refused
   (326 unknown instruction discriminators across five instructions, 1 unknown event
   discriminator); **581 byte-exact**, 88 with trailing bytes.
@@ -675,6 +676,56 @@ The committed fixtures (`test/fixtures/harvest-{rfq-v2,order-engine}-2026-11-01.
 Both wire findings above were delivered to the first-party repository as [issue #96](https://github.com/jup-ag/rfq-webhook-toolkit/issues/96): the undeclared co-signer account (present in 141/141 fills, signs all of them, pays the fee in 31/141) and the 40-byte form with its constant `0x06942069` tail tag. The issue carries one-click reproductions for each claim (fill tx `3iTpfkc7…` for the account list, `3cQfqyqaD…` for the payload), the fixture and report paths, and the limits stated as limits: which of the three signers builds the 8 bytes is not proven, the 4 varying bytes stay unidentified, and the 19 refuted interpretations remain named. The earlier, separate stale-IDL address finding is tracked as [#95](https://github.com/jup-ag/rfq-webhook-toolkit/issues/95).
 
 This is delivery, not adoption: no response exists yet, and neither issue makes sememe's first outside user — that threshold stays "a third party imports the artifact and 1,000 transactions decode without disagreement."
+
+## Eleventh program, third wire form: cp-amm's `swap` accepts three shapes (2026-11-02)
+
+The RFQ finding above is a program whose wire changed shape with **no** interface following. cp-amm is the opposite shape of problem, and it resolves the residual that the 30.10. traffic-coverage note left open: that note said the deployed `swap` *"reads further than its own interface file"*. **That sentence was wrong in an important way, and the measurement says so.**
+
+**The interface describes exactly one shape.** The program's own on-chain IDL account (`anchor:idl` @ `F1hSvutXSc9iAvB9bQPmjNDwiN2tCXzazTEEvDgNCBMa`) declares `swap` with one argument, `SwapParameters { amount_in: u64, minimum_amount_out: u64 }` — 8-byte discriminator + 16 bytes = **24 bytes, the only length it can describe**. The upstream source agrees ([MeteoraAg/damm-v2](https://github.com/MeteoraAg/damm-v2) @ `5398b5c`, `programs/cp-amm/src/instructions/swap/ix_swap.rs`): `pub struct SwapParameters { pub amount_in: u64, pub minimum_amount_out: u64 }`.
+
+**The chain carries three shapes.**
+
+| wire form | bytes | described by the IDL | trailing | accepted on-chain |
+|---|---|---|---|---|
+| 24 B | 477 (30.10.) / 284 (02.11.) | 24/24 | 0 | yes |
+| 25 B | 4 / 3 | 24/24 (the described prefix) | **1 zero byte, undeclared** | yes, 7/7 |
+| 32 B | 2 / 0 | 24/24 (the described prefix) | **8 zero bytes, undeclared** | yes, 2/2 |
+
+Measured over two independent mainnet windows — the committed harvest of 30.10. (slots 463380931..463380978, 48 blocks, 1,894 payloads) and a **fresh harvest of 02.11.** (slots 464398786..464398809, 24 blocks, 5,633 transactions fetched, 0 missing, 1,001 payloads) — so the wide form is not a one-window artifact: it appears in both, three days apart, and **still appears today**.
+
+**The extra bytes are not read, they are tolerated — and the program's own source proves it.** The deployed program does not use Anchor's dispatcher; it has a hand-written fast entrypoint (`programs/cp-amm/src/entrypoint.rs`) that does:
+
+```rust
+let swap_parameters = unwrap_or_return!(
+    SwapParameters::deserialize(
+        &mut &instruction_data[crate::instruction::Swap::DISCRIMINATOR.len()..]
+    )
+);
+```
+
+`deserialize` here is borsh's **slice** reader: it reads the two `u64` it needs and leaves the rest of the buffer alone. Anchor's own `deserialize` has the same property, which is why sememe's permissive `trailing: 'report'` mode exists at all. So the deployed program does **not** parse bytes past its own struct — it accepts a payload with bytes appended. The 30.10. wording ("reads further than its own interface file") overstated it, and the correction matters for the product: **an over-long payload is not evidence of a missing field**, and a decoder must not invent one. A missing field would carry information; these bytes carry none.
+
+**The 25-byte form is a `swap2` body under the `swap` discriminator.** Its body is **byte-identical** to what the interface's *other* instruction would encode: `swap2` takes `SwapParameters2 { amount_0: u64, amount_1: u64, swap_mode: u8 }`, and re-encoding the same two amounts through `swap2` with `swap_mode = 0` reproduces the 25-byte body exactly — verified on every 25-byte payload, in both windows. The 32-byte form is the same idea with 8 bytes of zero padding (the trailing bytes are **zero in 9/9** wide payloads — padding, not a field). So a client that switched from `swap` to `swap2` and kept sending under the old discriminator produces exactly these shapes.
+
+**Where they come from, measured on chain** ([research/cp-amm-wire-forms-2026-11-02.json](research/cp-amm-wire-forms-2026-11-02.json), `tools/cp-amm-wire-forms.mjs`, every fetch counted, 0 failures):
+
+- **9 wide payloads, 12 IDL-exact controls** — a control group, so "the wide form comes from somewhere else" is a contrast and not a sample of one.
+- **8 of 9 wide payloads are top-level** (8 of 12 controls likewise) — the wide form is **not** a CPI-only artifact; the same mix appears in both groups. One wide payload is a CPI, invoked by `4X3dGCFh63SyE2bNZdGUV7Rj5ukK1XgrxesoxyKQNiRN`.
+- **7 distinct fee payers among 9 wide payloads** — not one service wallet or one bot; and **zero overlap** with the controls' fee payers.
+- **9/9 wide payloads were accepted on-chain** (`txErr: null`), against 8 of 12 controls that failed on-chain — which is the repo's own rule from the RFQ section: *decode refusal is evidence about the IDL, not about whether the program executed*, applied in the other direction here.
+- The wide payloads carry the **declared 14 accounts** (top-level) or 18 (the CPI case) — the account list is not the carrier.
+
+**The interface has not moved.** A fresh `sememe pull` of the program's on-chain IDL today (slot 464399566) returns fingerprint `sha256:e80f49b1…` — **byte-identical** to the fingerprint of the fixture pulled on 30.10. So "the published interface is stale" is refuted by a measurement, not assumed; the description has not changed in three days while the chain kept sending all three shapes.
+
+**What this changes for sememe.** The residual is now a named, reproducible *tolerance* finding instead of an open question:
+
+- The permissive mode is **right** for this case, and now for a measured reason: the program accepts these payloads, so refusing them would be a decoder defect. `trailing.count > 0` stays the place where the fact surfaces.
+- The **strict** mode refuses only the wide forms — and refuses them *as undeclared*, not by inventing a field for the extra bytes. The test pins exactly that: the 25-byte body must equal a `swap2` body, and every trailing byte must be zero.
+- A consumer who wants the narrower meaning can read the 25-byte form as `swap2`/`swap_mode = 0` — that is a **client-side interpretation** the interface does not license, and sememe does not perform it silently.
+
+**Falsification.** `test/cp-amm-wire-forms.test.mjs` (6 tests) re-derives every number above from the two committed fixtures and the committed IDL, and pins the observed wire-length set as exactly `{24, 25, 32}` / `{24, 25}` so a new shape goes red instead of widening the finding silently. The committed report is cross-checked against the fixtures (no hand-edited numbers). Mutation ladder, each mutation red on its own check: editing the report's wide count (1 fail), making one trailing byte non-zero (2 fail), marking a wide payload as failed on-chain (1 fail), introducing a new wire length 26 (3 fail) — restored tree green 6/6. Suite 244 → **250/250**.
+
+**Limits.** Two windows and one program id; 9 wide payloads total, so the *frequency* is not established (1.24% of `swap` payloads in 30.10., 1.05% in 02.11. — small samples on both sides). The 32-byte form did not appear in the fresh window, so it may be rarer now or slot-bound; that is stated, not resolved. The claim that the extra bytes are *tolerated* rests on the upstream source of the deployed program at one commit (`5398b5c`) — the deployed **binary** was not disassembled, and the on-chain IDL is not proof of what the binary does. No third party is involved; this is a measurement about a program's wire, not an adoption claim.
 
 ## Next qualification
 
