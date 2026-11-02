@@ -1,6 +1,6 @@
 {
   "name": "sememe",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Local, fingerprint-verified Solana program interfaces: pull an IDL once, then decode instructions, accounts and events offline. Zero dependencies on the decode path. Ships the SPL Token + Token-2022 wire tables derived from the pinned upstream Rust crates.",
   "license": "MIT",
   "type": "module",
