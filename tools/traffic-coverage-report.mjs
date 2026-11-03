@@ -45,6 +45,7 @@ import { fileURLToPath } from 'node:url';
 import { decodePayload, decodeUnionPayload } from '../src/decode.mjs';
 import { decodeNativeInstruction, isNativeProgram } from '../src/native.mjs';
 import { decodeTokenInstruction, isTokenProgram } from '../src/token.mjs';
+import { decodeRaydiumInstruction, isRaydiumProgram } from '../src/raydium.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
@@ -95,6 +96,21 @@ async function classify(program, hex) {
       };
     } catch (error) {
       return { outcome: 'refused', via: 'token-upstream', reason: String(error?.message ?? error).slice(0, 110) };
+    }
+  }
+
+  if (isRaydiumProgram(program)) {
+    try {
+      const decoded = decodeRaydiumInstruction(program, Buffer.from(hex, 'hex'), { trailing: 'report' });
+      return {
+        outcome: 'decoded',
+        via: 'raydium-upstream',
+        name: decoded.name,
+        byteExact: decoded.roundTripByteExact === true,
+        trailing: decoded.trailing?.count ?? 0,
+      };
+    } catch (error) {
+      return { outcome: 'refused', via: 'raydium-upstream', reason: String(error?.message ?? error).slice(0, 110) };
     }
   }
 
@@ -213,7 +229,7 @@ const report = {
     transactionsWithWatchedTraffic: sample.transactions.length,
     method: sample.meta.method,
     selection: 'contiguous newest finalized blocks — the store was not consulted when the sample was taken, so it carries no store-selection bias',
-    measurementPath: 'the product entry points (decodePayload / decodeUnionPayload / native decoder / token decoder) against the committed store fixture',
+    measurementPath: 'the product entry points (decodePayload / decodeUnionPayload / native decoder / token decoder / raydium decoder) against the committed store fixture',
   },
   headline: {
     watchedPayloads: total,

@@ -1,7 +1,7 @@
 {
   "name": "sememe",
   "version": "0.3.0",
-  "description": "Local, fingerprint-verified Solana program interfaces: pull an IDL once, then decode instructions, accounts and events offline. Zero dependencies on the decode path. Ships the SPL Token + Token-2022 wire tables derived from the pinned upstream Rust crates.",
+  "description": "Local, fingerprint-verified Solana program interfaces: pull an IDL once, then decode instructions, accounts and events offline. Zero dependencies on the decode path. Ships derived wire tables for System, ComputeBudget, SPL Token, Token-2022 and Raydium AMM v4, pinned to upstream Rust.",
   "license": "MIT",
   "type": "module",
   "main": "./index.mjs",
@@ -19,7 +19,8 @@
     "./native-corpus": "./src/native-corpus.mjs",
     "./native-audit": "./src/native-audit.mjs",
     "./package.json": "./package.json",
-    "./token": "./src/token.mjs"
+    "./token": "./src/token.mjs",
+    "./raydium": "./src/raydium.mjs"
   },
   "files": [
     "index.mjs",

@@ -318,14 +318,18 @@ test('the measured coverage gain is in the committed report, not a claim in pros
   const strict = JSON.parse(await readFile(new URL('../research/traffic-coverage-2026-11-02.json', import.meta.url), 'utf8'));
   assert.equal(strict.headline.absentPolicy, 'error');
   assert.equal(strict.headline.shortForm, 0, 'the strict measurement decodes no short form');
-  assert.equal(strict.headline.decoded, 12391);
+  assert.equal(strict.headline.decoded, 12400);
   assert.equal(strict.headline.refused, 172);
 
-  // The gain is exactly the measured short forms: 12,391 + 171 = 12,562.
+  // The gain is exactly the measured short forms: 12,400 + 171 = 12,571.
   assert.equal(headline.decoded, strict.headline.decoded + 171);
   assert.equal(headline.refused, strict.headline.refused - 171);
   assert.equal(headline.refused, 1, 'one refusal remains — the Token-2022 tag-210 payload, not a short form');
   assert.equal(headline.watchedPayloads, strict.headline.watchedPayloads,
     'the denominator did not move');
-  assert.equal(headline.coveredPct, 99.9);
+  // 12,571 of 12,572 is 99.99%: with the Raydium table in place the only
+  // payload neither path can name is that one Token-2022 refusal.
+  assert.equal(headline.coveredPct, 100);
+  assert.equal(headline.noInterface, 0,
+    'the acquisition gap is closed — no payload lacks an interface');
 });

@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-03T03:40:47.572Z",
+ "generatedAt": "2026-11-03T07:54:23.575Z",
  "sample": {
   "file": "test/fixtures/traffic-sample-2026-11-02.json",
   "store": "test/fixtures/traffic-sample-store",
@@ -15,15 +15,15 @@
   "transactionsWithWatchedTraffic": 1872,
   "method": "getBlock finalized full encoding:json maxSupportedTransactionVersion:1 rewards:false; contiguous newest finalized slots minus 2",
   "selection": "contiguous newest finalized blocks — the store was not consulted when the sample was taken, so it carries no store-selection bias",
-  "measurementPath": "the product entry points (decodePayload / decodeUnionPayload / native decoder / token decoder) against the committed store fixture"
+  "measurementPath": "the product entry points (decodePayload / decodeUnionPayload / native decoder / token decoder / raydium decoder) against the committed store fixture"
  },
  "headline": {
   "watchedPayloads": 12572,
-  "decoded": 12562,
+  "decoded": 12571,
   "refused": 1,
-  "noInterface": 9,
-  "coveredPct": 99.9,
-  "byteExact": 11869,
+  "noInterface": 0,
+  "coveredPct": 100,
+  "byteExact": 11878,
   "byteExactPctOfDecoded": 94.5,
   "shortForm": 171,
   "chainVerified": 171,
@@ -38,21 +38,17 @@
  },
  "refusalReasons": [
   {
-   "reason": "no-interface: no stored IDL for program 675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8 in test/fixtures/traffic-sample-store",
-   "count": 9
-  },
-  {
    "reason": "token-upstream: unknown-selector: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: tag 210 is not in the pinned Token-2022 interfa",
    "count": 1
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 7707,
-  "decoded_txFailed": 4855,
+  "decoded_txSuccess": 7711,
+  "decoded_txFailed": 4860,
   "refused_txSuccess": 1,
   "refused_txFailed": 0,
-  "noInterface_txSuccess": 4,
-  "noInterface_txFailed": 5
+  "noInterface_txSuccess": 0,
+  "noInterface_txFailed": 0
  },
  "programs": [
   {
@@ -269,16 +265,16 @@
    "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
    "name": "Raydium AMM v4",
    "acquirable": false,
-   "decoded": 0,
+   "decoded": 9,
    "refused": 0,
-   "noInterface": 9,
-   "byteExact": 0,
+   "noInterface": 0,
+   "byteExact": 9,
    "describedExact": 0,
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
    "payloads": 9,
-   "coveredPct": 0
+   "coveredPct": 100
   },
   {
    "program": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
@@ -296,13 +292,5 @@
    "coveredPct": 100
   }
  ],
- "acquisitionQueue": [
-  {
-   "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
-   "name": "Raydium AMM v4",
-   "payloads": 9,
-   "acquirable": false,
-   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
-  }
- ]
+ "acquisitionQueue": []
 }

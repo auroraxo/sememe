@@ -22,6 +22,9 @@
 //      by the installed copy ("object and receipt disagree"), never decoded.
 //   5. sememe/native resolves as a subpath and decodes a real System-program
 //      payload against the pinned upstream derivation.
+//   5b. sememe/raydium resolves as a subpath and decodes a real Raydium AMM v4
+//      payload against the vendored program source — the one path where a
+//      consumer has no store to fall back on.
 //   6. The installed CLI decodes without any dependency installed
 //      (`sememe decode` must not load @solana/web3.js).
 //
@@ -44,6 +47,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const WHIRLPOOL = 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc';
 const SYSTEM = '11111111111111111111111111111111';
+const RAYDIUM = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
 
 const args = process.argv.slice(2);
 const preRef = (() => { const i = args.indexOf('--pre'); return i >= 0 ? args[i + 1] : null; })();
@@ -195,6 +199,24 @@ async function main() {
       out.trim() || (nativeProbe.stderr || '').slice(0, 120));
   } else {
     check('sememe/native subpath decodes a real System payload', false, 'no payload in fixture');
+  }
+
+  // ---------- sememe/raydium subpath: real Raydium AMM v4 payload, no store to fall back on
+  const traffic = JSON.parse(fs.readFileSync(path.join(ROOT, 'test/fixtures', 'traffic-sample-2026-11-02.json'), 'utf8'));
+  const rayPayload = traffic.transactions.flatMap((t) => t.payloads ?? [])
+    .find((p) => p.program === RAYDIUM);
+  if (rayPayload) {
+    const rayProbe = spawnSync('node', ['-e', `
+      import('sememe/raydium').then(async ({ decodeRaydiumInstruction }) => {
+        const d = decodeRaydiumInstruction('${RAYDIUM}', Buffer.from('${rayPayload.dataHex}', 'hex'));
+        console.log('RAYDIUM:' + d.name + ':' + d.roundTripByteExact + ':' + d.trailing.count);
+      }).catch(e => { console.log('RAYDIUM_FAILED:' + e.message); });`, ], { cwd: app, encoding: 'utf8' });
+    const out = String(rayProbe.stdout || '');
+    check('sememe/raydium subpath decodes a real Raydium payload byte-exactly',
+      out.startsWith('RAYDIUM:') && !out.includes('false') && out.trim().endsWith(':0'),
+      out.trim() || (rayProbe.stderr || '').slice(0, 120));
+  } else {
+    check('sememe/raydium subpath decodes a real Raydium payload byte-exactly', false, 'no Raydium payload in sample');
   }
 
   // ---------- the consumer's trio + the audit surfaces: what solana-tx-remix imports

@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus the two token programs (SPL Token, Token-2022) whose wire tables are derived from the pinned upstream Rust crates because they publish no IDL at all — 5,401/5,402 real mainnet payloads named, lifting unbiased-traffic coverage from 55.5% to 98.5% (2026-11-02) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus five programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget) and Raydium AMM v4, all five with wire tables DERIVED from pinned upstream Rust — and all 12,572 unbiased real-mainnet payloads now have an interface to decode against, lifting coverage from 55.5% to 98.6% strict / 100% with the chain-verified short forms (2026-11-03) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -29,7 +29,7 @@ const result = await decodePayload('./store', 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYz
 // result.name, result.args, result.roundTripByteExact, result.idl.fingerprint
 ```
 
-The decode path installs **zero runtime dependencies**: `sememe` itself has none on its entry, and every file it reaches imports only `node:` builtins. Beyond the entry, the package exports `sememe/native` (System + ComputeBudget, derived at import from the pinned upstream sources), `sememe/store` (read/verify receipts), `sememe/pull` (acquisition) and the low-level surfaces a consumer may need directly: `sememe/codec`, `sememe/canonical`, `sememe/discriminators`. Two audit surfaces let a consumer falsify the table it was handed instead of trusting it: `sememe/native-corpus` (the real mainnet System/ComputeBudget harvests the decoder was qualified against, re-hashed on every read) and `sememe/native-audit` (re-derive the native tables from the pinned vendored Rust and byte-compare the shipped artifacts — the same audit the suite runs).
+The decode path installs **zero runtime dependencies**: `sememe` itself has none on its entry, and every file it reaches imports only `node:` builtins. Beyond the entry, the package exports `sememe/native` (System + ComputeBudget, derived at import from the pinned upstream sources), `sememe/token` (SPL Token + Token-2022, derived the same way from the pinned interface crates), `sememe/raydium` (Raydium AMM v4, derived from its pinned program source), `sememe/store` (read/verify receipts), `sememe/pull` (acquisition) and the low-level surfaces a consumer may need directly: `sememe/codec`, `sememe/canonical`, `sememe/discriminators`. Two audit surfaces let a consumer falsify the table it was handed instead of trusting it: `sememe/native-corpus` (the real mainnet System/ComputeBudget harvests the decoder was qualified against, re-hashed on every read) and `sememe/native-audit` (re-derive the native tables from the pinned vendored Rust and byte-compare the shipped artifacts — the same audit the suite runs).
 
 **Acquisition is the one path that needs a package**, because deriving the Program Metadata PDA needs ed25519: `npm install github:auroraxo/sememe#v0.3.0 @solana/web3.js`. `@solana/web3.js` is declared as an *optional peer* precisely so a decoder-only consumer is never asked to install it. The CLI refuses `sememe pull` without it, with that instruction, and still runs every other subcommand.
 
@@ -614,7 +614,7 @@ instruction — a different upstream crate, refused by name rather than force-fi
 422 payloads with explained trailing bytes. Overall coverage on that sample moved from
 **55.5% to 98.5%**; the denominator never moved, the product gained a decode path.
 (A later step — adopting Jupiter Lend's published Liquidity IDL, see below — moved
-it to 98.6%.)
+it to 98.6%; the Raydium AMM v4 derivation, also below, took no-interface to 0.)
 
 Falsification (`test/token-interface.test.mjs`, 8 tests, each a mutation in a temp copy of
 the repo): swap two args in the artifact → load refused; edit the vendored Rust → load
@@ -798,7 +798,7 @@ first-party published copies).
 
 **The measurement.** `tools/traffic-coverage-report.mjs` runs every payload
 through the product's own entry points — `decodeUnionPayload`, `decodePayload`,
-the native decoder and the token decoder — and asks one question per payload:
+and the native, token and Raydium decoders — and asks one question per payload:
 could sememe have NAMED it? The four outcomes are kept apart on purpose.
 
 **First run, same day, same sample (kept for the record):** decoded 6,983,
@@ -816,11 +816,11 @@ derivation check, same two-check contract as the native tables).
 
 | outcome (current) | count | meaning |
 | --- | --- | --- |
-| decoded | 12,391 | an available interface named it |
+| decoded | 12,400 | an available interface named it |
 | refused | 172 | an interface exists and the bytes were refused (source lag, incl. 1 token payload: a token-metadata fallback instruction, a different upstream crate, refused rather than force-fitted) |
-| no-interface | 9 | no interface is acquirable for that program at all (Raydium AMM v4: 9) |
+| no-interface | **0** | no payload in this sample lacks an interface |
 
-**98.6% coverage** (12,391/12,572 watched payloads), with 11,698/12,391 = 94.4%
+**98.6% coverage** (12,400/12,572 watched payloads), with 11,707/12,400 = 94.4%
 of the decoded payloads re-encoding byte-exactly. What the 700 non-byte-exact
 decodes are, measured: 419 legacy `GetAccountDataSize` payloads carry two extra
 bytes the legacy program itself ignores (upstream's own comment says so), and
@@ -829,12 +829,17 @@ this table reports as trailing instead of inventing a field for them. The
 trailing count is part of the result, not a failure hidden by it.
 
 **What the number means now.** The acquisition gap this measurement existed to
-expose is closed for the program family that carried it: the remaining
-no-interface traffic is 9 payloads on ONE program (Raydium AMM v4). "Refused" (172) is
-source lag in interfaces that exist — PumpSwap's undeclared discriminator form
-and pump.fun's unexplained event tail are the bulk of it, both already reported
-to the first parties. The denominator never moved: same sample, same product
-entry points, one new decode path derived from upstream.
+expose is **empty for this sample**: every watched payload now sits on a program
+that has an interface sememe can decode against, so `acquisitionQueue` carries
+no entry. "Refused" (172) is source lag in interfaces that exist — PumpSwap's
+undeclared discriminator form and pump.fun's unexplained event tail are the bulk
+of it, both already reported to the first parties. The denominator never moved:
+same sample, same product entry points, one new decode path per gap.
+
+Empty is a property of these four blocks, not of the ecosystem. The coverage
+illusion the card names is **measured, not removed**: one window, one RPC, no
+outside user. A different window can put a program back in the queue, and the
+queue is derived from the rows, so that would show up as a row first.
 
 **The union path is a coverage lever, not a decode nicety.** Adopting the
 first-party published copy `pump-fun/pump-public-docs` `idl/pump_amm.json` moved
@@ -875,6 +880,46 @@ adopted receipt and the gap comes back by name** — the number moved because an
 interface was added, not a counter; the committed report and queue reflect the
 closure) plus the adopted-only union tests in `test/union.test.mjs`.
 
+**The last gap closed by derivation: Raydium AMM v4 (2026-11-03).** The final
+9 payloads sat on a program that publishes no interface at all — no IDL account
+either pullable address, measured at capture time and re-measured live. Unlike
+Jupiter Liquidity there was no first-party copy to adopt: its wire is not an
+Anchor 8-byte discriminator but a hand-written `pack()`/`unpack()` pair over a
+**sparse u8 tag set** (19 declared variants, 12 reachable on the wire, 7 refused
+by upstream with `unimplemented!()`). So the interface was derived from the
+program's own source, exactly as the token tables were derived from their
+crates: `vendor/raydium-amm@91739d8d` (Apache-2.0, license + sha256 pin on both
+files), `src/raydium-interface.mjs` for the rules, `interface/raydium-<program>.json`
+as the reviewable artifact, `src/raydium.mjs` for the two-check load and decode.
+
+The derivation reads upstream's own text rather than transcribing it: the wire
+tag is the literal integer the `pack()` arm pushes, cross-checked against the
+`unpack()` arm that binds that same integer; the args are the arm's byte-write
+sequence, cross-checked against the reads by count and width; a trailing
+optional group carries upstream's own `rest.len() >= N` threshold (**there is no
+option byte**, so a C-style read would misparse every real payload); a branch
+carries upstream's own discriminator values from the `AmmParams` enum. Because
+the seven refused variants have no `pack()` arm to read a number from, their
+tags come from their declaration position — which is checked against all twelve
+reachable variants first, so an upstream reorder fails the derivation instead
+of handing a refused tag a wrong name.
+
+Measured on the same sample, same entry points: **9/9 payloads decode and
+re-encode byte-exact** (`SwapBaseIn` ×2, `SwapBaseInV2` ×7), `no-interface`
+**9 → 0**, and `acquisitionQueue` is empty. The decoder ships as `sememe/raydium`
+with `sememe decode-raydium` / `sememe raydium-provenance`, and `sememe decode`
+on this program now points at it instead of telling the user to pull a receipt
+that can never exist.
+
+Falsification (`test/raydium-interface.test.mjs`, 12 tests, mutations in temp
+copies): a tampered artifact, a tampered `instruction.rs`, a tampered `state.rs`
+and a missing `vendor/` all refuse the load; removing the load-time equality
+check turns all four into silent passes (measured: 9 of 12 tests go red).
+Refusals are pinned by reason — unknown tag, each refused variant, truncated
+u64/pubkey/fees, unmatched discriminator, wildcard rejection — and the optional
+group round-trips in both directions with half a group refused as
+`partial-optional` rather than guessed.
+
 **Limits.** One four-block window (~20 seconds of mainnet), one RPC. The
 acquisability check ran at capture time and reflects that moment. The token
 tables are derived from upstream's interface crates at one pin each; a tagged
@@ -886,8 +931,10 @@ discriminators, own crate) is not vendored — its payloads refuse by name.
 Traffic outside the watched list (181 further programs, 4,842 instructions) is
 counted in the report but excluded from the denominator, because their bytes are
 not stored. A coverage number over one window is a window, not the ecosystem —
-this one can only be compared with another measurement of the same kind.
-Reproduce: `npm test` (the report is pinned twice — as a deep-equal against
+this one can only be compared with another measurement of the same kind. The
+Raydium table is derived at one pin of one repository; a tagged upstream change
+to a `pack()` arm refuses the load loudly rather than decoding stale. Reproduce:
+`npm test` (the report is pinned twice — as a deep-equal against
 what the tool computes, and as explicit assertions), or
 `node tools/traffic-coverage-report.mjs`.
 
@@ -956,11 +1003,11 @@ under `verified`; that asymmetry is the whole point, and it is a test
 
 | outcome | strict | `--absent verified` |
 | --- | --- | --- |
-| decoded | 12,391 | 12,562 (+171) |
+| decoded | 12,400 | 12,571 (+171) |
 | refused | 172 | 1 (the Token-2022 payload) |
-| no-interface | 9 | 9 |
-| coverage | 98.6% | **99.9%** |
-| byte-exact | 11,698 | 11,869 (+171, every short form re-encodes exactly) |
+| no-interface | 0 | 0 |
+| coverage | 98.6% | **100%** |
+| byte-exact | 11,707 | 11,878 (+171, every short form re-encodes exactly) |
 
 The denominator did not move; the strict measurement is unchanged and still
 committed, because a gain that only exists when you relax the decoder is a
@@ -969,8 +1016,9 @@ finding to measure, not a number to replace. Reproduce:
 ([`research/short-form-coverage-2026-11-03.json`](research/short-form-coverage-2026-11-03.json)).
 
 **What is still open.** The remaining 1 refusal is a Token-2022 tag the pinned
-table does not carry; the 9 no-interface payloads are unchanged (acquisition,
-not decoding); and the short-form table covers one four-block window — a
+table does not carry; the acquisition queue is empty *for this sample* (the
+Raydium closure above removed the last entry, and a different window can put a
+program back); and the short-form table covers one four-block window — a
 longer window may well find a short form nobody has witnessed, which must
 refuse under `verified` until a witness exists.
 

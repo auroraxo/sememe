@@ -162,8 +162,14 @@ test('the committed report and the acquisition queue reflect the closure', async
 
   assert.equal(report.acquisitionQueue.some((r) => r.program === JUPITER), false,
     'Jupiter Liquidity left the acquisition queue — it has a verified interface now');
-  assert.deepEqual(report.acquisitionQueue.map((r) => r.name), ['Raydium AMM v4'],
-    'the whole remaining acquisition gap is Raydium AMM v4 (9 payloads)');
-  assert.equal(report.headline.noInterface, 9);
-  assert.equal(report.headline.decoded, 12391);
+  // The last gap closed the same day: Raydium AMM v4 now decodes through the
+  // table derived from its own upstream program source (src/raydium.mjs), so
+  // no payload in the sample lacks an interface any more.
+  assert.deepEqual(report.acquisitionQueue.map((r) => r.name), [],
+    'the acquisition queue is empty — every watched payload has an interface');
+  assert.equal(report.headline.noInterface, 0);
+  assert.equal(report.headline.decoded, 12400);
+  const raydiumRow = report.programs.find((r) => r.program === '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8');
+  assert.equal(raydiumRow.decoded, 9, 'all nine Raydium payloads named by the derived table');
+  assert.equal(raydiumRow.noInterface, 0);
 });

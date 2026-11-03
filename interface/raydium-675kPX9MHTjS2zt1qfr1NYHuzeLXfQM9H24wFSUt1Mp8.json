@@ -1,0 +1,352 @@
+{
+  "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+  "label": "Raydium AMM v4",
+  "scheme": "legacy-rust",
+  "source": {
+    "repo": "raydium-io/raydium-amm",
+    "pin": "91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6",
+    "files": [
+      {
+        "path": "program/src/instruction.rs",
+        "sha256": "sha256:499a331b01a1142975dece9ca7258a937ae0598422c33ec516c2f3e4883e0818"
+      },
+      {
+        "path": "program/src/state.rs",
+        "sha256": "sha256:52ce5407aa5343d93965c8ab20861e4aaf62dbb84f73f047dc666d73d14998d8"
+      }
+    ],
+    "vendoredAt": "vendor/raydium-amm/91739d8d9f5cf347e0ce14ebe4d2bb7069fb31b6",
+    "derivation": "src/raydium-interface.mjs: tag = the literal integer upstream's pack() arm pushes, cross-checked against the unpack() arm that binds it; args = the pack() arm's byte-write sequence, cross-checked against unpack()'s reads by count and width; optional groups carry upstream's own rest.len() >= N threshold; branches carry upstream's own discriminator values (AmmParams enum text or numeric literal)"
+  },
+  "runtime": "raydium-io/raydium-amm at this pin: unpack() binds an explicit sparse u8 tag and reads with unpack_u8/unpack_u64; an unknown tag is InvalidInstructionData; the variants upstream marks unsupported panic (unimplemented!())",
+  "selector": {
+    "width": 1,
+    "encoding": "u8 enum tag (explicit, sparse — upstream declares 19 variants, 12 are reachable)"
+  },
+  "argEncoding": "u8/u16/u32/u64 LE; pubkey 32 raw bytes; optional groups are PRESENT only when upstream's rest.len() >= N threshold holds (no C-style option tag); amm_fees = upstream's packed Fees struct (8 x u64 LE)",
+  "ammFees": {
+    "len": 64,
+    "fields": [
+      {
+        "name": "min_separate_numerator",
+        "type": "u64"
+      },
+      {
+        "name": "min_separate_denominator",
+        "type": "u64"
+      },
+      {
+        "name": "trade_fee_numerator",
+        "type": "u64"
+      },
+      {
+        "name": "trade_fee_denominator",
+        "type": "u64"
+      },
+      {
+        "name": "pnl_numerator",
+        "type": "u64"
+      },
+      {
+        "name": "pnl_denominator",
+        "type": "u64"
+      },
+      {
+        "name": "swap_fee_numerator",
+        "type": "u64"
+      },
+      {
+        "name": "swap_fee_denominator",
+        "type": "u64"
+      }
+    ]
+  },
+  "instructions": [
+    {
+      "tag": 0,
+      "name": "Initialize",
+      "wire": "rejected",
+      "reason": "upstream marks this variant unsupported (unimplemented!() in unpack(); InvalidInstructionData in pack())",
+      "args": []
+    },
+    {
+      "tag": 1,
+      "name": "Initialize2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u8"
+        },
+        {
+          "name": "open_time",
+          "type": "u64"
+        },
+        {
+          "name": "init_pc_amount",
+          "type": "u64"
+        },
+        {
+          "name": "init_coin_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 2,
+      "name": "MonitorStep",
+      "wire": "rejected",
+      "reason": "upstream marks this variant unsupported (unimplemented!() in unpack(); InvalidInstructionData in pack())",
+      "args": []
+    },
+    {
+      "tag": 3,
+      "name": "Deposit",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "max_coin_amount",
+          "type": "u64"
+        },
+        {
+          "name": "max_pc_amount",
+          "type": "u64"
+        },
+        {
+          "name": "base_side",
+          "type": "u64"
+        }
+      ],
+      "optional": {
+        "presentWhenRemainingAtLeast": 8,
+        "args": [
+          {
+            "name": "other_amount_min",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "tag": 4,
+      "name": "Withdraw",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ],
+      "optional": {
+        "presentWhenRemainingAtLeast": 16,
+        "args": [
+          {
+            "name": "min_coin_amount",
+            "type": "u64"
+          },
+          {
+            "name": "min_pc_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "tag": 5,
+      "name": "MigrateToOpenBook",
+      "wire": "rejected",
+      "reason": "upstream marks this variant unsupported (unimplemented!() in unpack(); InvalidInstructionData in pack())",
+      "args": []
+    },
+    {
+      "tag": 6,
+      "name": "SetParams",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "param",
+          "type": "u8"
+        }
+      ],
+      "branches": [
+        {
+          "on": "param",
+          "values": [
+            2
+          ],
+          "args": [
+            {
+              "name": "fees_slice",
+              "type": "amm_fees"
+            }
+          ]
+        },
+        {
+          "on": "param",
+          "values": [
+            0,
+            1,
+            3
+          ],
+          "args": [
+            {
+              "name": "value",
+              "type": "u64"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "tag": 7,
+      "name": "WithdrawPnl",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 8,
+      "name": "WithdrawSrm",
+      "wire": "rejected",
+      "reason": "upstream marks this variant unsupported (unimplemented!() in unpack(); InvalidInstructionData in pack())",
+      "args": []
+    },
+    {
+      "tag": 9,
+      "name": "SwapBaseIn",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount_in",
+          "type": "u64"
+        },
+        {
+          "name": "minimum_amount_out",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 10,
+      "name": "PreInitialize",
+      "wire": "rejected",
+      "reason": "upstream marks this variant unsupported (unimplemented!() in unpack(); InvalidInstructionData in pack())",
+      "args": []
+    },
+    {
+      "tag": 11,
+      "name": "SwapBaseOut",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "max_amount_in",
+          "type": "u64"
+        },
+        {
+          "name": "amount_out",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 12,
+      "name": "SimulateInfo",
+      "wire": "rejected",
+      "reason": "upstream marks this variant unsupported (unimplemented!() in unpack(); InvalidInstructionData in pack())",
+      "args": []
+    },
+    {
+      "tag": 13,
+      "name": "AdminCancelOrders",
+      "wire": "rejected",
+      "reason": "upstream marks this variant unsupported (unimplemented!() in unpack(); InvalidInstructionData in pack())",
+      "args": []
+    },
+    {
+      "tag": 14,
+      "name": "CreateConfigAccount",
+      "wire": "accepted",
+      "args": []
+    },
+    {
+      "tag": 15,
+      "name": "UpdateConfigAccount",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "param",
+          "type": "u8"
+        }
+      ],
+      "branches": [
+        {
+          "on": "param",
+          "values": [
+            0,
+            1
+          ],
+          "args": [
+            {
+              "name": "owner",
+              "type": "pubkey"
+            }
+          ]
+        },
+        {
+          "on": "param",
+          "values": [
+            2
+          ],
+          "args": [
+            {
+              "name": "create_pool_fee",
+              "type": "u64"
+            }
+          ]
+        },
+        {
+          "on": "param",
+          "values": null,
+          "wire": "rejected",
+          "reason": "upstream refuses this discriminator value",
+          "args": []
+        }
+      ]
+    },
+    {
+      "tag": 16,
+      "name": "SwapBaseInV2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "amount_in",
+          "type": "u64"
+        },
+        {
+          "name": "minimum_amount_out",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 17,
+      "name": "SwapBaseOutV2",
+      "wire": "accepted",
+      "args": [
+        {
+          "name": "max_amount_in",
+          "type": "u64"
+        },
+        {
+          "name": "amount_out",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "tag": 18,
+      "name": "WithdrawExcessLamports",
+      "wire": "accepted",
+      "args": []
+    }
+  ]
+}

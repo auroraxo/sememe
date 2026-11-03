@@ -8,11 +8,14 @@ import path from 'node:path';
 // unless a pull is actually requested.
 import { decodePayload, decodeStoredAccount, decodeUnionPayload, adopt, parsePayload } from '../src/decode.mjs';
 import {
-  decodeNativeInstruction, nativeProvenance, nativePrograms,
+  decodeNativeInstruction, nativeProvenance, nativePrograms, isNativeProgram,
 } from '../src/native.mjs';
 import {
-  decodeTokenInstruction, tokenProvenance, tokenPrograms,
+  decodeTokenInstruction, tokenProvenance, tokenPrograms, isTokenProgram,
 } from '../src/token.mjs';
+import {
+  decodeRaydiumInstruction, raydiumProvenance, raydiumPrograms, isRaydiumProgram,
+} from '../src/raydium.mjs';
 import { toJsonSafe } from '../src/codec.mjs';
 import { VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE } from '../src/short-forms.mjs';
 
@@ -56,7 +59,15 @@ const usage = `usage:
       decodes against that pin. Extension sub-instructions report as trailing.
   sememe token-provenance [program-id]
       print the pinned crate, encoding rule and variant count for a token
-      program (or for both).`; 
+      program (or for both).
+  sememe decode-raydium <program-id> <payload> [--trailing report|error]
+      payload: base58 or hex instruction data. For RAYDIUM AMM V4 there is no
+      IDL account to pull at either address: its interface is pinned from the
+      upstream program source (sparse u8 tag, pack/unpack wire rule), and this
+      decodes against that pin. Variants upstream itself refuses stay refused.
+  sememe raydium-provenance [program-id]
+      print the pinned upstream commit, encoding rule and variant counts for a
+      Raydium program (or for all of them).`; 
 
 const [rawCommand, rawProgram, ...rawArgs] = process.argv.slice(2);
 const command = rawCommand;
@@ -130,9 +141,32 @@ try {
     }
     const union = unionRequested;
     const extra = { ...(trailing === undefined ? {} : { trailing }), ...(absent === undefined ? {} : { absent }) };
-    const decoded = union
-      ? await decodeUnionPayload(store, program, payload, extra)
-      : await decodePayload(store, program, payload, extra);
+    // A program that publishes NO interface — the two token programs, the two
+    // native programs, Raydium AMM v4 — has no stored receipt, so the store
+    // path cannot answer for it. That is not a missing-pull problem and the
+    // error must not say it is: name the vendored path that CAN answer, or a
+    // first-time user reads "run sememe pull" as the fix and pulls forever.
+    const vendored = (programId) => (isTokenProgram(programId) ? 'decode-token'
+      : isNativeProgram(programId) ? 'decode-native'
+        : isRaydiumProgram(programId) ? 'decode-raydium' : null);
+    let decoded;
+    try {
+      decoded = union
+        ? await decodeUnionPayload(store, program, payload, extra)
+        : await decodePayload(store, program, payload, extra);
+    } catch (error) {
+      const message = String(error?.message ?? error);
+      const command = vendored(program);
+      if (command && (message.startsWith('no stored IDL for program') || message.startsWith('no sememe store at'))) {
+        // The vendored answer is the whole answer: no pull will ever create a
+        // receipt for this program, so the "run sememe pull" part of the
+        // store's message is dropped rather than left to contradict the hint.
+        throw Error(`${program} publishes no interface to pull, so there is nothing to store — ` +
+          `its wire table is pinned from upstream instead.\n` +
+          `  use: sememe ${command} ${program} <payload>`);
+      }
+      throw error;
+    }
     console.log(JSON.stringify(decoded, null, 2));
     // A short-form decode is a measurement-backed claim, so the evidence is
     // surfaced on stderr as well: a scripted caller should not have to know
@@ -223,6 +257,41 @@ try {
     } else {
       console.log(JSON.stringify(tokenPrograms().map((id) => tokenProvenance(id)), null, 2));
     }
+  } else if (command === 'raydium-provenance') {
+    const wanted = program;
+    if (wanted) {
+      const provenance = raydiumProvenance(wanted);
+      if (!provenance) throw Error(`${wanted} is not a Raydium program sememe pins`);
+      console.log(JSON.stringify(provenance, null, 2));
+    } else {
+      console.log(JSON.stringify(raydiumPrograms().map((id) => raydiumProvenance(id)), null, 2));
+    }
+  } else if (command === 'decode-raydium') {
+    if (!program) throw Error('decode-raydium needs a program id');
+    const payload = args.shift();
+    if (!payload) throw Error('decode-raydium needs an instruction payload');
+    const trailing = option('--trailing', 'report');
+    if (trailing !== 'report' && trailing !== 'error') {
+      throw Error('--trailing must be "report" or "error"');
+    }
+    const decoded = decodeRaydiumInstruction(program, parsePayload(payload), { trailing });
+    if (decoded.refused === 'not-raydium') {
+      throw Error(`${program} is not a Raydium program sememe pins — try decode-native, decode-token or decode`);
+    }
+    console.log(JSON.stringify({
+      program,
+      kind: 'raydium-instruction',
+      name: decoded.name,
+      tag: decoded.tag,
+      selectorWidth: decoded.selectorWidth,
+      args: toJsonSafe(decoded.args),
+      absent: decoded.absent,
+      bytes: decoded.bytes,
+      consumed: decoded.consumed,
+      trailing: decoded.trailing,
+      roundTripByteExact: decoded.roundTripByteExact,
+      interface: raydiumProvenance(program),
+    }, null, 2));
   } else if (command === 'account') {
     if (!program) throw Error('account needs a program id');
     const data = args.shift();
