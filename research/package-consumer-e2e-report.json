@@ -149,7 +149,12 @@
       "name": "installed CLI decodes without any dependency installed",
       "pass": true,
       "detail": "name=swap"
+    },
+    {
+      "name": "installed CLI checks the account list and finds the undeclared co-signer",
+      "pass": false,
+      "detail": "exit=2 verdict="
     }
   ],
-  "at": "2026-11-03T17:27:27.657Z"
+  "at": "2026-11-03T21:35:15.027Z"
 }

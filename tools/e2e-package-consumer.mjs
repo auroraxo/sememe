@@ -46,6 +46,16 @@ import { canonicalJson } from '../src/canonical.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const WHIRLPOOL = 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc';
+// The order-engine fixture: the program whose live fills carry the undeclared
+// co-signer (jup-ag/rfq-webhook-toolkit#96). Used by the conformance check so
+// the installed package proves the finding too, not just the decode surface.
+const ORDER_ENGINE = '2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1';
+const ORDER_ENGINE_IDL = path.join(ROOT, 'test/fixtures/traffic-sample-store-2026-11-03',
+  'objects', 'f13a31e663c13c0fe47aa4c5a147951eaf0cb5c4e3bb825da4b8ead4e8988c91.json');
+const ORDER_ENGINE_RECEIPT = path.join(ROOT, 'test/fixtures/traffic-sample-store-2026-11-03',
+  'receipts',
+  '2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1-464182250-anchor-f13a31e663c13c0fe47aa4c5a147951eaf0cb5c4e3bb825da4b8ead4e8988c91.json');
+const ORDER_ENGINE_TX = path.join(ROOT, 'test/fixtures/order-engine-conformance-tx.json');
 const SYSTEM = '11111111111111111111111111111111';
 const RAYDIUM = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
 const TOKEN_2022 = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
@@ -131,6 +141,10 @@ async function main() {
     path.join(store, 'receipts', `${WHIRLPOOL}-${receiptFixture.slot}-metadata-${fingerprint}.json`),
     JSON.stringify(receiptFixture),
   );
+  // The order-engine interface rides in the same store: a checked-in receipt
+  // (slot 464182250, fingerprint re-hashed by the installed copy on read).
+  fs.copyFileSync(ORDER_ENGINE_IDL, path.join(store, 'objects', path.basename(ORDER_ENGINE_IDL)));
+  fs.copyFileSync(ORDER_ENGINE_RECEIPT, path.join(store, 'receipts', path.basename(ORDER_ENGINE_RECEIPT)));
 
   const harvest = JSON.parse(fs.readFileSync(path.join(ROOT, 'test/fixtures/harvest-whirlpool-2026-10-28.json'), 'utf8'));
   const payloads = harvest.transactions.flatMap((t) => (t.payloads ?? []).map((p) => ({ sig: t.signature, ...p })));
@@ -280,6 +294,25 @@ async function main() {
   let cliName = '';
   try { cliName = JSON.parse(cli.stdout).name ?? ''; } catch { cliOk = false; }
   check('installed CLI decodes without any dependency installed', cliOk && cliName.length > 0, `name=${cliName}`);
+
+  // ---------- conformance: the installed package checks the ACCOUNT LIST of
+  // a real fill against the stored interface and finds the undeclared
+  // co-signer — the finding that was reported to the first party as issue #96.
+  const conformTx = JSON.parse(fs.readFileSync(ORDER_ENGINE_TX, 'utf8'));
+  fs.writeFileSync(path.join(app, 'conform-tx.json'), JSON.stringify(conformTx));
+  const conformCli = spawnSync('node', [path.join(app, 'node_modules', 'sememe', 'bin', 'sememe.mjs'), 'conform',
+    path.join(app, 'conform-tx.json'), '--store', store, '--only', ORDER_ENGINE],
+  { cwd: app, encoding: 'utf8' });
+  let conformVerdict = '';
+  let conformDetail = `exit=${conformCli.status}`;
+  try {
+    conformVerdict = JSON.parse(conformCli.stdout).rows[0].verdict ?? '';
+    conformDetail += ` verdict=${conformVerdict} stderr=${String(conformCli.stderr || '').slice(0, 120)}`;
+  } catch {
+    conformDetail += ` stdout=${String(conformCli.stdout || '').slice(0, 120)} stderr=${String(conformCli.stderr || '').slice(0, 120)}`;
+  }
+  check('installed CLI checks the account list and finds the undeclared co-signer',
+    conformCli.status === 1 && conformVerdict === 'undeclared-signing-account', conformDetail);
 
   // ---------- report
   const report = {

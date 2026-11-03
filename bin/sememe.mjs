@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import os from 'node:os';
 import path from 'node:path';
+import { readFileSync } from 'node:fs';
 // `pull` is imported LAZILY (inside the branch): it is the only path that
 // needs @solana/web3.js. A consumer who installed the package for DECODING
 // only — the common case — must be able to run `sememe decode` without any
@@ -44,6 +45,13 @@ const usage = `usage:
       account-data: base64 account bytes (as getMultipleAccounts returns them)
           or hex. Without --name the account's 8-byte discriminator picks the
           account type from the stored IDL.
+  sememe conform <transaction.json> [--store <directory>] [--only <program-id>]
+      transaction.json: an RPC getTransaction/getBlock response entry
+          (encoding "json") with its meta — as saved by any RPC client.
+      Checks EVERY instruction of the transaction against the interface the
+      verified store declares for its program: account count, signer flags,
+      pinned addresses, and extra accounts. A disagreement is named; an
+      unreadable transaction shape is REFUSED, never reported as conforming.
   sememe decode-native <program-id> <payload> [--trailing report|error]
       payload: base58 or hex instruction data. For the NATIVE programs (System,
       ComputeBudget) there is no IDL to pull: their interface is pinned from
@@ -193,6 +201,26 @@ try {
         bytes: decoded.bytes,
         trailing: decoded.trailing,
       }));
+    }
+  } else if (command === 'conform') {
+    // The first positional after `conform` is the file (it lands in `program`
+    // like every other command's first argument).
+    const file = program ?? args.shift();
+    if (!file) throw Error('conform needs a transaction JSON file');
+    const store = option('--store', path.join(os.homedir(), '.sememe'));
+    const only = option('--only', undefined);
+    const envelope = JSON.parse(readFileSync(file, 'utf8'));
+    // Accept either a bare transaction entry or the full RPC envelope.
+    const transaction = envelope?.result ?? envelope;
+    const { checkTransaction } = await import('../src/conformance.mjs');
+    const report = await checkTransaction(transaction, store, only ? { only: [only] } : {});
+    console.log(JSON.stringify(report, null, 2));
+    const disagreement = report.summary.byVerdict;
+    const violations = Object.entries(disagreement)
+      .filter(([kind]) => ['missing-declared-accounts', 'declared-signer-not-signing', 'fixed-address-mismatch', 'undeclared-signing-account'].includes(kind));
+    if (violations.length) {
+      console.error(JSON.stringify({ note: 'account-list disagreement(s) found', kinds: violations.map(([kind, count]) => `${kind}:${count}`) }));
+      process.exitCode = 1;
     }
   } else if (command === 'decode-native') {
     if (!program) throw Error('decode-native needs a program id');

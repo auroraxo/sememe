@@ -1100,6 +1100,94 @@ that same processor and is still not vendored, so a group instruction would refu
 name; it has no payload in this window, so this is a stated boundary rather than a
 measured gap.
 
+## The interface's other half: the account list, checked against the wire (2026-11-03)
+
+Everything before this section verifies BYTES. An instruction is bytes AND an
+account list, and the account list is where a real first-party program diverged
+from its own interface: jup-ag's `order_engine` declared 11 accounts for `fill`
+while every observed fill carried 12 or 13 — and the extra account SIGNS every
+fill (reported as [jup-ag/rfq-webhook-toolkit#96](https://github.com/jup-ag/rfq-webhook-toolkit/issues/96)).
+A consumer that builds its signer/authority reasoning from the interface alone is
+blind to an account that signs.
+
+So the interface sememe stores now answers that question too, offline, from the
+same receipt-verified store:
+
+- `src/account-list.mjs` — `checkAccountList(instruction, observedAccounts)`:
+  compares an instruction's declared account list with the list one transaction
+  passed. Verdicts: `missing-declared-accounts`, `declared-signer-not-signing`,
+  `fixed-address-mismatch`, `undeclared-signing-account`, and the informational
+  `remaining-accounts` (extras that do NOT sign — Anchor's legitimate
+  `remaining_accounts`).
+- `src/conformance.mjs` — `checkTransaction(tx, store)`: every instruction of an
+  RPC `json`-shaped transaction (top level and CPI) checked against the stored
+  interface. The signer flags are derived from `message.header`'s counts —
+  `accountKeys` in that encoding carries addresses only — and a shape this file
+  cannot read is REFUSED (`ConformanceRefusal`), never reported as conforming.
+- `sememe conform <tx.json> --store <dir>`: the CLI entry; exit 1 on any
+  disagreement.
+- `tools/account-list-conformance.mjs`: the live measurement (program's own
+  signature page → `getTransaction` → every instruction checked).
+
+Four rules came out of the measurement, each from a case the first version got
+wrong, each pinned by a test that fails without its rule (19/20 on the stripped
+tree, 21/21 with it):
+
+1. **The optional flag has two spellings.** OpenBook v2's legacy IDL marks
+   `openOrdersAdmin` `isOptional: true, isSigner: true`; live traffic passes it
+   unsigned in 40/40 of one sample because the admin is not needed. Reading only
+   `optional` (the new spec) turned the account being ABSENT into 40 violations.
+2. **A declared signer that does not sign is a violation at depth 0 only.**
+   Whirlpool `swap_v2` invoked via CPI by the Titan router: the inner
+   instruction's `token_authority` is signed for inside the CPI stack
+   (`invoke_signed` PDA seeds), which never appears in the top-level
+   `numRequiredSignatures`. At depth > 0 the signer flag is not observable from
+   the header, so such a position is a named note (`cpi-signer-not-observable`),
+   not a violation. At depth 0 the header IS the authority and the check stands.
+3. **Anchor's absent-optional placeholder is the program's own id.** Comparing
+   that position's signer flag manufactures a violation out of the convention.
+4. **A declared-OPTIONAL signer arriving unsigned is absent, not violating**
+   (the same account being absent, reached through a different shape).
+
+**The measurement** ([research/account-list-conformance-2026-11-03.json](research/account-list-conformance-2026-11-03.json),
+2026-11-03T21:26Z, 170 RPC calls, 0 failures, 236 instructions from 137
+transactions of 6 programs, every row committed so the summaries re-derive from
+them):
+
+| program | instructions | verdicts |
+|---|---|---|
+| Whirlpool | 57 | 40 conforms, 17 remaining-accounts, 0 violations |
+| Jupiter v6 | 22 | 13 unknown-instruction, 2 conforms, 7 undeclared-signing-account |
+| OpenBook v2 | 43 | 36 conforms, 7 remaining-accounts, 0 violations |
+| PumpSwap | 56 | 25 remaining-accounts, 31 unknown-instruction |
+| pump.fun | 18 | 7 remaining-accounts, 10 unknown-instruction, 1 conforms |
+| jup-ag order\_engine | 40 | **40 undeclared-signing-account** |
+
+The contrast is the finding. Jupiter's signing extras sit inside routes of 14–43
+extra accounts and belong to 6 distinct caller wallets per 7 fills — the router
+passing the user's authority through, a legitimate `remaining_accounts` shape
+that happens to sign. order\_engine's signing extra is ONE CONSTANT address
+(`pAEmG7…`) in 40/40 fills, always at the LAST position, signing every fill and
+paying the fee in 31/141 of the November-1 sample: a hidden authority the
+published interface does not name. Same verdict kind, opposite meanings — which
+is why the report commits the rows, not just the counts.
+
+The `unknown-instruction` rows (54 total) are honest, not noise: pump.fun and
+PumpSwap's IDLs store all their discriminators (88/88 and 65/65 agree with
+Anchor's derivation), but the sampled fills carry NEWER instruction revisions
+than the stored pull (the `*_v2`/`*_v3` families measured in the short-form
+section above). A stale pull shows up here as unknown-instruction instead of a
+wrong decode — that is the check doing its job.
+
+**Known limits:** the signer observation is the transaction-level view — a CPI
+can sign for its PDAs and the header cannot see it (rule 2 handles the
+consequence, not the visibility); a program that legitimately accepts several
+account-list shapes produces one verdict per transaction, and only repeated
+agreement/disagreement across a sample means anything; writability disagreements
+are reported per position but never decide a verdict (the runtime enforces from
+the transaction, not the IDL); a failed transaction can have been rejected FOR
+one of these reasons, and `executed` is carried so a reader can tell.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
