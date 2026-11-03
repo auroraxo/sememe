@@ -318,10 +318,10 @@ test('the measured coverage gain is in the committed report, not a claim in pros
   const strict = JSON.parse(await readFile(new URL('../research/traffic-coverage-2026-11-02.json', import.meta.url), 'utf8'));
   assert.equal(strict.headline.absentPolicy, 'error');
   assert.equal(strict.headline.shortForm, 0, 'the strict measurement decodes no short form');
-  assert.equal(strict.headline.decoded, 12384);
+  assert.equal(strict.headline.decoded, 12391);
   assert.equal(strict.headline.refused, 172);
 
-  // The gain is exactly the measured short forms: 12,384 + 171 = 12,555.
+  // The gain is exactly the measured short forms: 12,391 + 171 = 12,562.
   assert.equal(headline.decoded, strict.headline.decoded + 171);
   assert.equal(headline.refused, strict.headline.refused - 171);
   assert.equal(headline.refused, 1, 'one refusal remains — the Token-2022 tag-210 payload, not a short form');

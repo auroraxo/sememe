@@ -167,7 +167,17 @@ function resultEnvelope(program, fields, winnerSource, view) {
  * fallback without byte evidence, and total refusal.
  */
 export function unionDecode({ program, primary, secondary, bytes, absent }) {
-  if (!primary?.idl) throw new UnionRefusal('invalid_input', 'unionDecode needs a primary source');
+  // An adopted copy is a VERIFIED source like any other: it may stand alone
+  // when there is no on-chain pull to sit next to. The acquisition gap
+  // (a program with no pullable IDL account — measured for Jupiter Liquidity
+  // and Raydium AMM v4 in the traffic sample) produced stores that hold a
+  // published copy and nothing else; refusing those with "needs a primary
+  // source" reported "no interface" about a store that has one, and made the
+  // union flag disagree with the plain decode on the same bytes.
+  // What an adopted copy must NEVER do is DISPLACE an on-chain pull: that is
+  // still the primary whenever one exists.
+  const soleSource = !primary?.idl && secondary?.idl ? secondary : null;
+  if (!primary?.idl && !soleSource) throw new UnionRefusal('invalid_input', 'unionDecode needs a primary source');
   if (!Buffer.isBuffer(bytes)) throw new UnionRefusal('invalid_input', 'unionDecode needs the payload bytes as a Buffer');
   // 'error' is the default and keeps the whole product strict. 'report' is the
   // opt-in that lets a source decode a wire form SHORTER than its own layout
@@ -177,8 +187,8 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
   if (absentPolicy !== 'report' && absentPolicy !== 'error') {
     throw new UnionRefusal('invalid_input', `unknown absent policy ${JSON.stringify(absent)}`);
   }
-  const prim = prepare(primary);
-  const sec = secondary?.idl ? prepare(secondary) : null;
+  const prim = prepare(soleSource ?? primary);
+  const sec = secondary?.idl && secondary !== soleSource ? prepare(secondary) : null;
 
   const primProbe = probe(prim, bytes, absentPolicy);
   const secProbe = sec ? probe(sec, bytes, absentPolicy) : null;
@@ -213,6 +223,7 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
     }
     const fields = decodeFields(prim, primProbe, bytes);
     view.verdict = 'single_source';
+    view.adoptedOnly = Boolean(soleSource);
     view.arbitration = { winner: prim.label, basis: 'only_source', evidence: primProbe.fullExact ? 'full_roundtrip' : 'described_roundtrip' };
     return resultEnvelope(program, fields, prim, view);
   }

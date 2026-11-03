@@ -48,20 +48,22 @@ const payloads = pumpHarvest.transactions.flatMap((tx) =>
   (tx.payloads ?? []).map((p) => ({ dataHex: p.dataHex, failed: tx.txErr !== null })));
 
 /** A store with an on-chain pull and (optionally) an adopted published copy. */
-async function store({ published = true, onChainIdl = pumpIdl, publishedIdl = pumpPublished } = {}) {
+async function store({ published = true, onChain = true, onChainIdl = pumpIdl, publishedIdl = pumpPublished } = {}) {
   const dir = await mkdtemp(path.join(os.tmpdir(), 'sememe-union-test-'));
   await mkdir(path.join(dir, 'objects'), { recursive: true });
   await mkdir(path.join(dir, 'receipts'), { recursive: true });
-  const bytes = Buffer.from(canonicalJson(onChainIdl) + '\n');
-  const fingerprint = createHash('sha256').update(bytes).digest('hex');
-  await writeFile(path.join(dir, 'objects', `${fingerprint}.json`), bytes);
-  await writeFile(
-    path.join(dir, 'receipts', `${PROGRAM}-463372656-metadata-${fingerprint}.json`),
-    Buffer.from(canonicalJson({
-      program: PROGRAM, source: 'metadata', slot: 463372656,
-      fingerprint: `sha256:${fingerprint}`, instructionCount: onChainIdl.instructions.length,
-    }) + '\n'),
-  );
+  if (onChain) {
+    const bytes = Buffer.from(canonicalJson(onChainIdl) + '\n');
+    const fingerprint = createHash('sha256').update(bytes).digest('hex');
+    await writeFile(path.join(dir, 'objects', `${fingerprint}.json`), bytes);
+    await writeFile(
+      path.join(dir, 'receipts', `${PROGRAM}-463372656-metadata-${fingerprint}.json`),
+      Buffer.from(canonicalJson({
+        program: PROGRAM, source: 'metadata', slot: 463372656,
+        fingerprint: `sha256:${fingerprint}`, instructionCount: onChainIdl.instructions.length,
+      }) + '\n'),
+    );
+  }
   if (published) {
     const file = path.join(dir, 'published.json');
     await writeFile(file, JSON.stringify(publishedIdl));
@@ -93,6 +95,56 @@ test('an adopted copy never becomes the default single source', async () => {
     const single = await findStoredIdl(dir, PROGRAM);
     assert.equal(single.receipt.slot, 463372656);
     assert.equal(single.receipt.source, 'metadata');
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+// The acquisition-gap case, end to end: a program with NO on-chain IDL
+// account at either pullable address (measured for Jupiter Liquidity and
+// Raydium AMM v4 in the unbiased traffic sample) whose only verified interface
+// is an adopted first-party published copy. The plain single-source reader
+// (findStoredIdl) already decodes such a store; the union path used to refuse
+// it with `unionDecode needs a primary source` — two verdicts from one store
+// depending on which flag the caller passed. An adopted copy must still never
+// DISPLACE an on-chain pull (tested above); with no on-chain pull to displace,
+// refusing to read it says "no interface" about a store that has one.
+test('a store whose ONLY source is an adopted copy decodes through the union path, and says so', async () => {
+  const dir = await store({ onChain: false });
+  try {
+    const { primary, secondary, onChain, adopted } = await findStoredIdls(dir, PROGRAM);
+    assert.equal(onChain.length, 0, 'nothing to displace');
+    assert.equal(adopted.length, 1);
+    assert.equal(primary, null);
+    assert.equal(secondary.idlMeta.source, 'published');
+
+    // A payload the published copy knows (sell_v3, absent from the on-chain
+    // copy — here there is no on-chain copy at all).
+    const row = payloads.find((p) => p.dataHex.startsWith('1c92de7726c469d5'));
+    assert.ok(row, 'the fixture must contain a sell_v3 payload');
+    const result = await decodeUnionPayload(dir, PROGRAM, row.dataHex);
+    assert.equal(result.instruction, 'sell_v3');
+    assert.equal(result.view.verdict, 'single_source');
+    assert.equal(result.view.adoptedOnly, true,
+      'the verdict must say the store had only an adopted copy — never imply an on-chain source answered');
+    // Provenance of the winning source stays the adopted receipt: published,
+    // slot null. That is what the caller must be able to quote.
+    assert.equal(result.idl.source, 'published');
+    assert.equal(result.idl.slot, null);
+    assert.equal(result.roundTripByteExact, true);
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+test('an adopted-only store still REFUSES a payload no source explains, by name', async () => {
+  const dir = await store({ onChain: false });
+  try {
+    // Truncated/unknown discriminator: nothing to fall back to.
+    await assert.rejects(
+      () => decodeUnionPayload(dir, PROGRAM, 'deadbeefdeadbeef'),
+      (error) => {
+        assert.ok(error instanceof UnionRefusal);
+        assert.match(error.message, /only stored source|refuse/);
+        return true;
+      },
+    );
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
 

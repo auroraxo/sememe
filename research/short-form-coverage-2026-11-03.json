@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-03T01:07:04.284Z",
+ "generatedAt": "2026-11-03T03:40:47.572Z",
  "sample": {
   "file": "test/fixtures/traffic-sample-2026-11-02.json",
   "store": "test/fixtures/traffic-sample-store",
@@ -19,11 +19,11 @@
  },
  "headline": {
   "watchedPayloads": 12572,
-  "decoded": 12555,
+  "decoded": 12562,
   "refused": 1,
-  "noInterface": 16,
+  "noInterface": 9,
   "coveredPct": 99.9,
-  "byteExact": 11862,
+  "byteExact": 11869,
   "byteExactPctOfDecoded": 94.5,
   "shortForm": 171,
   "chainVerified": 171,
@@ -42,21 +42,17 @@
    "count": 9
   },
   {
-   "reason": "no-interface: no stored IDL for program jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC in test/fixtures/traffic-sample-store",
-   "count": 7
-  },
-  {
    "reason": "token-upstream: unknown-selector: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: tag 210 is not in the pinned Token-2022 interfa",
    "count": 1
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 7701,
-  "decoded_txFailed": 4854,
+  "decoded_txSuccess": 7707,
+  "decoded_txFailed": 4855,
   "refused_txSuccess": 1,
   "refused_txFailed": 0,
-  "noInterface_txSuccess": 10,
-  "noInterface_txFailed": 6
+  "noInterface_txSuccess": 4,
+  "noInterface_txFailed": 5
  },
  "programs": [
   {
@@ -288,16 +284,16 @@
    "program": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
    "name": "Jupiter Liquidity",
    "acquirable": false,
-   "decoded": 0,
+   "decoded": 7,
    "refused": 0,
-   "noInterface": 7,
-   "byteExact": 0,
-   "describedExact": 0,
+   "noInterface": 0,
+   "byteExact": 7,
+   "describedExact": 7,
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
    "payloads": 7,
-   "coveredPct": 0
+   "coveredPct": 100
   }
  ],
  "acquisitionQueue": [
@@ -305,13 +301,6 @@
    "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
    "name": "Raydium AMM v4",
    "payloads": 9,
-   "acquirable": false,
-   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
-  },
-  {
-   "program": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
-   "name": "Jupiter Liquidity",
-   "payloads": 7,
    "acquirable": false,
    "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
   }

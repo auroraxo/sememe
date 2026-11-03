@@ -14,10 +14,10 @@
 // The headline (research/traffic-coverage-2026-11-02.json, sample captured
 // 2026-11-02T15:50Z from four contiguous finalized blocks):
 //   12,572 watched payloads from 1,872 transactions in 4 blocks
-//   decoded     12,384 (98.5%)  — an available interface could name them
+//   decoded     12,391 (98.6%)  — an available interface could name them
 //   refused        172          — interface present, bytes refused (source lag)
-//   no-interface    16          — no interface acquirable at all
-//   byte-exact re-encode: 11,691/12,384 = 94.4% of decoded
+//   no-interface     9          — no interface acquirable at all
+//   byte-exact re-encode: 11,698/12,391 = 94.4% of decoded
 // The split is the finding, and it moved the same day it was measured:
 // the first run of this report (same sample) put 5,418 payloads at
 // "no-interface", 99.7% of them SPL Token + Token-2022, which publish no IDL
@@ -25,8 +25,12 @@
 // fix shipped the same day: the two token wire tables are now derived from
 // the pinned upstream Rust crates (src/token-interface.mjs), so 5,401 of
 // those 5,402 payloads decode through the product. What remains of the
-// acquisition gap is 16 payloads on two programs (Raydium AMM v4, Jupiter
-// Liquidity) — the honest, small remainder.
+// acquisition gap was 16 payloads on two programs (Raydium AMM v4, Jupiter
+// Liquidity). Jupiter Liquidity is closed (2026-11-03): its first-party
+// published IDL was adopted, which the union path can only read because an
+// adopted copy may now stand alone — the program has NO on-chain IDL at
+// either pullable address. What remains is 9 payloads on ONE program
+// (Raydium AMM v4) — the honest, small remainder.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -77,15 +81,15 @@ test('the headline numbers hold, with their meaning intact', async () => {
     'every payload has a verdict — decoded, refused, or no-interface; none vanishes');
 
   // Coverage, measured through the product entry points.
-  assert.equal(h.decoded, 12384, '12,384 payloads decoded — fewer means a decoder or store-fixture regression');
-  assert.equal(h.coveredPct, 98.5, 'the honest unbiased-traffic coverage is 98.5% after the token tables landed');
+  assert.equal(h.decoded, 12391, '12,391 payloads decoded — fewer means a decoder or store-fixture regression');
+  assert.equal(h.coveredPct, 98.6, 'the honest unbiased-traffic coverage is 98.6% after the token tables and the Jupiter Liquidity published copy landed');
   assert.equal(h.refused, 172,
     '172 payloads refused by an interface that EXISTS (source lag) — refusals must not be hidden inside no-interface');
-  assert.equal(h.noInterface, 16,
-    '16 payloads have no interface at all — the acquisition gap, now measured small and named');
+  assert.equal(h.noInterface, 9,
+    '9 payloads have no interface at all — the acquisition gap, now measured small and named');
 
   // Byte evidence: decoding is not enough, the bytes must come back.
-  assert.equal(h.byteExact, 11691, '11,691 decoded payloads re-encode byte-exactly');
+  assert.equal(h.byteExact, 11698, '11,698 decoded payloads re-encode byte-exactly');
   assert.equal(h.byteExactPctOfDecoded, 94.4);
 
   // Refusal is a statement about the interface, not about the chain: there are
@@ -130,7 +134,7 @@ test('the token gap was closed by derivation, not by relabelling', async () => {
   const remaining = report.acquisitionQueue.reduce((acc, row) => acc + row.payloads, 0);
   assert.equal(remaining, report.headline.noInterface,
     'the acquisition queue is exactly the no-interface remainder');
-  assert.ok(remaining <= 20, 'the remaining acquisition gap is the measured 16 payloads');
+  assert.ok(remaining <= 20, 'the remaining acquisition gap is the measured 9 payloads');
 });
 
 test('the interfaces that exist decode at 90%+; the rest is source lag', async () => {
@@ -143,8 +147,8 @@ test('the interfaces that exist decode at 90%+; the rest is source lag', async (
   const withInterface = report.programs.filter((row) => row.noInterface === 0);
   const dec = withInterface.reduce((a, r) => a + r.decoded, 0);
   const pl = withInterface.reduce((a, r) => a + r.payloads, 0);
-  assert.equal(pl, 12556, 'everything except the 16 no-interface payloads has an interface');
-  assert.equal(dec, 12384);
+  assert.equal(pl, 12563, 'everything except the 9 no-interface payloads has an interface');
+  assert.equal(dec, 12391);
   assert.ok(dec / pl > 0.9, 'programs with an interface decode >90% of their traffic');
 
   // Adopting the FIRST-PARTY published copy is what moved PumpSwap from 82%
@@ -177,5 +181,7 @@ test('the acquisition queue is derivable, not curated', async () => {
   // it (3,804 payloads, now decoded via the vendored upstream table), so the
   // biggest remaining no-interface row is Raydium AMM v4.
   assert.equal(report.acquisitionQueue[0].name, 'Raydium AMM v4', 'the top of the queue is the biggest measured gap');
-  assert.equal(report.acquisitionQueue.length, 2, 'only two programs still have no interface at all');
+  assert.equal(report.acquisitionQueue.length, 1, 'only one program still has no interface at all');
+  assert.equal(report.acquisitionQueue[0].program, '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
+    'the last no-interface program is Raydium AMM v4 — a legacy u8-tagged program with no published IDL');
 });

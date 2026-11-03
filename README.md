@@ -613,6 +613,8 @@ acquirable at all) to **5,401 decoded**, one refusal (a `spl-token-metadata` fal
 instruction — a different upstream crate, refused by name rather than force-fitted) and
 422 payloads with explained trailing bytes. Overall coverage on that sample moved from
 **55.5% to 98.5%**; the denominator never moved, the product gained a decode path.
+(A later step — adopting Jupiter Lend's published Liquidity IDL, see below — moved
+it to 98.6%.)
 
 Falsification (`test/token-interface.test.mjs`, 8 tests, each a mutation in a temp copy of
 the repo): swap two args in the artifact → load refused; edit the vendored Rust → load
@@ -791,7 +793,7 @@ watched list are counted but their bytes are not stored (fixture size limit), so
 the denominator cannot silently shrink. The fixture is committed
 (`test/fixtures/traffic-sample-2026-11-02.json`, captured 2026-11-02T15:50Z),
 together with a store built for exactly this sample
-(`test/fixtures/traffic-sample-store/`: ten on-chain pulls plus three adopted
+(`test/fixtures/traffic-sample-store/`: ten on-chain pulls plus four adopted
 first-party published copies).
 
 **The measurement.** `tools/traffic-coverage-report.mjs` runs every payload
@@ -814,12 +816,12 @@ derivation check, same two-check contract as the native tables).
 
 | outcome (current) | count | meaning |
 | --- | --- | --- |
-| decoded | 12,384 | an available interface named it |
+| decoded | 12,391 | an available interface named it |
 | refused | 172 | an interface exists and the bytes were refused (source lag, incl. 1 token payload: a token-metadata fallback instruction, a different upstream crate, refused rather than force-fitted) |
-| no-interface | 16 | no interface is acquirable for that program at all (Raydium AMM v4: 9, Jupiter Liquidity: 7) |
+| no-interface | 9 | no interface is acquirable for that program at all (Raydium AMM v4: 9) |
 
-**98.5% coverage** (12,384/12,572 watched payloads), with 11,691/12,384 = 94.4%
-of the decoded payloads re-encoding byte-exactly. What the 693 non-byte-exact
+**98.6% coverage** (12,391/12,572 watched payloads), with 11,698/12,391 = 94.4%
+of the decoded payloads re-encoding byte-exactly. What the 700 non-byte-exact
 decodes are, measured: 419 legacy `GetAccountDataSize` payloads carry two extra
 bytes the legacy program itself ignores (upstream's own comment says so), and
 three Token-2022 extension dispatches carry their sub-instruction bytes, which
@@ -828,7 +830,7 @@ trailing count is part of the result, not a failure hidden by it.
 
 **What the number means now.** The acquisition gap this measurement existed to
 expose is closed for the program family that carried it: the remaining
-no-interface traffic is 16 payloads on two AMM programs. "Refused" (172) is
+no-interface traffic is 9 payloads on ONE program (Raydium AMM v4). "Refused" (172) is
 source lag in interfaces that exist — PumpSwap's undeclared discriminator form
 and pump.fun's unexplained event tail are the bulk of it, both already reported
 to the first parties. The denominator never moved: same sample, same product
@@ -840,6 +842,38 @@ PumpSwap from 82.0% to 96.4% (487/505 decoded) in one step: its on-chain IDL is
 stale, and the published copy covers 9 of the 10 discriminators seen in the
 window. The tenth (`e445a52e51cb9a1d`, 226 payloads) is declared by neither
 copy.
+
+**An adopted copy may now stand alone (2026-11-03).** The second half of the
+acquisition gap was **Jupiter Liquidity** (`jupeiUmn…`, 7 payloads): no IDL at
+either on-chain surface — measured at capture time, re-measured against live
+mainnet at slot 464744781 (both `null`), so the only verified interface is a
+published copy. Adopting the first-party
+[`jup-ag/jupiter-lend`](https://github.com/jup-ag/jupiter-lend)
+`target/idl/liquidity.json` at commit `0ab370a0` (26 instructions,
+`sha256:8ed1e22661ab…`) into the committed fixture store closed it — **7/7
+payloads decoded byte-exact through `decodeUnionPayload`**, and Jupiter
+Liquidity left the acquisition queue.
+
+Adopting it alone was not enough, because of a defect in the reader:
+`decodeUnionPayload` required a *primary* source, and a store with no on-chain
+receipt for the program has none — so the union path refused with
+`unionDecode needs a primary source` and reported "no interface" about a store
+that held exactly one, while plain `decodePayload` on the same bytes answered
+7/7. Two entry points, two answers, and the coverage measurement used the wrong
+one. **The rule now: an adopted copy may stand alone when there is no on-chain
+pull to displace — it may still never displace one** (the on-chain receipt stays
+primary whenever it exists, pinned by the existing M4 test). The verdict carries
+`view.adoptedOnly: true` plus `idl.source` / `idl.slot: null`, so a consumer can
+see that no chain slot answered. Refusals still refuse: a payload no stored
+source explains is refused **by name**, with the adopted-only provenance
+visible rather than laundered into a decode.
+
+Covered by `test/jupiter-liquidity-acquisition.test.mjs` (5 tests: the
+capture-time verdict still says `acquirable: false`; the store still holds no
+on-chain receipt; all 7 byte-exact with `adoptedOnly: true`; **delete the
+adopted receipt and the gap comes back by name** — the number moved because an
+interface was added, not a counter; the committed report and queue reflect the
+closure) plus the adopted-only union tests in `test/union.test.mjs`.
 
 **Limits.** One four-block window (~20 seconds of mainnet), one RPC. The
 acquisability check ran at capture time and reflects that moment. The token
@@ -922,11 +956,11 @@ under `verified`; that asymmetry is the whole point, and it is a test
 
 | outcome | strict | `--absent verified` |
 | --- | --- | --- |
-| decoded | 12,384 | 12,555 (+171) |
+| decoded | 12,391 | 12,562 (+171) |
 | refused | 172 | 1 (the Token-2022 payload) |
-| no-interface | 16 | 16 |
-| coverage | 98.5% | **99.9%** |
-| byte-exact | 11,691 | 11,862 (+171, every short form re-encodes exactly) |
+| no-interface | 9 | 9 |
+| coverage | 98.6% | **99.9%** |
+| byte-exact | 11,698 | 11,869 (+171, every short form re-encodes exactly) |
 
 The denominator did not move; the strict measurement is unchanged and still
 committed, because a gain that only exists when you relax the decoder is a
@@ -935,7 +969,7 @@ finding to measure, not a number to replace. Reproduce:
 ([`research/short-form-coverage-2026-11-03.json`](research/short-form-coverage-2026-11-03.json)).
 
 **What is still open.** The remaining 1 refusal is a Token-2022 tag the pinned
-table does not carry; the 16 no-interface payloads are unchanged (acquisition,
+table does not carry; the 9 no-interface payloads are unchanged (acquisition,
 not decoding); and the short-form table covers one four-block window — a
 longer window may well find a short form nobody has witnessed, which must
 refuse under `verified` until a witness exists.
