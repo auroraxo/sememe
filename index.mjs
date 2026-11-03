@@ -30,6 +30,8 @@ export {
   decodeBase58,
   unionDecode,
   UnionRefusal,
+  verifiedShortForm,
+  VERIFIED_SHORT_FORMS,
 } from './src/decode.mjs';
 
 export { encodeBase58 } from './src/base58.mjs';

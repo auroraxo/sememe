@@ -58,6 +58,17 @@ test('the package entry exports the documented decode surface, and only that', a
     assert.equal(typeof entry[name], 'function', `entry must export ${name}`);
   }
   assert.equal(typeof entry.UnionRefusal, 'function', 'entry must export the UnionRefusal error');
+  // The chain-verified short-form evidence rides on the entry: a consumer who
+  // can decode a short form must also be able to inspect the table that
+  // licenses it, without reaching into src/.
+  assert.equal(typeof entry.verifiedShortForm, 'function', 'entry must export verifiedShortForm');
+  assert.ok(Array.isArray(entry.VERIFIED_SHORT_FORMS), 'entry must export the verified short-form table');
+  assert.ok(entry.VERIFIED_SHORT_FORMS.length > 0);
+  for (const form of entry.VERIFIED_SHORT_FORMS) {
+    for (const key of ['program', 'discriminator', 'bytes', 'instruction', 'absent', 'witnesses']) {
+      assert.ok(key in form, `every table entry must carry ${key}`);
+    }
+  }
   // Acquisition is deliberately NOT on the entry: it imports @solana/web3.js,
   // so putting it here would turn every decoder-only consumer into a
   // dependency installer. It stays on its documented subpath.
@@ -72,7 +83,8 @@ test('every file the package ships imports only node: builtins or relative files
   // loads must have zero npm dependencies.
   const zeroDependency = ['index.mjs', 'src/account.mjs', 'src/adopt.mjs', 'src/base58.mjs', 'src/canonical.mjs',
     'src/codec.mjs', 'src/decode.mjs', 'src/discriminators.mjs', 'src/native-interface.mjs',
-    'src/native.mjs', 'src/store-read.mjs', 'src/store-write.mjs', 'src/token-interface.mjs',
+    'src/native.mjs', 'src/short-forms.mjs', 'src/store-read.mjs', 'src/store-write.mjs',
+    'src/token-interface.mjs',
     'src/token.mjs', 'src/union.mjs'];
   const files = zeroDependency.map((name) => path.join(ROOT, name));
   assert.ok(files.length >= 13, `expected the shipped sources, found ${files.length}`);

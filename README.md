@@ -857,6 +857,89 @@ Reproduce: `npm test` (the report is pinned twice — as a deep-equal against
 what the tool computes, and as explicit assertions), or
 `node tools/traffic-coverage-report.mjs`.
 
+## Short wire forms: 171 of 172 refusals were chain-accepted (2026-11-03)
+
+The 172-payload refusal column above is 172 separate facts about an
+*interface*, not about the chain. This section asked which side was right, one
+shape at a time.
+
+**The method.** `tools/short-form-wire-forms.mjs` groups the refused payloads by
+`(program, discriminator, wire length)` and, for each group, pulls a FINALIZED
+mainnet transaction witness with `maxSupportedTransactionVersion: 1`, resolves
+versioned account keys through their address lookup tables, reads the
+instruction data as base58 (that is how `encoding:"json"` carries it — the
+first version of this tool read it as base64 and compared nonsense), and
+requires three independent things before it will say the chain executed the
+payload: the transaction's `err` is `null`, the witness bytes are byte-IDENTICAL
+to the fixture payload, and the program's own `Program log: Instruction: ...`
+line matches the name the decode will report. A control group of already-decoded
+shapes runs alongside, so a witness fetch that silently failed would show up as
+a wrong answer rather than as evidence. Report:
+[`research/short-form-wire-forms-2026-11-03.json`](research/short-form-wire-forms-2026-11-03.json).
+
+**The result.** The five refused shapes are:
+
+| program | discriminator | wire bytes | payloads | instruction | field the wire does not carry |
+| --- | --- | --- | --- | --- | --- |
+| Pump.fun bonding curve | `e1f7501ed5b38488` | 24 | 152 | `buy_exact_quote_in_v3` | `partial_fill` |
+| PumpSwap | `c62e1552b4d9e870` | 24 | 17 | `buy_exact_quote_in` | `track_volume` |
+| Pump.fun bonding curve | `07051dc4f5176550` | 24 | 1 | `buy_v3` | `partial_fill` |
+| PumpSwap | `66063d1201daebea` | 24 | 1 | `buy` | `track_volume` |
+| Token-2022 | `d2e11ea258b84d8d` | 131 | 1 | not named | — |
+
+**171 of 172 payloads were executed by the chain** with bytes identical to the
+fixture. **0 were genuine chain-rejected refusals.** The stored interfaces
+over-describe the wire: they declare one `OptionBool` more than the deployed
+program reads, and a payload that ends where that field would start is refused
+as truncated. The published first-party IDL knows all four discriminators; it is
+the trailing option tag it expects that the 24-byte form does not carry. The
+fifth shape (Token-2022, tag 210) is not a short form and stays refused.
+
+**Why this is not simply "decode whatever ends on a field boundary."**
+Byte-exact re-encoding — the evidence that makes trailing bytes trustworthy —
+does NOT carry over. A payload truncated by a capture bug also ends on a field
+boundary and also re-encodes byte-exactly to the shortened bytes. Offline, on
+bytes alone, "the program accepts a shorter form" and "this payload was cut
+short" are indistinguishable. So `src/codec.mjs` keeps the default strict, and
+the opt-in comes in two flavours:
+
+| `--absent` | behaviour | risk |
+| --- | --- | --- |
+| `error` (default) | refuse, as before | none — and the 171 stay unnamed |
+| `report` | decode any payload ending on a field boundary, name the absent fields | names truncated payloads too |
+| `verified` | decode only shapes with a chain witness | evidence can go stale |
+
+`verified` is the product form of the measurement: the witnesses travel with
+the decoder as `src/short-forms.mjs`, keyed on program + discriminator + exact
+length, and a decode whose absent set differs from the measured one is REFUSED
+rather than decoded and labelled unverified — stale evidence is not spent on a
+shape nobody measured. A 16-byte truncation of the 24-byte form, which ends on a
+field boundary and re-encodes exactly, is accepted under `report` and refused
+under `verified`; that asymmetry is the whole point, and it is a test
+(`test/short-form-decoding.test.mjs`).
+
+**Coverage, same sample, same entry points, one opt-in:**
+
+| outcome | strict | `--absent verified` |
+| --- | --- | --- |
+| decoded | 12,384 | 12,555 (+171) |
+| refused | 172 | 1 (the Token-2022 payload) |
+| no-interface | 16 | 16 |
+| coverage | 98.5% | **99.9%** |
+| byte-exact | 11,691 | 11,862 (+171, every short form re-encodes exactly) |
+
+The denominator did not move; the strict measurement is unchanged and still
+committed, because a gain that only exists when you relax the decoder is a
+finding to measure, not a number to replace. Reproduce:
+`node tools/traffic-coverage-report.mjs --absent=verified`
+([`research/short-form-coverage-2026-11-03.json`](research/short-form-coverage-2026-11-03.json)).
+
+**What is still open.** The remaining 1 refusal is a Token-2022 tag the pinned
+table does not carry; the 16 no-interface payloads are unchanged (acquisition,
+not decoding); and the short-form table covers one four-block window — a
+longer window may well find a short form nobody has witnessed, which must
+refuse under `verified` until a witness exists.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.

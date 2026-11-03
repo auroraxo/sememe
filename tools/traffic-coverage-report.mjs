@@ -54,6 +54,17 @@ const STORE = 'test/fixtures/traffic-sample-store';
 const sample = read(SAMPLE);
 const acquirable = sample.acquirable ?? {};
 
+// --absent=report turns on the opt-in short-form decoding (src/codec.mjs).
+// The default is 'error' — the strict product. Both measurements are kept:
+// the strict one is the honest baseline, the opted-in one shows how much of
+// the remaining gap is a wire form the interface over-describes.
+const absentFlag = process.argv.find((arg) => arg.startsWith('--absent='));
+const ABSENT_POLICY = absentFlag ? absentFlag.slice('--absent='.length) : 'error';
+if (!['report', 'error', 'verified'].includes(ABSENT_POLICY)) {
+  process.stderr.write(`--absent must be report, error or verified, got ${JSON.stringify(ABSENT_POLICY)}\n`);
+  process.exit(2);
+}
+
 /** Decode one payload through the product, and classify the outcome. */
 async function classify(program, hex) {
   const byteLength = hex.length / 2;
@@ -91,7 +102,10 @@ async function classify(program, hex) {
   // sources, which is what a consumer gets. A program with only an on-chain
   // pull answers through the plain path.
   try {
-    const result = await decodeUnionPayload(STORE, program, hex, { trailing: 'report' });
+    const result = await decodeUnionPayload(STORE, program, hex, {
+      trailing: 'report',
+      absent: ABSENT_POLICY,
+    });
     return {
       outcome: 'decoded',
       via: result.verdict?.winner ? 'union' : 'idl',
@@ -99,6 +113,15 @@ async function classify(program, hex) {
       byteExact: result.roundTripByteExact === true,
       describedExact: result.describedRoundTripByteExact === true,
       trailing: result.trailing?.count ?? 0,
+      // Declared fields this wire form did not carry — non-empty means the
+      // payload is SHORTER than the interface says.
+      absentFields: result.absent?.length ?? 0,
+      absent: result.absent ?? [],
+      // Under 'verified', a short-form decode is only counted when the chain
+      // witness covers it exactly. The union path already refuses when the
+      // evidence does not match, so reaching here with absentFields > 0 means
+      // the evidence DID cover it.
+      chainVerified: result.shortForm?.verified === true,
     };
   } catch (error) {
     const reason = String(error?.message ?? error).slice(0, 110);
@@ -131,6 +154,7 @@ for (const tx of sample.transactions) {
         name: sample.catalog.find((c) => c.id === row.program)?.name ?? null,
         acquirable: acquirable[row.program]?.acquirable ?? null,
         decoded: 0, refused: 0, noInterface: 0, byteExact: 0, describedExact: 0, trailing: 0,
+        shortForm: 0, chainVerified: 0,
       };
       perProgram.set(row.program, entry);
     }
@@ -139,6 +163,10 @@ for (const tx of sample.transactions) {
       if (verdict.byteExact === true) entry.byteExact += 1;
       if (verdict.describedExact === true) entry.describedExact += 1;
       if (verdict.trailing > 0) entry.trailing += 1;
+      // A decoded payload that omits at least one declared field: the wire is
+      // shorter than the interface, and the decode names exactly which field.
+      if ((verdict.absentFields ?? 0) > 0) entry.shortForm += 1;
+      if (verdict.chainVerified === true) entry.chainVerified += 1;
       outcomeVsChain[tx.failed ? 'decoded_txFailed' : 'decoded_txSuccess'] += 1;
     } else if (verdict.outcome === 'refused') {
       entry.refused += 1;
@@ -165,6 +193,7 @@ const decoded = sum('decoded');
 const refused = sum('refused');
 const noInterface = sum('noInterface');
 const byteExact = sum('byteExact');
+const shortForm = sum('shortForm');
 
 // Traffic that no watched program covers at all: counted in the sample, not
 // stored, therefore NOT part of the coverage denominator. It is reported
@@ -192,6 +221,15 @@ const report = {
     coveredPct: Number((100 * decoded / total).toFixed(1)),
     byteExact,
     byteExactPctOfDecoded: Number((100 * byteExact / decoded).toFixed(1)),
+    // Payloads that decoded while OMITING at least one declared field: the
+    // wire form is shorter than the stored interface. Only counted when the
+    // opt-in 'absent: report' policy is on; zero in the strict measurement.
+    shortForm,
+    // How many of those carry a chain witness that covers them exactly.
+    // Under 'verified' this equals shortForm; under 'report' it is 0, because
+    // the blanket policy names forms nobody witnessed.
+    chainVerified: sum('chainVerified'),
+    absentPolicy: ABSENT_POLICY,
     note: 'coverage = payloads an available interface could NAME. "refused" (interface present, bytes refused) and "no-interface" (no interface acquirable at all) are counted separately because they need different fixes.',
   },
   trafficOutsideTheWatchedList: {

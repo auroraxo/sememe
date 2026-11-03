@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-02T20:12:54.030Z",
+ "generatedAt": "2026-11-03T01:07:54.980Z",
  "sample": {
   "file": "test/fixtures/traffic-sample-2026-11-02.json",
   "store": "test/fixtures/traffic-sample-store",
@@ -25,6 +25,9 @@
   "coveredPct": 98.5,
   "byteExact": 11691,
   "byteExactPctOfDecoded": 94.4,
+  "shortForm": 0,
+  "chainVerified": 0,
+  "absentPolicy": "error",
   "note": "coverage = payloads an available interface could NAME. \"refused\" (interface present, bytes refused) and \"no-interface\" (no interface acquirable at all) are counted separately because they need different fixes."
  },
  "trafficOutsideTheWatchedList": {
@@ -78,6 +81,8 @@
    "byteExact": 3385,
    "describedExact": 0,
    "trailing": 419,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 3804,
    "coveredPct": 100
   },
@@ -91,6 +96,8 @@
    "byteExact": 2517,
    "describedExact": 0,
    "trailing": 15,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 2532,
    "coveredPct": 100
   },
@@ -104,6 +111,8 @@
    "byteExact": 2502,
    "describedExact": 0,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 2502,
    "coveredPct": 100
   },
@@ -117,6 +126,8 @@
    "byteExact": 1594,
    "describedExact": 0,
    "trailing": 3,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 1598,
    "coveredPct": 99.9
   },
@@ -130,6 +141,8 @@
    "byteExact": 586,
    "describedExact": 619,
    "trailing": 33,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 772,
    "coveredPct": 80.2
   },
@@ -143,6 +156,8 @@
    "byteExact": 272,
    "describedExact": 487,
    "trailing": 215,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 505,
    "coveredPct": 96.4
   },
@@ -156,6 +171,8 @@
    "byteExact": 316,
    "describedExact": 323,
    "trailing": 7,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 323,
    "coveredPct": 100
   },
@@ -169,6 +186,8 @@
    "byteExact": 215,
    "describedExact": 216,
    "trailing": 1,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 216,
    "coveredPct": 100
   },
@@ -182,6 +201,8 @@
    "byteExact": 145,
    "describedExact": 145,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 145,
    "coveredPct": 100
   },
@@ -195,6 +216,8 @@
    "byteExact": 58,
    "describedExact": 58,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 58,
    "coveredPct": 100
   },
@@ -208,6 +231,8 @@
    "byteExact": 52,
    "describedExact": 52,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 52,
    "coveredPct": 100
   },
@@ -221,6 +246,8 @@
    "byteExact": 26,
    "describedExact": 26,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 26,
    "coveredPct": 100
   },
@@ -234,6 +261,8 @@
    "byteExact": 12,
    "describedExact": 12,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 12,
    "coveredPct": 100
   },
@@ -247,6 +276,8 @@
    "byteExact": 11,
    "describedExact": 11,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 11,
    "coveredPct": 100
   },
@@ -260,6 +291,8 @@
    "byteExact": 0,
    "describedExact": 0,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 9,
    "coveredPct": 0
   },
@@ -273,6 +306,8 @@
    "byteExact": 0,
    "describedExact": 0,
    "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
    "payloads": 7,
    "coveredPct": 0
   }

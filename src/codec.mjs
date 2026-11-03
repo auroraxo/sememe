@@ -783,11 +783,35 @@ function instructionByName(idl, name) {
  * IDL, both in transactions that succeeded on-chain (slot 462101502, and the
  * 43-byte form of the same instruction at slot 462101506) — refusing them
  * rejected 2 of 50 harvested payloads that the deployed program accepted.
+ *
+ * `absent` is the mirror image of `trailing`, and it is opt-in because offline
+ * it cannot be told apart from garbage: what if the IDL declares a field and
+ * the payload simply ENDS where that field would start?
+ *   'error'  (default) refuse with `truncated input`, exactly as before.
+ *   'report' decode every field the bytes actually carry and name the declared
+ *            fields that are absent under `absent`. Nothing is invented: an
+ *            absent field gets NO value, so the decoded args never claim a
+ *            default the program may not have used.
+ *
+ * The distinction that matters: a payload that ends ON a field boundary can
+ * name the fields it carries; a payload that ends INSIDE a field still cannot
+ * — a partial u64 is not a value — and that case refuses under both policies.
+ *
+ * `absent: 'report'` is justified by measurement, not by optimism: 171 of the
+ * 172 payloads this repo's unbiased mainnet sample refuses are chain-ACCEPTED
+ * wire forms whose interface declares one field more than the wire carries
+ * (research/short-form-wire-forms-2026-11-03.json — err:null, byte-identical
+ * payload, and the program's own "Instruction:" log line). Offline the decoder
+ * cannot reach that verdict, so the default stays strict and the caller opts in.
  */
-export function decodeInstructionData(idl, data, { allowTrailing, trailing } = {}) {
+export function decodeInstructionData(idl, data, { allowTrailing, trailing, absent } = {}) {
   const policy = trailing ?? (allowTrailing === false ? 'error' : 'report');
   if (policy !== 'report' && policy !== 'error') {
     throw new CodecError(`unknown trailing policy ${JSON.stringify(trailing)}`, null);
+  }
+  const absentPolicy = absent ?? 'error';
+  if (absentPolicy !== 'report' && absentPolicy !== 'error') {
+    throw new CodecError(`unknown absent policy ${JSON.stringify(absent)}`, null);
   }
   if (!(data instanceof Uint8Array)) throw new CodecError('instruction data must be a Uint8Array/Buffer', null);
   const ctx = context(idl);
@@ -811,10 +835,22 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing } = {
   const cursor = new Cursor(data);
   cursor.offset = consumed;
   const args = {};
-  for (const argument of instruction.args ?? []) {
+  const absentArgs = [];
+  const declaredArgs = instruction.args ?? [];
+  for (const [position, argument] of declaredArgs.entries()) {
     if (!argument || typeof argument.name !== 'string' || !('type' in argument)) {
       throw new CodecError(`instruction ${instruction.name} has a malformed argument`, null);
     }
+    // The payload ended exactly where the next field would begin: every field
+    // from here on is ABSENT, not truncated. A field boundary is the only
+    // place a payload can end and still carry a complete value for what came
+    // before — which is why this, and only this, is nameable.
+    if (cursor.remaining === 0 && absentPolicy === 'report') {
+      for (const rest of declaredArgs.slice(position)) absentArgs.push(rest.name);
+      break;
+    }
+    // With absent:'error' (default) this falls through to decodeAt, which
+    // reports `truncated input` — the behaviour every existing caller pins.
     assign(args, argument.name, decodeAt(argument.type, cursor, ctx, `${instruction.name}.${argument.name}`, 0), instruction.name);
   }
   const trailingCount = cursor.remaining;
@@ -829,6 +865,10 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing } = {
     instruction: instruction.name,
     discriminator: Buffer.from(data.subarray(0, consumed)).toString('hex'),
     args,
+    // Declared fields the payload did not carry, in declaration order.
+    // Empty for a fully-described payload, so `absent.length === 0` is the
+    // completeness assertion that `trailing.count === 0` is for extra bytes.
+    absent: absentArgs,
     consumed: cursor.offset,
     total: data.length,
     // Bytes the IDL does not explain, as count + hex. Present (0, '') when the
@@ -838,8 +878,15 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing } = {
   };
 }
 
-/** Encode one instruction payload (discriminator + args) using the IDL. */
-export function encodeInstructionData(idl, name, args) {
+/**
+ * Encode one instruction payload (discriminator + args) using the IDL.
+ *
+ * `absent` names declared arguments to skip — the inverse of a decode that
+ * reported them absent. Skipping is allowed only for a SUFFIX of the
+ * declaration: a hole in the middle would be re-encoded as a different byte
+ * layout, and byte-exactness is the only evidence this function offers.
+ */
+export function encodeInstructionData(idl, name, args, { absent } = {}) {
   const ctx = context(idl);
   const instruction = instructionByName(idl, name);
   const bytes = discriminatorBytes(instruction) ?? (() => {
@@ -847,13 +894,34 @@ export function encodeInstructionData(idl, name, args) {
   })();
   if (args === undefined || args === null) args = {};
   if (typeof args !== 'object' || Array.isArray(args)) throw new CodecError('args must be an object', null);
-  const known = new Set((instruction.args ?? []).map((argument) => argument.name));
+  const declared = instruction.args ?? [];
+  const known = new Set(declared.map((argument) => argument.name));
+  const absentSet = new Set(Array.isArray(absent) ? absent : []);
+  for (const fieldName of absentSet) {
+    if (!known.has(fieldName)) {
+      throw new CodecError(`unexpected argument(s) for ${instruction.name}: ${fieldName}`, instruction.name);
+    }
+    if (fieldName in args) {
+      throw new CodecError(`argument ${JSON.stringify(fieldName)} is both absent and present`, instruction.name);
+    }
+  }
+  // Only a trailing run may be absent: a gap would silently reorder bytes.
+  let seenAbsent = false;
+  for (const argument of declared) {
+    if (absentSet.has(argument.name)) { seenAbsent = true; continue; }
+    if (seenAbsent) {
+      throw new CodecError(
+        `argument ${JSON.stringify(argument.name)} follows an absent argument — only a trailing run may be omitted`,
+        instruction.name);
+    }
+  }
   const unknown = Object.keys(args).filter((key) => !known.has(key));
   if (unknown.length) {
     throw new CodecError(`unexpected argument(s) for ${instruction.name}: ${unknown.join(', ')}`, null);
   }
   const parts = [bytes];
-  for (const argument of instruction.args ?? []) {
+  for (const argument of declared) {
+    if (absentSet.has(argument.name)) continue;
     if (!(argument.name in args)) throw new CodecError(`missing argument ${JSON.stringify(argument.name)}`, instruction.name);
     parts.push(encodeAt(argument.type, args[argument.name], ctx, `${instruction.name}.${argument.name}`, 0));
   }

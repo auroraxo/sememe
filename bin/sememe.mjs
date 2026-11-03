@@ -14,18 +14,25 @@ import {
   decodeTokenInstruction, tokenProvenance, tokenPrograms,
 } from '../src/token.mjs';
 import { toJsonSafe } from '../src/codec.mjs';
+import { VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE } from '../src/short-forms.mjs';
 
 const usage = `usage:
+  sememe absent-help
+      print the chain-verified short wire forms that --absent verified licenses.
   sememe pull <program-id> [--store <directory>] [--rpc <https-url>]
   sememe adopt <program-id> <file> [--store <directory>] [--source <label>]
       store a first-party PUBLISHED interface copy next to the on-chain pull, so
       union decode has a second verified source. The receipt says "published":
       it is provenance of bytes, not proof the bytes describe the deployed program.
-  sememe decode <program-id> <payload> [--store <directory>] [--trailing report|error]
+  sememe decode <program-id> <payload> [--store <directory>] [--trailing report|error] [--absent error|report|verified]
       payload: base58 or hex instruction data (discriminator + args)
       --trailing report (default): decode the IDL-described prefix and report
           the bytes the IDL does not explain under "trailing"; --trailing error
           refuses the payload instead.
+      --absent error (default): a payload that ENDS where a declared field
+          would start is refused as truncated. --absent report: decode it and
+          name the absent fields. --absent verified: decode it only when a
+          chain witness covers that exact wire form (see --absent-help).
   sememe decode --union <program-id> <payload> [--store <directory>]
       decode against BOTH stored sources (on-chain + adopted). The result names
       the source that answered, the other source's verdict, and any layout
@@ -79,7 +86,14 @@ const option = (name, fallback) => {
 };
 
 try {
-  if (command === 'pull') {
+  if (command === 'absent-help') {
+    // The evidence behind --absent verified, printed so a user can see WHICH
+    // wire forms are licensed before relying on the flag.
+    console.log(JSON.stringify({
+      source: SHORT_FORM_SOURCE,
+      forms: VERIFIED_SHORT_FORMS,
+    }, null, 2));
+  } else if (command === 'pull') {
     if (!program) throw Error('pull needs a program id');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const rpc = option('--rpc', 'https://api.mainnet-beta.solana.com');
@@ -110,13 +124,29 @@ try {
     if (trailing !== undefined && trailing !== 'report' && trailing !== 'error') {
       throw Error('--trailing must be "report" or "error"');
     }
+    const absent = option('--absent', undefined);
+    if (absent !== undefined && !['error', 'report', 'verified'].includes(absent)) {
+      throw Error('--absent must be "error", "report" or "verified"');
+    }
     const union = unionRequested;
+    const extra = { ...(trailing === undefined ? {} : { trailing }), ...(absent === undefined ? {} : { absent }) };
     const decoded = union
-      ? await decodeUnionPayload(store, program, payload,
-        trailing === undefined ? {} : { trailing })
-      : await decodePayload(store, program, payload,
-        trailing === undefined ? {} : { trailing });
+      ? await decodeUnionPayload(store, program, payload, extra)
+      : await decodePayload(store, program, payload, extra);
     console.log(JSON.stringify(decoded, null, 2));
+    // A short-form decode is a measurement-backed claim, so the evidence is
+    // surfaced on stderr as well: a scripted caller should not have to know
+    // to look inside the JSON to learn the field was absent and why.
+    if (decoded.shortForm) {
+      console.error(JSON.stringify({
+        note: `${decoded.name} decoded as a chain-verified short form: the wire carries no `
+          + `${JSON.stringify(decoded.shortForm.absent)}`,
+        verified: decoded.shortForm.verified,
+        absent: decoded.shortForm.absent,
+        witnesses: decoded.shortForm.witnesses,
+        source: decoded.shortForm.source,
+      }));
+    }
     // Unexplained bytes are a completeness finding, not a crash: report them
     // on stderr so scripted callers notice without losing the decode result.
     if (decoded.trailing.count > 0 && trailing !== 'error') {

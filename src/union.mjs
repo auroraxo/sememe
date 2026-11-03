@@ -49,12 +49,21 @@ export class UnionRefusal extends Error {
 
 const reasonOf = (error) => String(error?.message ?? error).slice(0, 200);
 
-/** Decode + re-encode under one source's own layout; every fact stays per-source. */
-function probe(source, bytes) {
+/**
+ * Decode + re-encode under one source's own layout; every fact stays per-source.
+ *
+ * `absentPolicy` is passed through to the decoder. With 'report' a source that
+ * declares one field more than the wire carries can still decode — and then
+ * the re-encode MUST omit exactly the fields the decode reported absent, or
+ * the bytes would not reproduce and the decode would look like a guess. The
+ * absent list therefore travels from decode to re-encode: byte-exactness is
+ * what makes an absent field honest instead of invented.
+ */
+function probe(source, bytes, absentPolicy) {
   try {
-    const decoded = decodeData(source.idl, bytes, { trailing: 'report' });
+    const decoded = decodeData(source.idl, bytes, { trailing: 'report', absent: absentPolicy });
     const reencoded = decoded.kind === 'instruction'
-      ? encodeInstructionData(source.idl, decoded.instruction, decoded.args)
+      ? encodeInstructionData(source.idl, decoded.instruction, decoded.args, { absent: decoded.absent })
       : encodeEventData(source.idl, decoded.event, decoded.args, { tagged: decoded.tagged });
     const described = bytes.subarray(0, decoded.consumed);
     return {
@@ -120,6 +129,10 @@ function decodeFields(source, probeResult, bytes) {
     discriminator: decoded.discriminator,
     tagged: decoded.tagged,
     args: toJsonSafe(decoded.args),
+    // Declared fields this source's layout does not carry in these bytes.
+    // Non-empty means the wire is SHORTER than the interface says — the
+    // caller can see that instead of having to infer it from missing keys.
+    absent: decoded.absent ?? [],
     bytes: bytes.length,
     consumed: decoded.consumed,
     trailing: decoded.trailing,
@@ -153,14 +166,22 @@ function resultEnvelope(program, fields, winnerSource, view) {
  * | 'single_source'; throws `UnionRefusal` for 'name_conflict', a secondary
  * fallback without byte evidence, and total refusal.
  */
-export function unionDecode({ program, primary, secondary, bytes }) {
+export function unionDecode({ program, primary, secondary, bytes, absent }) {
   if (!primary?.idl) throw new UnionRefusal('invalid_input', 'unionDecode needs a primary source');
   if (!Buffer.isBuffer(bytes)) throw new UnionRefusal('invalid_input', 'unionDecode needs the payload bytes as a Buffer');
+  // 'error' is the default and keeps the whole product strict. 'report' is the
+  // opt-in that lets a source decode a wire form SHORTER than its own layout
+  // declares — measured as chain-accepted on mainnet (research/
+  // short-form-wire-forms-2026-11-03.json).
+  const absentPolicy = absent ?? 'error';
+  if (absentPolicy !== 'report' && absentPolicy !== 'error') {
+    throw new UnionRefusal('invalid_input', `unknown absent policy ${JSON.stringify(absent)}`);
+  }
   const prim = prepare(primary);
   const sec = secondary?.idl ? prepare(secondary) : null;
 
-  const primProbe = probe(prim, bytes);
-  const secProbe = sec ? probe(sec, bytes) : null;
+  const primProbe = probe(prim, bytes, absentPolicy);
+  const secProbe = sec ? probe(sec, bytes, absentPolicy) : null;
 
   const sourceView = (source, probeResult) => probeResult === null
     ? { label: source?.label ?? null, present: false }
@@ -174,6 +195,7 @@ export function unionDecode({ program, primary, secondary, bytes }) {
       roundTripByteExact: probeResult.ok ? probeResult.fullExact : undefined,
       describedRoundTripByteExact: probeResult.ok ? probeResult.describedExact : undefined,
       trailingBytes: probeResult.ok ? probeResult.decoded.trailing.count : undefined,
+      absentFields: probeResult.ok ? (probeResult.decoded.absent ?? []).length : undefined,
     };
 
   const view = {
