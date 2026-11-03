@@ -1,7 +1,7 @@
 {
   "what": "out-of-tree consumer installs the packed package and decodes real mainnet payloads through node_modules only",
   "pre": "c7689ab",
-  "tarball": "sememe-0.2.2.tgz",
+  "tarball": "sememe-0.3.0.tgz",
   "storeFingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
   "payloads": {
     "fingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
@@ -126,6 +126,11 @@
       "detail": "NATIVE:CreateAccount:true"
     },
     {
+      "name": "sememe/raydium subpath decodes a real Raydium payload byte-exactly",
+      "pass": true,
+      "detail": "RAYDIUM:SwapBaseIn:true:0"
+    },
+    {
       "name": "sememe/codec + sememe/canonical + sememe/discriminators resolve and work",
       "pass": true,
       "detail": "SURFACES:{\"codec\":true,\"canonical\":true,\"discriminators\":true,\"corpusSeeded\":63,\"corpusTamperCheck\":\"hash-ok\",\"auditOk\":true}"
@@ -146,5 +151,5 @@
       "detail": "name=swap"
     }
   ],
-  "at": "2026-11-01T09:44:21.516Z"
+  "at": "2026-11-03T08:19:52.038Z"
 }
