@@ -127,8 +127,8 @@
     },
     {
       "name": "sememe/token-metadata subpath decodes a real metadata payload byte-exactly from the installed copy",
-      "pass": false,
-      "detail": "TOKEN_METADATA_FAILED:Package subpath './token-metadata' is not defined by \"exports\" in /tmp/sememe-consumer-gnVFrj/app/node_modules/sememe/package.json imported from /tmp/sememe-consumer-gnVFrj/app/[eval]"
+      "pass": true,
+      "detail": "TOKEN_METADATA:Initialize:true:8:5"
     },
     {
       "name": "sememe/codec + sememe/canonical + sememe/discriminators resolve and work",
@@ -151,5 +151,5 @@
       "detail": "name=swap"
     }
   ],
-  "at": "2026-11-03T17:24:03.142Z"
+  "at": "2026-11-03T17:27:27.657Z"
 }
