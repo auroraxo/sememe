@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-03T10:48:47.065Z",
+ "generatedAt": "2026-11-03T17:31:45.797Z",
  "sample": {
   "file": "test/fixtures/traffic-sample-2026-11-03.json",
   "store": "test/fixtures/traffic-sample-store-2026-11-03",
@@ -31,11 +31,11 @@
  },
  "headline": {
   "watchedPayloads": 21528,
-  "decoded": 21359,
-  "refused": 169,
+  "decoded": 21370,
+  "refused": 158,
   "noInterface": 0,
-  "coveredPct": 99.2,
-  "byteExact": 19699,
+  "coveredPct": 99.3,
+  "byteExact": 19710,
   "byteExactPctOfDecoded": 92.2,
   "shortForm": 0,
   "chainVerified": 0,
@@ -64,24 +64,12 @@
   {
    "reason": "idl: both stored sources refuse this payload — anchor @slot 464870440: truncated input: need 1 byte(s) for bool at ",
    "count": 8
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (anchor @slot 464870457): unknown event discriminator bb77f80dafff403",
-   "count": 5
-  },
-  {
-   "reason": "token-upstream: unknown-selector: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: tag 210 is not in the pinned Token-2022 interfa",
-   "count": 3
-  },
-  {
-   "reason": "token-upstream: unknown-selector: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: tag 215 is not in the pinned Token-2022 interfa",
-   "count": 3
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 16561,
+  "decoded_txSuccess": 16572,
   "decoded_txFailed": 4798,
-  "refused_txSuccess": 44,
+  "refused_txSuccess": 33,
   "refused_txFailed": 125,
   "noInterface_txSuccess": 0,
   "noInterface_txFailed": 0
@@ -136,16 +124,16 @@
    "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
    "name": "Token-2022",
    "acquirable": false,
-   "decoded": 2243,
-   "refused": 6,
+   "decoded": 2249,
+   "refused": 0,
    "noInterface": 0,
-   "byteExact": 2240,
+   "byteExact": 2246,
    "describedExact": 0,
    "trailing": 3,
    "shortForm": 0,
    "chainVerified": 0,
    "payloads": 2249,
-   "coveredPct": 99.7
+   "coveredPct": 100
   },
   {
    "program": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
@@ -241,16 +229,16 @@
    "program": "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN",
    "name": "Meteora DBC",
    "acquirable": true,
-   "decoded": 17,
-   "refused": 5,
+   "decoded": 22,
+   "refused": 0,
    "noInterface": 0,
-   "byteExact": 17,
-   "describedExact": 17,
+   "byteExact": 22,
+   "describedExact": 22,
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
    "payloads": 22,
-   "coveredPct": 77.3
+   "coveredPct": 100
   },
   {
    "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
