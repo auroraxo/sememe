@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-03T07:55:17.887Z",
+ "generatedAt": "2026-11-03T16:51:47.233Z",
  "sample": {
   "file": "test/fixtures/traffic-sample-2026-11-02.json",
   "store": "test/fixtures/traffic-sample-store",
@@ -19,11 +19,11 @@
  },
  "headline": {
   "watchedPayloads": 12572,
-  "decoded": 12400,
-  "refused": 172,
+  "decoded": 12401,
+  "refused": 171,
   "noInterface": 0,
   "coveredPct": 98.6,
-  "byteExact": 11707,
+  "byteExact": 11708,
   "byteExactPctOfDecoded": 94.4,
   "shortForm": 0,
   "chainVerified": 0,
@@ -46,18 +46,14 @@
    "count": 18
   },
   {
-   "reason": "token-upstream: unknown-selector: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: tag 210 is not in the pinned Token-2022 interfa",
-   "count": 1
-  },
-  {
    "reason": "idl: both stored sources refuse this payload — anchor @slot 464554569: unknown instruction discriminator 07051dc4f5",
    "count": 1
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 7691,
+  "decoded_txSuccess": 7692,
   "decoded_txFailed": 4709,
-  "refused_txSuccess": 21,
+  "refused_txSuccess": 20,
   "refused_txFailed": 151,
   "noInterface_txSuccess": 0,
   "noInterface_txFailed": 0
@@ -112,16 +108,16 @@
    "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
    "name": "Token-2022",
    "acquirable": false,
-   "decoded": 1597,
-   "refused": 1,
+   "decoded": 1598,
+   "refused": 0,
    "noInterface": 0,
-   "byteExact": 1594,
+   "byteExact": 1595,
    "describedExact": 0,
    "trailing": 3,
    "shortForm": 0,
    "chainVerified": 0,
    "payloads": 1598,
-   "coveredPct": 99.9
+   "coveredPct": 100
   },
   {
    "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",

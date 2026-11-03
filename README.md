@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus five programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget) and Raydium AMM v4, all five with wire tables DERIVED from pinned upstream Rust — and all 12,572 unbiased real-mainnet payloads now have an interface to decode against, lifting coverage from 55.5% to 98.6% strict / 100% with the chain-verified short forms (2026-11-03) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus five programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget) and Raydium AMM v4, all five with wire tables DERIVED from pinned upstream Rust — and all 12,572 unbiased real-mainnet payloads now have an interface to decode against, lifting coverage from 55.5% to 98.6% strict / 100% verified (the last strict refusal, Token-2022's token-metadata fallback, decodes since 2026-11-03) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
 ## The idea
 
@@ -614,7 +614,8 @@ instruction — a different upstream crate, refused by name rather than force-fi
 422 payloads with explained trailing bytes. Overall coverage on that sample moved from
 **55.5% to 98.5%**; the denominator never moved, the product gained a decode path.
 (A later step — adopting Jupiter Lend's published Liquidity IDL, see below — moved
-it to 98.6%; the Raydium AMM v4 derivation, also below, took no-interface to 0.)
+it to 98.6%; the Raydium AMM v4 derivation, also below, took no-interface to 0. The
+token-metadata fallback, one step further, closed the last token refusal.)
 
 Falsification (`test/token-interface.test.mjs`, 8 tests, each a mutation in a temp copy of
 the repo): swap two args in the artifact → load refused; edit the vendored Rust → load
@@ -625,9 +626,9 @@ refusal reasons for an unknown tag, a truncated payload and an invalid option ta
 
 Limits: Token-2022's 15 extension dispatch tags are named at the top level only — their
 sub-instruction bytes report as trailing, because the extension crates are separate
-interfaces this table does not vendor. The `spl-token-metadata` fallback crate is not
-vendored either, so its payloads refuse by name. Upstream's `Batch` (tag 255) unpacks but
+interfaces this table does not vendor. Upstream's `Batch` (tag 255) unpacks but
 the processor refuses it — the table records the wire shape, not a runtime guarantee.
+(The `spl-token-metadata` fallback crate IS vendored now — see the next section.)
 
 Limits: Linux-mainnet measured only; the strict-20 coverage study does not include the native programs (they were never part of the sample, so no coverage number moved); the runtime acceptance rule is checked against the agave source at one point in time, not against a live validator; no outside user yet.
 
@@ -816,11 +817,11 @@ derivation check, same two-check contract as the native tables).
 
 | outcome (current) | count | meaning |
 | --- | --- | --- |
-| decoded | 12,400 | an available interface named it |
-| refused | 172 | an interface exists and the bytes were refused (source lag, incl. 1 token payload: a token-metadata fallback instruction, a different upstream crate, refused rather than force-fitted) |
+| decoded | 12,401 | an available interface named it |
+| refused | 171 | an interface exists and the bytes were refused (source lag in the pump programs' wire forms) |
 | no-interface | **0** | no payload in this sample lacks an interface |
 
-**98.6% coverage** (12,400/12,572 watched payloads), with 11,707/12,400 = 94.4%
+**98.6% coverage** (12,401/12,572 watched payloads), with 11,708/12,401 = 94.4%
 of the decoded payloads re-encoding byte-exactly. What the 700 non-byte-exact
 decodes are, measured: 419 legacy `GetAccountDataSize` payloads carry two extra
 bytes the legacy program itself ignores (upstream's own comment says so), and
@@ -831,7 +832,7 @@ trailing count is part of the result, not a failure hidden by it.
 **What the number means now.** The acquisition gap this measurement existed to
 expose is **empty for this sample**: every watched payload now sits on a program
 that has an interface sememe can decode against, so `acquisitionQueue` carries
-no entry. "Refused" (172) is source lag in interfaces that exist — PumpSwap's
+no entry. "Refused" (171) is source lag in interfaces that exist — PumpSwap's
 undeclared discriminator form and pump.fun's unexplained event tail are the bulk
 of it, both already reported to the first parties. The denominator never moved:
 same sample, same product entry points, one new decode path per gap.
@@ -927,7 +928,7 @@ upstream release that changes a pack() arm refuses the load loudly instead of
 decoding stale. Token-2022 extension sub-instructions (the 15 extension
 dispatch tags) are named at the top level only; their sub-instruction bytes
 report as trailing. The spl-token-metadata fallback interface (8-byte
-discriminators, own crate) is not vendored — its payloads refuse by name.
+discriminators, own crate) is vendored and derived like the others — see below.
 Traffic outside the watched list (181 further programs, 4,842 instructions) is
 counted in the report but excluded from the denominator, because their bytes are
 not stored. A coverage number over one window is a window, not the ecosystem —
@@ -999,15 +1000,16 @@ field boundary and re-encodes exactly, is accepted under `report` and refused
 under `verified`; that asymmetry is the whole point, and it is a test
 (`test/short-form-decoding.test.mjs`).
 
-**Coverage, same sample, same entry points, one opt-in:**
+**Coverage, same sample, same entry points, one opt-in** (after the token-metadata
+fallback landed, which closed the last strict refusal — see below):
 
 | outcome | strict | `--absent verified` |
 | --- | --- | --- |
-| decoded | 12,400 | 12,571 (+171) |
-| refused | 172 | 1 (the Token-2022 payload) |
+| decoded | 12,401 | 12,572 (+171) |
+| refused | 171 | **0** |
 | no-interface | 0 | 0 |
 | coverage | 98.6% | **100%** |
-| byte-exact | 11,707 | 11,878 (+171, every short form re-encodes exactly) |
+| byte-exact | 11,708 | 11,879 (+171, every short form re-encodes exactly) |
 
 The denominator did not move; the strict measurement is unchanged and still
 committed, because a gain that only exists when you relax the decoder is a
@@ -1015,12 +1017,88 @@ finding to measure, not a number to replace. Reproduce:
 `node tools/traffic-coverage-report.mjs --absent=verified`
 ([`research/short-form-coverage-2026-11-03.json`](research/short-form-coverage-2026-11-03.json)).
 
-**What is still open.** The remaining 1 refusal is a Token-2022 tag the pinned
-table does not carry; the acquisition queue is empty *for this sample* (the
-Raydium closure above removed the last entry, and a different window can put a
-program back); and the short-form table covers one four-block window — a
-longer window may well find a short form nobody has witnessed, which must
-refuse under `verified` until a witness exists.
+**What is still open.** The strict-verified gap is closed for this sample: after the
+token-metadata fallback below landed, the last strict refusal decodes, so
+`--absent=verified` reports 0 refusals on this window. The acquisition queue is empty
+*for this sample* (the Raydium closure above removed the last entry, and a different
+window can put a program back); and the short-form table covers one four-block window —
+a longer window may well find a short form nobody has witnessed, which must refuse
+under `verified` until a witness exists.
+
+## The last refusal was the program's own fallback: Token-2022 token-metadata (2026-11-03)
+
+One payload in the unbiased sample refused every path sememe had: a Token-2022
+instruction whose first byte is `0xd2`, 112 bytes long. It was not source lag and not
+an acquisition gap — it was a decode path sememe did not have.
+
+**What the program does.** Token-2022's processor tries the ONE-BYTE token selector
+first (`decode_instruction_type(input)`); when that byte is not a token variant it
+falls through to `TokenMetadataInstruction::unpack(input)` and, if that fails too, to
+`TokenGroupInstruction::unpack`. The token-metadata instructions therefore carry
+**EIGHT-BYTE discriminators** (`sha256("spl_token_metadata_interface:<action>")[..8]`)
+and never match the token table's 1-byte tags. sememe's refusal was a true statement
+about the token table and a false one about the program.
+
+**What landed.** `vendor/spl-token-metadata-interface/7038969e` (Apache-2.0, byte-
+identical to crates.io `spl-token-metadata-interface` 1.0.1 — the version Token-2022's
+own `Cargo.lock` pins; the directory name is the crate's upstream git sha) plus two
+modules and one artifact, honouring the same two-check contract as every other table:
+
+- `src/token-metadata-interface.mjs` derives the table FROM the vendored source:
+  the discriminator from upstream's own `#[discriminator_hash_input("...")]` string,
+  the argument order from each struct's Borsh field declaration, and the wire rules
+  (string = u32 LE length + bytes, enum = 1-byte variant index, option = 1 tag byte,
+  `MaybeNull<Address>` = 32 transparent bytes where all-zero is `None`).
+  It refuses on anything it cannot pin: an unknown field type, a variant upstream
+  declares that the table does not name, a discriminator collision.
+- The **discriminator rule is anchored by upstream's own literal**: `state.rs`
+  hardcodes the `TokenMetadata` account discriminator `[112,132,90,90,11,88,157,87]`,
+  and upstream's own test derives it from `sha256("<NAMESPACE>:token_metadata")`. The
+  derivation recomputes it and throws if it differs — so the hash rule cannot drift
+  silently while the five instruction discriminators ride along with it.
+- `src/token-metadata.mjs` loads it with the two-check contract (fresh derivation must
+  byte-equal the committed artifact) and decodes; `src/token.mjs` reaches it exactly
+  where upstream does — the 1-byte selector is consulted FIRST, and only a payload
+  whose first byte is not a token variant gets there. Legacy SPL Token has no such
+  branch and still refuses.
+- `interface/token-metadata.json` + `tools/token-metadata-interface.mjs [--check]`.
+
+**Strictness, verified rather than assumed.** Upstream's `unpack` calls
+`try_from_slice`, which REFUSES a payload with unexplained trailing bytes — and it does
+so in the upstream crate itself: a trailing byte is a `BorshIoError`. sememe mirrors
+that (trailing bytes are a refusal, not a reported count), so the decoder never claims
+the chain accepts bytes the chain rejects.
+
+**The falsifier is the program, not a second reading of the source.**
+`tools/token-metadata-oracle.mjs` builds a Rust program
+(`tools/token-metadata-oracle/`) against the exact pinned crates —
+`spl-token-metadata-interface 1.0.1`, `spl-discriminator 0.5.2`, `solana-nullable 1.3.0`,
+`borsh 1.8.1` — and asks them: it packs every variant, unpacks the observed mainnet
+payloads, and reports which inputs it refuses
+([`research/token-metadata-oracle-2026-11-03.json`](research/token-metadata-oracle-2026-11-03.json)).
+`test/token-metadata.test.mjs` then compares sememe's table against that output:
+all five discriminators (produced by upstream's own `SplDiscriminate` derive macro),
+all ten re-encodes, and all nine refusal reasons agree.
+
+**Measured, same sample, same product entry points:** Token-2022 goes from 1,597/1,598
+(the one refusal was this payload) to **1,598/1,598**; strict coverage 12,400 →
+**12,401 decoded** / 172 → **171 refused**; `--absent=verified` 12,571 →
+**12,572 / 0 refusals = 100%**. The denominator never moved.
+
+**Tests: 10 new** (`test/token-metadata.test.mjs`, 306 → 316). The mutation ladder:
+tampered artifact → load refused; tampered vendored `instruction.rs` → load refused;
+deleted `vendor/spl-token-metadata-interface` → load refused; a hand-mutated
+`RemoveKey` field order (bool moved behind the string) is caught by the artifact check
+AND by the oracle comparison. Refusals stay named: unknown 8-byte discriminator,
+truncated discriminator, forged Borsh string length, trailing byte, invalid bool byte,
+undeclared `Field` tag.
+
+**Known limits, kept explicit.** This is the instruction path only — the `TokenMetadata`
+account (the TLV account those instructions mutate) is a different structure and is not
+decoded. The `TokenGroup` fallback (`spl-token-group-interface`) is the third branch in
+that same processor and is still not vendored, so a group instruction would refuse by
+name; it has no payload in this window, so this is a stated boundary rather than a
+measured gap.
 
 ## Next qualification
 

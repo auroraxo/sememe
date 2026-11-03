@@ -57,6 +57,9 @@ const usage = `usage:
       there is no IDL account to pull at either address: their interface is
       pinned from the upstream Rust crates (pack/unpack wire rule), and this
       decodes against that pin. Extension sub-instructions report as trailing.
+      Token-2022 payloads whose first byte is no token tag fall through to the
+      token-METADATA table (spl-token-metadata-interface, 8-byte
+      discriminators) — the same fallback Token-2022's own processor takes.
   sememe token-provenance [program-id]
       print the pinned crate, encoding rule and variant count for a token
       program (or for both).

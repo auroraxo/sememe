@@ -49,9 +49,19 @@ import { decodeTokenInstruction, isTokenProgram } from '../src/token.mjs';
 import { accountKeyList, programIdOf, toHex } from './lib/payloads.mjs';
 
 const RPC = process.env.SEMEME_RPC ?? 'https://api.mainnet-beta.solana.com';
-const STORE = 'test/fixtures/traffic-sample-store';
-const SAMPLE = 'test/fixtures/traffic-sample-2026-11-02.json';
-const OUT = process.argv[2] ?? 'research/short-form-wire-forms-2026-11-03.json';
+// Defaults keep the committed 2026-11-03 report reproducible byte-for-byte
+// (test/short-form-wire-forms.test.mjs runs this tool with no arguments and
+// compares the result). A second window passes --sample/--store explicitly.
+const flag = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return fallback;
+  const value = process.argv[index + 1];
+  if (value === undefined) throw Error(`missing value for ${name}`);
+  return value;
+};
+const STORE = flag('--store', 'test/fixtures/traffic-sample-store');
+const SAMPLE = flag('--sample', 'test/fixtures/traffic-sample-2026-11-02.json');
+const OUT = flag('--out', process.argv[2] ?? 'research/short-form-wire-forms-2026-11-03.json');
 // How many chain witnesses to pull per group. Small on purpose: the public
 // RPC throttles hard, and the question is answered by a handful of witnesses.
 const WITNESSES_PER_GROUP = Number(process.env.SEMEME_WITNESSES ?? 4);

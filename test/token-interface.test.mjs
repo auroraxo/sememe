@@ -186,12 +186,17 @@ test('real mainnet token payloads decode byte-exactly through the product', asyn
     }
   }
   assert.equal(total, 5402, 'the two token programs carry 5,402 payloads in the sample');
-  assert.equal(decoded, 5401, 'every payload except the token-metadata fallback decodes');
-  assert.equal(exact, 4979, 'the byte-exact re-encode count on real wire');
-  assert.equal(refused, 1);
-  // The one refusal: an 8-byte spl-token-metadata discriminator, a different
-  // vendored crate this table does not cover — named, not force-fitted.
-  assert.deepEqual([...refusalKinds.keys()], ['unknown-selector']);
+  assert.equal(decoded, 5402, 'every payload decodes — the token-metadata fallback included');
+  assert.equal(exact, 4980, 'the byte-exact re-encode count on real wire');
+  assert.equal(refused, 0);
+  // The token-metadata fallback that used to be refused as `unknown-selector`
+  // now decodes through the SECOND table Token-2022's processor consults —
+  // because that is what the program does with those bytes. Its name comes
+  // from upstream's own variant list. This sample carries exactly one such
+  // payload (an Initialize); the UpdateAuthority form appears in the
+  // 2026-11-03 sample and is pinned by test/token-metadata.test.mjs.
+  assert.deepEqual([...refusalKinds.keys()], []);
+  assert.equal(names.get('Initialize'), 1, 'the token-metadata Initialize payload decodes by name');
   // The most frequent money-movement instructions are named by upstream's
   // own variant names.
   assert.ok((names.get('TransferChecked') ?? 0) > 1000, 'TransferChecked is the traffic');

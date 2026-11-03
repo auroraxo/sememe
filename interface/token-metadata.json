@@ -1,0 +1,132 @@
+{
+  "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "label": "SPL Token Metadata (Token-2022 fallback)",
+  "scheme": "native-token-metadata",
+  "source": {
+    "repo": "solana-program/token-2022",
+    "crate": "spl-token-metadata-interface",
+    "version": "1.0.1",
+    "pin": "7038969ec74a89f1afdb9bc97c112d4d26fead9a",
+    "file": "interface/src/instruction.rs",
+    "stateFile": "interface/src/state.rs",
+    "fileSha256": "sha256:7af2670a970d9a907cd8b134c629817875c7303831b0b01b96d488526690d521",
+    "stateFileSha256": "sha256:865edf6b1d21d913403308e4bd6347d7210e02489c46c243ecd5210995f791de",
+    "vendoredAt": "vendor/spl-token-metadata-interface/7038969ec74a89f1afdb9bc97c112d4d26fead9a",
+    "derivation": "src/token-metadata-interface.mjs: discriminator = sha256(upstream's own #[discriminator_hash_input])[..8], anchored by upstream's hardcoded TokenMetadata literal; args = the Borsh field order of the struct declaration; string = u32 LE length + bytes; enum = 1-byte variant index; option = 1 tag byte + payload; MaybeNull<Address> = transparent 32 raw bytes, all-zero = None"
+  },
+  "runtime": "Token-2022 processor at this pin: the 1-byte PodTokenInstruction selector is tried first, then TokenMetadataInstruction::unpack(input) is tried; upstream's unpack uses try_from_slice, so TRAILING BYTES ARE REFUSED; an unknown 8-byte discriminator is InvalidInstruction",
+  "selector": {
+    "width": 8,
+    "encoding": "sha256(namespace:action)[..8]"
+  },
+  "argEncoding": "borsh string = u32 LE length + bytes; borsh enum = 1-byte variant index; borsh option = 1 tag byte (0 none / 1 some) + payload; bool = 1 byte; MaybeNull<Address> = 32 raw bytes, all-zero = None",
+  "strict": {
+    "trailingBytes": "refuse",
+    "reason": "upstream unpack() calls try_from_slice, which refuses a payload with unexplained trailing bytes (verified against the upstream crate: a trailing byte is a BorshIoError)"
+  },
+  "fieldEnum": [
+    {
+      "tag": 0,
+      "name": "Name",
+      "payload": null
+    },
+    {
+      "tag": 1,
+      "name": "Symbol",
+      "payload": null
+    },
+    {
+      "tag": 2,
+      "name": "Uri",
+      "payload": null
+    },
+    {
+      "tag": 3,
+      "name": "Key",
+      "payload": "borsh_string"
+    }
+  ],
+  "instructions": [
+    {
+      "name": "Initialize",
+      "struct": "Initialize",
+      "discriminator": "d2e11ea258b84d8d",
+      "hashInput": "spl_token_metadata_interface:initialize_account",
+      "args": [
+        {
+          "name": "name",
+          "type": "borsh_string"
+        },
+        {
+          "name": "symbol",
+          "type": "borsh_string"
+        },
+        {
+          "name": "uri",
+          "type": "borsh_string"
+        }
+      ]
+    },
+    {
+      "name": "UpdateField",
+      "struct": "UpdateField",
+      "discriminator": "dde9312db5cadcc8",
+      "hashInput": "spl_token_metadata_interface:updating_field",
+      "args": [
+        {
+          "name": "field",
+          "type": "borsh_enum",
+          "enum": "Field"
+        },
+        {
+          "name": "value",
+          "type": "borsh_string"
+        }
+      ]
+    },
+    {
+      "name": "RemoveKey",
+      "struct": "RemoveKey",
+      "discriminator": "ea122038598d25b5",
+      "hashInput": "spl_token_metadata_interface:remove_key_ix",
+      "args": [
+        {
+          "name": "idempotent",
+          "type": "borsh_bool"
+        },
+        {
+          "name": "key",
+          "type": "borsh_string"
+        }
+      ]
+    },
+    {
+      "name": "UpdateAuthority",
+      "struct": "UpdateAuthority",
+      "discriminator": "d7e4a6e45464567b",
+      "hashInput": "spl_token_metadata_interface:update_the_authority",
+      "args": [
+        {
+          "name": "new_authority",
+          "type": "maybe_null_address"
+        }
+      ]
+    },
+    {
+      "name": "Emit",
+      "struct": "Emit",
+      "discriminator": "faa6b4fa0d0cb846",
+      "hashInput": "spl_token_metadata_interface:emitter",
+      "args": [
+        {
+          "name": "start",
+          "type": "borsh_option_u64"
+        },
+        {
+          "name": "end",
+          "type": "borsh_option_u64"
+        }
+      ]
+    }
+  ]
+}

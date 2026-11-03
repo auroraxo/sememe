@@ -50,8 +50,18 @@ import { decodeRaydiumInstruction, isRaydiumProgram } from '../src/raydium.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
 
-const SAMPLE = 'test/fixtures/traffic-sample-2026-11-02.json';
-const STORE = 'test/fixtures/traffic-sample-store';
+const arg = (name, fallback) => {
+  const index = process.argv.indexOf(name);
+  if (index < 0) return fallback;
+  const value = process.argv[index + 1];
+  if (value === undefined) throw Error(`missing value for ${name}`);
+  return value;
+};
+// Defaults keep the committed 2026-11-02 report reproducible byte-for-byte
+// (test/traffic-coverage-report.test.mjs runs this tool with no arguments and
+// deep-equals the result). A second window passes --sample/--store explicitly.
+const SAMPLE = arg('--sample', 'test/fixtures/traffic-sample-2026-11-02.json');
+const STORE = arg('--store', 'test/fixtures/traffic-sample-store');
 const sample = read(SAMPLE);
 const acquirable = sample.acquirable ?? {};
 

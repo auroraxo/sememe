@@ -1,0 +1,196 @@
+{
+  "discriminatorRule": {
+    "namespace": "spl_token_metadata_interface",
+    "preimage": "spl_token_metadata_interface:token_metadata",
+    "anchorLiteral": "70845a5a0b589d57",
+    "computedByOracle": "70845a5a0b589d57",
+    "instructionDiscriminators": {
+      "Initialize": "d2e11ea258b84d8d",
+      "UpdateField": "dde9312db5cadcc8",
+      "RemoveKey": "ea122038598d25b5",
+      "UpdateAuthority": "d7e4a6e45464567b",
+      "Emit": "faa6b4fa0d0cb846"
+    },
+    "oracleCrateVersions": {
+      "spl-token-metadata-interface": "1.0.1",
+      "spl-discriminator": "0.5.2",
+      "solana-nullable": "1.3.0",
+      "borsh": "1.8.1",
+      "solana-address": "2.6.1"
+    }
+  },
+  "packed": [
+    {
+      "name": "Initialize",
+      "args": {
+        "name": "attention",
+        "symbol": "att",
+        "uri": "https://ipfs.io/ipfs/bafkreia2sie54jyne33qx7ivxxbnohqnh2stkdvbpitqxgxyf4zzgdgg74"
+      },
+      "hex": "d2e11ea258b84d8d09000000617474656e74696f6e030000006174745000000068747470733a2f2f697066732e696f2f697066732f6261666b726569613273696535346a796e65333371783769767878626e6f68716e683273746b647662706974717867787966347a7a676467673734"
+    },
+    {
+      "name": "Initialize",
+      "args": {
+        "name": "charco.fun",
+        "symbol": "CHARCO",
+        "uri": "https://ipfs.io/ipfs/bafkreicij7mv4marvmppitgqqne6kvzcborp53shppzw6kqgzx3z5xeea4"
+      },
+      "hex": "d2e11ea258b84d8d0a00000063686172636f2e66756e0600000043484152434f5000000068747470733a2f2f697066732e696f2f697066732f6261666b72656963696a376d76346d6172766d707069746771716e65366b767a63626f72703533736870707a77366b71677a78337a357865656134"
+    },
+    {
+      "name": "UpdateField",
+      "args": {
+        "field": {
+          "tag": 0,
+          "variant": "Name"
+        },
+        "value": "new_name"
+      },
+      "hex": "dde9312db5cadcc800080000006e65775f6e616d65"
+    },
+    {
+      "name": "UpdateField",
+      "args": {
+        "field": {
+          "value": "custom",
+          "variant": "Key"
+        },
+        "value": "v"
+      },
+      "hex": "dde9312db5cadcc80306000000637573746f6d0100000076"
+    },
+    {
+      "name": "RemoveKey",
+      "args": {
+        "idempotent": true,
+        "key": "k"
+      },
+      "hex": "ea122038598d25b501010000006b"
+    },
+    {
+      "name": "RemoveKey",
+      "args": {
+        "idempotent": false,
+        "key": "k"
+      },
+      "hex": "ea122038598d25b500010000006b"
+    },
+    {
+      "name": "UpdateAuthority",
+      "args": {
+        "new_authority": null
+      },
+      "hex": "d7e4a6e45464567b0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "name": "UpdateAuthority",
+      "args": {
+        "new_authority": "US517G5965aydkZ46HS38QLi7UQiSojurfbQfKCELFx"
+      },
+      "hex": "d7e4a6e45464567b0707070707070707070707070707070707070707070707070707070707070707"
+    },
+    {
+      "name": "Emit",
+      "args": {
+        "end": null,
+        "start": null
+      },
+      "hex": "faa6b4fa0d0cb8460000"
+    },
+    {
+      "name": "Emit",
+      "args": {
+        "end": 9,
+        "start": 1
+      },
+      "hex": "faa6b4fa0d0cb846010100000000000000010900000000000000"
+    }
+  ],
+  "observed": [
+    {
+      "label": "initialize-attention",
+      "accepted": true,
+      "name": "Initialize",
+      "reencodeEqual": true,
+      "hex": "d2e11ea258b84d8d09000000617474656e74696f6e030000006174745000000068747470733a2f2f697066732e696f2f697066732f6261666b726569613273696535346a796e65333371783769767878626e6f68716e683273746b647662706974717867787966347a7a676467673734"
+    },
+    {
+      "label": "initialize-charco",
+      "accepted": true,
+      "name": "Initialize",
+      "reencodeEqual": true,
+      "hex": "d2e11ea258b84d8d0600000043484152434f0600000043484152434f5000000068747470733a2f2f697066732e696f2f697066732f6261666b726569656f343379666d62676866696d6a33346f36737261746b76796f77786e3435346767713270693379717534776d346b35776c3469"
+    },
+    {
+      "label": "initialize-charco-fun",
+      "accepted": true,
+      "name": "Initialize",
+      "reencodeEqual": true,
+      "hex": "d2e11ea258b84d8d0a00000063686172636f2e66756e0600000043484152434f5000000068747470733a2f2f697066732e696f2f697066732f6261666b72656963696a376d76346d6172766d707069746771716e65366b767a63626f72703533736870707a77366b71677a78337a357865656134"
+    },
+    {
+      "label": "update-authority-none",
+      "accepted": true,
+      "name": "UpdateAuthority",
+      "reencodeEqual": true,
+      "hex": "d7e4a6e45464567b0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "refused": [
+    {
+      "label": "unknown 8-byte discriminator",
+      "hex": "0000000000000000",
+      "upstreamError": "InvalidInstructionData",
+      "reason": "unknown-selector"
+    },
+    {
+      "label": "trailing byte after UpdateAuthority",
+      "hex": "d7e4a6e45464567b0000000000000000000000000000000000000000000000000000000000000000aa",
+      "upstreamError": "BorshIoError",
+      "reason": "trailing-bytes"
+    },
+    {
+      "label": "trailing byte after Initialize",
+      "hex": "d2e11ea258b84d8d09000000617474656e74696f6e030000006174745000000068747470733a2f2f697066732e696f2f697066732f6261666b726569613273696535346a796e65333371783769767878626e6f68716e683273746b647662706974717867787966347a7a67646767373400",
+      "upstreamError": "BorshIoError",
+      "reason": "trailing-bytes"
+    },
+    {
+      "label": "too short for a discriminator",
+      "hex": "00000000000000",
+      "upstreamError": "InvalidInstructionData",
+      "reason": "truncated-discriminator"
+    },
+    {
+      "label": "discriminator only, no body",
+      "hex": "d7e4a6e45464567b",
+      "upstreamError": "BorshIoError",
+      "reason": "truncated-address"
+    },
+    {
+      "label": "forged Borsh string length",
+      "hex": "d2e11ea258b84d8dff000000616263",
+      "upstreamError": "InvalidInstructionData",
+      "reason": "truncated-string"
+    },
+    {
+      "label": "Emit truncated after one option byte",
+      "hex": "faa6b4fa0d0cb84601",
+      "upstreamError": "BorshIoError",
+      "reason": "truncated-option-payload"
+    },
+    {
+      "label": "RemoveKey bool byte 2",
+      "hex": "ea122038598d25b502010000006b",
+      "upstreamError": "BorshIoError",
+      "reason": "invalid-bool"
+    },
+    {
+      "label": "Field tag 4 (undeclared)",
+      "hex": "dde9312db5cadcc8040100000076",
+      "upstreamError": "BorshIoError",
+      "reason": "unknown-enum-variant"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-03T07:54:23.575Z",
+ "generatedAt": "2026-11-03T17:12:16.544Z",
  "sample": {
   "file": "test/fixtures/traffic-sample-2026-11-02.json",
   "store": "test/fixtures/traffic-sample-store",
@@ -19,11 +19,11 @@
  },
  "headline": {
   "watchedPayloads": 12572,
-  "decoded": 12571,
-  "refused": 1,
+  "decoded": 12572,
+  "refused": 0,
   "noInterface": 0,
   "coveredPct": 100,
-  "byteExact": 11878,
+  "byteExact": 11879,
   "byteExactPctOfDecoded": 94.5,
   "shortForm": 171,
   "chainVerified": 171,
@@ -36,16 +36,11 @@
   "transactions": 2737,
   "note": "counted, bytes NOT stored (fixture size limit). NOT in the coverage denominator — reporting them separately keeps the denominator honest."
  },
- "refusalReasons": [
-  {
-   "reason": "token-upstream: unknown-selector: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: tag 210 is not in the pinned Token-2022 interfa",
-   "count": 1
-  }
- ],
+ "refusalReasons": [],
  "outcomeVsChain": {
-  "decoded_txSuccess": 7711,
+  "decoded_txSuccess": 7712,
   "decoded_txFailed": 4860,
-  "refused_txSuccess": 1,
+  "refused_txSuccess": 0,
   "refused_txFailed": 0,
   "noInterface_txSuccess": 0,
   "noInterface_txFailed": 0
@@ -100,16 +95,16 @@
    "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
    "name": "Token-2022",
    "acquirable": false,
-   "decoded": 1597,
-   "refused": 1,
+   "decoded": 1598,
+   "refused": 0,
    "noInterface": 0,
-   "byteExact": 1594,
+   "byteExact": 1595,
    "describedExact": 0,
    "trailing": 3,
    "shortForm": 0,
    "chainVerified": 0,
    "payloads": 1598,
-   "coveredPct": 99.9
+   "coveredPct": 100
   },
   {
    "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",

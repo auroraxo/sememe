@@ -168,7 +168,7 @@ test('the committed report and the acquisition queue reflect the closure', async
   assert.deepEqual(report.acquisitionQueue.map((r) => r.name), [],
     'the acquisition queue is empty — every watched payload has an interface');
   assert.equal(report.headline.noInterface, 0);
-  assert.equal(report.headline.decoded, 12400);
+  assert.equal(report.headline.decoded, 12401);
   const raydiumRow = report.programs.find((r) => r.program === '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8');
   assert.equal(raydiumRow.decoded, 9, 'all nine Raydium payloads named by the derived table');
   assert.equal(raydiumRow.noInterface, 0);

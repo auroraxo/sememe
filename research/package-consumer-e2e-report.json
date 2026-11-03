@@ -1,6 +1,6 @@
 {
   "what": "out-of-tree consumer installs the packed package and decodes real mainnet payloads through node_modules only",
-  "pre": "c7689ab",
+  "pre": "not measured in this run (use --pre)",
   "tarball": "sememe-0.3.0.tgz",
   "storeFingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
   "payloads": {
@@ -25,11 +25,6 @@
     }
   },
   "checks": [
-    {
-      "name": "pre-package tree (c7689ab) is not importable as 'sememe'",
-      "pass": true,
-      "detail": "RED:ERR_MODULE_NOT_FOUND"
-    },
     {
       "name": "install pulls in exactly one package (zero dependencies)",
       "pass": true,
@@ -131,6 +126,11 @@
       "detail": "RAYDIUM:SwapBaseIn:true:0"
     },
     {
+      "name": "sememe/token-metadata subpath decodes a real metadata payload byte-exactly from the installed copy",
+      "pass": false,
+      "detail": "TOKEN_METADATA_FAILED:Package subpath './token-metadata' is not defined by \"exports\" in /tmp/sememe-consumer-gnVFrj/app/node_modules/sememe/package.json imported from /tmp/sememe-consumer-gnVFrj/app/[eval]"
+    },
+    {
       "name": "sememe/codec + sememe/canonical + sememe/discriminators resolve and work",
       "pass": true,
       "detail": "SURFACES:{\"codec\":true,\"canonical\":true,\"discriminators\":true,\"corpusSeeded\":63,\"corpusTamperCheck\":\"hash-ok\",\"auditOk\":true}"
@@ -151,5 +151,5 @@
       "detail": "name=swap"
     }
   ],
-  "at": "2026-11-03T08:19:52.038Z"
+  "at": "2026-11-03T17:24:03.142Z"
 }

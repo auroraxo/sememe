@@ -30,11 +30,23 @@
 // tags 26/27/28/30/33/34/36/37/39/40/41/42/43/44/46 dispatch into extension
 // processors on input[1..]) are named at the top level only, and their
 // sub-instruction bytes are reported as trailing. Token-2022's tag 255
-// (Batch) unpacks upstream but the processor refuses it, and the token-metadata
-// fallback interface (spl-token-metadata-interface, 8-byte discriminator) is a
-// separate crate this table does not vendor — payloads of that shape are
-// refused with a named reason instead of being force-fitted into the token
-// table.
+// (Batch) unpacks upstream but the processor refuses it.
+//
+// The token-metadata FALLBACK (spl-token-metadata-interface, 8-byte
+// discriminators) is now covered, because Token-2022's own processor falls
+// through to it: `decode_instruction_type(input)` reads ONE byte, and when
+// that byte is not a PodTokenInstruction variant the processor tries
+// `TokenMetadataInstruction::unpack(input)` before giving up. A payload
+// starting with 0xd2/0xdd/0xea/0xd7/0xfa is therefore an instruction this
+// program EXECUTES, and refusing it as "unknown-selector" would have been a
+// true statement about the token table and a false one about the program.
+//
+// The fallback is Token-2022 ONLY (legacy SPL Token's processor has no such
+// branch) and it sits EXACTLY where upstream puts it: the 1-byte token
+// selector is consulted FIRST, and only a payload whose first byte is not a
+// token variant reaches the metadata table. Upstream does not fall through
+// to metadata when a token variant is recognized but its body is bad, so
+// neither does this module.
 //
 // Strictness mirrors src/native.mjs: an unknown selector, a truncated
 // payload, an invalid option tag or an unknown authority byte is a refusal
@@ -48,6 +60,11 @@ import {
   deriveTokenInterface, TOKEN_SPECS, vendoredTokenHash,
   SPL_TOKEN_PROGRAM, SPL_TOKEN_2022_PROGRAM,
 } from './token-interface.mjs';
+import {
+  decodeTokenMetadataInstruction, encodeTokenMetadataInstruction,
+  tokenMetadataProvenance, tokenMetadataNames, TokenMetadataCodecError,
+  TOKEN_METADATA_PROGRAM,
+} from './token-metadata.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
@@ -109,6 +126,16 @@ export function isTokenProgram(program) {
   return ARTIFACTS.has(program);
 }
 
+/**
+ * Whether `program`'s processor falls through to the token-metadata table.
+ *
+ * Token-2022's processor does (`decode_instruction_type` fails ->
+ * `TokenMetadataInstruction::unpack`); legacy SPL Token has no such branch.
+ */
+export function hasTokenMetadataFallback(program) {
+  return program === TOKEN_METADATA_PROGRAM;
+}
+
 /** Program ids this module can decode, for callers that enumerate. */
 export function tokenPrograms() {
   return [...ARTIFACTS.keys()];
@@ -124,6 +151,9 @@ export function tokenProvenance(program) {
     encoding: artifact.argEncoding,
     runtime: artifact.runtime,
     variants: artifact.instructions.length,
+    // Token-2022's processor falls through to the token-metadata crate; the
+    // fallback has its OWN vendored source, artifact and wire rules.
+    ...(hasTokenMetadataFallback(program) ? { fallback: tokenMetadataProvenance() } : {}),
   };
 }
 
@@ -286,6 +316,25 @@ export function decodeTokenInstruction(program, bytes, { trailing = 'report' } =
   const tag = bytes[0];
   const entry = artifact.instructions.find((ix) => ix.tag === tag);
   if (!entry) {
+    // Upstream's own dispatch order: the ONE-BYTE token selector is tried
+    // first, and only when it does not match does the processor fall through
+    // to `TokenMetadataInstruction::unpack(input)`. A payload whose first
+    // byte is not a token variant is therefore either a metadata instruction
+    // (8-byte discriminator, Token-2022 only) or a refusal — and it is never
+    // a token instruction this table skipped.
+    if (hasTokenMetadataFallback(program)) {
+      try {
+        return decodeTokenMetadataInstruction(program, bytes);
+      } catch (error) {
+        // The fallback raises its own error type; the token module's
+        // contract is one error type with a named reason, so the reason is
+        // preserved and the type is normalized here.
+        if (error instanceof TokenMetadataCodecError) {
+          throw new TokenCodecError(error.reason, error.message);
+        }
+        throw error;
+      }
+    }
     throw new TokenCodecError(
       'unknown-selector',
       `${program}: tag ${tag} is not in the pinned ${artifact.label} interface`,
@@ -361,13 +410,20 @@ export function encodeTokenInstruction(program, name, values = {}) {
 /** Names the table can claim for `program` (coverage callers). */
 export function tokenNames(program) {
   const artifact = ARTIFACTS.get(program);
-  return artifact ? artifact.instructions.map((entry) => entry.name) : [];
+  if (!artifact) return [];
+  const base = artifact.instructions.map((entry) => entry.name);
+  // The processor's fallback branch is part of what the program accepts, so
+  // enumeration must include it — a name list that omits it would make a
+  // "known name" check refuse payloads the program executes.
+  return hasTokenMetadataFallback(program) ? [...base, ...tokenMetadataNames()] : base;
 }
 
-/** Whether `name` belongs to `program`'s token table. */
+/** Whether `name` belongs to `program`'s token table (including the fallback). */
 export function isTokenName(program, name) {
   const artifact = ARTIFACTS.get(program);
-  return Boolean(artifact) && artifact.instructions.some((entry) => entry.name === name);
+  if (!artifact) return false;
+  if (artifact.instructions.some((entry) => entry.name === name)) return true;
+  return hasTokenMetadataFallback(program) && tokenMetadataNames().includes(name);
 }
 
 /** AuthorityType byte -> name for `program` (exposed for callers/tests). */

@@ -86,15 +86,15 @@ test('the headline numbers hold, with their meaning intact', async () => {
     'every payload has a verdict — decoded, refused, or no-interface; none vanishes');
 
   // Coverage, measured through the product entry points.
-  assert.equal(h.decoded, 12400, '12,400 payloads decoded — fewer means a decoder or store-fixture regression');
+  assert.equal(h.decoded, 12401, '12,401 payloads decoded — fewer means a decoder or store-fixture regression');
   assert.equal(h.coveredPct, 98.6, 'the honest unbiased-traffic coverage is 98.6% after the token tables, the Jupiter Liquidity published copy and the Raydium table landed');
-  assert.equal(h.refused, 172,
-    '172 payloads refused by an interface that EXISTS (source lag) — refusals must not be hidden inside no-interface');
+  assert.equal(h.refused, 171,
+    '171 payloads refused by an interface that EXISTS (source lag) — refusals must not be hidden inside no-interface');
   assert.equal(h.noInterface, 0,
     'no payload in this sample lacks an interface — the acquisition gap this report exists to measure is empty');
 
   // Byte evidence: decoding is not enough, the bytes must come back.
-  assert.equal(h.byteExact, 11707, '11,707 decoded payloads re-encode byte-exactly');
+  assert.equal(h.byteExact, 11708, '11,708 decoded payloads re-encode byte-exactly');
   assert.equal(h.byteExactPctOfDecoded, 94.4);
 
   // Refusal is a statement about the interface, not about the chain: there are
@@ -105,8 +105,8 @@ test('the headline numbers hold, with their meaning intact', async () => {
     'every decoded payload sits in some transaction outcome');
   assert.equal(v.refused_txSuccess + v.refused_txFailed, h.refused);
   assert.equal(v.noInterface_txSuccess + v.noInterface_txFailed, h.noInterface);
-  assert.equal(v.refused_txSuccess, 21,
-    '21 refused payloads were in transactions the chain accepted — a refusal never implies chain failure');
+  assert.equal(v.refused_txSuccess, 20,
+    '20 refused payloads were in transactions the chain accepted — a refusal never implies chain failure');
   assert.equal(v.noInterface_txSuccess, 0,
     'the acquisition gap is empty, so no successful transaction carries an unnamed payload');
   assert.equal(v.noInterface_txFailed, 0);
@@ -128,9 +128,13 @@ test('the token gap was closed by derivation, not by relabelling', async () => {
   assert.equal(spl.payloads + token2022.payloads, 5402, 'the two token programs carry 5,402 payloads');
   assert.equal(spl.decoded, 3804, 'every SPL Token payload decodes through the pinned upstream table');
   assert.equal(spl.noInterface, 0);
-  assert.equal(token2022.decoded, 1597);
+  assert.equal(token2022.decoded, 1598);
   assert.equal(token2022.noInterface, 0);
-  assert.equal(token2022.refused, 1, 'the one refusal is the token-metadata fallback, named and force-fitted to nothing');
+  // Token-2022 now decodes EVERY payload in this sample: the last refusal was
+  // the token-metadata fallback, which the processor itself consults after
+  // the 1-byte selector fails — so it decodes through its own vendored table
+  // rather than being force-fitted into the token one.
+  assert.equal(token2022.refused, 0, 'the token-metadata fallback decodes through its own table');
 
   // The measurement path names the token decoder: the number moved because
   // the product gained a decode path, not because the denominator changed.
@@ -158,7 +162,7 @@ test('the interfaces that exist decode at 90%+; the rest is source lag', async (
   const dec = withInterface.reduce((a, r) => a + r.decoded, 0);
   const pl = withInterface.reduce((a, r) => a + r.payloads, 0);
   assert.equal(pl, 12572, 'every payload in the sample sits on a program that has an interface');
-  assert.equal(dec, 12400);
+  assert.equal(dec, 12401);
   assert.ok(dec / pl > 0.9, 'programs with an interface decode >90% of their traffic');
 
   // Adopting the FIRST-PARTY published copy is what moved PumpSwap from 82%

@@ -48,6 +48,7 @@ const ROOT = path.resolve(HERE, '..');
 const WHIRLPOOL = 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc';
 const SYSTEM = '11111111111111111111111111111111';
 const RAYDIUM = '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8';
+const TOKEN_2022 = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
 
 const args = process.argv.slice(2);
 const preRef = (() => { const i = args.indexOf('--pre'); return i >= 0 ? args[i + 1] : null; })();
@@ -217,6 +218,27 @@ async function main() {
       out.trim() || (rayProbe.stderr || '').slice(0, 120));
   } else {
     check('sememe/raydium subpath decodes a real Raydium payload byte-exactly', false, 'no Raydium payload in sample');
+  }
+
+  // ---------- sememe/token-metadata subpath: the real token-metadata payload
+  // the strict decode path used to refuse, from an INSTALLED copy — proving the
+  // vendored crate, its artifact and the derivation check all ship.
+  const mdPayload = traffic.transactions.flatMap((t) => t.payloads ?? [])
+    .find((p) => p.program === TOKEN_2022 && p.dataHex.startsWith('d2e11ea258b84d8d'));
+  if (mdPayload) {
+    const mdProbe = spawnSync('node', ['-e', `
+      import('sememe/token-metadata').then(async ({ decodeTokenMetadataInstruction, tokenMetadataProvenance }) => {
+        const d = decodeTokenMetadataInstruction('${TOKEN_2022}', Buffer.from('${mdPayload.dataHex}', 'hex'));
+        const p = tokenMetadataProvenance();
+        console.log('TOKEN_METADATA:' + d.name + ':' + d.roundTripByteExact + ':' + d.selectorWidth + ':' + p.variants);
+      }).catch(e => { console.log('TOKEN_METADATA_FAILED:' + e.message); });`, ], { cwd: app, encoding: 'utf8' });
+    const out = String(mdProbe.stdout || '');
+    check('sememe/token-metadata subpath decodes a real metadata payload byte-exactly from the installed copy',
+      out.startsWith('TOKEN_METADATA:Initialize:true:8:5'),
+      out.trim() || (mdProbe.stderr || '').slice(0, 160));
+  } else {
+    check('sememe/token-metadata subpath decodes a real metadata payload byte-exactly from the installed copy',
+      false, 'no token-metadata payload in sample');
   }
 
   // ---------- the consumer's trio + the audit surfaces: what solana-tx-remix imports
