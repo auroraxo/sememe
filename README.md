@@ -41,6 +41,23 @@ Measured on that sample (2026-11-04): 1,000 checked transactions, 6,337 payloads
 
 The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — no third party has executed this yet (the `jup-ag/rfq-webhook-toolkit#96` signal had 0 comments when this was measured, 2026-11-04), so the first external run remains the open gate. Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic).
 
+## Your own transactions: raw RPC responses (the shape you already hold)
+
+The two commands above decode sememe's fixtures. A repository, archive, dashboard or indexer does not hold sememe fixtures — it holds **raw RPC responses**, overwhelmingly with the default `encoding: "base64"`, where the transaction is its wire bytes and only the chain's own parser can read it. sememe now reads that shape directly (legacy, v0 and v1 transactions, outer and inner instructions) and **verifies each transaction's ed25519 signatures before decoding it**, so a damaged or forged byte is refused by name (`wire-signature-invalid`) instead of decoded wrongly:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --rpc-response your-getBlock-or-getTransaction-response.json \
+  --absent verified
+```
+
+Accepts a `getBlock` response (`result.transactions`), a `getTransaction` response (`result.transaction`), or an archive document carrying a `transactions` array — each entry in the `["<base64 wire bytes>", "base64"]` shape the RPC returns. Exit codes: 0 pass, 1 a decode disagreement, an unreadable/damaged transaction or a decode error, 2 usage/IO. A transaction whose bytes cannot be parsed or verified is counted under `transactionsUnreadable` with its reason in `unreadableReasons` and fails the run — never silently skipped.
+
+Measured 2026-11-04 on `test/fixtures/foreign-archive-wire-4blocks.json` (real mainnet, contiguous slots 464588080–464588083, 1,947 transactions in their raw base64 wire shape): the first 1,000 transactions carry 6,355 payloads across 115 programs, 4,646 decoded byte-exactly (100%), 0 decode errors, 0 disagreements, 0 unreadable, 0 network attempts. The 1,709 payloads the store has no interface for are reported by program, not dropped. The wire parser itself was validated against the chain's own `encoding:"json"` parser for all 648 transactions of slot 464588080: per-payload, byte-for-byte identical rows (3,528 payload rows, 0 mismatches), pinned in `test/rpc-response-ingest.test.mjs`.
+
+**Honest limits:** the store answers only for the programs it carries (no-interface payloads are counted, not decoded); signature verification covers the static signers the message declares; v1 transactions are parsed per the upstream `MessageV1` layout pinned on 2026-11-04 and verified against the json encoding of the same block; and no third party has run this on their own archive yet — that remains the gate this command exists to make runnable.
+
 ## The idea
 
 "What do these bytes mean?" is currently either a paid cloud feature or a decoder rebuilt inside every repository. Vendored IDL files are snapshots without provenance, a fingerprint, or a freshness check.

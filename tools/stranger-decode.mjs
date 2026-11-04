@@ -57,6 +57,7 @@ import { decodeNativeInstruction, isNativeProgram } from '../src/native.mjs';
 import { decodeTokenInstruction, isTokenProgram, encodeTokenInstruction } from '../src/token.mjs';
 import { decodeRaydiumInstruction, isRaydiumProgram, encodeRaydiumInstruction } from '../src/raydium.mjs';
 import { encodeNativeInstruction } from '../src/native.mjs';
+import { extractPayloads, accountKeyList } from './lib/payloads.mjs';
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -71,6 +72,7 @@ const option = (name, fallback) => {
 const store = option('--store', null);
 const harvestPath = option('--harvest', null);
 const samplePath = option('--sample', null);
+const rpcResponsePath = option('--rpc-response', null);
 const outPath = option('--out', null);
 const limit = Number(option('--limit', '1000'));
 const absentPolicy = option('--absent', 'error');
@@ -82,7 +84,8 @@ const usageExit = (message) => {
 };
 
 if (!store) usageExit('--store is required (the store `sememe pull` writes)');
-if (Boolean(harvestPath) === Boolean(samplePath)) usageExit('give exactly one of --harvest or --sample');
+const chosenSources = [harvestPath, samplePath, rpcResponsePath].filter(Boolean);
+if (chosenSources.length !== 1) usageExit('give exactly one of --harvest, --sample or --rpc-response');
 if (!Number.isFinite(limit) || limit < 0) usageExit('--limit must be a number >= 0 (0 = no limit)');
 if (!['error', 'report', 'verified'].includes(absentPolicy)) usageExit(`--absent must be error, verified or report, got ${JSON.stringify(absentPolicy)}`);
 try {
@@ -91,21 +94,97 @@ try {
   usageExit(`no sememe store at ${store}: run "sememe pull <program-id> --store ${store}" first`);
 }
 
-let inputFile = harvestPath ?? samplePath;
+const kind = rpcResponsePath ? 'rpc-response' : harvestPath ? 'harvest' : 'sample';
+let inputFile;
 let document;
-try {
-  document = JSON.parse(await readFile(inputFile, 'utf8'));
-} catch (error) {
-  usageExit(`cannot read ${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
+let wireMeta = { entriesTotal: 0, unreadable: 0, reasons: {} };
+if (kind === 'rpc-response') {
+  // A foreign repo's raw RPC document: getBlock / getTransaction responses in
+  // their DEFAULT `encoding: "base64"` shape (the transaction as wire bytes).
+  // This is the shape archives, indexers and dashboards hold; requiring the
+  // repo to re-harvest into sememe's own shapes was the integration gap.
+  inputFile = rpcResponsePath;
+  try {
+    document = JSON.parse(await readFile(inputFile, 'utf8'));
+  } catch (error) {
+    usageExit(`cannot read ${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
+  }
+  const { transactionsFromRpcDocument, normalizeRpcWireTransaction } = await import('./lib/wire-tx.mjs');
+  let entries;
+  try {
+    ({ transactions: entries } = transactionsFromRpcDocument(document));
+  } catch (error) {
+    usageExit(`${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
+  }
+  wireMeta.entriesTotal = entries.length;
+  const readable = [];
+  for (const [index, entry] of entries.entries()) {
+    try {
+      readable.push(normalizeRpcWireTransaction(entry));
+    } catch (error) {
+      // Named and counted, never silently dropped: a transaction whose wire
+      // bytes cannot be parsed is counted as UNREADABLE (it fails the run)
+      // and names WHY.
+      const reason = error?.reason ?? 'wire-unknown';
+      wireMeta.reasons[reason] = (wireMeta.reasons[reason] ?? 0) + 1;
+    }
+  }
+  wireMeta.unreadable = entries.length - readable.length;
+  // The per-transaction payload rows, extracted by the SAME extractor the
+  // harvest/sample documents were built with — the wire parser only replaces
+  // the chain's pre-parsing, not the decode contract.
+  const rowsOf = (normalized) => {
+    const doc = { transaction: normalized.transaction, meta: normalized.meta };
+    const keys = accountKeyList(doc);
+    const programs = new Set();
+    for (const ix of normalized.transaction.message.instructions) {
+      const program = keys[ix.programIdIndex];
+      if (program) programs.add(program);
+    }
+    for (const group of normalized.meta.innerInstructions ?? []) {
+      for (const ix of group?.instructions ?? []) {
+        const program = keys[ix.programIdIndex];
+        if (program) programs.add(program);
+      }
+    }
+    const rows = [];
+    for (const program of programs) {
+      for (const extracted of extractPayloads(doc, program)) {
+        rows.push({
+          program,
+          ix: extracted.ix,
+          depth: extracted.depth,
+          innerIndex: extracted.innerIndex,
+          dataBase58: extracted.dataBase58,
+          dataHex: extracted.dataHex,
+        });
+      }
+    }
+    return rows;
+  };
+  document = {
+    transactions: readable.map((normalized) => ({
+      signature: normalized.signature,
+      txErr: normalized.meta?.err ?? null,
+      payloads: rowsOf(normalized),
+    })),
+  };
+} else {
+  inputFile = harvestPath ?? samplePath;
+  try {
+    document = JSON.parse(await readFile(inputFile, 'utf8'));
+  } catch (error) {
+    usageExit(`cannot read ${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
+  }
 }
-if (!Array.isArray(document.transactions) || !document.transactions.length) {
-  usageExit(`${inputFile} carries no transactions array`);
+if (!Array.isArray(document.transactions)
+    || (!document.transactions.length && kind !== 'rpc-response')) {
+  usageExit(`${inputFile} carries no readable transactions`);
 }
 
 // Payload rows, normalized across the two document shapes:
 //   harvest: transactions[].payloads[] + document.program
 //   sample:  transactions[].payloads[] with per-row .program
-const kind = harvestPath ? 'harvest' : 'sample';
 const documentProgram = kind === 'harvest' ? document.program : null;
 if (kind === 'harvest' && typeof documentProgram !== 'string') {
   usageExit(`${inputFile} is a harvest without a program field`);
@@ -115,6 +194,8 @@ const summary = {
   transactionsChecked: 0,
   transactionsWithPayloads: 0,
   transactionsWithoutPayloads: 0,
+  transactionsUnreadable: 0,
+  unreadableReasons: {},
   payloadsChecked: 0,
   decoded: 0,
   decodeErrors: 0,
@@ -138,6 +219,14 @@ const bumpProgram = (program) => {
   summary.byProgram[key] ??= { payloads: 0, decoded: 0, decodeErrors: 0, disagreements: 0, noInterface: 0 };
   return summary.byProgram[key];
 };
+
+// Wire-ingest provenance, recorded on the report (only for --rpc-response):
+// how many transactions the RPC document carried, how many could not be
+// parsed, and why. A damaged transaction is counted, never dropped.
+if (wireMeta.entriesTotal > 0) {
+  summary.transactionsUnreadable = wireMeta.unreadable;
+  summary.unreadableReasons = wireMeta.reasons;
+}
 
 const maxExamples = 5;
 
@@ -201,7 +290,7 @@ for (const transaction of document.transactions) {
   const rows = Array.isArray(transaction.payloads) ? transaction.payloads : [];
   if (!rows.length) { summary.transactionsWithoutPayloads += 1; continue; }
   summary.transactionsWithPayloads += 1;
-  if (kind === 'harvest' ? transaction.txErr != null : transaction.failed === true) summary.failedOnChain += 1;
+  if (kind === 'sample' ? transaction.failed === true : transaction.txErr != null) summary.failedOnChain += 1;
 
   for (const row of rows) {
     const program = kind === 'harvest' ? documentProgram : row.program;
@@ -261,6 +350,7 @@ summary.byteExactRate = summary.decoded > 0
   : null;
 
 const failed = summary.decodeErrors > 0 || summary.disagreements > 0
+  || summary.transactionsUnreadable > 0
   || (summary.payloadsChecked > 0 && summary.noInterface === summary.payloadsChecked)
   || summary.payloadsChecked === 0;
 const report = {
