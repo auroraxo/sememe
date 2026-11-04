@@ -17,12 +17,26 @@ augmented by the measured acquisition this directory pins
   These are provenance of BYTES, not proof the bytes describe the deployed
   program — the union decode arbitrates between on-chain and published by
   byte evidence (src/union.mjs).
+- 8 `first-party` receipts: 1 Lighthouse (Jac0xb/lighthouse, shank dialect,
+  commit 0812300) + 7 adopted on 2026-11-04 from the publish-nothing
+  classification (`tools/adopt-foreign-first-party.mjs`, artifact
+  research/adopt-foreign-first-party-2026-11-04.json). Their origin names the
+  foreign repo, commit and file:
+  step-finance-oss-step-ingestooor-001cf39-<file>.
 
 The 13 adopted programs (files from crates/idl-gens/idls/):
 jup_dca.json, kamino_farms.json, hubble_lending.json, nx_leverage.json,
 dflow.json, kamino_vaults.json, jup_perps.json, marginfi.json,
 meteora_farms.json, defituna.json, tr_referrals.json, jupiter_staking.json,
 flash_trade.json.
+
+The 7 first-party adopted programs (2026-11-04; from the 35-program
+publish-nothing classification, research/publish-nothing-classification-2026-11-04.json):
+lulo.json (FL3X2p…), nx_lending.json (NXFiKi…), solayer_restake.json (sSo1iU…),
+solayer_avs.json (endoLN…), reward_options.json (RopsJ7…), titan.json (T1TANp…),
+step_staking.json (Stk5NC…). NX Lending appears twice by design: the 13
+`published` copies above include nx_leverage.json (EHBN9Y…), a DIFFERENT program;
+nx_lending.json (NXFiKi…) had no receipt before this sweep.
 
 ## Why
 

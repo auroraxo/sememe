@@ -1,0 +1,300 @@
+{
+ "tool": "classify-publish-nothing",
+ "generatedAt": "2026-11-04T19:11:20.650Z",
+ "source": {
+  "sweep": "research/step-ingestooor-full-sweep-shank-2026-11-04.json",
+  "noInterface": 87
+ },
+ "summary": {
+  "programs": 35,
+  "payloads": 87,
+  "byCategory": {
+   "first-party-foreign-idl": {
+    "programs": 7,
+    "payloads": 22
+   },
+   "dedicated-foreign-parser": {
+    "programs": 9,
+    "payloads": 32
+   },
+   "core-runtime-program": {
+    "programs": 3,
+    "payloads": 5
+   },
+   "unrepresented-source-gap": {
+    "programs": 16,
+    "payloads": 28
+   }
+  },
+  "status": "pass"
+ },
+ "rows": [
+  {
+   "program": "7Mc3vSdRWoThArpni6t5W4XjvQf4BuMny1uC8b6VBn48",
+   "payloads": 2,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "Ed25519SigVerify111111111111111111111111111",
+   "payloads": 1,
+   "verdict": "core-runtime-program",
+   "nature": "Solana runtime/sysvar; no IDL exists by protocol design"
+  },
+  {
+   "program": "obriQD1zbpyLz95G5n7nJe6a4DPjpFwa5XYPoNm113y",
+   "payloads": 3,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+   "payloads": 4,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP",
+   "payloads": 2,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "HyaB3W9q6XdA5xwpU4XnSZV94htfmbmqJXZcEbRaJutt",
+   "payloads": 2,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "MP1zz2HUAzL5P2uLR5nKaDSnxofh8VTZyk26NCewWzk",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "FL3X2pRsQ9zHENpZSKDRREtccwJuei8yg9fwDu9UN69Q",
+   "payloads": 7,
+   "verdict": "first-party-foreign-idl",
+   "sourceFile": "crates/idl-gens/idls/lulo.json",
+   "instructions": 54,
+   "addressMatches": true,
+   "adoptable": true
+  },
+  {
+   "program": "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL",
+   "payloads": 3,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+   "payloads": 3,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/dex/manifest.rs",
+   "allParserFiles": [
+    "crates/parsers/src/dex/manifest.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+   "payloads": 1,
+   "verdict": "core-runtime-program",
+   "nature": "Solana runtime/sysvar; no IDL exists by protocol design"
+  },
+  {
+   "program": "4pP8eDKACuV7T2rbFPE8CHxGKDYAzSdRsdMsGvz2k4oc",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "NXFiKimQN3QSL3CDhCXddyVmLfrai8HK36bHKaAzK7g",
+   "payloads": 4,
+   "verdict": "first-party-foreign-idl",
+   "sourceFile": "crates/idl-gens/idls/nx_lending.json",
+   "instructions": 43,
+   "addressMatches": true,
+   "adoptable": true
+  },
+  {
+   "program": "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy",
+   "payloads": 4,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/staking/stake_pool.rs",
+   "allParserFiles": [
+    "crates/parsers/src/staking/stake_pool.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "sSo1iU21jBrU9VaJ8PJib1MtorefUV4fzC9GURa2KNn",
+   "payloads": 3,
+   "verdict": "first-party-foreign-idl",
+   "sourceFile": "crates/idl-gens/idls/solayer_restake.json",
+   "instructions": 4,
+   "addressMatches": true,
+   "adoptable": true
+  },
+  {
+   "program": "AxiomxSitiyXyPjKgJ9XSrdhsydtZsskZTEDam3PxKcC",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "FarmqiPv5eAj3j1GMdMCMUGXqPUvmquZtMy86QH6rzhG",
+   "payloads": 2,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/farms/raydium_v6.rs",
+   "allParserFiles": [
+    "crates/parsers/src/farms/raydium_v6.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q",
+   "payloads": 2,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/farms/raydium_v3.rs",
+   "allParserFiles": [
+    "crates/parsers/src/farms/raydium_v3.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "DnqJ15nYEdFYr6ywvvVWfYLdUTb1nqecECCSYmyWiJe9",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ",
+   "payloads": 5,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/amm/saber.rs",
+   "allParserFiles": [
+    "crates/parsers/src/amm/saber.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "SSwapUtytfBdBn1b9NUGG6foMVPtcWgpRU32HToDUZr",
+   "payloads": 3,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/amm/saros.rs",
+   "allParserFiles": [
+    "crates/parsers/src/amm/saros.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "2TQ4a9igqmz91BtHjnAk5hk7JjVuRwyQBsQfrGGpcXYK",
+   "payloads": 2,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY",
+   "payloads": 2,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/dex/phoenix/parser.rs",
+   "allParserFiles": [
+    "crates/parsers/src/dex/phoenix/parser.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "3s1rAymURnacreXreMy718GfqW6kygQsLNka1xDyW8pC",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "endoLNCKTqDn8gSVnN2hDdpgACUPWHZTwoYnnMybpAT",
+   "payloads": 2,
+   "verdict": "first-party-foreign-idl",
+   "sourceFile": "crates/idl-gens/idls/solayer_avs.json",
+   "instructions": 6,
+   "addressMatches": true,
+   "adoptable": true
+  },
+  {
+   "program": "Stake11111111111111111111111111111111111111",
+   "payloads": 3,
+   "verdict": "core-runtime-program",
+   "nature": "Solana runtime/sysvar; no IDL exists by protocol design"
+  },
+  {
+   "program": "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo",
+   "payloads": 10,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/lending/solend/parser.rs",
+   "allParserFiles": [
+    "crates/parsers/src/lending/solend/parser.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "3JmCcXAjmBpFzHHuUpgJFfTQEQnAR7K1erNLtWV1g7d9",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE",
+   "payloads": 2,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY",
+   "payloads": 1,
+   "verdict": "dedicated-foreign-parser",
+   "sourceFile": "crates/parsers/src/staking/stake_pool.rs",
+   "allParserFiles": [
+    "crates/parsers/src/staking/stake_pool.rs"
+   ],
+   "parserFileCount": 1
+  },
+  {
+   "program": "RopsJ74nrtcsk9iND8CFFNjn5mxf1tFzF3RhMPJ3CdV",
+   "payloads": 1,
+   "verdict": "first-party-foreign-idl",
+   "sourceFile": "crates/idl-gens/idls/reward_options.json",
+   "instructions": 3,
+   "addressMatches": true,
+   "adoptable": true
+  },
+  {
+   "program": "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT",
+   "payloads": 4,
+   "verdict": "first-party-foreign-idl",
+   "sourceFile": "crates/idl-gens/idls/titan.json",
+   "instructions": 3,
+   "addressMatches": true,
+   "adoptable": true
+  },
+  {
+   "program": "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY",
+   "payloads": 1,
+   "verdict": "unrepresented-source-gap",
+   "note": "no IDL and no dedicated parser in foreign repo; payload appears in transaction traces"
+  },
+  {
+   "program": "Stk5NCWomVN3itaFjLu382u9ibb5jMSHEsh6CuhaGjB",
+   "payloads": 1,
+   "verdict": "first-party-foreign-idl",
+   "sourceFile": "crates/idl-gens/idls/step_staking.json",
+   "instructions": 6,
+   "addressMatches": true,
+   "adoptable": true
+  }
+ ]
+}

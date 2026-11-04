@@ -1,0 +1,74 @@
+{
+ "tool": "adopt-foreign-first-party",
+ "generatedAt": "2026-11-04T19:13:21.737Z",
+ "source": {
+  "sweep": "research/step-ingestooor-full-sweep-shank-2026-11-04.json",
+  "foreignRepo": "step-finance-oss/step-ingestooor",
+  "foreignCommit": "001cf39",
+  "store": "test/fixtures/traffic-sample-store-2026-11-04-pulled"
+ },
+ "summary": {
+  "planned": 7,
+  "adopted": 7,
+  "adoptedPayloads": 22,
+  "verdict": "measured"
+ },
+ "rows": [
+  {
+   "program": "FL3X2pRsQ9zHENpZSKDRREtccwJuei8yg9fwDu9UN69Q",
+   "payloads": 7,
+   "file": "lulo.json",
+   "verdict": "adopted",
+   "fingerprint": "sha256:9cfdb8df5a03f2d5cd6cf4be8d624afd004c2265f955c1af4ef8726d78779800",
+   "instructionCount": 54
+  },
+  {
+   "program": "NXFiKimQN3QSL3CDhCXddyVmLfrai8HK36bHKaAzK7g",
+   "payloads": 4,
+   "file": "nx_lending.json",
+   "verdict": "adopted",
+   "fingerprint": "sha256:2835ba2448b5db45967ed2f52628416ab57a7b003911911a2ae06c4cbf7ae211",
+   "instructionCount": 43
+  },
+  {
+   "program": "sSo1iU21jBrU9VaJ8PJib1MtorefUV4fzC9GURa2KNn",
+   "payloads": 3,
+   "file": "solayer_restake.json",
+   "verdict": "adopted",
+   "fingerprint": "sha256:e454ac30fc76174cf19c20d995061e9d5148ec9bf67ef43417385d86fb754613",
+   "instructionCount": 4
+  },
+  {
+   "program": "endoLNCKTqDn8gSVnN2hDdpgACUPWHZTwoYnnMybpAT",
+   "payloads": 2,
+   "file": "solayer_avs.json",
+   "verdict": "adopted",
+   "fingerprint": "sha256:3dd0fd2edc506990c53f45447ee2738fc8d850906408c94873085851dd702f01",
+   "instructionCount": 6
+  },
+  {
+   "program": "RopsJ74nrtcsk9iND8CFFNjn5mxf1tFzF3RhMPJ3CdV",
+   "payloads": 1,
+   "file": "reward_options.json",
+   "verdict": "adopted",
+   "fingerprint": "sha256:868ec38c2e7e2f537a125f08eabf3052c46929bf08e95c26f7266b897ea2c8e3",
+   "instructionCount": 3
+  },
+  {
+   "program": "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT",
+   "payloads": 4,
+   "file": "titan.json",
+   "verdict": "adopted",
+   "fingerprint": "sha256:eeb953c401dec718a63671e5fced6cfb970900e163ac7cda64711820225e2493",
+   "instructionCount": 3
+  },
+  {
+   "program": "Stk5NCWomVN3itaFjLu382u9ibb5jMSHEsh6CuhaGjB",
+   "payloads": 1,
+   "file": "step_staking.json",
+   "verdict": "adopted",
+   "fingerprint": "sha256:f552e224f42dc5fda1046c1a207c76d4ba7cca6c228bac407b8541f7dc8928e2",
+   "instructionCount": 6
+  }
+ ]
+}

@@ -1395,9 +1395,54 @@ the ed25519 verification path still does not apply to this payload family.
 Lighthouse publishes no on-chain interface: the store copy is only as honest
 as its upstream source (first-party, fingerprinted, origin-labelled) — if
 upstream changes the wire, sememe will refuse by name, not decode wrongly.
-The acquisition gap for this sweep is 129 payloads, not zero: the remaining
-programs publish nothing anywhere and still need `sememe adopt` or an
-upstream derivation.
+
+## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
+
+With Lighthouse decoded under shank, exactly **35 programs (87 payloads)** remained
+in the `no-interface-published` set. Rather than polishing the coverage headline,
+`tools/classify-publish-nothing.mjs` measured where an interface for each one
+could come from, scanning the foreign repository's own committed source
+(`step-finance-oss/step-ingestooor @001cf39`, MIT; committed artifact:
+`research/publish-nothing-classification-2026-11-04.json`, pinned in
+`test/classify-publish-nothing.test.mjs`):
+
+| Category | Programs | Payloads | Nature |
+|---|---|---|---|
+| `first-party-foreign-idl` | **7** | **22** | First-party Anchor/Shank IDL in foreign repo (`crates/idl-gens/idls/`) declaring the program address |
+| `dedicated-foreign-parser` | **9** | **32** | Custom hand-written Rust parser under `crates/parsers/src/` (Solend: 10, Saber: 5, Stake Pool: 4, etc.) — no published IDL exists |
+| `core-runtime-program` | **3** | **5** | Core Solana runtime / sysvar programs (`Stake111...`, `Ed25519SigVerify...`, `noopb9bk...`) — no IDL by protocol design |
+| `unrepresented-source-gap` | **16** | **28** | Appears in test fixture traces; neither an IDL nor a dedicated parser in the foreign repo |
+| **Total** | **35** | **87** | Partition verified without remainder (pinned in `test/classify-publish-nothing.test.mjs`) |
+
+### Seven first-party copies adopted, sweep re-measured
+
+The 7 first-party foreign IDLs were swept into the store via
+`tools/adopt-foreign-first-party.mjs` through `sememe adopt` (`test/fixtures/traffic-sample-store-2026-11-04-pulled/`,
+receipts source `first-party`, origin naming repo, commit and file; artifact:
+`research/adopt-foreign-first-party-2026-11-04.json`, pinned in `test/adopt-foreign-first-party.test.mjs`):
+Lulo (`FL3X2p...`), NX Lending (`NXFiKi...`), Solayer Restake (`sSo1iU...`),
+Solayer AVS (`endoLN...`), Reward Options (`RopsJ7...`), Titan (`T1TANp...`),
+Step Staking (`Stk5NC...`).
+
+Re-measurement of the full 156-fixture foreign set with identical flags
+(`--absent error`, `research/step-ingestooor-full-sweep-classified-2026-11-04.json`,
+pinned in `test/classified-sweep-report.test.mjs`):
+
+- **decoded:** 703 → **724** (+21 payloads decoded)
+- **gap (`noInterface`):** 87 → **65** (-22 payloads; 21 decoded, 1 refused by name)
+- **byteExactFull:** 696 → **716** (+20 full byte-exact)
+- **byteExactDescribed:** 7 → **8** (+1 Titan swap described exact)
+- **byteExactRate:** 100% (every decoded payload re-encodes byte-for-byte)
+- **decodeErrors:** 16 → **17** — the single non-decoded payload is **REFUSED BY NAME**:
+  `T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT: Venue: unknown variant index 40` (an honest
+  refusal on an unrepresented enum variant, not a silent mis-parse).
+- **disagreements:** 0 (still completely diff-free)
+- Exactly the 7 adopted programs moved in `byProgram`; the remaining 28 programs
+  sum to exactly 65 payloads.
+
+The true acquisition gap for this sweep is now **65 payloads** across 28 programs —
+all of which have NO published IDL (9 dedicated custom parsers, 3 core runtime,
+16 unrepresented trace programs).
 
 ## Next qualification
 
