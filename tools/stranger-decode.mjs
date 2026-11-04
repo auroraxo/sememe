@@ -27,6 +27,12 @@
 //                     carry the document's program id).
 //   --sample <file>   a tools/traffic-sample.mjs document (multi-program,
 //                     each payload row carries its own program).
+//   --rpc-response <file> a raw RPC response: getBlock/getTransaction in
+//                     the default `encoding:"base64"` shape (wire bytes,
+//                     signature-verified before decoding) or the
+//                     `encoding:"json"` shape foreign repos' own test
+//                     fixtures hold (chain-parsed instructions carry no
+//                     bytes there; they are counted, not decoded)
 // Both are read offline; the run performs ZERO network calls and that is
 // enforced: this file installs the zero-RPC guard before anything else is
 // imported, so a decode path that reached for the network would fail loudly
@@ -97,30 +103,62 @@ try {
 const kind = rpcResponsePath ? 'rpc-response' : harvestPath ? 'harvest' : 'sample';
 let inputFile;
 let document;
-let wireMeta = { entriesTotal: 0, unreadable: 0, reasons: {} };
+let wireMeta = { entriesTotal: 0, unreadable: 0, reasons: {}, encoding: null, chainParsed: 0 };
 if (kind === 'rpc-response') {
   // A foreign repo's raw RPC document: getBlock / getTransaction responses in
-  // their DEFAULT `encoding: "base64"` shape (the transaction as wire bytes).
-  // This is the shape archives, indexers and dashboards hold; requiring the
-  // repo to re-harvest into sememe's own shapes was the integration gap.
+  // their DEFAULT `encoding: "base64"` shape (the transaction as wire bytes)
+  // — and in the `encoding: "json"` shape the chain's own parser produced,
+  // which is what foreign repositories' OWN test fixtures hold (measured on
+  // step-finance-oss/step-ingestooor and CryptGodSon/Solana-Explorer,
+  // 2026-11-04). This is the shape archives, indexers and dashboards hold;
+  // requiring the repo to re-harvest into sememe's own shapes was the
+  // integration gap.
   inputFile = rpcResponsePath;
   try {
     document = JSON.parse(await readFile(inputFile, 'utf8'));
   } catch (error) {
     usageExit(`cannot read ${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
   }
-  const { transactionsFromRpcDocument, normalizeRpcWireTransaction } = await import('./lib/wire-tx.mjs');
+  const { transactionsFromRpcDocument, normalizeRpcWireTransaction, normalizeRpcJsonTransaction } = await import('./lib/wire-tx.mjs');
   let entries;
   try {
     ({ transactions: entries } = transactionsFromRpcDocument(document));
   } catch (error) {
     usageExit(`${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
   }
+  // The encoding is decided by the DOCUMENT, not by a flag: a transaction
+  // whose bytes are a base64 string is a wire entry; a transaction whose
+  // instructions are objects is the chain's json encoding. Guessing wrong
+  // here would decode a payload from the wrong field, so the decision is
+  // made per entry and a mixed document is refused rather than half-read.
+  const isWireEntry = (entry) => Array.isArray(entry?.transaction) && typeof entry.transaction[0] === 'string';
+  const isJsonEntry = (entry) => Array.isArray(entry?.transaction?.message?.instructions);
   wireMeta.entriesTotal = entries.length;
   const readable = [];
+  const entryEncodings = [];
   for (const [index, entry] of entries.entries()) {
+    const wire = isWireEntry(entry);
+    const json = isJsonEntry(entry);
+    if (!wire && !json) {
+      wireMeta.unreadable += 1;
+      wireMeta.reasons['rpc-encoding-unknown'] = (wireMeta.reasons['rpc-encoding-unknown'] ?? 0) + 1;
+      continue;
+    }
+    if (wire && json) {
+      wireMeta.unreadable += 1;
+      wireMeta.reasons['rpc-encoding-ambiguous'] = (wireMeta.reasons['rpc-encoding-ambiguous'] ?? 0) + 1;
+      continue;
+    }
     try {
-      readable.push(normalizeRpcWireTransaction(entry));
+      const normalized = wire ? normalizeRpcWireTransaction(entry) : normalizeRpcJsonTransaction(entry);
+      entryEncodings.push(wire ? 'base64' : 'json');
+      if (!wire) {
+        // Instructions the chain already parsed carry NO bytes in the
+        // document. They are counted by name, never decoded: an empty
+        // payload is a missing field, not a transfer of nothing.
+        wireMeta.chainParsed += normalized.chainParsed ?? 0;
+      }
+      readable.push(normalized);
     } catch (error) {
       // Named and counted, never silently dropped: a transaction whose wire
       // bytes cannot be parsed is counted as UNREADABLE (it fails the run)
@@ -130,6 +168,8 @@ if (kind === 'rpc-response') {
     }
   }
   wireMeta.unreadable = entries.length - readable.length;
+  wireMeta.encoding = readable.some((entry) => entry?.transaction?.message?.instructions?.length
+    && entry.transaction.message.instructions[0]?.programId !== undefined) ? 'json' : 'base64';
   // The per-transaction payload rows, extracted by the SAME extractor the
   // harvest/sample documents were built with — the wire parser only replaces
   // the chain's pre-parsing, not the decode contract.
@@ -138,12 +178,12 @@ if (kind === 'rpc-response') {
     const keys = accountKeyList(doc);
     const programs = new Set();
     for (const ix of normalized.transaction.message.instructions) {
-      const program = keys[ix.programIdIndex];
+      const program = ix.programId ?? keys[ix.programIdIndex];
       if (program) programs.add(program);
     }
     for (const group of normalized.meta.innerInstructions ?? []) {
       for (const ix of group?.instructions ?? []) {
-        const program = keys[ix.programIdIndex];
+        const program = ix.programId ?? keys[ix.programIdIndex];
         if (program) programs.add(program);
       }
     }
@@ -163,9 +203,10 @@ if (kind === 'rpc-response') {
     return rows;
   };
   document = {
-    transactions: readable.map((normalized) => ({
+    transactions: readable.map((normalized, position) => ({
       signature: normalized.signature,
       txErr: normalized.meta?.err ?? null,
+      encoding: entryEncodings[position],
       payloads: rowsOf(normalized),
     })),
   };
@@ -205,6 +246,7 @@ const summary = {
   byteExactDescribed: 0,
   trailingPayloads: 0,
   shortFormReported: 0,
+  missingBytes: 0,
   failedOnChain: 0,
   byteExactRate: null,
   refusalReasons: {},
@@ -226,6 +268,8 @@ const bumpProgram = (program) => {
 if (wireMeta.entriesTotal > 0) {
   summary.transactionsUnreadable = wireMeta.unreadable;
   summary.unreadableReasons = wireMeta.reasons;
+  summary.rpcEncoding = wireMeta.encoding;
+  summary.chainParsedInstructions = wireMeta.chainParsed;
 }
 
 const maxExamples = 5;
@@ -293,6 +337,15 @@ for (const transaction of document.transactions) {
   if (kind === 'sample' ? transaction.failed === true : transaction.txErr != null) summary.failedOnChain += 1;
 
   for (const row of rows) {
+    // A json-encoded document carries NO bytes for instructions its chain
+    // parser already `parsed` (the parsed form replaces them). Feeding the
+    // decoder an empty payload would turn a missing document field into a
+    // fake refusal, so those rows are counted and skipped — named in the
+    // report, never silently mixed into the decode denominator.
+    if (!row.dataHex && transaction.encoding === 'json') {
+      summary.missingBytes += 1;
+      continue;
+    }
     const program = kind === 'harvest' ? documentProgram : row.program;
     const entry = bumpProgram(program);
     summary.payloadsChecked += 1;
@@ -376,7 +429,7 @@ if (outPath) {
   const { writeFile } = await import('node:fs/promises');
   await writeFile(outPath, `${JSON.stringify(report, null, 1)}\n`);
 }
-console.log(JSON.stringify({
+  console.log(JSON.stringify({
   status: report.status,
   transactionsChecked: summary.transactionsChecked,
   payloadsChecked: summary.payloadsChecked,
@@ -386,6 +439,9 @@ console.log(JSON.stringify({
   noInterface: summary.noInterface,
   byteExactRate: summary.byteExactRate,
   programs: Object.keys(summary.byProgram).length,
+  rpcEncoding: summary.rpcEncoding ?? null,
+  chainParsedInstructions: summary.chainParsedInstructions ?? 0,
+  missingBytes: summary.missingBytes,
   networkAttempts: report.networkAttempts,
 }));
 if (failed) {

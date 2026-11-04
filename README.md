@@ -58,6 +58,22 @@ Measured 2026-11-04 on `test/fixtures/foreign-archive-wire-4blocks.json` (real m
 
 **Honest limits:** the store answers only for the programs it carries (no-interface payloads are counted, not decoded); signature verification covers the static signers the message declares; v1 transactions are parsed per the upstream `MessageV1` layout pinned on 2026-11-04 and verified against the json encoding of the same block; and no third party has run this on their own archive yet — that remains the gate this command exists to make runnable.
 
+### The shape a foreign repository's own test fixtures hold (`encoding:"json"`)
+
+The paragraph above measured what an RPC *returns by default*. But foreign repositories that keep transaction fixtures do not keep that shape: they keep what the chain's parser already read — `encoding:"json"`. Measured 2026-11-04 on the 122 transaction fixtures of [step-finance-oss/step-ingestooor](https://github.com/step-finance-oss/step-ingestooor) (MIT) and the fixture of [CryptGodSon/Solana-Explorer](https://github.com/CryptGodSon/Solana-Explorer) (MIT): instruction `data` as base58, every instruction carrying `programId` spelled out (1,541/1,541; zero `programIdIndex`), address-table keys already expanded inside `message.accountKeys`, and — the part that changes the contract — **932 of 1,541 instructions already `parsed` by the chain with no bytes left in the document at all**.
+
+Before this, `--rpc-response` read only the base64 shape: pointed at a foreign repository's own fixture it exited 2 (`not-an-rpc-response`). The integration could not read a single artifact a foreign repository actually holds — because the one shape it accepted was the shape sememe's own harvester produces. The same command now reads both:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --rpc-response their-own-getTransaction-fixture.json
+```
+
+Measured on the seven committed fixtures (six from step-ingestooor, one from Solana-Explorer, verbatim under `test/fixtures/foreign-repo-json-2026-11-04/` with both MIT licenses): 7 transactions, 160 payload rows of which 56 carry bytes — 48 decoded byte-exactly (100%), 8 named `noInterface` (programs outside the store), and **104 chain-parsed rows counted as `missingBytes`, never fed to the decoder as empty payloads**: a chain-parsed instruction has no bytes to decode, and turning that missing document field into a decode refusal would be a lie about what was measured. Zero disagreements, zero decode errors, zero network attempts. Pinned in `test/foreign-repo-json-ingest.test.mjs` (red against the pre-fix tree; four mutations of the new code each individually red).
+
+**Honest limits of this path:** the json encoding carries **no message bytes, so no signature can be verified against them** — the ed25519 self-verification of the base64 path cannot apply, and a structurally-valid value mutation inside an argument passes decode+re-encode by design (only the wire path's signature check covers value-level tampering). The encoding is detected per transaction; an unresolvable `programIdIndex` is refused by name rather than attributed to nothing. And the same gate as before: no third party has run this against their own repository — the command exists so they can.
+
 ## The idea
 
 "What do these bytes mean?" is currently either a paid cloud feature or a decoder rebuilt inside every repository. Vendored IDL files are snapshots without provenance, a fingerprint, or a freshness check.

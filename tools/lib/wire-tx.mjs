@@ -514,7 +514,108 @@ export function transactionsFromRpcDocument(document) {
   const result = document?.result;
   if (Array.isArray(result?.transactions)) return { transactions: result.transactions, source: 'getBlock' };
   if (result?.transaction) return { transactions: [result], source: 'getTransaction' };
+  // A BARE getTransaction result, without the RPC envelope — the shape a
+  // foreign repository's own test fixtures hold (measured on
+  // step-finance-oss/step-ingestooor and CryptGodSon/Solana-Explorer:
+  // { blockTime, slot, meta, transaction: { message, signatures } }). The
+  // same bare result in the base64 shape (transaction: [b64, "base64"]) is
+  // accepted; the per-entry encoding detection decides which parser runs.
+  if (document?.transaction?.message || Array.isArray(document?.transaction)) {
+    return { transactions: [document], source: 'getTransaction-result' };
+  }
   if (Array.isArray(document?.transactions)) return { transactions: document.transactions, source: 'array' };
   if (Array.isArray(document)) return { transactions: document, source: 'array' };
-  refuse('not-an-rpc-response', 'no RPC result found (expected result.transactions or result.transaction)');
+  refuse('not-an-rpc-response', 'no RPC result found (expected result.transactions, result.transaction, a bare transaction result, or a transactions array)');
+}
+
+/**
+ * Normalize ONE transaction of an RPC `encoding: "json"` response — the
+ * shape a foreign repository's OWN test fixtures hold (measured on
+ * step-finance-oss/step-ingestooor and CryptGodSon/Solana-Explorer,
+ * 2026-11-04): the chain's parser has already split the wire into fields,
+ * instruction `data` arrives as base58, every instruction carries its
+ * `programId` spelled out, and inner instructions live under `meta`.
+ *
+ * The document holds NO bytes to verify a signature against, so this path
+ * makes no verification CLAIM — that is what the base64 path is for. What it
+ * does enforce is the parts the decode depends on:
+ *   - the account list must resolve (static keys, then loadedAddresses); a
+ *     document that resolves an instruction by an index beyond that list is
+ *     refused instead of silently attributing the payload to nothing,
+ *   - the reported version is passed through unchanged,
+ *   - an instruction the chain already `parsed` carries NO bytes: it is
+ *     counted by name (`chainParsed`), never fed to the decoder as empty.
+ *
+ * Note on address tables: in this encoding the lookup-table keys are usually
+ * ALREADY EXPANDED inside `message.accountKeys` (entries with
+ * `source: "lookupTable"`, measured on both foreign repos), so requiring
+ * `meta.loadedAddresses` would refuse real documents. The guard fires only
+ * when an instruction actually resolves by an index the key list cannot
+ * cover.
+ *
+ * @param {object} entry one transaction of a `encoding:"json"` response
+ * @returns {{transaction: object, meta: object, signature: string|null,
+ *            version: string|number, chainParsed: number}}
+ */
+export function normalizeRpcJsonTransaction(entry) {
+  const message = entry?.transaction?.message;
+  if (!message || !Array.isArray(message.instructions)) {
+    refuse('json-not-a-transaction', 'the entry carries no transaction.message.instructions (is this an encoding:"json" getTransaction result?)');
+  }
+  if (!Array.isArray(message.accountKeys) || message.accountKeys.length === 0) {
+    refuse('json-account-keys-missing', 'message.accountKeys is missing or empty — instruction indexes cannot resolve');
+  }
+  const staticKeys = message.accountKeys.map((key) => (typeof key === 'string' ? key : key?.pubkey)).filter(Boolean);
+  const loaded = entry.meta?.loadedAddresses ?? {};
+  if (loaded.writable !== undefined && !Array.isArray(loaded.writable)) {
+    refuse('json-loaded-addresses', 'meta.loadedAddresses.writable is present but not an array');
+  }
+  if (loaded.readonly !== undefined && !Array.isArray(loaded.readonly)) {
+    refuse('json-loaded-addresses', 'meta.loadedAddresses.readonly is present but not an array');
+  }
+  const resolved = staticKeys.length + (loaded.writable?.length ?? 0) + (loaded.readonly?.length ?? 0);
+  const declaredVersion = entry.version ?? 'legacy';
+  // An instruction that names its program by INDEX needs the key list to
+  // cover that index; refusing beats attributing the payload to nothing.
+  const checkIndex = (instructions) => {
+    for (const instruction of instructions ?? []) {
+      const index = instruction?.programIdIndex;
+      if (Number.isSafeInteger(index) && index >= resolved) {
+        refuse('json-index-unresolvable', `programIdIndex ${index} is beyond the ${resolved} resolvable account keys and the document spells out no programId`);
+      }
+    }
+  };
+  checkIndex(message.instructions);
+  for (const group of entry.meta?.innerInstructions ?? []) checkIndex(group?.instructions);
+  // Count, per transaction, how many instructions the chain already parsed:
+  // those rows exist in the document WITHOUT their bytes, so the decoder must
+  // never see them (an empty payload is not a transfer of nothing — it is a
+  // missing document field).
+  let chainParsed = 0;
+  const countParsed = (instructions) => {
+    for (const instruction of instructions ?? []) {
+      if (instruction && typeof instruction === 'object' && !('data' in instruction)) chainParsed += 1;
+    }
+  };
+  countParsed(message.instructions);
+  for (const group of entry.meta?.innerInstructions ?? []) countParsed(group?.instructions);
+  return {
+    transaction: {
+      message: {
+        accountKeys: staticKeys,
+        header: message.header ?? null,
+        instructions: message.instructions,
+        recentBlockhash: message.recentBlockhash ?? null,
+        ...(Array.isArray(message.addressTableLookups) ? { addressTableLookups: message.addressTableLookups } : {}),
+      },
+    },
+    meta: {
+      ...(entry.meta ?? {}),
+      innerInstructions: entry.meta?.innerInstructions ?? [],
+      loadedAddresses: { writable: loaded.writable ?? [], readonly: loaded.readonly ?? [] },
+    },
+    signature: entry.transaction.signatures?.[0] ?? null,
+    version: declaredVersion,
+    chainParsed,
+  };
 }
