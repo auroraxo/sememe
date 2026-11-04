@@ -81,10 +81,16 @@ test('the verified table is exactly what the chain measurement found', async () 
     assert.ok(measured.has(key), `the report's shortForms entry ${key} appears in the rows`);
   }
   assert.equal(measured.size, 4, 'four distinct short wire forms were measured');
-  assert.equal(VERIFIED_SHORT_FORMS.length, measured.size,
-    'the product table holds exactly the measured short forms');
+  // The product table may hold MORE than this window measured — a later
+  // window can witness more shapes (test/short-form-window-2026-11-04.test.mjs
+  // pins the second window). What must hold HERE: every form this window
+  // measured is in the table, under the name and count this window saw.
+  const inThisWindow = VERIFIED_SHORT_FORMS.filter((form) =>
+    measured.has(`${form.program}|${form.discriminator}|${form.bytes}`));
+  assert.equal(inThisWindow.length, measured.size,
+    'the product table holds every short form this window measured');
 
-  for (const form of VERIFIED_SHORT_FORMS) {
+  for (const form of inThisWindow) {
     const key = `${form.program}|${form.discriminator}|${form.bytes}`;
     const row = measured.get(key);
     assert.ok(row, `the table entry ${key} was measured`);
@@ -94,7 +100,12 @@ test('the verified table is exactly what the chain measurement found', async () 
 });
 
 test('every verified short form decodes, names its absent field, and round-trips byte-exactly', async () => {
-  for (const form of VERIFIED_SHORT_FORMS) {
+  const report = JSON.parse(await readFile(REPORT, 'utf8'));
+  const measured = new Set(report.rows
+    .filter((row) => row.sememeOutcome === 'refused' && row.chainExecuted && row.wireBytes !== 25)
+    .map((row) => `${row.program}|${row.discriminator}|${row.wireBytes}`));
+  for (const form of VERIFIED_SHORT_FORMS.filter((f) =>
+    measured.has(`${f.program}|${f.discriminator}|${f.bytes}`))) {
     const hex = await witnessPayload(form.discriminator, form.bytes);
     // The union path is the product's answer for a program with two sources
     // (an on-chain IDL and an adopted published copy): both are consulted and
@@ -127,7 +138,12 @@ test('the union entry point names the short forms too', async () => {
 test('the strict default still refuses every short form', async () => {
   // The whole product stays strict unless a caller opts in. A decode that
   // names a short form by default would be claiming knowledge nobody has.
-  for (const form of VERIFIED_SHORT_FORMS) {
+  const report = JSON.parse(await readFile(REPORT, 'utf8'));
+  const measured = new Set(report.rows
+    .filter((row) => row.sememeOutcome === 'refused' && row.chainExecuted && row.wireBytes !== 25)
+    .map((row) => `${row.program}|${row.discriminator}|${row.wireBytes}`));
+  for (const form of VERIFIED_SHORT_FORMS.filter((f) =>
+    measured.has(`${f.program}|${f.discriminator}|${f.bytes}`))) {
     const hex = await witnessPayload(form.discriminator, form.bytes);
     await assert.rejects(
       () => decodeUnionPayload(STORE, form.program, hex),

@@ -15,17 +15,25 @@
 //
 // What makes the shorter form KNOWABLE is a chain witness. Each entry below was
 // measured on mainnet by tools/short-form-wire-forms.mjs against
-// research/short-form-wire-forms-2026-11-03.json:
+// research/short-form-wire-forms-2026-11-03.json (the 4-block window) and
+// research/short-form-wire-forms-2026-11-04.json (the 32-block window):
 //
 //   - the transaction's `err` field is null (the chain accepted it),
 //   - the witness instruction bytes are byte-IDENTICAL to the fixture payload,
 //   - the program's own log line names the instruction the decode will report.
 //
-// On this repo's unbiased 12,572-payload sample that resolved 171 of the 172
-// refusals: 0 of them were genuine chain-rejected refusals. The table is the
-// product form of that measurement — the evidence travels with the decoder, so
-// `absent: 'verified'` can name these forms while still refusing every other
-// payload that happens to end on a field boundary.
+// On the 2026-11-03 12,572-payload sample that resolved 171 of the 172
+// refusals: 0 of them were genuine chain-rejected refusals. The 2026-11-04
+// 89,546-payload window resolved 350 of 350 refusals the same way, and found
+// three MORE short forms the first window had never seen — because the table
+// is keyed on program + discriminator + exact length, and the first window
+// simply did not contain them: pump.fun's bonding curve executes the 24-byte
+// `buy` form that had only been witnessed on PumpSwap, plus `buy_exact_sol_in`
+// and the 146-byte `create_v2`, which omits THREE declared fields.
+//
+// The table is the product form of those measurements — the evidence travels
+// with the decoder, so `absent: 'verified'` can name these forms while still
+// refusing every other payload that happens to end on a field boundary.
 //
 // A payload must match program + discriminator + EXACT wire length. Matching
 // the discriminator alone is not enough: the 25-byte form of
@@ -74,10 +82,43 @@ const VERIFIED_SHORT_FORMS = [
     absent: ['track_volume'],
     witnesses: 1,
   },
+  // --- 2026-11-04 window (research/short-form-wire-forms-2026-11-04.json) ---
+  // The same 24-byte `buy` form, on pump.fun's BONDING CURVE program. The
+  // discriminator and the length match the PumpSwap entry above, but the
+  // program is a different deployment, so the 2026-11-03 window could not
+  // witness it: the key is program + discriminator + exact length, and only
+  // one of the two programs was measured then.
+  {
+    program: '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P',
+    discriminator: '66063d1201daebea',
+    bytes: 24,
+    instruction: 'buy',
+    absent: ['track_volume'],
+    witnesses: 7,
+  },
+  {
+    program: '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P',
+    discriminator: '38fc74089edfcd5f',
+    bytes: 24,
+    instruction: 'buy_exact_sol_in',
+    absent: ['track_volume'],
+    witnesses: 1,
+  },
+  // The first short form that omits MORE THAN ONE declared field: the
+  // interface declares three, the wire carries none of them.
+  {
+    program: '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P',
+    discriminator: 'd6904cec5f8b31b4',
+    bytes: 146,
+    instruction: 'create_v2',
+    absent: ['is_cashback_enabled', 'creator_fee_bps', 'is_holder_reward'],
+    witnesses: 1,
+  },
 ];
 
 export const SHORT_FORM_SOURCE =
-  'research/short-form-wire-forms-2026-11-03.json (chain witnesses: err:null, byte-identical payload, matching program log line)';
+  'research/short-form-wire-forms-2026-11-03.json + research/short-form-wire-forms-2026-11-04.json '
+  + '(chain witnesses: err:null, byte-identical payload, matching program log line)';
 
 export const VERIFIED = VERIFIED_SHORT_FORMS;
 export { VERIFIED_SHORT_FORMS };
