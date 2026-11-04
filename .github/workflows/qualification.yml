@@ -11,13 +11,15 @@ jobs:
       - uses: actions/checkout@v4
       # The full-foreign-set sweep test reads step-finance-oss/step-ingestooor
       # (MIT) fixtures from a clone checked out NEXT to this repository — the
-      # same layout as the local ~/github_repos convention. Pinned to the
-      # commit the research artifact was measured on.
-      - uses: actions/checkout@v4
-        with:
-          repository: step-finance-oss/step-ingestooor
-          ref: 001cf39
-          path: step-ingestooor
+      # same layout as the local ~/github_repos convention.
+      - name: Check out foreign fixtures (step-finance-oss/step-ingestooor)
+        run: |
+          # Pinned to the commit the research artifact was measured on:
+          # a moved foreign HEAD must turn CI red only through re-measurement,
+          # never silently.
+          git clone https://github.com/step-finance-oss/step-ingestooor.git ../step-ingestooor
+          git -C ../step-ingestooor checkout 001cf39
+          echo "SEMEME_STEP_INGESTOOR_PATH=$PWD/../step-ingestooor" >> "$GITHUB_ENV"
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
