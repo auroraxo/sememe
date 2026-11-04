@@ -33,7 +33,7 @@
 // sources can be compared at all; stored discriminators are never touched.
 
 import { decodeData, encodeInstructionData, encodeEventData, toJsonSafe } from './codec.mjs';
-import { withDerivedDiscriminators } from './discriminators.mjs';
+import { withDerivedDiscriminators, snakeCase, globalDiscriminator } from './discriminators.mjs';
 
 const MAX_DIFF_PATHS = 20;
 
@@ -82,9 +82,19 @@ function probe(source, bytes, absentPolicy) {
  * side's provenance can be quoted in the result. */
 function prepare(source) {
   const { idl: filledIdl, filled, conflicts } = withDerivedDiscriminators(source.idl);
+  // The STORED discriminators, kept per instruction name: a rename is
+  // recognized by the bytes, not by a name similarity — see the rename check
+  // in unionDecode.
+  const stored = new Map();
+  for (const ix of source.idl?.instructions ?? []) {
+    if (ix && typeof ix.name === 'string' && Array.isArray(ix.discriminator) && ix.discriminator.length === 8) {
+      stored.set(ix.name, Buffer.from(ix.discriminator).toString('hex'));
+    }
+  }
   return {
     ...source,
     idl: filledIdl,
+    storedDiscriminators: stored,
     discriminatorDerivation: {
       filledInstructions: filled.instructions,
       filledEvents: filled.events,
@@ -275,11 +285,49 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
   // same bytes is an interface conflict, not a decode.
   const primFields = decodeFields(prim, primProbe, bytes);
   const secFields = decodeFields(sec, secProbe, bytes);
+  //
+  // Measured exception (2026-11-04, step-ingestooor sweep, 31 payloads across
+  // hubble/dca/farms/vaults/perps/marginfi/tuna/referrals): Anchor's own rule
+  // derives the INSTRUCTION discriminator from the snake-cased name
+  // (sha256("global:" + snake_case(name))[0..8]), so two sources that matched
+  // the same 8 bytes and differ only in naming CONVENTION (`closeDca` vs
+  // `close_dca`, `repayLoan` vs `repay_loan`) are describing ONE wire
+  // instruction — refusing it would refuse real, successfully executed
+  // traffic over a spelling difference. That case is DECODED, the convention
+  // difference recorded under `view.namingConvention`, the on-chain name kept
+  // as the answer. EVENTS stay strict: their discriminator hashes the raw
+  // name (no snake_case), so two event names that differ at all are two
+  // different claimed schemas for the same bytes.
   if (primFields.name !== secFields.name || primFields.kind !== secFields.kind) {
-    throw new UnionRefusal('name_conflict',
-      `interface conflict on the same bytes: ${prim.label} says "${primFields.name}", `
-      + `${sec.label} says "${secFields.name}" — refusing instead of picking a winner`,
-      { view: { ...view, primary: { ...view.primary, name: primFields.name }, secondary: { ...view.secondary, name: secFields.name } } });
+    const sameInstructionTwoConventions = primFields.kind === 'instruction'
+      && secFields.kind === 'instruction'
+      && snakeCase(primFields.name) === snakeCase(secFields.name);
+    const storedDisc = (source, name) => source.storedDiscriminators?.get(name) ?? null;
+    const ruleDisc = (name) => Buffer.from(globalDiscriminator(name)).toString('hex');
+    const renamedByPrimary = storedDisc(prim, primFields.name) === ruleDisc(secFields.name);
+    const renamedBySecondary = storedDisc(sec, secFields.name) === ruleDisc(primFields.name);
+    // The convention check comes FIRST: for `closeDca` vs `close_dca` Anchor's
+    // rule yields the same discriminator either way, so both the convention
+    // and the rename test would match — but it is one instruction under two
+    // spellings, not a rename, and the recorded `kind` must say so.
+    const sameInstructionRenamed = !sameInstructionTwoConventions
+      && primFields.kind === 'instruction'
+      && secFields.kind === 'instruction'
+      && (renamedByPrimary || renamedBySecondary);
+    if (!sameInstructionTwoConventions && !sameInstructionRenamed) {
+      throw new UnionRefusal('name_conflict',
+        `interface conflict on the same bytes: ${prim.label} says "${primFields.name}", `
+        + `${sec.label} says "${secFields.name}" — refusing instead of picking a winner`,
+        { view: { ...view, primary: { ...view.primary, name: primFields.name }, secondary: { ...view.secondary, name: secFields.name } } });
+    }
+    view.namingConvention = {
+      primary: primFields.name,
+      secondary: secFields.name,
+      kind: sameInstructionRenamed ? 'rename' : 'naming-convention',
+      rule: sameInstructionRenamed
+        ? "anchor: the primary's stored discriminator equals sha256('global:' + snake_case(secondary name))[0..8] — same wire instruction, renamed by the program; the on-chain name answers"
+        : "anchor: sha256('global:' + snake_case(name))[0..8] — same instruction, two naming conventions; the on-chain name answers",
+    };
   }
 
   // Arbitration by bytes, strongest evidence first:

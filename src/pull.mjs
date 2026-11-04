@@ -59,6 +59,37 @@ async function writeOnce(destination, content) {
   }
 }
 
+/**
+ * Install one verified on-chain IDL into the store: objects/ + receipts/.
+ *
+ * Extracted from `pull` on 2026-11-04 so a batch acquisition over MANY
+ * programs shares exactly one write path with the single-program CLI: a
+ * second writer would drift (the step-ingestooor sweep measured 34 pullable
+ * programs; pulling them one process each re-probes and re-hashes what one
+ * batched getMultipleAccounts already answered). The arguments are exactly
+ * what `pull` produced after its verification: the decoded IDL, the source
+ * that answered, its address, and the slot the RPC context carried.
+ */
+export async function installIdl(idl, { program, source, address, slot }, storeDir) {
+  const json = Buffer.from(canonicalJson(idl) + '\n');
+  const fingerprint = sha256(json);
+  if (!Number.isSafeInteger(slot) || slot < 0) throw Error('RPC context lacks a valid slot');
+  const directory = path.resolve(storeDir);
+  const objects = path.join(directory, 'objects');
+  const receipts = path.join(directory, 'receipts');
+  await mkdir(objects, { recursive: true, mode: 0o700 });
+  await mkdir(receipts, { recursive: true, mode: 0o700 });
+  const file = path.join(objects, `${fingerprint}.json`);
+  await writeOnce(file, json);
+  const receipt = {
+    program, source, address, slot,
+    fingerprint: `sha256:${fingerprint}`, instructionCount: idl.instructions.length,
+  };
+  const receiptPath = path.join(receipts, `${program}-${slot}-${source}-${fingerprint}.json`);
+  await writeOnce(receiptPath, Buffer.from(canonicalJson(receipt) + '\n'));
+  return { ...receipt, path: file, receiptPath };
+}
+
 export async function pull(programInput, storeDir, rpcUrl = 'https://api.mainnet-beta.solana.com', fetcher = fetch) {
   const program = validId(programInput);
   if (typeof storeDir !== 'string' || !storeDir.trim()) throw Error('explicit --store path required');
@@ -79,21 +110,5 @@ export async function pull(programInput, storeDir, rpcUrl = 'https://api.mainnet
     } catch (error) { errors.push(`${source}: ${String(error.message).slice(0, 100)}`); }
   }
   if (!selected) throw Error(`no verified on-chain IDL for ${program}: ${errors.join('; ')}`);
-  const json = Buffer.from(canonicalJson(idl) + '\n');
-  const fingerprint = sha256(json);
-  if (!Number.isSafeInteger(response.slot) || response.slot < 0) throw Error('RPC context lacks a valid slot');
-  const directory = path.resolve(storeDir);
-  const objects = path.join(directory, 'objects');
-  const receipts = path.join(directory, 'receipts');
-  await mkdir(objects, { recursive: true, mode: 0o700 });
-  await mkdir(receipts, { recursive: true, mode: 0o700 });
-  const file = path.join(objects, `${fingerprint}.json`);
-  await writeOnce(file, json);
-  const receipt = {
-    program, source: selected.source, address: selected.address, slot: response.slot,
-    fingerprint: `sha256:${fingerprint}`, instructionCount: idl.instructions.length,
-  };
-  const receiptPath = path.join(receipts, `${program}-${response.slot}-${selected.source}-${fingerprint}.json`);
-  await writeOnce(receiptPath, Buffer.from(canonicalJson(receipt) + '\n'));
-  return { ...receipt, path: file, receiptPath };
+  return installIdl(idl, { program, source: selected.source, address: selected.address, slot: response.slot }, storeDir);
 }

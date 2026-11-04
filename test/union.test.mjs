@@ -29,13 +29,20 @@ import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { canonicalJson } from '../src/canonical.mjs';
 import { adopt } from '../src/adopt.mjs';
 import { decodeUnionPayload, findStoredIdls } from '../src/decode.mjs';
 import { unionDecode, UnionRefusal } from '../src/union.mjs';
+import { globalDiscriminator } from '../src/discriminators.mjs';
 
 const PROGRAM = '6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P';
 const OTHER = 'JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4';
+
+// The mutant's directory: src/ itself, so its relative imports resolve
+// against the real tree (including the vendored Rust).
+const ROOT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const ROOT_MUTANT_DIR = ROOT_DIR;
 
 const load = async (name) =>
   JSON.parse(await readFile(new URL(`./fixtures/${name}`, import.meta.url), 'utf8'));
@@ -365,4 +372,189 @@ test('adopt stores the file content-addressed, and re-adopting it changes nothin
     assert.equal(second.fingerprint, first.fingerprint);
     assert.equal(second.receiptPath, first.receiptPath);
   } finally { await rm(dir, { recursive: true, force: true }); }
+});
+
+// ---------------------------------------------------------------------------
+// Naming differences that are NOT interface conflicts.
+//
+// Measured 2026-11-04 on the step-ingestooor foreign fixture set (156
+// files, MIT): 31 payloads across hubble_lending, jup_dca, kamino_farms,
+// kamino_vaults, jup_perps, marginfi, defituna and tr_referrals were REFUSED
+// with "interface conflict on the same bytes" — while both sources had
+// matched the same 8 bytes and the transaction had SUCCEEDED on chain.
+//
+// Two shapes were measured, both of them Anchor's own discriminator rule
+// (sha256("global:" + snake_case(name))[0..8]):
+//
+//   1. two naming CONVENTIONS for one instruction: `closeDca` vs
+//      `close_dca`, `repayLoan` vs `repay_loan`. snake_case makes them the
+//      same name, so they are ONE wire instruction with two labels.
+//   2. a RENAME by the program: the on-chain IDL calls it
+//      `repay_tuna_lp_position_debt` and still stores the discriminator
+//      sha256("global:repay_debt")[0..8] = 4fc81e0ffc16a208 — the bytes the
+//      first-party copy names `repay_debt`.
+//
+// Both are DECODED now, with the difference recorded under
+// `view.namingConvention`, and the ON-CHAIN name answering. The refusal stays
+// for every other difference (see the alpha/beta test above), and EVENTS
+// stay strict: an event discriminator hashes the raw name, so two different
+// event names are two different claimed schemas.
+//
+// Falsification: the mutation at the end of this file breaks the rename check
+// and must turn the rename test red.
+
+test('two naming conventions for one instruction decode, and the difference is recorded', () => {
+  // Anchor's rule: sha256("global:close_dca")[0..8]. Both sources match the
+  // same bytes; one spells it camelCase, the other snake_case.
+  const disc = globalDiscriminator('close_dca');
+  const primary = { label: 'primary', idl: { instructions: [{ name: 'closeDca', discriminator: disc }], types: [] } };
+  const secondary = { label: 'secondary', idl: { instructions: [{ name: 'close_dca', discriminator: disc }], types: [] } };
+  const result = unionDecode({ program: PROGRAM, primary, secondary, bytes: Buffer.from(disc) });
+  assert.equal(result.name, 'closeDca', 'the on-chain name answers');
+  assert.equal(result.view.namingConvention.kind, 'naming-convention');
+  assert.equal(result.view.namingConvention.primary, 'closeDca');
+  assert.equal(result.view.namingConvention.secondary, 'close_dca');
+  assert.ok(result.view.namingConvention.rule.includes('snake_case'),
+    'the reason must name the rule that makes them one instruction');
+});
+
+test('a renamed instruction (same stored discriminator) decodes, and the rename is recorded', () => {
+  // The on-chain copy renamed the instruction but kept the discriminator, so
+  // the STORED bytes are the evidence: the primary stores the value the
+  // Anchor rule derives from the SECONDARY's name.
+  const disc = globalDiscriminator('repay_debt');
+  const primary = {
+    label: 'primary',
+    idl: { instructions: [{ name: 'repay_tuna_lp_position_debt', discriminator: disc }], types: [] },
+  };
+  const secondary = { label: 'secondary', idl: { instructions: [{ name: 'repay_debt', discriminator: disc }], types: [] } };
+  const result = unionDecode({ program: PROGRAM, primary, secondary, bytes: Buffer.from(disc) });
+  assert.equal(result.name, 'repay_tuna_lp_position_debt', 'the on-chain name answers');
+  assert.equal(result.view.namingConvention.kind, 'rename');
+  assert.equal(result.view.namingConvention.primary, 'repay_tuna_lp_position_debt');
+  assert.equal(result.view.namingConvention.secondary, 'repay_debt');
+});
+
+test('two genuinely different instruction names are STILL refused', () => {
+  // The rename check must not become a blanket "any two names are fine":
+  // `alpha` and `beta` share a discriminator by hand and mean different
+  // things, so the refusal stands.
+  const disc = [1, 1, 1, 1, 1, 1, 1, 1];
+  const primary = { label: 'primary', idl: { instructions: [{ name: 'alpha', discriminator: disc }], types: [] } };
+  const secondary = { label: 'secondary', idl: { instructions: [{ name: 'beta', discriminator: disc }], types: [] } };
+  assert.throws(
+    () => unionDecode({ program: PROGRAM, primary, secondary, bytes: Buffer.from(disc) }),
+    (error) => {
+      assert.equal(error.verdict, 'name_conflict');
+      return true;
+    },
+  );
+});
+
+test('two different EVENT names for the same bytes stay refused', () => {
+  // An event discriminator hashes the RAW name (no snake_case), so two
+  // different event names are two different claimed schemas — the strict
+  // refusal holds where the instruction rule does not apply.
+  //
+  // An Anchor event self-CPI payload is EVENT_IX_TAG (8 bytes) ++ event
+  // discriminator (8 bytes); the bare discriminator would be read as an
+  // instruction discriminator instead.
+  const disc = [2, 2, 2, 2, 2, 2, 2, 2];
+  const tag = Buffer.alloc(8);
+  tag.writeBigUInt64LE(0x1d9acb512ea545e4n);
+  // One u8 field, and its byte — a struct with NO fields is not a valid
+  // named struct for the codec ("malformed struct field").
+  const bytes = Buffer.concat([tag, Buffer.from(disc), Buffer.from([7])]);
+  const body = [{ name: 'x', type: 'u8' }];
+  const primary = {
+    label: 'primary',
+    idl: {
+      instructions: [],
+      events: [{ name: 'TradeEvent', discriminator: disc }],
+      types: [{ name: 'TradeEvent', type: { kind: 'struct', fields: body } }],
+    },
+  };
+  const secondary = {
+    label: 'secondary',
+    idl: {
+      instructions: [],
+      events: [{ name: 'trade_event', discriminator: disc }],
+      types: [{ name: 'trade_event', type: { kind: 'struct', fields: body } }],
+    },
+  };
+  assert.throws(
+    () => unionDecode({ program: PROGRAM, primary, secondary, bytes }),
+    (error) => {
+      assert.equal(error.verdict, 'name_conflict');
+      return true;
+    },
+  );
+});
+
+// ---------------------------------------------------------------------------
+// Falsification: each mutation breaks exactly ONE rule above and must turn
+// the corresponding test red. The mutant lives inside src/ (so its relative
+// imports resolve against the real tree) under a dot-prefixed name and is
+// deleted afterwards; the real module is never modified.
+// Pattern matches test/acquisition-gap.test.mjs M1/M2.
+
+async function withUnionMutant(name, mutate) {
+  const tmp = await mkdtemp(path.join(ROOT_MUTANT_DIR, 'mut-'));
+  const source = await readFile(path.join(ROOT_DIR, 'src', 'union.mjs'), 'utf8');
+  const mutated = mutate(source);
+  assert.notEqual(mutated, source, `${name}: the mutation must actually change the source`);
+  const mutantPath = path.join(ROOT_DIR, 'src', `.union-mutant-${path.basename(tmp)}.mjs`);
+  try {
+    await writeFile(mutantPath, mutated);
+    return await import(mutantPath);
+  } finally {
+    await rm(tmp, { recursive: true, force: true });
+    await rm(mutantPath, { force: true });
+  }
+}
+
+test('M1: dropping the rename check turns the rename test red (the name_conflict rule it replaces)', async () => {
+  const mutant = await withUnionMutant('rename', (source) => source.replace(
+    'const sameInstructionRenamed = !sameInstructionTwoConventions',
+    'const sameInstructionRenamed = false && !sameInstructionTwoConventions',
+  ));
+  const disc = globalDiscriminator('repay_debt');
+  const primary = { label: 'primary', idl: { instructions: [{ name: 'repay_tuna_lp_position_debt', discriminator: disc }], types: [] } };
+  const secondary = { label: 'secondary', idl: { instructions: [{ name: 'repay_debt', discriminator: disc }], types: [] } };
+  assert.throws(
+    () => mutant.unionDecode({ program: PROGRAM, primary, secondary, bytes: Buffer.from(disc) }),
+    (error) => {
+      assert.equal(error.verdict, 'name_conflict',
+        'M1 must make the rename refusal come back — otherwise the rename test pins nothing');
+      return true;
+    },
+  );
+  // Non-vacuity: the REAL module still decodes the same bytes.
+  const { unionDecode } = await import('../src/union.mjs');
+  const real = unionDecode({ program: PROGRAM, primary, secondary, bytes: Buffer.from(disc) });
+  assert.equal(real.view.namingConvention.kind, 'rename');
+});
+
+test('M2: letting ANY two names through turns the genuine-conflict test red', async () => {
+  const mutant = await withUnionMutant('blanket', (source) => source.replace(
+    'if (!sameInstructionTwoConventions && !sameInstructionRenamed) {',
+    'if (false) {',
+  ));
+  const disc = [1, 1, 1, 1, 1, 1, 1, 1];
+  const primary = { label: 'primary', idl: { instructions: [{ name: 'alpha', discriminator: disc }], types: [] } };
+  const secondary = { label: 'secondary', idl: { instructions: [{ name: 'beta', discriminator: disc }], types: [] } };
+  const result = mutant.unionDecode({ program: PROGRAM, primary, secondary, bytes: Buffer.from(disc) });
+  assert.equal(result.name, 'alpha',
+    'M2 must let alpha/beta through (a winner picked, no refusal), otherwise the guard that keeps genuine conflicts refused pins nothing');
+  assert.equal(result.view.verdict, 'agree', 'the mutant must report agreement instead of refusing');
+  // The REAL module still refuses those bytes.
+  const { unionDecode, UnionRefusal } = await import('../src/union.mjs');
+  assert.throws(
+    () => unionDecode({ program: PROGRAM, primary, secondary, bytes: Buffer.from(disc) }),
+    (error) => {
+      assert.ok(error instanceof UnionRefusal);
+      assert.equal(error.verdict, 'name_conflict');
+      return true;
+    },
+  );
 });
