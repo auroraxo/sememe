@@ -1,0 +1,2257 @@
+{
+ "tool": "measure-dedicated-parser-upstream",
+ "generatedAt": "2026-11-04T22:57:50.305Z",
+ "source": {
+  "classification": "publish-nothing-classification-2026-11-04.json",
+  "foreignRepo": "/home/aurora/github_repos/step-ingestooor @001cf39"
+ },
+ "control": {
+  "literal": "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ",
+  "repo": "saber-hq/stable-swap",
+  "searchMatches": 623,
+  "matches": 1
+ },
+ "licenseGate": {
+  "repos": [
+   {
+    "repo": "CKS-Systems/manifest",
+    "spdxId": "GPL-3.0",
+    "state": "copyleft"
+   },
+   {
+    "repo": "raydium-io/raydium-sdk",
+    "spdxId": "GPL-3.0",
+    "state": "copyleft"
+   },
+   {
+    "repo": "step-finance/step-common",
+    "spdxId": null,
+    "state": "unlicensed"
+   },
+   {
+    "repo": "saber-hq/stable-swap",
+    "spdxId": "Apache-2.0",
+    "state": "permissive"
+   },
+   {
+    "repo": "Ellipsis-Labs/phoenix-sdk",
+    "spdxId": null,
+    "state": "unlicensed"
+   },
+   {
+    "repo": "solendprotocol/solana-program-library",
+    "spdxId": "NOASSERTION",
+    "state": "undetermined"
+   }
+  ],
+  "commitAllowed": false
+ },
+ "rows": [
+  {
+   "program": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+   "payloads": 3,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/dex/manifest.rs"
+    ],
+    "citedUpstream": [
+     "CKS-Systems/manifest"
+    ]
+   },
+   "dialectPin": {
+    "citedRepos": [
+     "CKS-Systems/manifest"
+    ],
+    "resolvedFrom": [],
+    "licenses": [
+     {
+      "repo": "CKS-Systems/manifest",
+      "spdxId": "GPL-3.0",
+      "state": "copyleft",
+      "commitAllowed": false
+     }
+    ]
+   },
+   "hits": [
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/web/src/lib/slot200/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/rust/slim/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sendaifun/solana-agent-kit",
+     "path": "packages/plugin-defi/src/manifest/tools/manifest_trade.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "scripts/stats_utils/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sendaifun/solana-agent-kit",
+     "path": "docs/v1/features/defi-integration/manifest_market.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sendaifun/solana-agent-kit",
+     "path": "docs/v2/integrations/defi-integration/manifest_market.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/Expand.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/ClaimSeat.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms_account.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "Cetipoo/solana-onchain-arbitrage-bot",
+     "path": "src/v10.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/GlobalAddTrader.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/Defrag.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/GlobalCreate.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/governance-ui",
+     "path": "utils/orders.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/GlobalClean.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/Deposit.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DefiLlama/dimension-adapters",
+     "path": "fees/manifest-trade/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/Withdraw.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/explorer",
+     "path": "public/verified-programs.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/en/rpc/json-structures.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "programs/manifest/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "scripts/manifest-replay/src/rpc.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/CreateMarket.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/GlobalDeposit.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "scripts/balance-checker.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/GlobalEvict.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "docs/assessments/mainnet-rent/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/GlobalWithdraw.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "fuzz/crucible/gen-idl.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/manifest/manifest_solana_base_trades.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/accounts/BaseAtoms.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/manifest/manifest_solana_stg_raw_swaps.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "scripts/collector-core.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "scripts/defrag/defrag.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/accounts/QuoteAtoms.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/instructions/Swap.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "fuzz/crucible/src/main.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/manifest/accounts/GlobalAtoms.ts",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms_account.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    },
+    {
+     "repo": "solana-foundation/explorer",
+     "path": "public/verified-programs.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy",
+   "payloads": 4,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/staking/stake_pool.rs"
+    ],
+    "citedUpstream": []
+   },
+   "dialectPin": {
+    "citedRepos": [],
+    "resolvedFrom": [],
+    "licenses": []
+   },
+   "hits": [
+    {
+     "repo": "solana-foundation/explorer",
+     "path": "app/utils/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "otter-sec/anchor",
+     "path": "ts/packages/spl-stake-pool/src/program.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-rpc/shipstern",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-program/stake-pool",
+     "path": "program/program-id.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sendaifun/skills",
+     "path": "skills/sanctum/resources/program-ids.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "explorer/src/utils/tx.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/explorer",
+     "path": "public/accounts-sitemap.xml",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mrgnlabs/mrgn-ts",
+     "path": "packages/tools/scripts/lst_info.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Fankouzu/solana-basic-ui",
+     "path": "docs/SolanaProgramLibrary/stake-pool/stake-pool.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-program/stake-pool",
+     "path": "clients/js-legacy/src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "smartcontractkit/external-adapters-js",
+     "path": "packages/sources/solana-functions/src/shared/buffer-layout-accounts.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "programs/marginfi/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sunrise-stake/app",
+     "path": "check_mainnet_validators.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-fm/explorer-kit",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-program/stake-pool",
+     "path": "SECURITY.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "elophanto/EloPhanto",
+     "path": "skills/sanctum-staking/resources/program-ids.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sunrise-stake/app",
+     "path": "fetch_mainnet_validator_stakes.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/util/program-name.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "igneous-labs/S",
+     "path": "keys/spl-stake-pool-keys/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bmresearch/Solnet",
+     "path": "src/Solnet.Programs/StakePool/StakePoolProgram.cs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-program/stake-pool",
+     "path": "program/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Fankouzu/solana-basic-ui",
+     "path": "docs/SolanaProgramLibrary/stake-pool/cli.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/lifi.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-program/stake-pool",
+     "path": "clients/py/stake_pool/constants.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/solana-governance",
+     "path": "ncn/ledger/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jito-foundation/jito-bell",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mrtnetwork/On_chain",
+     "path": "lib/solana/src/instructions/stake_pool/constant.dart",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "parasol-aser/vrust-open-source",
+     "path": "examples/solana-program-library/docs/src/stake-pool.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-fm/explorer-kit",
+     "path": "packages/explorerkit-idls/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "wormholelabs-xyz/example-queries-solana-stake-pool",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sunrise-stake/app",
+     "path": "packages/client/src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "filippbudko/solana-program-library",
+     "path": "docs/src/stake-pool.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "nirholas/crypto-vision",
+     "path": "packages/sweep/src/services/defi/jito.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "parasol-aser/vrust-open-source",
+     "path": "examples/solana-program-library/stake-pool/program/program-id.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "honey-protocol/honey-frontend-legacy",
+     "path": "helpers/utils.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-fm/explorer-kit",
+     "path": "packages/explorerkit-translator/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-program/solana-program.github.io",
+     "path": "docs/content/docs/stake-pool/index.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jerryarmstrong/some_rst",
+     "path": "stake-pool/js/src/constants.rst",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sunrise-stake/app",
+     "path": "mainnet_pool.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "jerryarmstrong/some_rst",
+     "path": "stake-pool/program/program-id.rst",
+     "class": "reference-doc"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "sunrise-stake/app",
+     "path": "mainnet_pool.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "FarmqiPv5eAj3j1GMdMCMUGXqPUvmquZtMy86QH6rzhG",
+   "payloads": 2,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/farms/raydium_v6.rs"
+    ],
+    "citedUpstream": []
+   },
+   "dialectPin": {
+    "citedRepos": [],
+    "resolvedFrom": [],
+    "licenses": []
+   },
+   "hits": [
+    {
+     "repo": "raydium-io/raydium-sdk-V2",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/FarmqiPv5eAj3j1GMdMCMUGXqPUvmquZtMy86QH6rzhG_account.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sendaifun/skills",
+     "path": "skills/raydium/resources/program-ids.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "elophanto/EloPhanto",
+     "path": "skills/raydium-amm/resources/program-ids.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "BulbaSwap/raydium-sdk",
+     "path": "src/baseInfo/program.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ashpoolin/parserzero",
+     "path": "src/utils/programMap.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DenisTok/raydium-sdk",
+     "path": "src/baseInfo/program.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "s1licon/raydium-sdk-nodenext",
+     "path": "src/baseInfo/program.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "frankli-dev/raydium-sdk-v2",
+     "path": "lib/raydium/serum/id.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "frankli-dev/raydium-sdk-v2",
+     "path": "lib/common/programId.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ashpoolin/parserone",
+     "path": "src/utils/programMap.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ClickHouse/CryptoHouse",
+     "path": "queries.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "jup-ag/platform-list",
+     "path": "src/platforms/raydium.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "spire-fyi/spire_fyi",
+     "path": "data/program_manual_labels.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "frankli-dev/raydium-sdk-v2",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/gobbersdk2",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "soonlabs/cobaltx-sdk-fix",
+     "path": "lib/cobaltx/serum/id.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ubadineke/xray",
+     "path": "src/lib/programAddresses.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "OOBE-PROTOCOL/synapse-client-sdk",
+     "path": "src/grpc/parser/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "spire-fyi/spire_fyi",
+     "path": "data/all_programs.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "sappysealsz/opt-raydium-sdk-v2",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "soonlabs/cobaltx-sdk-fix",
+     "path": "lib/common/programId.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "tuananhgscfin/raydium-sdk-v2",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Rahul-Bhati/Liquidity-Reward-Bot",
+     "path": "utils/trackFarmsReward.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xBloctopus/solana-package",
+     "path": "src/package_io/constants.star",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Solar-Studio/solar-sdk",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solscanofficial/labels",
+     "path": "labels.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "soonlabs/cobaltx-sdk-fix",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "openlab-openos/openverse-raydium-sdk-v2",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dikanevn/l",
+     "path": "ys1.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Gravex-io/gravex-sdk",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "MyzTyn/Solana-Tools",
+     "path": "PoolWatcherTool/PoolWatcher.Raydium/Config/Constants.cs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "spire-fyi/spire_fyi",
+     "path": "data/all_programs_new_users.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "frankli-dev/raydium-sdk-v2",
+     "path": "lib/raydium/serum/index.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "warlyware/aurora-vertex",
+     "path": "src/utils/solana.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "iam-joey/scout",
+     "path": "src/data/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Amal-David/docingest",
+     "path": "server/storage/docs/docs.raydium.io/documentation_2025-01-19T03:53:13.151Z.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "raydium-io/raydium-docs-v1",
+     "path": "sdk-api/rust-cpi.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "soonlabs/cobaltx-sdk-fix",
+     "path": "lib/cobaltx/serum/index.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Hijanhv/raydium--Architecture-Design-",
+     "path": "ARCHITECTURE.md",
+     "class": "reference-doc"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/FarmqiPv5eAj3j1GMdMCMUGXqPUvmquZtMy86QH6rzhG_account.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    },
+    {
+     "repo": "ClickHouse/CryptoHouse",
+     "path": "queries.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "solscanofficial/labels",
+     "path": "labels.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q",
+   "payloads": 2,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/farms/raydium_v3.rs"
+    ],
+    "citedUpstream": [
+     "raydium-io/raydium-sdk",
+     "step-finance/step-common"
+    ]
+   },
+   "dialectPin": {
+    "citedRepos": [
+     "raydium-io/raydium-sdk",
+     "step-finance/step-common"
+    ],
+    "resolvedFrom": [],
+    "licenses": [
+     {
+      "repo": "raydium-io/raydium-sdk",
+      "spdxId": "GPL-3.0",
+      "state": "copyleft",
+      "commitAllowed": false
+     },
+     {
+      "repo": "step-finance/step-common",
+      "spdxId": null,
+      "state": "unlicensed",
+      "commitAllowed": false
+     }
+    ]
+   },
+   "hits": [
+    {
+     "repo": "Josh-XT/AGiXT",
+     "path": "agixt/extensions/raydium.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/explorer",
+     "path": "app/utils/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "project-serum/spl-token-wallet",
+     "path": "src/utils/transactions.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "raydium-io/raydium-contract-instructions",
+     "path": "staking-anchor/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "raydium-io/raydium-sdk-V2",
+     "path": "src/common/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Stochastic-Adventure/RaydiumAPYScraper",
+     "path": "resources/ids.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xtorch/datasource",
+     "path": "solanas/analyzers/EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "hodgerpodger/staketaxcsv",
+     "path": "src/staketaxcsv/sol/constants.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "explorer/src/utils/tx.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/explorer",
+     "path": "public/accounts-sitemap.xml",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Friktion-Labs/tulipv2-sdk",
+     "path": "examples/deps/accounts/EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "raydium-io/raydium-contract-instructions",
+     "path": "Anchor.toml",
+     "class": "reference-code"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/util/program-name.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "The-Great-Ape/client",
+     "path": "src/lib/token/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bmresearch/Solnet.Raydium",
+     "path": "Solnet.Raydium/Consts.cs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ChangeYourself0613/solana-raydium-ui",
+     "path": "src/utils/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DappioLab/navigator",
+     "path": "src/francium/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "chainflip-io/chainflip-backend",
+     "path": "engine/src/witness/sol/lookup_table_witnessing.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "identity-com/cryptid",
+     "path": "wallet/src/utils/transactions.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Grape-Labs/grape-verification-dashboard-legacy",
+     "path": "src/utils/token/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DappioLab/navigator",
+     "path": "src/raydium/ids/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "BulbaSwap/raydium-sdk",
+     "path": "src/baseInfo/program.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sincerely91/react-swap-ui",
+     "path": "utils/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/governance-ui",
+     "path": "components/instructions/programs/raydium.tsx",
+     "class": "reference-code"
+    },
+    {
+     "repo": "honey-protocol/honey-frontend-legacy",
+     "path": "helpers/utils.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DappioLab/auto-compounding-bot",
+     "path": "raydium/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xsupersimon/raydium-launchpad-bonkfun-transaction-parser-go",
+     "path": "PROGRAM_IDS.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Mythic-Project/governance-ui",
+     "path": "components/instructions/programs/names.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "julesy101/solana-defi-tracker-raydium",
+     "path": "platform-constants/platform.identifiers.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cyriimm/bulk-spl-token-dist",
+     "path": "src/utils/transactions.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Jungle-Finance/jungle-fi-sdk",
+     "path": "src/jungle_ray/ray.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "superblock-dev/gauntlet-frontend",
+     "path": "src/utils/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xsupersimon/raydium-launchpad-bonkfun-transaction-parser-go",
+     "path": "Transaction-Parser-README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Friktion-Labs/tulipv2-sdk",
+     "path": "common/src/config/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ashpoolin/parserzero",
+     "path": "src/utils/programMap.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "metaplex-foundation/amman",
+     "path": "amman/src/diagnostics/programs/program-names.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "KryptikApp/kryptikwebapp",
+     "path": "src/helpers/DEXs/raydium/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sea-sol/vue-template",
+     "path": "src/utils/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Grape-Labs/grape-verification-dashboard-legacy",
+     "path": "src/views/Meanfi/helpers/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DAIOSFoundation/d-wallet-api",
+     "path": "config/SOL/ProgramIds.js",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "0xtorch/datasource",
+     "path": "solanas/analyzers/EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "Friktion-Labs/tulipv2-sdk",
+     "path": "examples/deps/accounts/EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    }
+   ],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ",
+   "payloads": 5,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/amm/saber.rs"
+    ],
+    "citedUpstream": [
+     "saber-hq/stable-swap"
+    ]
+   },
+   "dialectPin": {
+    "citedRepos": [
+     "saber-hq/stable-swap"
+    ],
+    "resolvedFrom": [
+     "saber-hq/stable-swap"
+    ],
+    "licenses": [
+     {
+      "repo": "saber-hq/stable-swap",
+      "spdxId": "Apache-2.0",
+      "state": "permissive",
+      "commitAllowed": true
+     }
+    ]
+   },
+   "hits": [
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "client/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/start_localnet.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "stable-swap-program/do.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "src/dapps/dapp_SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "stable-swap-program/program/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "stable-swap-client/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "stable-swap-anchor/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "stable-swap-program/program/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DeployDAO/solana-program-index",
+     "path": "programs/SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/new_scrape.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/programs.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "Anchor.toml",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/instruction-parser",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saber-hq/saber-common",
+     "path": "packages/stableswap-sdk/src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "hodgerpodger/staketaxcsv",
+     "path": "src/staketaxcsv/sol/constants.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "explorer/src/utils/tx.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/xray/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cashioapp/cashio",
+     "path": "scripts/download-programs.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "massbitprotocol/massbitprotocol",
+     "path": "apis/solana_api/account.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/util/program-name.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "1sol-io/1sol-sdk-ts",
+     "path": "src/const.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "agiprolabs/claude-trading-skills",
+     "path": "skills/solana-tx-building/scripts/decode_transaction.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/lifi.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cxcx-ai/solana-dex-parser",
+     "path": "src/constants/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "stable-swap-program/scripts/deployment_config.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "DappioLab/navigator",
+     "path": "src/saber/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "parasol-aser/vrust-open-source",
+     "path": "examples/cashio/scripts/download-programs.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "parasol-aser/vrust-open-source",
+     "path": "examples/stable-swap/stable-swap-program/do.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vvizardev/telegram-wallet-tracking-bot-v1.0",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "parasol-aser/vrust-open-source",
+     "path": "examples/stable-swap/stable-swap-program/program/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "cyphersnake/solana-events-parser",
+     "path": "src/log_parser.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "parasol-aser/vrust-open-source",
+     "path": "examples/stable-swap/stable-swap-anchor/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "parasol-aser/vrust-open-source",
+     "path": "examples/stable-swap/stable-swap-client/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cashioapp/cashio",
+     "path": "Anchor.toml",
+     "class": "reference-code"
+    },
+    {
+     "repo": "HZCX404/memecoin-trading-bots",
+     "path": "Solana-Arbitrage-Bot/mainnet/start_localnet.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "HZCX404/memecoin-trading-bots",
+     "path": "Solana-Arbitrage-Bot/offchain/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Block-Logic/dropped_solana_txs",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jup-ag/platform-list",
+     "path": "src/platforms/saber.ts",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "DeployDAO/solana-program-index",
+     "path": "programs/SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/programs.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "saber-hq/stable-swap",
+     "path": "stable-swap-program/scripts/deployment_config.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    }
+   ],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "SSwapUtytfBdBn1b9NUGG6foMVPtcWgpRU32HToDUZr",
+   "payloads": 3,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/amm/saros.rs"
+    ],
+    "citedUpstream": []
+   },
+   "dialectPin": {
+    "citedRepos": [],
+    "resolvedFrom": [],
+    "licenses": []
+   },
+   "hits": [
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "src/dapps/dapp_SSwapUtytfBdBn1b9NUGG6foMVPtcWgpRU32HToDUZr.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DefiLlama/dimension-adapters",
+     "path": "dexs/saros/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/instruction-parser",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/xray/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/lifi.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cxcx-ai/solana-dex-parser",
+     "path": "src/constants/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "pinax-network/substreams-solana-idls",
+     "path": "src/saros/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/jupiter-amm-implementation",
+     "path": "jupiter-core/src/amms/spl_token_swap_amm.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vvizardev/telegram-wallet-tracking-bot-v1.0",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "pinax-network/substreams-svm",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "1sol-io/1sol-sdk-ts",
+     "path": "src/const.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sepivip/SeekerClaw",
+     "path": "app/src/main/assets/nodejs-project/solana.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xalberto/jupiter-arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "saros-xyz/saros-sdk",
+     "path": "src/constants/saros-id.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mooncitydev/solana-arbitrage-bot-master",
+     "path": "src/constant/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jozef-pridavok/arbitrage",
+     "path": "dex/src/saros_amm/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saros-xyz/saros-swap",
+     "path": "program/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "streamingfast/substreams",
+     "path": "docs/how-to-guides/develop-your-own-substreams/solana/explore-solana/dex-trades.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sonicfromnewyoke/saros-playground",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "pinax-network/substreams-solana-idls",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "src/dapps/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "alexisssol/Solana-Wallet-Tracker",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "saros-xyz/saros-sdk",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ShiftForex/defillama",
+     "path": "projects/saros/index.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "L19579/L19_Broflovski",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ashpoolin/parserzero",
+     "path": "src/utils/programMap.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "OrbisWeb3/orbisdb",
+     "path": "server/plugins/solana-token-gating/index.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "OrbisWeb3/orbisdb",
+     "path": "server/plugins/helius-webhook-receiver/utils.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sonicfromnewyoke/saros-playground",
+     "path": "programs/update.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "SarosFinance/saros-swap",
+     "path": "program/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sonicfromnewyoke/saros-playground",
+     "path": "programs/src/amm.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "OrbisWeb3/orbisdb",
+     "path": "server/plugins/solana-credentials/index.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ashpoolin/parserone",
+     "path": "src/utils/programMap.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sercan0x/opeq",
+     "path": "web/lib/amms.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "target/debug/deps/substreams.d",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "DefaultPerson/solana-dex-parser-go",
+     "path": "constants/programs.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "apollotoday/Arbitrage-bot-jupiter-aggrigator",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "helius-labs/photon-explorer",
+     "path": "src/types/helius-sdk/enums.ts",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY",
+   "payloads": 2,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/dex/phoenix/parser.rs"
+    ],
+    "citedUpstream": [
+     "Ellipsis-Labs/phoenix-sdk"
+    ]
+   },
+   "dialectPin": {
+    "citedRepos": [
+     "Ellipsis-Labs/phoenix-sdk"
+    ],
+    "resolvedFrom": [
+     "Ellipsis-Labs/phoenix-sdk"
+    ],
+    "licenses": [
+     {
+      "repo": "Ellipsis-Labs/phoenix-sdk",
+      "spdxId": null,
+      "state": "unlicensed",
+      "commitAllowed": false
+     }
+    ]
+   },
+   "hits": [
+    {
+     "repo": "Ellipsis-Labs/phoenix-v1",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "src/dapps/dapp_PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sevenlabs-hq/carbon",
+     "path": "decoders/phoenix-v1-decoder/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/web/src/lib/slot200/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Ellipsis-Labs/phoenix-v1",
+     "path": "src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vybenetwork/solana-token-metadata-api",
+     "path": "src/frontend/app.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vybenetwork/solana-ohlc-api",
+     "path": "src/frontend/app.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vybenetwork/solana-trades-api",
+     "path": "src/frontend/app.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/instruction-parser",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Ellipsis-Labs/phoenix-sdk",
+     "path": "typescript/phoenix-sdk/src/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Fankouzu/solana-basic-ui",
+     "path": "docs/SolanaDocumention/core/programs.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "lbc-team/Pioneer",
+     "path": "translations/7989.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-fm/explorer-kit",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Ellipsis-Labs/phoenixpy",
+     "path": "phoenix/program_id.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "umiiii/solparser",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "umiiii/solparser",
+     "path": "consts/address.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Ellipsis-Labs/phoenix-cli",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "otter-sec/solana-verified-programs-api",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Ellipsis-Labs/phoenix-v1",
+     "path": ".verified-build.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "franco-bianco/solanaswap-go",
+     "path": "solanaswap-go/consts.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Ellipsis-Labs/phoenix-sdk",
+     "path": "typescript/phoenix-sdk/src/instructions/Log.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/zh/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/en/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/fi/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/id/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/it/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/nl/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/pt/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/pl/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/es/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/tr/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/de/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/ko/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/fr/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/vi/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/ja/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/ar/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "tensor-foundation/toolkit",
+     "path": "phoenix/src/helpers/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/uk/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/docs/content/docs/ru/programs/verified-builds.mdx",
+     "class": "reference-doc"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "Ellipsis-Labs/phoenix-v1",
+     "path": ".verified-build.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    }
+   ],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo",
+   "payloads": 10,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/lending/solend/parser.rs"
+    ],
+    "citedUpstream": [
+     "solendprotocol/solana-program-library"
+    ]
+   },
+   "dialectPin": {
+    "citedRepos": [
+     "solendprotocol/solana-program-library"
+    ],
+    "resolvedFrom": [],
+    "licenses": [
+     {
+      "repo": "solendprotocol/solana-program-library",
+      "spdxId": "NOASSERTION",
+      "state": "undetermined",
+      "commitAllowed": false
+     }
+    ]
+   },
+   "hits": [
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "programs/solend-mocks/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xtorch/datasource",
+     "path": "solanas/analyzers/So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "ask-the-hive/the-hive",
+     "path": "constants/solana-lending-programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "explorer/src/utils/tx.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "programs/marginfi/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Friktion-Labs/tulipv2-sdk",
+     "path": "examples/deps/accounts/So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "aleph-im/aleph-indexer-library",
+     "path": "packages/spl-lending/src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/util/program-name.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "liqtags/crypto-rekts",
+     "path": "rekts/Solend.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "coral-xyz/apr-ui",
+     "path": "pages/program/[address]/index.tsx",
+     "class": "reference-code"
+    },
+    {
+     "repo": "MeteoraAg/vault-sdk",
+     "path": "ts-client/src/vault/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "MeteoraAg/vault-sdk",
+     "path": "programs/vault/src/strategy/base.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "aleph-im/aleph-indexer-framework",
+     "path": "packages/solana/src/services/parser/src/layout/layoutHub.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/trippy-mrgn-ts",
+     "path": "getluts.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solendprotocol/public",
+     "path": "solend-sdk/src/core/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "Anchor.toml",
+     "class": "reference-code"
+    },
+    {
+     "repo": "YutaSugimura/DeFi-Map",
+     "path": "address.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "CarmineOptions/derisk-solana",
+     "path": "src/protocols/addresses.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ergonia/solend-py",
+     "path": "src/solend/solana_rpc.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Block-Logic/dropped_solana_txs",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jup-ag/platform-list",
+     "path": "src/platforms/save.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sham789/solend-liquidator",
+     "path": "solend-liquidator/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jito-labs/solend-sdk",
+     "path": "token-lending/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ask-the-hive/the-hive",
+     "path": "app/(app)/api/lending/build-transaction/route.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "honey-protocol/honey-frontend-legacy",
+     "path": "helpers/utils.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/governance-ui",
+     "path": "tools/sdk/solend/configuration.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "acheroncrypto/native-to-anchor",
+     "path": "client/packages/solend-program/src/program.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DappioLab/navigator",
+     "path": "src/solend/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sham789/solend-liquidator",
+     "path": "solana-program-library/token-lending/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ronaldzgithub/blockdata",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solendprotocol/public",
+     "path": "liquidator/src/libs/utils.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "kirtiraj22/Solana-DeFi-Analytics-MCP-Server",
+     "path": "src/config/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solendprotocol/tvl-calculator-example",
+     "path": "index.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jito-labs/solend-sdk",
+     "path": "token-lending/sdk/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jito-labs/solend-sdk",
+     "path": "token-lending/brick/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jito-labs/solend-sdk",
+     "path": "token-lending/program/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "SRWA-Cypherpunk/SRWA",
+     "path": "frontend/src/integrations/solend/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "furkan3152/Kletia",
+     "path": "docs/platform/solana-venues.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "XxLikeABossxX-org/solscan-adapter",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "LightCreator1007/solana-position-manager",
+     "path": "skill/leaves/lending.md",
+     "class": "reference-doc"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "0xtorch/datasource",
+     "path": "solanas/analyzers/So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "Friktion-Labs/tulipv2-sdk",
+     "path": "examples/deps/accounts/So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    }
+   ],
+   "incomplete": false,
+   "incompleteRetried": false
+  },
+  {
+   "program": "SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY",
+   "payloads": 1,
+   "verdict": "upstream-reference-only",
+   "premise": {
+    "state": "parser-found",
+    "sourceFiles": [
+     "crates/parsers/src/staking/stake_pool.rs"
+    ],
+    "citedUpstream": []
+   },
+   "dialectPin": {
+    "citedRepos": [],
+    "resolvedFrom": [],
+    "licenses": []
+   },
+   "hits": [
+    {
+     "repo": "sendaifun/skills",
+     "path": "skills/sanctum/resources/program-ids.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "programs/marginfi/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DefiLlama/dimension-adapters",
+     "path": "fees/sanctum-validator-lsts/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "elophanto/EloPhanto",
+     "path": "skills/sanctum-staking/resources/program-ids.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sendaifun/skills",
+     "path": "skills/sanctum/SKILL.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/lifi.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "igneous-labs/S",
+     "path": "keys/sanctum-spl-stake-pool-keys/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "elophanto/EloPhanto",
+     "path": "skills/sanctum-staking/SKILL.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Mythic-Project/governance-ui",
+     "path": "components/instructions/programs/stakeSanctum.tsx",
+     "class": "reference-code"
+    },
+    {
+     "repo": "igneous-labs/inf-1.5",
+     "path": "sol-val-calc/spl/core/src/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "glitchful-dev/sol-stake-pool-apy",
+     "path": "packages/price-updator/src/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "glamsystems/glam-sdk-ts-legacy",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/stacSOL",
+     "path": "src/lib/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sercan0x/opeq",
+     "path": "web/lib/amms.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "furkan3152/Kletia",
+     "path": "packages/core/src/protocols/stakePools.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "andresdefi/cryptoskills",
+     "path": "skills/sanctum/SKILL.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "DefaultPerson/solana-dex-parser-go",
+     "path": "constants/programs.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Hubra-labs/SolanaHub",
+     "path": "src/app/services/sanctum.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "kekloldyormarket/yal",
+     "path": "sdk/src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ShiftForex/defillama",
+     "path": "projects/sanctum-validator-lsts/index.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "igneous-labs/sanctum-router-sdk",
+     "path": "ts/sdk/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Hubra-labs/SolanaHub",
+     "path": "src/app/services/liquid-stake.service.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "igneous-labs/sanctum-spl-stake-pool-cli",
+     "path": "src/parse/spl_stake_pool_program.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/stacSOL",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "kekloldyormarket/yal",
+     "path": "frontend/lib/sdk/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "SolanaVault/vault-lst-list-generator",
+     "path": "constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jonasXchen/solana-sveltekit",
+     "path": "src/lib/utils/staking/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Planckify-Labs/monad-submission-mobile-app",
+     "path": "services/defi/adapters/solana/lst.config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jwcheon/dimension-adapters-humantap",
+     "path": "fees/sanctum-validator-lsts/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "kekloldyormarket/yal",
+     "path": "cli/src/util.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/governance-ui",
+     "path": "pages/dao/[symbol]/proposal/components/instructions/Validators/SanctumWithdrawStake.tsx",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/stacSOL",
+     "path": "src/Faq.tsx",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/governance-ui",
+     "path": "pages/dao/[symbol]/proposal/components/instructions/Validators/SanctumDepositStake.tsx",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jwcheon/dimension-adapters-x3x",
+     "path": "fees/sanctum-validator-lsts/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sushant6095/epoch-protocol",
+     "path": "packages/config-sdk/src/schemas/MarketData.config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "eco-incorp/sauce",
+     "path": "docs/api/router-solana.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "staccDOTsol/stacSOL",
+     "path": "api/referral-index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "openSVM/osvm-cli",
+     "path": "src/utils/program_aliases.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/stacSOL",
+     "path": "api/manager-fee-index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "owizdom/getSignatureHistory",
+     "path": "src/utils/knownPrograms.ts",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [],
+   "incomplete": false,
+   "incompleteRetried": false
+  }
+ ],
+ "summary": {
+  "programs": 9,
+  "payloads": 32,
+  "byVerdict": {
+   "upstream-reference-only": 9
+  },
+  "payloadsByVerdict": {
+   "upstream-reference-only": 32
+  },
+  "unknown": 0,
+  "verdict": "measured",
+  "upstreamInterfacePrograms": 0,
+  "upstreamInterfacePayloads": 0,
+  "licenseBlockedPrograms": 0
+ },
+ "limits": {
+  "index": "GitHub code search, literal (quoted) queries scoped to the pinned upstream repo: absence claims are scoped to the indexed surface — unindexed repos cannot answer; incomplete results are retried once after 20s, a persistent incomplete stays unknown (no-verdict)",
+  "verification": "every idl candidate (max 5/program) fetched; ok = the file really contains the literal; binding from the file itself",
+  "premise": "local git grep against the foreign clone at HEAD, parser sources only",
+  "dialectPin": "the pin is the upstream repo the foreign parser cites; it names a SOURCE, not a decoded interface — no bytes are adopted by this tool",
+  "licensing": "SPDX read from the API per repo; null = unlicensed, GPL-* = copyleft; neither may be committed"
+ }
+}
