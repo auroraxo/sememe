@@ -19,6 +19,7 @@
 // {"defined": "Name"}, ["u8", 32] and {"kind": "type"} aliases.
 
 import { encodeBase58, decodeBase58 } from './base58.mjs';
+import { isShankIdl, isShankDiscriminant, shankDiscriminatorBytes, SHANK_LEB128_TYPES } from './shank.mjs';
 
 const MAX_DEPTH = 32;
 // Instruction data is bounded by transaction size; a hostile length prefix
@@ -211,6 +212,55 @@ function resolveDefined(typeName, ctx, path) {
   return typedef.type;
 }
 
+// --- shank LEB128 length dialect --------------------------------------------
+//
+// The lighthouse family (shank) encodes array/string lengths as unsigned
+// LEB128, not Borsh's fixed u32 — and ships the types (`CompactU64`,
+// `CompactBytes`, `*Assertions`) WITHOUT definitions. They are hooked at the
+// `defined` branch below. Two rules keep this from becoming a guess:
+//   - only an IDL in the shank dialect engages them (Anchor IDLs keep strict
+//     u32 lengths even for a same-named type);
+//   - a name the IDL itself defines always wins (ctx.types is checked first).
+
+function readLeb128(cur, path) {
+  let value = 0n;
+  let shift = 0n;
+  for (;;) {
+    if (shift >= 70n) throw new CodecError('LEB128 longer than 10 bytes', path);
+    const byte = cur.take(1, 'LEB128 byte')[0];
+    value |= BigInt(byte & 0x7f) << shift;
+    if ((byte & 0x80) === 0) break;
+    shift += 7n;
+  }
+  if (value > 0xffffffffffffffffn) throw new CodecError(`LEB128 value ${value} exceeds u64`, path);
+  return value;
+}
+
+function writeLeb128(value, path) {
+  if (!Number.isSafeInteger(value) || value < 0) {
+    throw new CodecError(`LEB128 needs a non-negative safe integer, got ${describe(value)}`, path);
+  }
+  const out = [];
+  let rest = value;
+  for (;;) {
+    let byte = rest & 0x7f;
+    rest >>>= 7;
+    if (rest !== 0) byte |= 0x80;
+    out.push(byte);
+    if (rest === 0) return Buffer.from(out);
+  }
+}
+
+/**
+ * The hooked LEB128 type for `name`, or null: engaged ONLY for an IDL in the
+ * shank dialect. Anchor IDLs keep refusing an undefined `CompactU64` even if
+ * same-named — the length dialect belongs to the IDL, not to the string.
+ */
+function shankLeb128Type(name, ctx) {
+  if (!ctx.shank) return null;
+  return SHANK_LEB128_TYPES.get(name) ?? null;
+}
+
 function arrayParts(type) {
   const array = type.array;
   if (Array.isArray(array)) {
@@ -321,6 +371,30 @@ function decodeAt(type, cur, ctx, path, depth) {
   if ('defined' in type) {
     const name = typeof type.defined === 'string' ? type.defined : type.defined?.name;
     if (typeof name !== 'string') throw new CodecError('malformed defined type', path);
+    // A name the IDL itself defines always wins; only an UNDEFINED name may
+    // fall back to the shank LEB128 hook.
+    if (!ctx.types.has(name)) {
+      const hooked = shankLeb128Type(name, ctx);
+      if (hooked) {
+        if (hooked.kind === 'scalar') {
+          const value = readLeb128(cur, path);
+          if (value > BigInt(Number.MAX_SAFE_INTEGER)) {
+            throw new CodecError(`LEB128 ${value} exceeds the JS safe integer range`, path);
+          }
+          return Number(value);
+        }
+        const length = Number(readLeb128(cur, path));
+        if (hooked.kind === 'bytes') {
+          return Array.from(cur.take(length, 'CompactBytes'));
+        }
+        const element = { defined: hooked.element };
+        const out = [];
+        for (let index = 0; index < length; index++) {
+          out.push(decodeAt(element, cur, ctx, `${path}[${index}]`, depth + 1));
+        }
+        return out;
+      }
+    }
     ctx.missing?.add(name);
     return decodeAt(resolveDefined(name, ctx, path), cur, ctx, name, depth + 1);
   }
@@ -428,6 +502,23 @@ function encodeAt(type, value, ctx, path, depth) {
   if ('defined' in type) {
     const name = typeof type.defined === 'string' ? type.defined : type.defined?.name;
     if (typeof name !== 'string') throw new CodecError('malformed defined type', path);
+    if (!ctx.types.has(name)) {
+      const hooked = shankLeb128Type(name, ctx);
+      if (hooked) {
+        if (hooked.kind === 'scalar') return writeLeb128(value, path);
+        if (!Array.isArray(value)) throw new CodecError(`expected an array for ${name}, got ${describe(value)}`, path);
+        const length = writeLeb128(value.length, path);
+        if (hooked.kind === 'bytes') {
+          if (!value.every((byte) => Number.isInteger(byte) && byte >= 0 && byte <= 255)) {
+            throw new CodecError(`${name} must be bytes 0-255, got ${describe(value)}`, path);
+          }
+          return Buffer.concat([length, Buffer.from(value)]);
+        }
+        const element = { defined: hooked.element };
+        return Buffer.concat(
+          [length, ...value.map((entry) => encodeAt(element, entry, ctx, `${path}[]`, depth + 1))]);
+      }
+    }
     return encodeAt(resolveDefined(name, ctx, path), value, ctx, name, depth + 1);
   }
   if ('generic' in type) {
@@ -596,10 +687,16 @@ function context(idl) {
   for (const typedef of idl.types ?? []) {
     if (typedef && typeof typedef.name === 'string') types.set(typedef.name, typedef);
   }
-  return { types };
+  // The shank LEB128 hook engages only for shank-dialect IDLs; `types` is
+  // consulted first everywhere, so a name the IDL defines wins regardless.
+  return { types, shank: isShankIdl(idl) };
 }
 
 function discriminatorBytes(instruction, kind = 'instruction') {
+  // Shank IDLs store the selector under `discriminant` (1 byte), not
+  // `discriminator` (8 bytes); shankDiscriminatorBytes refuses anything else.
+  const shank = shankDiscriminatorBytes(instruction);
+  if (shank) return shank;
   const raw = instruction?.discriminator;
   if (!Array.isArray(raw) || raw.length === 0) return null;
   if (!raw.every((byte) => Number.isInteger(byte) && byte >= 0 && byte <= 255)) {

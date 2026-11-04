@@ -27,6 +27,7 @@
 // derivation only fills gaps. A conflict is an error, not a silent override.
 
 import { createHash } from 'node:crypto';
+import { isShankDiscriminant } from './shank.mjs';
 
 const sha256 = (text) => createHash('sha256').update(text).digest();
 
@@ -105,6 +106,17 @@ export function withDerivedDiscriminators(idl) {
   let events = 0;
   const conflicts = [];
   for (const instruction of copy.instructions ?? []) {
+    // A shank discriminant is a 1-byte variant selector, not a sighash. The
+    // two schemes are independent: deriving Anchor's sighash for a shank
+    // instruction yields a table that matches no real wire (measured: all 18
+    // lighthouse instructions filled with bogus sighashes before this rule
+    // existed). The stored discriminant is copied verbatim — it is a STORED
+    // value under a different field name, so it is not counted as an Anchor
+    // derivation and never checked against the sighash rule.
+    if (isShankDiscriminant(instruction)) {
+      instruction.discriminator = [instruction.discriminant.value];
+      continue;
+    }
     if (isDiscriminator(instruction.discriminator)) {
       const derived = globalDiscriminator(instruction.name);
       if (!derived.every((byte, index) => byte === instruction.discriminator[index])) {
