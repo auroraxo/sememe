@@ -13,6 +13,7 @@
 // the acquisition subpath (`sememe/pull`) declares web3.js as an optional
 // peer — pull users install it themselves.
 import { gunzipSync, inflateSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
 import { PublicKey } from '@solana/web3.js';
 
 export const METADATA_PROGRAM = new PublicKey('ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S');
@@ -71,6 +72,46 @@ export function decodeAccount(account, source, programId) {
 }
 
 /** Batched `getMultipleAccounts` with bounded retry; never throws — returns {error} instead. */
+/**
+ * Classify ONE IDL account: is there a usable schema behind it?
+ *
+ * "Usable" must mean a decoder can USE the schema, not that the schema names
+ * things. A discriminator-less IDL names every instruction and still decodes
+ * nothing: measured on Kamino Lend (66 instructions, 0 discriminators), 0 of
+ * 1,432 real mainnet payloads decoded.
+ *
+ * This moved here from tools/measure.mjs on 2026-11-04: the gap classifier
+ * (src/gap.mjs) needs it, and the classifier has to work from an INSTALLED
+ * package — tools/ is not shipped.
+ */
+export function inspect(account, source, programId) {
+  if (!account) return { state: 'missing' };
+  const expectedOwner = source === 'metadata' ? METADATA_PROGRAM.toBase58() : programId;
+  if (account.owner !== expectedOwner) return { state: 'wrong_owner', owner: account.owner };
+  try {
+    const idl = decodeAccount(account, source, programId);
+    const digest = createHash('sha256').update(JSON.stringify(idl)).digest('hex');
+    const stored = idl.instructions.filter((ix) => Array.isArray(ix.discriminator)).length;
+    const derived = idl.instructions.length - stored;
+    const decodable = stored + derived > 0;
+    return {
+      state: 'usable',
+      instructions: idl.instructions.length,
+      fingerprint: digest,
+      // A strict, honest split for the coverage claim:
+      //   storedDiscriminators  - the program itself published the bytes
+      //   derivedDiscriminators - Anchor's rule can supply them from the name
+      //   decodableStoredOnly    - usable with the published bytes alone
+      storedDiscriminators: stored,
+      derivedDiscriminators: derived,
+      decodableStoredOnly: stored > 0,
+      decodableWithDerivation: decodable,
+    };
+  } catch (error) {
+    return { state: 'undecodable', error: String(error?.message ?? error).slice(0, 150) };
+  }
+}
+
 export async function rpcAccounts(url, keys, fetcher = fetch, tries = 3) {
   const payload = { jsonrpc: '2.0', id: 1, method: 'getMultipleAccounts',
     params: [keys, { encoding: 'base64', commitment: 'finalized' }] };

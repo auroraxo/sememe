@@ -1,0 +1,696 @@
+{
+ "tool": "acquisition-gap",
+ "generatedAt": "2026-11-04T11:19:49.329Z",
+ "rpcUrl": "https://api.mainnet-beta.solana.com",
+ "slot": 465282754,
+ "source": {
+  "report": "research/step-ingestooor-full-sweep-2026-11-04.json",
+  "generatedAt": "2026-11-04T09:26:07.933Z",
+  "noInterface": 306
+ },
+ "summary": {
+  "programs": 70,
+  "payloads": 306,
+  "byVerdict": {
+   "no-interface-published": 36,
+   "pullable": 34
+  },
+  "payloadsByVerdict": {
+   "no-interface-published": 129,
+   "pullable": 177
+  },
+  "unknown": 0,
+  "verdict": "measured",
+  "pullablePrograms": 34,
+  "pullablePayloads": 177,
+  "publishesNothingPrograms": 36,
+  "publishesNothingPayloads": 129,
+  "undecodablePrograms": 0,
+  "vendoredPrograms": 0,
+  "knownPrograms": 70
+ },
+ "rows": [
+  {
+   "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
+   "payloads": 42,
+   "slot": 465282753,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M",
+   "payloads": 20,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 12,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X",
+   "payloads": 14,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 8,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+   "payloads": 12,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 196,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr",
+   "payloads": 12,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 27,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "fragnAis7Bp6FTsMoa6YcH8UffhEw43Ph79qAiK3iF3",
+   "payloads": 11,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 66,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "VALaaymxQh2mNy2trH9jUqHT1mTow76wpTcGmSWSwJe",
+   "payloads": 11,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 12,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "HubbLeXBb7qyLHt3x7gvYaRrxQmmgExb7fCJgDqFuB6T",
+   "payloads": 10,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 50,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "EHBN9YKtMmrZhj8JZqyBQRGqyyeHw5xUB1Q5eAHszuMt",
+   "payloads": 10,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 22,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo",
+   "payloads": 10,
+   "slot": 465282753,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "FL3X2pRsQ9zHENpZSKDRREtccwJuei8yg9fwDu9UN69Q",
+   "payloads": 7,
+   "slot": 465282753,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+   "payloads": 6,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 18,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "DoVEsk76QybCEHQGzkvYPWLQu9gzNoZZZt3TPiL597e",
+   "payloads": 6,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 7,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "HFn8GnPADiny6XqUoWE8uRPPxb29ikn4yTuPa9MF2fWJ",
+   "payloads": 6,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 16,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "6LtLpnUFNByNXLyCoK9wA2MykKAmQNZKBdY8s47dehDc",
+   "payloads": 6,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 43,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu",
+   "payloads": 5,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 59,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA",
+   "payloads": 5,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "metadata",
+   "instructions": 124,
+   "decodableStoredOnly": true,
+   "canonical": "usable",
+   "legacy": "usable"
+  },
+  {
+   "program": "GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH",
+   "payloads": 5,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 18,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "SMANK4F5osjfVpKFH5LPzE6HPpbzSPu5iHPBhuor5xU",
+   "payloads": 5,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 13,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ",
+   "payloads": 5,
+   "slot": 465282753,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+   "payloads": 4,
+   "slot": 465282753,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "6m2CDdhRgxpH4WjvdzxAYbGxwdGUz5MziiL5jek2kBma",
+   "payloads": 4,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 14,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "FarmuwXPWXvefWUeqFAa5w6rifLkq5X6E8bimYvrhCB1",
+   "payloads": 4,
+   "slot": 465282753,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 15,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "NXFiKimQN3QSL3CDhCXddyVmLfrai8HK36bHKaAzK7g",
+   "payloads": 4,
+   "slot": 465282753,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy",
+   "payloads": 4,
+   "slot": 465282753,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT",
+   "payloads": 4,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "obriQD1zbpyLz95G5n7nJe6a4DPjpFwa5XYPoNm113y",
+   "payloads": 3,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd",
+   "payloads": 3,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 30,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL",
+   "payloads": 3,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+   "payloads": 3,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "sSo1iU21jBrU9VaJ8PJib1MtorefUV4fzC9GURa2KNn",
+   "payloads": 3,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SSwapUtytfBdBn1b9NUGG6foMVPtcWgpRU32HToDUZr",
+   "payloads": 3,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "Stake11111111111111111111111111111111111111",
+   "payloads": 3,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "CarrotwivhMpDnm27EHmRLeQ683Z1PufuqEmBZvD282s",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 42,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "7Mc3vSdRWoThArpni6t5W4XjvQf4BuMny1uC8b6VBn48",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "tuna4uSQZncNeeiAMKbstuxA9CUkHH6HmC64wgmnogD",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 66,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "2wT8Yq49kHgDzXuPxZSaeLaH1qbmGXtEyPy64bL7aD3c",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 3,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "SLendK7ySfcEzyaFqy93gDnD3RtrpXJcnRwb6zFHJSh",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 66,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "HyaB3W9q6XdA5xwpU4XnSZV94htfmbmqJXZcEbRaJutt",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SMPLecH534NA9acpos4G6x7uf3LWbCAwZQE9e8ZekMu",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 15,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "FarmqiPv5eAj3j1GMdMCMUGXqPUvmquZtMy86QH6rzhG",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "2TQ4a9igqmz91BtHjnAk5hk7JjVuRwyQBsQfrGGpcXYK",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "endoLNCKTqDn8gSVnN2hDdpgACUPWHZTwoYnnMybpAT",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SsubM7pGA83VRnCodXVrxU2GZNBQzBYgzPUYBssCwU1",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 16,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3",
+   "payloads": 2,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 9,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "Ed25519SigVerify111111111111111111111111111",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "jupoNjAxXgZ4rjzxzPMP4oxduvQsQtZzyknqvzYNrNu",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 9,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "voTpe3tHQ7AjQHMapgSue2HJFAh2cGsdokqN3XqmVSj",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 13,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "MP1zz2HUAzL5P2uLR5nKaDSnxofh8VTZyk26NCewWzk",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "GDDMwNyyx8uB6zrqwBFHjLLG3TBYk2F8Az4yrQC5RzMp",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 3,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 31,
+   "decodableStoredOnly": false,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "4pP8eDKACuV7T2rbFPE8CHxGKDYAzSdRsdMsGvz2k4oc",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "AxiomxSitiyXyPjKgJ9XSrdhsydtZsskZTEDam3PxKcC",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "DnqJ15nYEdFYr6ywvvVWfYLdUTb1nqecECCSYmyWiJe9",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "3s1rAymURnacreXreMy718GfqW6kygQsLNka1xDyW8pC",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "3JmCcXAjmBpFzHHuUpgJFfTQEQnAR7K1erNLtWV1g7d9",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "RopsJ74nrtcsk9iND8CFFNjn5mxf1tFzF3RhMPJ3CdV",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 33,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  },
+  {
+   "program": "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 29,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "swapFpHZwjELNnjvThjajtiVmkz3yPQEHjLtka2fwHW",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 13,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "vo1tWgqZMjG61Z2T9qUaMYKqZ75CYzMuaZ2LZP1n7HV",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "pullable",
+   "source": "anchor",
+   "instructions": 11,
+   "decodableStoredOnly": true,
+   "canonical": "missing",
+   "legacy": "usable"
+  },
+  {
+   "program": "Stk5NCWomVN3itaFjLu382u9ibb5jMSHEsh6CuhaGjB",
+   "payloads": 1,
+   "slot": 465282754,
+   "verdict": "no-interface-published",
+   "canonical": "missing",
+   "legacy": "missing"
+  }
+ ]
+}

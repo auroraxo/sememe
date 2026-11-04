@@ -24,6 +24,18 @@ const usage = `usage:
   sememe absent-help
       print the chain-verified short wire forms that --absent verified licenses.
   sememe pull <program-id> [--store <directory>] [--rpc <https-url>]
+  sememe gap <program-id> [--rpc <https-url>]
+      answer the question "why is there no interface here?" BEFORE you pull.
+      Probes both on-chain IDL addresses and returns one of:
+        pullable              an interface exists on chain that this program's
+                              store simply does not have yet -> run sememe pull
+        no-interface-published  neither address answers -> pulling it can never
+                              help: adopt a published copy or derive upstream
+        present-undecodable   an account exists but its schema is unusable
+        vendored              answered by sememe's pinned wire table, no IDL
+        unknown               the RPC failed — deliberately NOT an absence
+      Never reports an RPC failure as an absence, and never tells you to pull
+      a program that publishes nothing (the fix would never arrive).
   sememe adopt <program-id> <file> [--store <directory>] [--source <label>]
       store a first-party PUBLISHED interface copy next to the on-chain pull, so
       union decode has a second verified source. The receipt says "published":
@@ -126,6 +138,23 @@ try {
       throw Error(`pull needs @solana/web3.js: install it next to sememe (npm i @solana/web3.js@1.98.4) — ${String(error?.message ?? error).slice(0, 120)}`);
     }
     console.log(JSON.stringify(await pull(program, store, rpc), null, 2));
+  } else if (command === 'gap') {
+    if (!program) throw Error('gap needs a program id');
+    const rpc = option('--rpc', 'https://api.mainnet-beta.solana.com');
+    let probe, where, nextStep;
+    try {
+      // Lazily imported like `pull`: the only path that needs web3.js.
+      ({ probeGap: probe, nextStep } = await import('../src/gap.mjs'));
+      ({ addresses: where } = await import('../src/acquire.mjs'));
+    } catch (error) {
+      throw Error(`gap needs @solana/web3.js: install it next to sememe (npm i @solana/web3.js@1.98.4) — ${String(error?.message ?? error).slice(0, 120)}`);
+    }
+    // The same classifier the qualification report uses, so what a user is
+    // told and what the research artifact records are one code path.
+    const { rows } = await probe([{ program, payloads: 0 }], { url: rpc });
+    const row = rows[0];
+    console.log(JSON.stringify({ ...row, addresses: await where(program), next: nextStep(row, program) }, null, 2));
+    if (row.verdict === 'unknown') process.exitCode = 3;
   } else if (command === 'adopt') {
     if (!program) throw Error('adopt needs a program id');
     const file = args.shift();

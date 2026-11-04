@@ -6,45 +6,12 @@
 // here, which meant the shipped package had to reach OUT of itself into
 // tools/. This file is the coverage harness and keeps only what the harness
 // needs; the implementation lives once, in src/acquire.mjs.
-import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import {
-  METADATA_PROGRAM, addresses, decodeAccount, rpcAccounts,
+  METADATA_PROGRAM, addresses, decodeAccount, inspect, rpcAccounts,
 } from '../src/acquire.mjs';
 
-export { METADATA_PROGRAM, addresses, decodeAccount, rpcAccounts };
-
-export function inspect(account, source, programId) {
-  if (!account) return { state: 'missing' };
-  const expectedOwner = source === 'metadata' ? METADATA_PROGRAM.toBase58() : programId;
-  if (account.owner !== expectedOwner) return { state: 'wrong_owner', owner: account.owner };
-  try {
-    const idl = decodeAccount(account, source, programId);
-    const digest = createHash('sha256').update(JSON.stringify(idl)).digest('hex');
-    // "Usable" must mean a decoder can USE the schema, not that the schema
-    // names things. A discriminator-less IDL names every instruction and
-    // still decodes nothing: measured on Kamino Lend (66 instructions, 0
-    // discriminators), 0 of 1,432 real mainnet payloads decoded.
-    const stored = idl.instructions.filter((ix) => Array.isArray(ix.discriminator)).length;
-    const derived = idl.instructions.length - stored;
-    const decodable = stored + derived > 0;
-    return {
-      state: 'usable',
-      instructions: idl.instructions.length,
-      fingerprint: digest,
-      // A strict, honest split for the coverage claim:
-      //   storedDiscriminators  - the program itself published the bytes
-      //   derivedDiscriminators - Anchor's rule can supply them from the name
-      //   decodableStoredOnly    - usable with the published bytes alone
-      storedDiscriminators: stored,
-      derivedDiscriminators: derived,
-      decodableStoredOnly: stored > 0,
-      decodableWithDerivation: decodable,
-    };
-  } catch (error) {
-    return { state: 'undecodable', error: String(error?.message ?? error).slice(0, 150) };
-  }
-}
+export { METADATA_PROGRAM, addresses, decodeAccount, inspect, rpcAccounts };
 
 export async function measure(programs, url, fetcher = fetch, options = {}) {
   if (!Array.isArray(programs) || programs.length !== 20 || new Set(programs.map(p => p.id)).size !== 20)

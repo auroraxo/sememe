@@ -21,7 +21,8 @@
     "./package.json": "./package.json",
     "./token": "./src/token.mjs",
     "./token-metadata": "./src/token-metadata.mjs",
-    "./raydium": "./src/raydium.mjs"
+    "./raydium": "./src/raydium.mjs",
+    "./gap": "./src/gap.mjs"
   },
   "files": [
     "index.mjs",

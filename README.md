@@ -127,6 +127,43 @@ node bin/sememe.mjs pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store /tm
 
 The CLI fetches the canonical Program Metadata and legacy Anchor IDL accounts at a finalized RPC slot, checks account owner/program binding and JSON instruction shape, prefers canonical when both exist, and stores normalized JSON by SHA-256 under `<store>/objects/`. A receipt under `<store>/receipts/` records program ID, source account address, slot, fingerprint and instruction count. Repeating the pull of identical content does not rewrite the stored object; corrupt files are refused rather than overwritten. A public Whirlpool pull succeeded on 27.10. at slot 462039125 with 66 named instructions and fingerprint `sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f` (own run; no outside use).
 
+### Before you pull: ask why an interface is missing (`sememe gap`)
+
+When a consumer hits `no stored IDL for program X`, running `sememe pull` blindly is the wrong reflex: many programs on Solana publish no IDL at all, so a pull will simply fail repeatedly and leave the consumer guessing whether the RPC failed, the address is wrong, or the program was closed. `sememe gap` probes both on-chain IDL addresses (Program Metadata and legacy `anchor:idl`) and returns the exact diagnosis, with the fix that actually applies:
+
+```bash
+node bin/sememe.mjs gap DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M
+```
+
+```json
+{
+  "program": "DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M",
+  "verdict": "pullable",
+  "source": "anchor",
+  "instructions": 12,
+  "next": "sememe pull DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M"
+}
+```
+
+Pointed at a program that publishes nothing at either address (for example `L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95`, the largest single gap in the 156-fixture set, 42 payloads, Lighthouse):
+
+```json
+{
+  "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
+  "verdict": "no-interface-published",
+  "next": "this program publishes no on-chain interface at either address — pulling it can never succeed. Use sememe adopt <program> <file> with a first-party published copy, or a pinned upstream derivation."
+}
+```
+
+The five possible verdicts, all mutually exclusive:
+- `pullable`: an on-chain interface exists that your local store does not have yet -> `sememe pull` is the fix.
+- `no-interface-published`: neither address answers -> pulling it forever will never help. Use `sememe adopt` with a first-party published copy, or a pinned upstream derivation.
+- `present-undecodable`: an account exists at one of the addresses, but its schema cannot be decoded (malformed, or declares another program).
+- `vendored`: one of the programs sememe answers via pinned upstream wire tables (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4) — there is no on-chain IDL to store.
+- `unknown`: the RPC failed. **An RPC failure is never recorded as an absence** (the crates.io 403 lesson: a client-side failure that reads as missing data). The CLI exits 3 (`no-verdict`) in this case so scripted callers know the chain's state is unmeasured.
+
+Measured 2026-11-04 over all 70 gap programs of the foreign 156-fixture set (`research/acquisition-gap-2026-11-04.json`): **34 programs publish an on-chain IDL (177 payloads)** — never-pulled gaps, not derivation work — and **36 publish nothing (129 payloads)**.
+
 **Limit:** This is acquisition and content-addressed storage, not an independent audit of the on-chain ABI, offline resolver, freshness guarantee or authority check. Fetch responses are trusted to the configured RPC; first-party repo parity has not been established. Account and event decoding, `resolve`, `decode-tx`, `lock`, `diff` and the optional local daemon remain proposals; only instruction data is decoded today. A later Rust core/TypeScript SDK may replace this Node-based prototype; neither exists yet.
 
 ## Working now: decode instruction data offline from the stored IDL
