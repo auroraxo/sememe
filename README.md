@@ -19,7 +19,7 @@ node tools/stranger-decode.mjs \
 Output (exit 0 on pass, 1 on disagreement, 2 on usage/IO):
 
 ```json
-{"status":"pass","transactionsChecked":1000,"payloadsChecked":1089,"decoded":1089,"decodeErrors":0,"disagreements":0,"noInterface":0,"byteExactRate":100,"programs":1,"networkAttempts":0}
+{"status":"pass","transactionsChecked":1000,"payloadsChecked":1089,"decoded":1089,"decodeErrors":0,"disagreements":0,"noInterface":0,"byteExactRate":100,"programs":1,"rpcEncoding":null,"chainParsedInstructions":0,"missingBytes":0,"networkAttempts":0}
 ```
 
 What that command proves, per payload, through the product's own entry points (`decodeUnionPayload`, plus the native/token/raydium tables):
@@ -39,7 +39,7 @@ node tools/stranger-decode.mjs \
 
 Measured on that sample (2026-11-04): 1,000 checked transactions, 6,337 payloads, 6,337 decoded, 0 decode errors, 0 disagreements, 0 no-interface, 100% byte-exact across 15 programs, 0 network attempts. `--absent error` (the default) refuses the witnessed short forms on purpose; `verified` applies only forms a chain witness covers, `report` names the absent fields without evidence — the same switch the product CLI exposes.
 
-The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — no third party has executed this yet (the `jup-ag/rfq-webhook-toolkit#96` signal had 0 comments when this was measured, 2026-11-04), so the first external run remains the open gate. Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic).
+The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — no third party has executed this yet (the `jup-ag/rfq-webhook-toolkit#96` signal had 0 comments when this was measured, 2026-11-04), so the first external run remains the open gate. Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic). The funnel a stranger walks before that first run is measured separately (2026-11-05, `tools/measure-stranger-funnel.mjs` -> `research/stranger-funnel-2026-11-05.json`): a fresh GitHub clone ran both quickstart commands verbatim (1,089 and 6,337 payloads, all decoded byte-exactly, exit 0), the published tag `v0.3.0` installed into an empty app with no npm account, and its entry decoded 1,119/1,119 real payloads byte-exactly from `node_modules/sememe` — the harness (tools/test/research) does not travel into the install. The quickstart block itself is pinned by `test/quickstart-funnel.test.mjs`, which caught and fixed one defect on 2026-11-05: the documented output line was the pre-2026-11-04 schema (missing `rpcEncoding`, `chainParsedInstructions`, `missingBytes`) — a stranger comparing her terminal to the README saw two different products. The README now documents the line the tool actually prints, and a hand-edited documented line goes red.
 
 ## Your own transactions: raw RPC responses (the shape you already hold)
 

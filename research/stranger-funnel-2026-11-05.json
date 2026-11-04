@@ -1,0 +1,112 @@
+{
+  "tool": "measure-stranger-funnel",
+  "generatedAt": "2026-11-04T23:53:08.069Z",
+  "tag": "v0.3.0",
+  "steps": [
+    {
+      "step": "fresh-clone",
+      "verdict": "measured",
+      "ms": 1892,
+      "cloneDir": "/tmp/sememe-funnel-1636748/sememe",
+      "commit": "f6605c0368c22840c2900a898ea7d90aa578ed5b"
+    },
+    {
+      "step": "readme-quickstart-commands",
+      "verdict": "measured",
+      "ms": 3,
+      "commands": [
+        "git clone https://github.com/auroraxo/sememe && cd sememe\nnode tools/stranger-decode.mjs  --store test/fixtures/traffic-sample-store-2026-11-04  --harvest test/fixtures/harvest-whirlpool-2026-10-28.json  --limit 1000",
+        "node tools/stranger-decode.mjs  --store test/fixtures/traffic-sample-store-2026-11-04  --sample test/fixtures/traffic-sample-2026-11-04.json  --limit 1000 --absent verified"
+      ]
+    },
+    {
+      "step": "quickstart-on-fresh-clone",
+      "verdict": "measured",
+      "ms": 22833,
+      "runs": [
+        {
+          "command": "git clone https://github.com/auroraxo/sememe && cd sememe\nnode tools/stranger-decode.mjs  --store test/fixtures/traffic-sample-store-2026-11-04  --harvest test/fixtures/harvest-whirlpool-2026-10-28.json  --limit 1000",
+          "summary": {
+            "status": "pass",
+            "transactionsChecked": 1000,
+            "payloadsChecked": 1089,
+            "decoded": 1089,
+            "decodeErrors": 0,
+            "disagreements": 0,
+            "noInterface": 0,
+            "byteExactRate": 100,
+            "programs": 1,
+            "rpcEncoding": null,
+            "chainParsedInstructions": 0,
+            "missingBytes": 0,
+            "networkAttempts": 0
+          }
+        },
+        {
+          "command": "node tools/stranger-decode.mjs  --store test/fixtures/traffic-sample-store-2026-11-04  --sample test/fixtures/traffic-sample-2026-11-04.json  --limit 1000 --absent verified",
+          "summary": {
+            "status": "pass",
+            "transactionsChecked": 1000,
+            "payloadsChecked": 6337,
+            "decoded": 6337,
+            "decodeErrors": 0,
+            "disagreements": 0,
+            "noInterface": 0,
+            "byteExactRate": 100,
+            "programs": 15,
+            "rpcEncoding": null,
+            "chainParsedInstructions": 0,
+            "missingBytes": 0,
+            "networkAttempts": 0
+          }
+        }
+      ]
+    },
+    {
+      "step": "install-published-tag",
+      "verdict": "measured",
+      "ms": 5112,
+      "appDir": "/tmp/sememe-funnel-1636748/app",
+      "installed": "/tmp/sememe-funnel-1636748/app/node_modules/sememe",
+      "entries": [
+        "LICENSE",
+        "README.md",
+        "bin",
+        "index.mjs",
+        "interface",
+        "package.json",
+        "src",
+        "vendor"
+      ]
+    },
+    {
+      "step": "installed-tree-is-the-product",
+      "verdict": "measured",
+      "ms": 1,
+      "entries": [
+        "LICENSE",
+        "README.md",
+        "bin",
+        "index.mjs",
+        "interface",
+        "package.json",
+        "src",
+        "vendor"
+      ],
+      "harnessAbsent": true
+    },
+    {
+      "step": "decode-through-installed-entry",
+      "verdict": "measured",
+      "ms": 9002,
+      "summary": {
+        "checked": 1119,
+        "decoded": 1119,
+        "errors": 0,
+        "noInterface": 0,
+        "byteExact": 1119
+      }
+    }
+  ],
+  "verdict": "funnel-measured"
+}
