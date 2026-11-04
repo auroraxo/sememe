@@ -9,6 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # The full-foreign-set sweep test reads step-finance-oss/step-ingestooor
+      # (MIT) fixtures from a clone checked out NEXT to this repository — the
+      # same layout as the local ~/github_repos convention. Pinned to the
+      # commit the research artifact was measured on.
+      - uses: actions/checkout@v4
+        with:
+          repository: step-finance-oss/step-ingestooor
+          ref: 001cf39
+          path: step-ingestooor
       - uses: actions/setup-node@v4
         with:
           node-version: '24'

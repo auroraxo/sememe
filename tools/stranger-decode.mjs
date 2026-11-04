@@ -55,7 +55,7 @@
 // 2 usage/IO errors (bad arguments, unreadable file, missing store).
 
 import './lib/network-guard.mjs';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { accessSync } from 'node:fs';
 import path from 'node:path';
 import { decodePayload, decodeUnionPayload } from '../src/decode.mjs';
@@ -79,19 +79,20 @@ const store = option('--store', null);
 const harvestPath = option('--harvest', null);
 const samplePath = option('--sample', null);
 const rpcResponsePath = option('--rpc-response', null);
+const fixturesDir = option('--fixtures-dir', null);
 const outPath = option('--out', null);
 const limit = Number(option('--limit', '1000'));
 const absentPolicy = option('--absent', 'error');
 
 const usageExit = (message) => {
   console.error(`stranger-decode: ${message}`);
-  console.error('usage: node tools/stranger-decode.mjs --store <dir> (--harvest <file> | --sample <file>) [--limit N] [--absent error|verified|report] [--out report.json]');
+  console.error('usage: node tools/stranger-decode.mjs --store <dir> (--harvest <file> | --sample <file> | --rpc-response <file> | --fixtures-dir <dir>) [--limit N] [--absent error|verified|report] [--out report.json]');
   process.exit(2);
 };
 
 if (!store) usageExit('--store is required (the store `sememe pull` writes)');
-const chosenSources = [harvestPath, samplePath, rpcResponsePath].filter(Boolean);
-if (chosenSources.length !== 1) usageExit('give exactly one of --harvest, --sample or --rpc-response');
+const chosenSources = [harvestPath, samplePath, rpcResponsePath, fixturesDir].filter(Boolean);
+if (chosenSources.length !== 1) usageExit('give exactly one of --harvest, --sample, --rpc-response or --fixtures-dir');
 if (!Number.isFinite(limit) || limit < 0) usageExit('--limit must be a number >= 0 (0 = no limit)');
 if (!['error', 'report', 'verified'].includes(absentPolicy)) usageExit(`--absent must be error, verified or report, got ${JSON.stringify(absentPolicy)}`);
 try {
@@ -100,31 +101,35 @@ try {
   usageExit(`no sememe store at ${store}: run "sememe pull <program-id> --store ${store}" first`);
 }
 
-const kind = rpcResponsePath ? 'rpc-response' : harvestPath ? 'harvest' : 'sample';
-let inputFile;
-let document;
-let wireMeta = { entriesTotal: 0, unreadable: 0, reasons: {}, encoding: null, chainParsed: 0 };
-if (kind === 'rpc-response') {
-  // A foreign repo's raw RPC document: getBlock / getTransaction responses in
-  // their DEFAULT `encoding: "base64"` shape (the transaction as wire bytes)
-  // — and in the `encoding: "json"` shape the chain's own parser produced,
-  // which is what foreign repositories' OWN test fixtures hold (measured on
-  // step-finance-oss/step-ingestooor and CryptGodSon/Solana-Explorer,
-  // 2026-11-04). This is the shape archives, indexers and dashboards hold;
-  // requiring the repo to re-harvest into sememe's own shapes was the
-  // integration gap.
-  inputFile = rpcResponsePath;
+class UsageRefusal extends Error {}
+
+const kind = fixturesDir ? 'fixtures-dir' : rpcResponsePath ? 'rpc-response' : harvestPath ? 'harvest' : 'sample';
+let inputTransactionCount = 0;
+let inputProgram = null;
+
+/**
+ * Build ONE transaction document from a file, with the same decisions the
+ * single-file paths make. Returns { document, wireMeta } or throws a refusal
+ * (named) when the file is not a transaction document at all.
+ *
+ * The --fixtures-dir sweep calls this PER FILE: a sweep is the same
+ * instrument run over many files, never a second implementation that could
+ * drift from the one a stranger uses.
+ */
+async function buildDocumentFromFile(file) {
+  const wireMeta = { entriesTotal: 0, unreadable: 0, reasons: {}, encoding: null, chainParsed: 0 };
+  let document;
   try {
-    document = JSON.parse(await readFile(inputFile, 'utf8'));
+    document = JSON.parse(await readFile(file, 'utf8'));
   } catch (error) {
-    usageExit(`cannot read ${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
+    throw new UsageRefusal(`cannot read ${file}: ${String(error?.message ?? error).slice(0, 160)}`);
   }
-  const { transactionsFromRpcDocument, normalizeRpcWireTransaction, normalizeRpcJsonTransaction } = await import('./lib/wire-tx.mjs');
+  const { transactionsFromRpcDocument, normalizeRpcWireTransaction, normalizeRpcJsonTransaction, normalizeFlatTransaction } = await import('./lib/wire-tx.mjs');
   let entries;
   try {
     ({ transactions: entries } = transactionsFromRpcDocument(document));
   } catch (error) {
-    usageExit(`${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
+    throw new UsageRefusal(`${file}: ${String(error?.message ?? error).slice(0, 160)}`);
   }
   // The encoding is decided by the DOCUMENT, not by a flag: a transaction
   // whose bytes are a base64 string is a wire entry; a transaction whose
@@ -133,25 +138,29 @@ if (kind === 'rpc-response') {
   // made per entry and a mixed document is refused rather than half-read.
   const isWireEntry = (entry) => Array.isArray(entry?.transaction) && typeof entry.transaction[0] === 'string';
   const isJsonEntry = (entry) => Array.isArray(entry?.transaction?.message?.instructions);
+  // A third dialect, measured on step-finance-oss/step-ingestooor (MIT) on
+  // 2026-11-04: the transaction is FLATTENED — `instructions` and `accounts`
+  // sit at the file level, `transaction.message` keeps only the blockhash (or
+  // is absent entirely). 37 of that repo's 156 fixtures hold this shape.
+  const isFlatEntry = (entry) => Array.isArray(entry?.instructions);
   wireMeta.entriesTotal = entries.length;
   const readable = [];
   const entryEncodings = [];
   for (const [index, entry] of entries.entries()) {
     const wire = isWireEntry(entry);
     const json = isJsonEntry(entry);
-    if (!wire && !json) {
-      wireMeta.unreadable += 1;
+    const flat = !wire && !json && isFlatEntry(entry);
+    if (!wire && !json && !flat) {
       wireMeta.reasons['rpc-encoding-unknown'] = (wireMeta.reasons['rpc-encoding-unknown'] ?? 0) + 1;
       continue;
     }
-    if (wire && json) {
-      wireMeta.unreadable += 1;
+    if ((wire && json) || (flat && (wire || json))) {
       wireMeta.reasons['rpc-encoding-ambiguous'] = (wireMeta.reasons['rpc-encoding-ambiguous'] ?? 0) + 1;
       continue;
     }
     try {
-      const normalized = wire ? normalizeRpcWireTransaction(entry) : normalizeRpcJsonTransaction(entry);
-      entryEncodings.push(wire ? 'base64' : 'json');
+      const normalized = wire ? normalizeRpcWireTransaction(entry) : json ? normalizeRpcJsonTransaction(entry) : normalizeFlatTransaction(entry);
+      entryEncodings.push(wire ? 'base64' : json ? 'json' : 'flat');
       if (!wire) {
         // Instructions the chain already parsed carry NO bytes in the
         // document. They are counted by name, never decoded: an empty
@@ -168,8 +177,10 @@ if (kind === 'rpc-response') {
     }
   }
   wireMeta.unreadable = entries.length - readable.length;
-  wireMeta.encoding = readable.some((entry) => entry?.transaction?.message?.instructions?.length
-    && entry.transaction.message.instructions[0]?.programId !== undefined) ? 'json' : 'base64';
+  wireMeta.encoding = entryEncodings.length
+    ? (entryEncodings[0] === 'flat' ? 'flat' : readable.some((entry) => entry?.transaction?.message?.instructions?.length
+      && entry.transaction.message.instructions[0]?.programId !== undefined) ? 'json' : 'base64')
+    : null;
   // The per-transaction payload rows, extracted by the SAME extractor the
   // harvest/sample documents were built with — the wire parser only replaces
   // the chain's pre-parsing, not the decode contract.
@@ -202,7 +213,7 @@ if (kind === 'rpc-response') {
     }
     return rows;
   };
-  document = {
+  const out = {
     transactions: readable.map((normalized, position) => ({
       signature: normalized.signature,
       txErr: normalized.meta?.err ?? null,
@@ -210,25 +221,7 @@ if (kind === 'rpc-response') {
       payloads: rowsOf(normalized),
     })),
   };
-} else {
-  inputFile = harvestPath ?? samplePath;
-  try {
-    document = JSON.parse(await readFile(inputFile, 'utf8'));
-  } catch (error) {
-    usageExit(`cannot read ${inputFile}: ${String(error?.message ?? error).slice(0, 160)}`);
-  }
-}
-if (!Array.isArray(document.transactions)
-    || (!document.transactions.length && kind !== 'rpc-response')) {
-  usageExit(`${inputFile} carries no readable transactions`);
-}
-
-// Payload rows, normalized across the two document shapes:
-//   harvest: transactions[].payloads[] + document.program
-//   sample:  transactions[].payloads[] with per-row .program
-const documentProgram = kind === 'harvest' ? document.program : null;
-if (kind === 'harvest' && typeof documentProgram !== 'string') {
-  usageExit(`${inputFile} is a harvest without a program field`);
+  return { document: out, wireMeta };
 }
 
 const summary = {
@@ -237,6 +230,8 @@ const summary = {
   transactionsWithoutPayloads: 0,
   transactionsUnreadable: 0,
   unreadableReasons: {},
+  fixturesTotal: kind === 'fixtures-dir' ? 0 : undefined,
+  fixturesUnreadable: kind === 'fixtures-dir' ? 0 : undefined,
   payloadsChecked: 0,
   decoded: 0,
   decodeErrors: 0,
@@ -262,17 +257,104 @@ const bumpProgram = (program) => {
   return summary.byProgram[key];
 };
 
-// Wire-ingest provenance, recorded on the report (only for --rpc-response):
+// Wire-ingest provenance, recorded on the report (only for the RPC paths):
 // how many transactions the RPC document carried, how many could not be
 // parsed, and why. A damaged transaction is counted, never dropped.
-if (wireMeta.entriesTotal > 0) {
-  summary.transactionsUnreadable = wireMeta.unreadable;
-  summary.unreadableReasons = wireMeta.reasons;
-  summary.rpcEncoding = wireMeta.encoding;
-  summary.chainParsedInstructions = wireMeta.chainParsed;
+// Wire-ingest provenance, recorded on the report (only for the RPC paths):
+// how many transactions the RPC document carried, how many could not be
+// parsed, and why. A damaged transaction is counted, never dropped.
+function recordWireMeta(wireMeta) {
+  if (wireMeta.entriesTotal > 0) {
+    summary.transactionsUnreadable += wireMeta.unreadable;
+    for (const [reason, count] of Object.entries(wireMeta.reasons)) {
+      summary.unreadableReasons[reason] = (summary.unreadableReasons[reason] ?? 0) + count;
+    }
+    // Single-file reports name THE encoding; sweeps count how many files held
+    // which encoding — a single value would be whichever file ran last.
+    if (wireMeta.encoding && kind !== 'fixtures-dir') summary.rpcEncoding = wireMeta.encoding;
+    if (wireMeta.encoding) {
+      summary.encodingsSeen ??= {};
+      summary.encodingsSeen[wireMeta.encoding] = (summary.encodingsSeen[wireMeta.encoding] ?? 0) + 1;
+    }
+    summary.chainParsedInstructions = (summary.chainParsedInstructions ?? 0) + wireMeta.chainParsed;
+  }
 }
 
 const maxExamples = 5;
+
+/** Decode every payload of one already-built transaction document. */
+async function runDocument(transactions) {
+  for (const transaction of transactions) {
+    if (limit > 0 && summary.transactionsChecked >= limit) break;
+    summary.transactionsChecked += 1;
+    const rows = Array.isArray(transaction.payloads) ? transaction.payloads : [];
+    if (!rows.length) { summary.transactionsWithoutPayloads += 1; continue; }
+    summary.transactionsWithPayloads += 1;
+    if (kind === 'sample' ? transaction.failed === true : transaction.txErr != null) summary.failedOnChain += 1;
+
+    for (const row of rows) {
+      // A json/flat-encoded document carries NO bytes for instructions its
+      // chain parser already `parsed` (the parsed form replaces them). Feeding
+      // the decoder an empty payload would turn a missing document field into
+      // a fake refusal, so those rows are counted and skipped — named in the
+      // report, never silently mixed into the decode denominator.
+      if (!row.dataHex && transaction.encoding !== 'base64') {
+        summary.missingBytes += 1;
+        continue;
+      }
+      const program = row.program;
+      const entry = bumpProgram(program);
+      summary.payloadsChecked += 1;
+      entry.payloads += 1;
+      const verdict = await decodeOne(program, row.dataHex);
+      if (verdict.outcome === 'no-interface') {
+        summary.noInterface += 1;
+        entry.noInterface += 1;
+        summary.noInterfacePrograms[program] = (summary.noInterfacePrograms[program] ?? 0) + 1;
+        continue;
+      }
+      if (verdict.outcome === 'refused') {
+        summary.decodeErrors += 1;
+        entry.decodeErrors += 1;
+        const key = `${program}: ${verdict.reason}`;
+        summary.refusalReasons[key] = (summary.refusalReasons[key] ?? 0) + 1;
+        if (summary.decodeErrorExamples.length < maxExamples) {
+          summary.decodeErrorExamples.push({
+            transaction: transaction.signature ?? null,
+            program,
+            dataHex: String(row.dataHex).slice(0, 80),
+            reason: verdict.reason,
+          });
+        }
+        continue;
+      }
+      // Decoded. Now the byte evidence — the "diff-frei" part.
+      const byteOk = verdict.fullExact || verdict.describedExact;
+      if (!byteOk) {
+        summary.disagreements += 1;
+        entry.disagreements += 1;
+        if (summary.disagreementExamples.length < maxExamples) {
+          summary.disagreementExamples.push({
+            transaction: transaction.signature ?? null,
+            program,
+            name: verdict.name,
+            dataHex: String(row.dataHex).slice(0, 80),
+            fullExact: verdict.fullExact,
+            describedExact: verdict.describedExact,
+          });
+        }
+        continue;
+      }
+      summary.decoded += 1;
+      entry.decoded += 1;
+      if (verdict.fullExact) summary.byteExactFull += 1;
+      else summary.byteExactDescribed += 1;
+      if (verdict.trailing > 0) summary.trailingPayloads += 1;
+      if (Array.isArray(verdict.absent) && verdict.absent.length) summary.shortFormReported += 1;
+    }
+  }
+}
+
 
 /** Decode one payload through the product's own entries and verify the bytes. */
 async function decodeOne(program, hex) {
@@ -328,93 +410,145 @@ async function decodeOne(program, hex) {
   }
 }
 
-for (const transaction of document.transactions) {
-  if (limit > 0 && summary.transactionsChecked >= limit) break;
-  summary.transactionsChecked += 1;
-  const rows = Array.isArray(transaction.payloads) ? transaction.payloads : [];
-  if (!rows.length) { summary.transactionsWithoutPayloads += 1; continue; }
-  summary.transactionsWithPayloads += 1;
-  if (kind === 'sample' ? transaction.failed === true : transaction.txErr != null) summary.failedOnChain += 1;
+// ---- Main flow -------------------------------------------------------------
+//
+// Single-file modes keep the exact copy-paste contract; --fixtures-dir sweeps
+// every *.json of a directory tree through the SAME per-file path and reports
+// one verdict row per file. A file that is not a transaction document is not
+// a crash in a sweep: it is counted (fixturesUnreadable, named reason) and
+// the sweep's totals stay attributable per file.
 
-  for (const row of rows) {
-    // A json-encoded document carries NO bytes for instructions its chain
-    // parser already `parsed` (the parsed form replaces them). Feeding the
-    // decoder an empty payload would turn a missing document field into a
-    // fake refusal, so those rows are counted and skipped — named in the
-    // report, never silently mixed into the decode denominator.
-    if (!row.dataHex && transaction.encoding === 'json') {
-      summary.missingBytes += 1;
-      continue;
-    }
-    const program = kind === 'harvest' ? documentProgram : row.program;
-    const entry = bumpProgram(program);
-    summary.payloadsChecked += 1;
-    entry.payloads += 1;
-    const verdict = await decodeOne(program, row.dataHex);
-    if (verdict.outcome === 'no-interface') {
-      summary.noInterface += 1;
-      entry.noInterface += 1;
-      summary.noInterfacePrograms[program] = (summary.noInterfacePrograms[program] ?? 0) + 1;
-      continue;
-    }
-    if (verdict.outcome === 'refused') {
-      summary.decodeErrors += 1;
-      entry.decodeErrors += 1;
-      const key = `${program}: ${verdict.reason}`;
-      summary.refusalReasons[key] = (summary.refusalReasons[key] ?? 0) + 1;
-      if (summary.decodeErrorExamples.length < maxExamples) {
-        summary.decodeErrorExamples.push({
-          transaction: transaction.signature ?? null,
-          program,
-          dataHex: String(row.dataHex).slice(0, 80),
-          reason: verdict.reason,
-        });
-      }
-      continue;
-    }
-    // Decoded. Now the byte evidence — the "diff-frei" part.
-    const byteOk = verdict.fullExact || verdict.describedExact;
-    if (!byteOk) {
-      summary.disagreements += 1;
-      entry.disagreements += 1;
-      if (summary.disagreementExamples.length < maxExamples) {
-        summary.disagreementExamples.push({
-          transaction: transaction.signature ?? null,
-          program,
-          name: verdict.name,
-          dataHex: String(row.dataHex).slice(0, 80),
-          fullExact: verdict.fullExact,
-          describedExact: verdict.describedExact,
-        });
-      }
-      continue;
-    }
-    summary.decoded += 1;
-    entry.decoded += 1;
-    if (verdict.fullExact) summary.byteExactFull += 1;
-    else summary.byteExactDescribed += 1;
-    if (verdict.trailing > 0) summary.trailingPayloads += 1;
-    if (Array.isArray(verdict.absent) && verdict.absent.length) summary.shortFormReported += 1;
+const perFileRows = [];
+
+if (kind === 'fixtures-dir') {
+  let names;
+  try {
+    names = (await readdir(fixturesDir, { recursive: true })).filter((name) => name.endsWith('.json')).sort();
+  } catch (error) {
+    usageExit(`cannot read fixtures dir ${fixturesDir}: ${String(error?.message ?? error).slice(0, 160)}`);
   }
+  if (!names.length) usageExit(`${fixturesDir} holds no .json fixture files`);
+  for (const name of names) {
+    const file = path.join(fixturesDir, name);
+    let built;
+    try {
+      built = await buildDocumentFromFile(file);
+    } catch (error) {
+      if (error instanceof UsageRefusal) {
+        summary.fixturesTotal += 1;
+        summary.fixturesUnreadable += 1;
+        const reason = /not-an-rpc-response/.test(error.message) ? 'not-an-rpc-response' : error.message.slice(0, 120);
+        perFileRows.push({ file: name, unreadable: 1, reason, transactions: 0, payloadsChecked: 0, decoded: 0, decodeErrors: 0, disagreements: 0, noInterface: 0, missingBytes: 0 });
+        continue;
+      }
+      throw error;
+    }
+    const before = {
+      transactions: summary.transactionsChecked,
+      payloadsChecked: summary.payloadsChecked,
+      decoded: summary.decoded,
+      decodeErrors: summary.decodeErrors,
+      disagreements: summary.disagreements,
+      noInterface: summary.noInterface,
+      missingBytes: summary.missingBytes,
+      unreadable: summary.transactionsUnreadable,
+    };
+    recordWireMeta(built.wireMeta);
+    inputTransactionCount += built.document.transactions.length;
+    await runDocument(built.document.transactions);
+    const row = {
+      file: name,
+      encoding: built.wireMeta.encoding,
+      transactions: summary.transactionsChecked - before.transactions,
+      unreadable: summary.transactionsUnreadable - before.unreadable,
+      chainParsed: built.wireMeta.chainParsed,
+      payloadsChecked: summary.payloadsChecked - before.payloadsChecked,
+      decoded: summary.decoded - before.decoded,
+      decodeErrors: summary.decodeErrors - before.decodeErrors,
+      disagreements: summary.disagreements - before.disagreements,
+      noInterface: summary.noInterface - before.noInterface,
+      missingBytes: summary.missingBytes - before.missingBytes,
+    };
+    perFileRows.push(row);
+    summary.fixturesTotal += 1;
+  }
+} else if (kind === 'harvest' || kind === 'sample') {
+  // The harvest/sample documents are sememe's OWN shapes (a program at
+  // document level / per-row programs) — read verbatim, exactly as before
+  // the sweep existed. Only the RPC paths go through the normalizer.
+  const sourceFile = harvestPath ?? samplePath;
+  let document;
+  try {
+    document = JSON.parse(await readFile(sourceFile, 'utf8'));
+  } catch (error) {
+    usageExit(`cannot read ${sourceFile}: ${String(error?.message ?? error).slice(0, 160)}`);
+  }
+  if (!Array.isArray(document.transactions) || !document.transactions.length) {
+    usageExit(`${sourceFile} carries no readable transactions`);
+  }
+  if (kind === 'harvest' && typeof document.program !== 'string') {
+    usageExit(`${sourceFile} is a harvest without a program field`);
+  }
+  inputProgram = kind === 'harvest' ? document.program : null;
+  inputTransactionCount = document.transactions.length;
+  // The harvest path names its program at document level; the per-row program
+  // is filled in here so runDocument stays shape-agnostic.
+  if (kind === 'harvest') {
+    for (const transaction of document.transactions) {
+      for (const row of transaction.payloads ?? []) row.program = inputProgram;
+    }
+  }
+  await runDocument(document.transactions);
+} else {
+  const sourceFile = rpcResponsePath;
+  let built;
+  try {
+    built = await buildDocumentFromFile(sourceFile);
+  } catch (error) {
+    if (error instanceof UsageRefusal) usageExit(error.message);
+    throw error;
+  }
+  recordWireMeta(built.wireMeta);
+  inputTransactionCount = built.document.transactions.length;
+  await runDocument(built.document.transactions);
 }
 
 summary.byteExactRate = summary.decoded > 0
   ? Number((100 * (summary.byteExactFull + summary.byteExactDescribed) / summary.decoded).toFixed(1))
   : null;
 
-const failed = summary.decodeErrors > 0 || summary.disagreements > 0
-  || summary.transactionsUnreadable > 0
-  || (summary.payloadsChecked > 0 && summary.noInterface === summary.payloadsChecked)
-  || summary.payloadsChecked === 0;
+// Sweep vs single-file failure semantics, measured and stated rather than
+// inherited: the SINGLE-FILE contract (what a stranger copies from the
+// README) stays byte-identical — any refusal exits 1. A SWEEP over a foreign
+// repo's whole fixture set answers a different question: can the instrument
+// read and give a verdict to every fixture, and does every payload it DECODED
+// reproduce its bytes? Refusals (unknown discriminator, unwitnessed short
+// form, no interface) are verdicts with reasons — the acquisition gaps this
+// run quantifies — and are pinned per file in the report and per number in
+// the committed research artifact, so a NEW refusal still goes red.
+const failed = kind === 'fixtures-dir'
+  ? summary.disagreements > 0
+    || summary.transactionsUnreadable > 0
+    || summary.payloadsChecked === 0
+  : summary.decodeErrors > 0 || summary.disagreements > 0
+    || summary.transactionsUnreadable > 0
+    || (summary.payloadsChecked > 0 && summary.noInterface === summary.payloadsChecked)
+    || summary.payloadsChecked === 0;
 const report = {
   tool: 'stranger-decode',
+  ...(kind === 'fixtures-dir' ? {
+    fixturesDir,
+    fixturesTotal: summary.fixturesTotal,
+    fixturesUnreadable: summary.fixturesUnreadable,
+    perFile: perFileRows,
+  } : {}),
   generatedAt: new Date().toISOString(),
   status: failed ? 'fail' : 'pass',
   input: {
-    file: inputFile,
+    file: kind === 'fixtures-dir' ? fixturesDir : (harvestPath ?? samplePath ?? rpcResponsePath),
     kind,
-    program: documentProgram,
-    transactionsInDocument: document.transactions.length,
+    ...(inputProgram !== null ? { program: inputProgram } : {}),
+    transactionsInDocument: inputTransactionCount,
   },
   store,
   absentPolicy,

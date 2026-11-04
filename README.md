@@ -60,15 +60,26 @@ Measured 2026-11-04 on `test/fixtures/foreign-archive-wire-4blocks.json` (real m
 
 ### The shape a foreign repository's own test fixtures hold (`encoding:"json"`)
 
-The paragraph above measured what an RPC *returns by default*. But foreign repositories that keep transaction fixtures do not keep that shape: they keep what the chain's parser already read — `encoding:"json"`. Measured 2026-11-04 on the 122 transaction fixtures of [step-finance-oss/step-ingestooor](https://github.com/step-finance-oss/step-ingestooor) (MIT) and the fixture of [CryptGodSon/Solana-Explorer](https://github.com/CryptGodSon/Solana-Explorer) (MIT): instruction `data` as base58, every instruction carrying `programId` spelled out (1,541/1,541; zero `programIdIndex`), address-table keys already expanded inside `message.accountKeys`, and — the part that changes the contract — **932 of 1,541 instructions already `parsed` by the chain with no bytes left in the document at all**.
+The paragraph above measured what an RPC *returns by default*. But foreign repositories that keep transaction fixtures do not keep that shape: they keep what the chain's parser already read — `encoding:"json"` — and some hold a **flattened dialect** where `instructions` and `accounts` sit at the file level (37 of the 156 fixtures in [step-finance-oss/step-ingestooor](https://github.com/step-finance-oss/step-ingestooor)). Measured on that entire 156-fixture set and the fixture of [CryptGodSon/Solana-Explorer](https://github.com/CryptGodSon/Solana-Explorer) (both MIT): instruction `data` as base58, every instruction carrying `programId` spelled out, address-table keys expanded, and **1,193 instructions already `parsed` by the chain with no bytes left in the document at all**.
 
-Before this, `--rpc-response` read only the base64 shape: pointed at a foreign repository's own fixture it exited 2 (`not-an-rpc-response`). The integration could not read a single artifact a foreign repository actually holds — because the one shape it accepted was the shape sememe's own harvester produces. The same command now reads both:
+Before this, `--rpc-response` read only the base64 shape: pointed at a foreign repository's own fixture it exited 2 (`not-an-rpc-response`). The integration could not read a single artifact a foreign repository actually holds — because the one shape it accepted was the shape sememe's own harvester produces. The same command now reads both shapes, plus the flattened dialect:
 
 ```bash
 node tools/stranger-decode.mjs \
   --store test/fixtures/traffic-sample-store-2026-11-04 \
   --rpc-response their-own-getTransaction-fixture.json
 ```
+
+Or sweep a whole directory tree of fixtures with one command:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --fixtures-dir path/to/foreign/crates/parsers/tests \
+  --out report.json
+```
+
+Measured 2026-11-04 across all 156 fixtures of `step-finance-oss/step-ingestooor` (commit 001cf39, MIT; research artifact `research/step-ingestooor-full-sweep-2026-11-04.json`): **156 files (119 standard getTransaction, 37 flattened dialect), 806 payload rows, 493 decoded byte-exactly (100%), 0 unreadable transactions, 0 disagreements, 0 network attempts**. The 306 payloads the store has no interface for are quantified by program across 70 gap programs (top: Raydium Concentrated Liquidity `L2TExM…` 42, Jupiter DCA `DCA265…` 20, Jito Tip `j1o2qR…` 14, Flash Trade `FLASH6…` 12). Seven payloads refuse with named reasons (3 stale interface, 4 unwitnessed short forms). Pinned in `test/step-ingestooor-full-sweep.test.mjs` (5 tests, red on pre-tree, four mutations each individually red).
 
 Measured on the seven committed fixtures (six from step-ingestooor, one from Solana-Explorer, verbatim under `test/fixtures/foreign-repo-json-2026-11-04/` with both MIT licenses): 7 transactions, 160 payload rows of which 56 carry bytes — 48 decoded byte-exactly (100%), 8 named `noInterface` (programs outside the store), and **104 chain-parsed rows counted as `missingBytes`, never fed to the decoder as empty payloads**: a chain-parsed instruction has no bytes to decode, and turning that missing document field into a decode refusal would be a lie about what was measured. Zero disagreements, zero decode errors, zero network attempts. Pinned in `test/foreign-repo-json-ingest.test.mjs` (red against the pre-fix tree; four mutations of the new code each individually red).
 

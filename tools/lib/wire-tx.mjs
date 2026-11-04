@@ -510,6 +510,79 @@ export function normalizeRpcWireTransaction(entry) {
  * @param {object} document
  * @returns {{transactions: object[], source: string}}
  */
+/**
+ * Normalize ONE transaction of the FLATTENED dialect — measured on
+ * step-finance-oss/step-ingestooor (MIT) on 2026-11-04: 37 of that repo's
+ * 156 fixture files hold the transaction FLATTENED, i.e. `instructions` and
+ * `accounts` sit at the FILE level and `transaction.message` keeps only the
+ * blockhash (or is absent entirely). The chain's own parser produced these
+ * files; a foreign repo stores what IT received.
+ *
+ * The dialect carries the same information as the standard one:
+ *   - instruction `data` as base58, `programId` spelled out,
+ *   - `accounts` at file level: the account list (pubkey/signer/writable/
+ *     source), the same list the standard dialect keeps in
+ *     `message.accountKeys`,
+ *   - inner instructions under `meta.innerInstructions`.
+ *
+ * What this dialect does NOT carry: the `message` shell, the address-table
+ * lookups, and the signatures (only `signature` at file level). So no
+ * signature claim is made here either — the same limit as the json path.
+ *
+ * The account list is what the payload extractor resolves program ids and
+ * account indexes against, so it is rebuilt from the file-level `accounts`
+ * into the standard `message.accountKeys` shape. Instructions the chain
+ * already parsed carry no `data` field: they are counted by name
+ * (`chainParsed`), never decoded as empty payloads.
+ *
+ * @param {object} entry one flattened transaction document
+ * @returns {{transaction: object, meta: object, signature: string|null,
+ *            version: string|number, chainParsed: number}}
+ */
+export function normalizeFlatTransaction(entry) {
+  const instructions = entry?.instructions;
+  if (!Array.isArray(instructions)) {
+    refuse('flat-not-a-transaction', 'the entry carries no instructions (is this a flattened transaction document?)');
+  }
+  const rawAccounts = entry.accounts;
+  if (rawAccounts !== undefined && !Array.isArray(rawAccounts)) {
+    refuse('flat-accounts-malformed', 'accounts is present but not an array');
+  }
+  const accountKeys = (rawAccounts ?? []).map((account) => {
+    if (typeof account === 'string') return account;
+    if (account && typeof account === 'object' && typeof account.pubkey === 'string') return account.pubkey;
+    return null;
+  }).filter(Boolean);
+  const message = entry?.transaction?.message ?? {};
+  let chainParsed = 0;
+  const countParsed = (list) => {
+    for (const instruction of list ?? []) {
+      if (instruction && typeof instruction === 'object' && !('data' in instruction)) chainParsed += 1;
+    }
+  };
+  countParsed(instructions);
+  for (const group of entry?.meta?.innerInstructions ?? []) countParsed(group?.instructions);
+  return {
+    transaction: {
+      message: {
+        accountKeys,
+        header: message.header ?? null,
+        instructions,
+        recentBlockhash: message.recentBlockhash ?? entry?.recentBlockhash ?? null,
+        ...(Array.isArray(message.addressTableLookups) ? { addressTableLookups: message.addressTableLookups } : {}),
+      },
+    },
+    meta: {
+      ...(entry?.meta ?? {}),
+      innerInstructions: entry?.meta?.innerInstructions ?? [],
+      loadedAddresses: { writable: [], readonly: [] },
+    },
+    signature: typeof entry?.signature === 'string' ? entry.signature : null,
+    version: entry?.version ?? 'legacy',
+    chainParsed,
+  };
+}
+
 export function transactionsFromRpcDocument(document) {
   const result = document?.result;
   if (Array.isArray(result?.transactions)) return { transactions: result.transactions, source: 'getBlock' };
@@ -522,6 +595,13 @@ export function transactionsFromRpcDocument(document) {
   // accepted; the per-entry encoding detection decides which parser runs.
   if (document?.transaction?.message || Array.isArray(document?.transaction)) {
     return { transactions: [document], source: 'getTransaction-result' };
+  }
+  // The FLATTENED dialect (measured on step-finance-oss/step-ingestooor, MIT,
+  // 2026-11-04): the transaction's instructions and its account list sit at
+  // the file level, and `transaction.message` keeps only the blockhash (or is
+  // absent). A foreign repo stores what the chain's parser handed it.
+  if (Array.isArray(document?.instructions)) {
+    return { transactions: [document], source: 'flattened-transaction' };
   }
   if (Array.isArray(document?.transactions)) return { transactions: document.transactions, source: 'array' };
   if (Array.isArray(document)) return { transactions: document, source: 'array' };
