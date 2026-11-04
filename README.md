@@ -4,6 +4,43 @@ A local meaning layer for Solana bytes. `sememe pull <program>` fetches and veri
 
 **Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus five programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget) and Raydium AMM v4, all five with wire tables DERIVED from pinned upstream Rust — and all 12,572 unbiased real-mainnet payloads now have an interface to decode against, lifting coverage from 55.5% to 98.6% strict / 100% verified (the last strict refusal, Token-2022's token-metadata fallback, decodes since 2026-11-03) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
 
+## Quickstart: the copy-paste 1,000-transaction check (2026-11-04)
+
+The whole product, from a fresh clone, in one command a stranger can paste:
+
+```bash
+git clone https://github.com/auroraxo/sememe && cd sememe
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --harvest test/fixtures/harvest-whirlpool-2026-10-28.json \
+  --limit 1000
+```
+
+Output (exit 0 on pass, 1 on disagreement, 2 on usage/IO):
+
+```json
+{"status":"pass","transactionsChecked":1000,"payloadsChecked":1089,"decoded":1089,"decodeErrors":0,"disagreements":0,"noInterface":0,"byteExactRate":100,"programs":1,"networkAttempts":0}
+```
+
+What that command proves, per payload, through the product's own entry points (`decodeUnionPayload`, plus the native/token/raydium tables):
+
+1. **The payload decodes** (or is refused with a named reason — a refusal is a non-zero exit, not a silent skip).
+2. **Re-encoding the decoded value reproduces the bytes**: byte-exact for the whole payload, or for the described prefix when the wire carries trailing bytes the interface does not describe (`roundTripByteExact` / `describedRoundTripByteExact`). A payload that can do neither is a **disagreement** and fails the run.
+3. **Zero network calls were attempted** — enforced by `tools/lib/network-guard.mjs`, which is loaded before anything else and recorded in the report's `networkAttempts: 0`. Offline is a property of the run, not of the prose.
+
+The same command against the multi-program traffic sample (15 programs, `pump.fun`/PumpSwap short forms included) is:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --sample test/fixtures/traffic-sample-2026-11-04.json \
+  --limit 1000 --absent verified
+```
+
+Measured on that sample (2026-11-04): 1,000 checked transactions, 6,337 payloads, 6,337 decoded, 0 decode errors, 0 disagreements, 0 no-interface, 100% byte-exact across 15 programs, 0 network attempts. `--absent error` (the default) refuses the witnessed short forms on purpose; `verified` applies only forms a chain witness covers, `report` names the absent fields without evidence — the same switch the product CLI exposes.
+
+The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — no third party has executed this yet (the `jup-ag/rfq-webhook-toolkit#96` signal had 0 comments when this was measured, 2026-11-04), so the first external run remains the open gate. Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic).
+
 ## The idea
 
 "What do these bytes mean?" is currently either a paid cloud feature or a decoder rebuilt inside every repository. Vendored IDL files are snapshots without provenance, a fingerprint, or a freshness check.
