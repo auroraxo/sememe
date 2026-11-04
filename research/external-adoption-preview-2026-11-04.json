@@ -1,0 +1,818 @@
+{
+ "tool": "preview-external-adoption",
+ "generatedAt": "2026-11-04T20:22:43.822Z",
+ "source": {
+  "sweep": "unrepresented-external-sweep-2026-11-04.json",
+  "baseline": "step-ingestooor-full-sweep-classified-2026-11-04.json",
+  "fixtures": "/home/aurora/github_repos/step-ingestooor/crates/parsers/tests"
+ },
+ "licenseGate": {
+  "repos": [
+   {
+    "repo": "bitquery/solana-idl-lib",
+    "spdxId": null,
+    "state": "unlicensed"
+   },
+   {
+    "repo": "Bonasa-Tech/manifest",
+    "spdxId": "GPL-3.0",
+    "state": "copyleft"
+   }
+  ],
+  "commitAllowed": false
+ },
+ "committedStoreReceiptsBefore": 76,
+ "committedStoreReceiptsAfter": 76,
+ "committedStoreModified": false,
+ "storeCopy": "/tmp/sememe-external-adoption-preview",
+ "rows": [
+  {
+   "program": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+   "payloads": 1,
+   "repo": "bitquery/solana-idl-lib",
+   "path": "humidifi/humidifi.json",
+   "sha256": "65d738afd9f7997556e4d9e73c419e3987c43ce43de94a50aa3be469b4b888da",
+   "license": {
+    "repo": "bitquery/solana-idl-lib",
+    "spdxId": null
+   },
+   "origin": "bitquery/solana-idl-lib@humidifi/humidifi.json",
+   "decodedBefore": 0,
+   "decodedAfter": 0,
+   "refusalAfter": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp: decode refused by the only stored source (published (adopted, 9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp.json)): unknown instruction discriminator f6dc67bb46c"
+  },
+  {
+   "program": "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+   "payloads": 4,
+   "repo": "bitquery/solana-idl-lib",
+   "path": "solfi/solfi.json",
+   "sha256": "26c3f5c229880558ae1df8408b1680adb8d1128550c8ce3243dfd3668eae38fc",
+   "license": {
+    "repo": "bitquery/solana-idl-lib",
+    "spdxId": null
+   },
+   "origin": "bitquery/solana-idl-lib@solfi/solfi.json",
+   "decodedBefore": 0,
+   "decodedAfter": 4,
+   "refusalAfter": null
+  },
+  {
+   "program": "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL",
+   "payloads": 3,
+   "repo": "Bonasa-Tech/manifest",
+   "path": "client/idl/wrapper.json",
+   "sha256": "e5f880f27b42f85aa8e36acc5246f31418d94acb9c449ecd676ecbc975966f41",
+   "license": {
+    "repo": "Bonasa-Tech/manifest",
+    "spdxId": "GPL-3.0"
+   },
+   "origin": "Bonasa-Tech/manifest@client/idl/wrapper.json",
+   "decodedBefore": 0,
+   "decodedAfter": 3,
+   "refusalAfter": null
+  },
+  {
+   "program": "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY",
+   "payloads": 1,
+   "repo": "bitquery/solana-idl-lib",
+   "path": "zerofi/zerofi.json",
+   "sha256": "2364fc17af8ec7b9b4bac8ba095f3d177b9957bf71b0ee6e9434760f6f484250",
+   "license": {
+    "repo": "bitquery/solana-idl-lib",
+    "spdxId": null
+   },
+   "origin": "bitquery/solana-idl-lib@zerofi/zerofi.json",
+   "decodedBefore": 0,
+   "decodedAfter": 1,
+   "refusalAfter": null
+  }
+ ],
+ "summary": {
+  "moved": [
+   "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+   "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+   "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL",
+   "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY"
+  ],
+  "leaked": [],
+  "decodedDelta": 8,
+  "gapDelta": -9,
+  "verdict": "measured",
+  "decoded": 732,
+  "noInterface": 56,
+  "decodeErrors": 18,
+  "disagreements": 0,
+  "byteExactRate": 100,
+  "movedRows": [
+   "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+   "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+   "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL",
+   "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY"
+  ],
+  "movedRowsUnadopted": []
+ },
+ "previewSummary": {
+  "transactionsChecked": 156,
+  "transactionsWithPayloads": 156,
+  "transactionsWithoutPayloads": 0,
+  "transactionsUnreadable": 0,
+  "unreadableReasons": {},
+  "fixturesTotal": 156,
+  "fixturesUnreadable": 0,
+  "payloadsChecked": 806,
+  "decoded": 732,
+  "decodeErrors": 18,
+  "noInterface": 56,
+  "disagreements": 0,
+  "byteExactFull": 720,
+  "byteExactDescribed": 12,
+  "trailingPayloads": 12,
+  "shortFormReported": 0,
+  "missingBytes": 1193,
+  "failedOnChain": 0,
+  "byteExactRate": 100,
+  "refusalReasons": {
+   "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp: decode refused by the only stored source (published (adopted, 9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp.json)): unknown instruction discriminator f6dc67bb46c": 1,
+   "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn: both stored sources refuse this payload — anchor @slot 465308534: unknown instruction discriminator c27b28f725ed7777 (196 known, e.g. e12d954274a0e45d, 30d329e9": 1,
+   "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn: both stored sources refuse this payload — anchor @slot 465308534: unknown instruction discriminator 85368d1d537082c5 (196 known, e.g. e12d954274a0e45d, 30d329e9": 1,
+   "PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu: both stored sources refuse this payload — anchor @slot 465308534: RefreshAssetsUnderManagementParams: malformed struct field; published (adopted, jup_perps.json": 1,
+   "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH: decode refused by the only stored source (metadata @slot 465105042): unknown instruction discriminator b712469c946da122 (3 known, e.g. 033a28ebf7ee4d7f, ef10c88": 1,
+   "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH: decode refused by the only stored source (metadata @slot 465105042): unknown instruction discriminator f223c68952e1f2b6 (3 known, e.g. 033a28ebf7ee4d7f, ef10c88": 1,
+   "6m2CDdhRgxpH4WjvdzxAYbGxwdGUz5MziiL5jek2kBma: decode refused by the only stored source (anchor @slot 465308534): unknown instruction discriminator ad834e2696a57b0f (14 known, e.g. 3ec6d6c1d59f6cd2, 5301f57d": 3,
+   "6m2CDdhRgxpH4WjvdzxAYbGxwdGUz5MziiL5jek2kBma: decode refused by the only stored source (anchor @slot 465308534): unknown instruction discriminator 414b3f4ceb5b5b88 (14 known, e.g. 3ec6d6c1d59f6cd2, 5301f57d": 1,
+   "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA: both stored sources refuse this payload — anchor @slot 465104876: truncated input: need 1 byte(s) for bool at offset 24, only 0 left; pump-fun-pump-public-docs ": 2,
+   "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA: both stored sources refuse this payload — anchor @slot 465104876: truncated input: need 1 byte(s) for bool at offset 368, only 0 left; pump-fun-pump-public-docs": 1,
+   "REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3: both stored sources refuse this payload — anchor @slot 465308538: unknown instruction discriminator e5572ea2159de772 (9 known, e.g. 457ed725143c49eb, 5c1900f3e6": 1,
+   "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT: decode refused by the only stored source (first-party (adopted, step-finance-oss-step-ingestooor-001cf39-titan.json)): Venue: unknown variant index 40 (type has": 1,
+   "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG: decode refused by the only stored source (anchor @slot 465104912): unknown event discriminator 1b3c15d58aaabb93 (23 known, e.g. c6b6b734610c3138, baf44bfbbc0d19": 1,
+   "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA: both stored sources refuse this payload — anchor @slot 465104876: truncated input: need 8 byte(s) for 8-byte integer at offset 401, only 0 left; pump-fun-pump-p": 1,
+   "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ: decode refused by the only stored source (anchor @slot 465308538): truncated input: need 1 byte(s) for bool at offset 33, only 0 left": 1
+  },
+  "byProgram": {
+   "ComputeBudget111111111111111111111111111111": {
+    "payloads": 271,
+    "decoded": 271,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "CarrotwivhMpDnm27EHmRLeQ683Z1PufuqEmBZvD282s": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95": {
+    "payloads": 42,
+    "decoded": 42,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "7Mc3vSdRWoThArpni6t5W4XjvQf4BuMny1uC8b6VBn48": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "tuna4uSQZncNeeiAMKbstuxA9CUkHH6HmC64wgmnogD": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH": {
+    "payloads": 6,
+    "decoded": 6,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 1,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo": {
+    "payloads": 26,
+    "decoded": 26,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc": {
+    "payloads": 39,
+    "decoded": 39,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn": {
+    "payloads": 12,
+    "decoded": 10,
+    "decodeErrors": 2,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "Ed25519SigVerify111111111111111111111111111": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "fragnAis7Bp6FTsMoa6YcH8UffhEw43Ph79qAiK3iF3": {
+    "payloads": 11,
+    "decoded": 11,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "HubbLeXBb7qyLHt3x7gvYaRrxQmmgExb7fCJgDqFuB6T": {
+    "payloads": 10,
+    "decoded": 10,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "DoVEsk76QybCEHQGzkvYPWLQu9gzNoZZZt3TPiL597e": {
+    "payloads": 6,
+    "decoded": 6,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu": {
+    "payloads": 5,
+    "decoded": 4,
+    "decodeErrors": 1,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "HFn8GnPADiny6XqUoWE8uRPPxb29ikn4yTuPa9MF2fWJ": {
+    "payloads": 6,
+    "decoded": 6,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M": {
+    "payloads": 20,
+    "decoded": 20,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4": {
+    "payloads": 55,
+    "decoded": 55,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8": {
+    "payloads": 8,
+    "decoded": 8,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "obriQD1zbpyLz95G5n7nJe6a4DPjpFwa5XYPoNm113y": {
+    "payloads": 3,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 3
+   },
+   "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe": {
+    "payloads": 4,
+    "decoded": 4,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "jupoNjAxXgZ4rjzxzPMP4oxduvQsQtZzyknqvzYNrNu": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X": {
+    "payloads": 14,
+    "decoded": 14,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "2wT8Yq49kHgDzXuPxZSaeLaH1qbmGXtEyPy64bL7aD3c": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "SLendK7ySfcEzyaFqy93gDnD3RtrpXJcnRwb6zFHJSh": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB": {
+    "payloads": 8,
+    "decoded": 8,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi": {
+    "payloads": 17,
+    "decoded": 17,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "HyaB3W9q6XdA5xwpU4XnSZV94htfmbmqJXZcEbRaJutt": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "VALaaymxQh2mNy2trH9jUqHT1mTow76wpTcGmSWSwJe": {
+    "payloads": 11,
+    "decoded": 11,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "voTpe3tHQ7AjQHMapgSue2HJFAh2cGsdokqN3XqmVSj": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD": {
+    "payloads": 42,
+    "decoded": 42,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "FarmsPZpWu9i7Kky8tPN37rs2TpmMrAZrC7S7vJa91Hr": {
+    "payloads": 12,
+    "decoded": 12,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "6LtLpnUFNByNXLyCoK9wA2MykKAmQNZKBdY8s47dehDc": {
+    "payloads": 6,
+    "decoded": 6,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "KvauGMspG5k6rtzrqqn7WNn3oZdyKqLKwK2XWQ8FLjd": {
+    "payloads": 3,
+    "decoded": 3,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK": {
+    "payloads": 15,
+    "decoded": 15,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "MP1zz2HUAzL5P2uLR5nKaDSnxofh8VTZyk26NCewWzk": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "FL3X2pRsQ9zHENpZSKDRREtccwJuei8yg9fwDu9UN69Q": {
+    "payloads": 7,
+    "decoded": 7,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 2,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL": {
+    "payloads": 3,
+    "decoded": 3,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms": {
+    "payloads": 3,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 3
+   },
+   "GDDMwNyyx8uB6zrqwBFHjLLG3TBYk2F8Az4yrQC5RzMp": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "MFv2hWf31Z9kbCa1snEPYctwafyhdvnV7FZnsebVacA": {
+    "payloads": 5,
+    "decoded": 5,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "SMPLecH534NA9acpos4G6x7uf3LWbCAwZQE9e8ZekMu": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "SQDS4ep65T869zMMBKyuUq6aD6EgTu8psMjkvj52pCf": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "6m2CDdhRgxpH4WjvdzxAYbGxwdGUz5MziiL5jek2kBma": {
+    "payloads": 4,
+    "decoded": 0,
+    "decodeErrors": 4,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "4pP8eDKACuV7T2rbFPE8CHxGKDYAzSdRsdMsGvz2k4oc": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "FarmuwXPWXvefWUeqFAa5w6rifLkq5X6E8bimYvrhCB1": {
+    "payloads": 4,
+    "decoded": 4,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "EHBN9YKtMmrZhj8JZqyBQRGqyyeHw5xUB1Q5eAHszuMt": {
+    "payloads": 10,
+    "decoded": 10,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "NXFiKimQN3QSL3CDhCXddyVmLfrai8HK36bHKaAzK7g": {
+    "payloads": 4,
+    "decoded": 4,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy": {
+    "payloads": 4,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 4
+   },
+   "sSo1iU21jBrU9VaJ8PJib1MtorefUV4fzC9GURa2KNn": {
+    "payloads": 3,
+    "decoded": 3,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb": {
+    "payloads": 6,
+    "decoded": 6,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "AxiomxSitiyXyPjKgJ9XSrdhsydtZsskZTEDam3PxKcC": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA": {
+    "payloads": 4,
+    "decoded": 0,
+    "decodeErrors": 4,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "FarmqiPv5eAj3j1GMdMCMUGXqPUvmquZtMy86QH6rzhG": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "DnqJ15nYEdFYr6ywvvVWfYLdUTb1nqecECCSYmyWiJe9": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH": {
+    "payloads": 5,
+    "decoded": 5,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "SMANK4F5osjfVpKFH5LPzE6HPpbzSPu5iHPBhuor5xU": {
+    "payloads": 5,
+    "decoded": 5,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ": {
+    "payloads": 5,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 5
+   },
+   "SSwapUtytfBdBn1b9NUGG6foMVPtcWgpRU32HToDUZr": {
+    "payloads": 3,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 3
+   },
+   "2TQ4a9igqmz91BtHjnAk5hk7JjVuRwyQBsQfrGGpcXYK": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "3s1rAymURnacreXreMy718GfqW6kygQsLNka1xDyW8pC": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "endoLNCKTqDn8gSVnN2hDdpgACUPWHZTwoYnnMybpAT": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "Stake11111111111111111111111111111111111111": {
+    "payloads": 3,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 3
+   },
+   "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo": {
+    "payloads": 10,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 10
+   },
+   "3JmCcXAjmBpFzHHuUpgJFfTQEQnAR7K1erNLtWV1g7d9": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE": {
+    "payloads": 2,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 2
+   },
+   "SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 1
+   },
+   "RopsJ74nrtcsk9iND8CFFNjn5mxf1tFzF3RhMPJ3CdV": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "SsubM7pGA83VRnCodXVrxU2GZNBQzBYgzPUYBssCwU1": {
+    "payloads": 2,
+    "decoded": 2,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3": {
+    "payloads": 2,
+    "decoded": 1,
+    "decodeErrors": 1,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT": {
+    "payloads": 4,
+    "decoded": 3,
+    "decodeErrors": 1,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "fUSioN9YKKSa3CUC2YUc4tPkHJ5Y6XW1yz8y6F7qWz9": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG": {
+    "payloads": 3,
+    "decoded": 2,
+    "decodeErrors": 1,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ": {
+    "payloads": 1,
+    "decoded": 0,
+    "decodeErrors": 1,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "swapFpHZwjELNnjvThjajtiVmkz3yPQEHjLtka2fwHW": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "vo1tWgqZMjG61Z2T9qUaMYKqZ75CYzMuaZ2LZP1n7HV": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   },
+   "Stk5NCWomVN3itaFjLu382u9ibb5jMSHEsh6CuhaGjB": {
+    "payloads": 1,
+    "decoded": 1,
+    "decodeErrors": 0,
+    "disagreements": 0,
+    "noInterface": 0
+   }
+  },
+  "decodeErrorExamples": [
+   {
+    "transaction": "627zjqXdMpkogJFCxhcnVTtFCUHWpkAWXoMQPCwQKWnpCJcAzqeg5kx29p8cxmTKHAhXorxEjAVF8Rc1xryyyT7B",
+    "program": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+    "dataHex": "f6dc67bb46c7f073d3fc2effe3baeac339ff2dffe0bae9c33d",
+    "reason": "decode refused by the only stored source (published (adopted, 9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp.json)): unknown instruction discriminator f6dc67bb46c"
+   },
+   {
+    "transaction": "5mpk4XBaCUgQA3ua3i86N48MqxUsJr6mbcipAT2eBsZiWFsW4oJ8X7Kh9WV7rmvgntH8iGQSbiP6JG7rSWCqfuPr",
+    "program": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+    "dataHex": "c27b28f725ed7777",
+    "reason": "both stored sources refuse this payload — anchor @slot 465308534: unknown instruction discriminator c27b28f725ed7777 (196 known, e.g. e12d954274a0e45d, 30d329e9"
+   },
+   {
+    "transaction": "2AcSvRG5D681hE61gcnsHXNeXVj1i5m8pqeauoyaVmRN13P1GRWMQ68SXn4xZfPrRnr46qSJFZWcxH6J4UCoTZ31",
+    "program": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+    "dataHex": "85368d1d537082c5",
+    "reason": "both stored sources refuse this payload — anchor @slot 465308534: unknown instruction discriminator 85368d1d537082c5 (196 known, e.g. e12d954274a0e45d, 30d329e9"
+   },
+   {
+    "transaction": "28yJ2Pk9Z3ov71cy5iqnR4oZjkEyRgLk3ehKGFzhgt1kKe4kFUyHzsDGL6SdZana9TgwvGmUrcwBLAPJ4AxLopNc",
+    "program": "PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu",
+    "dataHex": "a200d737e10fb900",
+    "reason": "both stored sources refuse this payload — anchor @slot 465308534: RefreshAssetsUnderManagementParams: malformed struct field; published (adopted, jup_perps.json"
+   },
+   {
+    "transaction": "2rAz9F5s5FsvpXSWdLCXVzGX6ZUEs8gRxmSx81ugvNgyg8bgwZnGaoW3pf2b65AiYqZNDSJXPz4qyDBfQ4GR6oWQ",
+    "program": "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+    "dataHex": "b712469c946da12200000b085f010000000001",
+    "reason": "decode refused by the only stored source (metadata @slot 465105042): unknown instruction discriminator b712469c946da122 (3 known, e.g. 033a28ebf7ee4d7f, ef10c88"
+   }
+  ],
+  "disagreementExamples": [],
+  "noInterfacePrograms": {
+   "7Mc3vSdRWoThArpni6t5W4XjvQf4BuMny1uC8b6VBn48": 2,
+   "Ed25519SigVerify111111111111111111111111111": 1,
+   "obriQD1zbpyLz95G5n7nJe6a4DPjpFwa5XYPoNm113y": 3,
+   "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP": 2,
+   "HyaB3W9q6XdA5xwpU4XnSZV94htfmbmqJXZcEbRaJutt": 2,
+   "MP1zz2HUAzL5P2uLR5nKaDSnxofh8VTZyk26NCewWzk": 1,
+   "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms": 3,
+   "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV": 1,
+   "4pP8eDKACuV7T2rbFPE8CHxGKDYAzSdRsdMsGvz2k4oc": 1,
+   "SPoo1Ku8WFXoNDMHPsrGSTSG1Y47rzgn41SLUNakuHy": 4,
+   "AxiomxSitiyXyPjKgJ9XSrdhsydtZsskZTEDam3PxKcC": 1,
+   "FarmqiPv5eAj3j1GMdMCMUGXqPUvmquZtMy86QH6rzhG": 2,
+   "EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q": 2,
+   "DnqJ15nYEdFYr6ywvvVWfYLdUTb1nqecECCSYmyWiJe9": 1,
+   "SSwpkEEcbUqx4vtoEByFjSkhKdCT862DNVb52nZg1UZ": 5,
+   "SSwapUtytfBdBn1b9NUGG6foMVPtcWgpRU32HToDUZr": 3,
+   "2TQ4a9igqmz91BtHjnAk5hk7JjVuRwyQBsQfrGGpcXYK": 2,
+   "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY": 2,
+   "3s1rAymURnacreXreMy718GfqW6kygQsLNka1xDyW8pC": 1,
+   "Stake11111111111111111111111111111111111111": 3,
+   "So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo": 10,
+   "3JmCcXAjmBpFzHHuUpgJFfTQEQnAR7K1erNLtWV1g7d9": 1,
+   "SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE": 2,
+   "SP12tWFxD9oJsVWNavTTBZvMbA6gkAmxtVgxdqvyvhY": 1
+  },
+  "encodingsSeen": {
+   "json": 119,
+   "flat": 37
+  },
+  "chainParsedInstructions": 1193
+ },
+ "limits": {
+  "license": "bitquery/solana-idl-lib unlicensed (null), Bonasa-Tech/manifest GPL-3.0 -> bytes stay in the throwaway work-dir; the committed store is untouched",
+  "verdict": "exactly the adopted rows may move; any other movement -> no-verdict",
+  "humidifi": "1 payload refuses with an unknown discriminator — a named refusal, not a silent parse"
+ }
+}

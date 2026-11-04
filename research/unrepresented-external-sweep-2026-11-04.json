@@ -1,0 +1,2839 @@
+{
+ "tool": "measure-unrepresented-external",
+ "generatedAt": "2026-11-04T20:09:12.719Z",
+ "source": {
+  "classification": "publish-nothing-classification-2026-11-04.json",
+  "foreignRepo": "/home/aurora/github_repos/step-ingestooor @001cf39"
+ },
+ "control": {
+  "literal": "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+  "repo": "bitquery/solana-idl-lib",
+  "path": "solfi/solfi.json",
+  "searchMatches": 1,
+  "fileOk": true,
+  "matches": 1
+ },
+ "rows": [
+  {
+   "program": "7Mc3vSdRWoThArpni6t5W4XjvQf4BuMny1uC8b6VBn48",
+   "payloads": 2,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/carrot_vault/deposit.json",
+     "crates/parsers/tests/carrot_vault/withdraw.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "DeFi-Carrot/jup-carrot-integration",
+     "path": "amm/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DeFi-Carrot/carrot-protocol-cpi",
+     "path": "example/program_dump.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "hogyzen12/carrot-sdk",
+     "path": "src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DeFi-Carrot/carrot-protocol-cpi",
+     "path": "example/programs/example/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DeFi-Carrot/carrot-protocol-cpi",
+     "path": "example/Anchor.toml",
+     "class": "reference-code"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/carrot_vault/deposit.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/carrot_vault/withdraw.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "eco-incorp/sauce",
+     "path": "sdk/test/fixtures/svm-exact-in-programs/manifest.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/carrot_vault/deposit.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/carrot_vault/withdraw.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [],
+   "incomplete": false
+  },
+  {
+   "program": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+   "payloads": 1,
+   "verdict": "external-interface-published",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/dflow/swap_with_fee.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "DefiLlama/dimension-adapters",
+     "path": "dexs/humidifi/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/web/src/lib/slot200/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "tryghostxyz/gg-program-resurrect",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "eabz/evm-indexer",
+     "path": "src/svm/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ivs-ug/humidifi-api-demo",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/humidifi/humidifi_solana_stg_raw_swaps.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "eabz/evm-indexer",
+     "path": "src/svm/registry.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "gemwalletcom/wallet",
+     "path": "core/crates/primitives/src/contract_constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/sol-known-programs.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "pinax-network/substreams-solana-idls",
+     "path": "src/humidifi/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sepivip/SeekerClaw",
+     "path": "app/src/main/assets/nodejs-project/solana.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bitquery/solana-idl-lib",
+     "path": "humidifi/humidifi.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "LimeChain/magnus",
+     "path": "crates/shared/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/humidifi/humidifi_solana_base_trades.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "pinax-network/substreams-solana-idls",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "LimeChain/mona",
+     "path": "src/cons.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Hweippy/prism-client-sdk",
+     "path": "src/markets/humidifi.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ivs-ug/humidifi-api-demo",
+     "path": "src/humidifi_example.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "captorix/awesome-solana-prop-amms",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "kyoshoku/kyo-dex-integrate",
+     "path": "src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "FixedLocally/sandwich-finder",
+     "path": "sandwich-finder/src/events/addresses.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "TraceSVM/propamm-simulator",
+     "path": "src/protocol/humidifi.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sercan0x/opeq",
+     "path": "web/lib/amms.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "imfromfuture3000-Android/Deployer-Gene",
+     "path": "analyze-transaction-log.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DefaultPerson/solana-dex-parser-go",
+     "path": "constants/programs.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Hweippy/prism-client-sdk",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "furydotbot/swap-api",
+     "path": "src/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "okxlabs/Web3-DEX-Router-Solana-V1",
+     "path": "programs/dex-solana/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vitorpy/humidifi-explained",
+     "path": "NOTES.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "farfary/ScreenerBot",
+     "path": "src/swaps/operations.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jowency-me/solana-tx-parser",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "kyoshoku/tessera-v",
+     "path": "src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "GuiBibeau/solos-data",
+     "path": "docs/adr/0014-spot-swaps.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "furkan3152/Kletia",
+     "path": "packages/core/src/protocols/venueContracts.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "lrafasouza/sign-safe-skill",
+     "path": "docs/precision-report.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "imfromfuture3000-Android/Deployer-Gene",
+     "path": "ACTIVATION-SUMMARY.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "nitro-svm/examples",
+     "path": "src/utils/types.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "imfromfuture3000-Android/Deployer-Gene",
+     "path": "execute-transfer-ownership.js",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "bitquery/solana-idl-lib",
+     "path": "humidifi/humidifi.json",
+     "ok": true,
+     "shaped": true,
+     "instructions": 5,
+     "binding": "declared"
+    }
+   ],
+   "evidence": {
+    "repo": "bitquery/solana-idl-lib",
+    "path": "humidifi/humidifi.json",
+    "instructions": 5,
+    "binding": "declared"
+   },
+   "incomplete": false
+  },
+  {
+   "program": "obriQD1zbpyLz95G5n7nJe6a4DPjpFwa5XYPoNm113y",
+   "payloads": 3,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/jupiter/dca_end_and_close.json",
+     "crates/parsers/tests/jupiter/jup-lo-fill-order.json",
+     "crates/parsers/tests/jupiter/va_fill.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "jup-ag/instruction-parser",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/obric/obric_solana_base_trades.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/obric/obric_solana_stg_raw_swaps.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/lifi.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "vvizardev/telegram-wallet-tracking-bot-v1.0",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sepivip/SeekerClaw",
+     "path": "app/src/main/assets/nodejs-project/solana.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xalberto/jupiter-arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mooncitydev/solana-arbitrage-bot-master",
+     "path": "src/constant/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "LimeChain/magnus",
+     "path": "crates/shared/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jozef-pridavok/arbitrage",
+     "path": "dex/src/_unused/obric_v2/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jozef-pridavok/arbitrage",
+     "path": "scripts/solval.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "alexisssol/Solana-Wallet-Tracker",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jozef-pridavok/arbitrage",
+     "path": "scripts/solvalindex.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "LimeChain/mona",
+     "path": "src/cons.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "tenequm/solana-idls",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dmsoltech/obric-jupiter-integration",
+     "path": "rust-integration/v2/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sercan0x/opeq",
+     "path": "web/lib/amms.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "argenestel/tradgents",
+     "path": "docs/VENUES.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "DefaultPerson/solana-dex-parser-go",
+     "path": "constants/programs.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "apollotoday/Arbitrage-bot-jupiter-aggrigator",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "furydotbot/swap-api",
+     "path": "src/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "WorthlessDeveloper/propquote",
+     "path": "crates/propquote-obric/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "okxlabs/Web3-DEX-Router-Solana-V1",
+     "path": "programs/dex-solana/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "tenequm/solana-idls",
+     "path": "src/generated/idls.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "tenequm/solana-idls",
+     "path": "src/protocols.config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ape7054/telbot",
+     "path": "src/core/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jowency-me/solana-tx-parser",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "vola-trebla/arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dexoryn/jupiter-arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ape7054/telbot",
+     "path": "src/backup/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "SwineCoder101/Solana-trade-telegram-service",
+     "path": "shared/enums.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dmsoltech/obric-jupiter-integration",
+     "path": "rust-integration/accounts/programs/obric-solana/src/consts.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dmsoltech/obric-jupiter-integration",
+     "path": "rust-integration/accounts/programs/obric-solana/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "kyoshoku/tessera-v",
+     "path": "src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "WorthlessDeveloper/propquote",
+     "path": "crates/propquote-core/src/bs58.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mgild/mint_parser",
+     "path": "mint_parser/src/markets/obric/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "HarryLiIsMe/solana_token_trade_monitor_backend",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "LimeChain/pmm-sim",
+     "path": "cfg/accounts/obric-v2_BWBHrYqfcjAh5dSiRwzPnY4656cApXVXmkeDmAfwBKQG.json",
+     "class": "idl-candidate"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "LimeChain/pmm-sim",
+     "path": "cfg/accounts/obric-v2_BWBHrYqfcjAh5dSiRwzPnY4656cApXVXmkeDmAfwBKQG.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false
+  },
+  {
+   "program": "SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe",
+   "payloads": 4,
+   "verdict": "external-interface-published",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/jupiter/dca_fill.json",
+     "crates/parsers/tests/jupiter/jup-lo-fill-order.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "tryghostxyz/solfi-sim",
+     "path": "src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/instruction-parser",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "tryghostxyz/solfi-sim",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe_account.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "umiiii/solparser",
+     "path": "consts/address.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bitquery/solana-idl-lib",
+     "path": "solfi/solfi.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/lifi.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cxcx-ai/solana-dex-parser",
+     "path": "src/constants/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "vvizardev/telegram-wallet-tracking-bot-v1.0",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "pinax-network/substreams-solana-idls",
+     "path": "src/solfi/v1/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "A5-/Wallet-Monitoring-TG-bot",
+     "path": "swap-detection/main.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "pinax-network/substreams-svm",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "A5-/Wallet-Monitoring-TG-bot",
+     "path": "transfer-detection/main.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sepivip/SeekerClaw",
+     "path": "app/src/main/assets/nodejs-project/solana.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xalberto/jupiter-arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mooncitydev/solana-arbitrage-bot-master",
+     "path": "src/constant/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "lhjarsenal/sol-tool",
+     "path": "src/solfi/client.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "capicua4454/arb-assist",
+     "path": "docs/examples/smb-config.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/solfi/solfi_solana_base_trades.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "capicua4454/arb-assist",
+     "path": "docs/configuration/dex-configuration.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ferris-joy/solana-mev-bot",
+     "path": "src/dex/solfi/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "pinax-network/substreams-solana-idls",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "alexisssol/Solana-Wallet-Tracker",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "capicua4454/arb-assist",
+     "path": "config.toml (smb)",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "blueshift-gg/beethoven",
+     "path": "crates/client/src/swap/solfi.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "blueshift-gg/beethoven",
+     "path": "crates/swap/solfi/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/jupiterAggregatorV6_sharedAccountsRoute_2.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "bitquery/grpc-code-samples",
+     "path": "go-demo/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "kyoshoku/kyo-dex-integrate",
+     "path": "src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "FixedLocally/sandwich-finder",
+     "path": "sandwich-finder/src/events/addresses.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dulumao/go-coin-sol",
+     "path": "program/sol-fi/constant/constant.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sercan0x/opeq",
+     "path": "web/lib/amms.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "argenestel/tradgents",
+     "path": "docs/VENUES.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "DefaultPerson/solana-dex-parser-go",
+     "path": "constants/programs.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "apollotoday/Arbitrage-bot-jupiter-aggrigator",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "furydotbot/swap-api",
+     "path": "src/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "okxlabs/Web3-DEX-Router-Solana-V1",
+     "path": "programs/dex-solana/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "FernoLabs/blockzilla",
+     "path": "crates/parser/blockzilla-log-parser/src/lib.rs",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe_account.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    },
+    {
+     "repo": "bitquery/solana-idl-lib",
+     "path": "solfi/solfi.json",
+     "ok": true,
+     "shaped": true,
+     "instructions": 1,
+     "binding": "declared"
+    },
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/jupiterAggregatorV6_sharedAccountsRoute_2.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "evidence": {
+    "repo": "bitquery/solana-idl-lib",
+    "path": "solfi/solfi.json",
+    "instructions": 1,
+    "binding": "declared"
+   },
+   "incomplete": false
+  },
+  {
+   "program": "9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP",
+   "payloads": 2,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/jupiter/missing_ata.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "otter-sec/anchor",
+     "path": "client/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "client/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/start_localnet.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "src/dapps/dapp_9W959DqEETiGZocYWCQPaJ6sBmUzgfxXfqGeTEdp3aQP.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "onchain-data/orca.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/orca_swap.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DefiLlama/DefiLlama-Adapters",
+     "path": "projects/orca/index.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "onchain-data/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solido",
+     "path": "anker/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "onchain-data/analyze.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/new_scrape.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "DefiLlama/DefiLlama-Adapters",
+     "path": "projects/helper/solana.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "runtime/src/mev/utils.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/programs.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "vybenetwork/solana-token-metadata-api",
+     "path": "src/frontend/app.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vybenetwork/solana-ohlc-api",
+     "path": "src/frontend/app.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vybenetwork/solana-trades-api",
+     "path": "src/frontend/app.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/instruction-parser",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "runtime/src/mev/arbitrage.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "hodgerpodger/staketaxcsv",
+     "path": "src/staketaxcsv/sol/constants.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "umiiii/solparser",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "umiiii/solparser",
+     "path": "consts/address.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "runtime/src/mev.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Syndica/sig",
+     "path": "v1/src/accountsdb/Db.zig",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ChorusOne/solana-mev",
+     "path": "explorer/src/utils/tx.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/xray/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-foundation/explorer",
+     "path": "public/accounts-sitemap.xml",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "agiprolabs/claude-trading-skills",
+     "path": "skills/copy-trading/scripts/monitor_wallet.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "helius-labs/xray",
+     "path": "src/lib/util/program-name.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "p2p-org/solana-swift",
+     "path": "Sources/SolanaSwift/Models/PublicKey.swift",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "KeystoneHQ/keystone3-firmware",
+     "path": "rust/apps/solana/src/parser/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "agiprolabs/claude-trading-skills",
+     "path": "skills/solana-tx-building/scripts/decode_transaction.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cxcx-ai/solana-dex-parser",
+     "path": "src/constants/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/sol-known-programs.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DappioLab/navigator",
+     "path": "src/orca/ids.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "WangWilly/solana-trading-bot",
+     "path": "src/helpers/copyTradeHelper/const.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DappioLab/navigator",
+     "path": "src/francium/ids.ts",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "0xNineteen/solana-arbitrage-bot",
+     "path": "mainnet-fork/programs.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    }
+   ],
+   "incomplete": false
+  },
+  {
+   "program": "HyaB3W9q6XdA5xwpU4XnSZV94htfmbmqJXZcEbRaJutt",
+   "payloads": 2,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/jupiter/no-dooot.json",
+     "crates/parsers/tests/raydium/swap.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "otter-sec/anchor",
+     "path": "client/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "src/dapps/dapp_HyaB3W9q6XdA5xwpU4XnSZV94htfmbmqJXZcEbRaJutt.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "blockworks-foundation/autobahn",
+     "path": "lib/dex-invariant/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/instruction-parser",
+     "path": "src/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "blockworks-foundation/autobahn",
+     "path": "lib/dex-invariant/src/internal/invariant-types/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DefiLlama/dimension-adapters",
+     "path": "dexs/invariant/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/lifi.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "vvizardev/telegram-wallet-tracking-bot-v1.0",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "invariant-labs/protocol",
+     "path": "sdk/src/network.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sepivip/SeekerClaw",
+     "path": "app/src/main/assets/nodejs-project/solana.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xalberto/jupiter-arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mooncitydev/solana-arbitrage-bot-master",
+     "path": "src/constant/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/platform-list",
+     "path": "src/platforms/invariant.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jozef-pridavok/arbitrage",
+     "path": "scripts/solval.sh",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "src/dapps/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "alexisssol/Solana-Wallet-Tracker",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/jupiterAggregatorV6_sharedAccountsRoute_1.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "invariant-labs/protocol",
+     "path": "programs/invariant/invariant-types/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ashpoolin/parserzero",
+     "path": "src/utils/programMap.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "spire-fyi/spire_fyi",
+     "path": "spire_fyi/utils.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "AmbitionsXXXV/Solana-use",
+     "path": "crates/raydium_monitor/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "spire-fyi/spire_fyi",
+     "path": "sql/sdk_dex.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jozef-pridavok/arbitrage",
+     "path": "dex/src/_unused/invariant_swap/invariant_types/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ashpoolin/parserone",
+     "path": "src/utils/programMap.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "invariant-labs/protocol",
+     "path": "programs/invariant/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sercan0x/opeq",
+     "path": "web/lib/amms.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "808putnam/qtrade2",
+     "path": "anchor/client/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dragonwarrior9873/dex-trades",
+     "path": "target/debug/deps/substreams.d",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "DefaultPerson/solana-dex-parser-go",
+     "path": "constants/programs.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "codertjay/Bugs",
+     "path": "dlt_scanned/audit_dlt_08316.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "invariant-labs/protocol",
+     "path": "Anchor.toml",
+     "class": "reference-code"
+    },
+    {
+     "repo": "apollotoday/Arbitrage-bot-jupiter-aggrigator",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "furydotbot/swap-api",
+     "path": "src/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "spire-fyi/spire_fyi",
+     "path": "sql/sdk_openbook_users.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jozef-pridavok/arbitrage",
+     "path": "dex/src/_unused/invariant_swap/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ape7054/telbot",
+     "path": "src/core/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "vola-trebla/arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "eabz/evm-indexer",
+     "path": "src/svm/fixtures/phase2.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/jupiterAggregatorV6_sharedAccountsRoute_1.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false
+  },
+  {
+   "program": "MP1zz2HUAzL5P2uLR5nKaDSnxofh8VTZyk26NCewWzk",
+   "payloads": 1,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/kamino/v2_deser_err.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "ZXXYy/Solana_Failed_Tx",
+     "path": "src/analysis/RQ2/error_log.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ZXXYy/Solana_Failed_Txs",
+     "path": "src/analyze/RQ2/error_log.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ZXXYy/Solana_Failed_Tx",
+     "path": "data/top_failed_program/top_failed_program.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260604T012148Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_10800s_20260604T040225Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/kamino/v2_deser_err.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/kamino/v2_deser_err.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260604T012148Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_10800s_20260604T040225Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false
+  },
+  {
+   "program": "wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL",
+   "payloads": 3,
+   "verdict": "external-interface-published",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/manifest/diff-decimals.json",
+     "crates/parsers/tests/manifest/market_info.json",
+     "crates/parsers/tests/manifest/same-decimals.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/Defrag.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/Collect.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/CreateWrapper.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/ClaimSeat.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "programs/wrapper/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DefiLlama/dimension-adapters",
+     "path": "fees/manifest-trade/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "docs/WALLET_INTEGRATION.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/Deposit.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/Withdraw.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "scripts/defrag/defrag.mjs",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/BatchUpdateBaseGlobal.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/BatchUpdateQuoteGlobal.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/ts/src/wrapper/instructions/BatchUpdate.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "scripts/stats_utils/manifestStatsServer.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/platform-list",
+     "path": "src/platforms/manifest.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/idl/wrapper.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "client/ts/src/wrapper/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saml33/manifest-landing",
+     "path": "programs/wrapper/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "web/manifest/src/wrapper/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "programs/wrapper/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "programs/manifest/src/wrapper/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "client/ts/src/wrapper/instructions/Collect.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "client/ts/src/wrapper/instructions/CreateWrapper.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "client/ts/src/wrapper/instructions/ClaimSeat.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saml33/manifest-landing",
+     "path": "client/ts/src/wrapper/instructions/CreateWrapper.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saml33/manifest-landing",
+     "path": "client/ts/src/wrapper/instructions/ClaimSeat.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "web/manifest/src/wrapper/instructions/CreateWrapper.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "web/manifest/src/wrapper/instructions/ClaimSeat.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "docs/WALLET_INTEGRATION.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "client/ts/src/wrapper/instructions/Deposit.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "programs/manifest/src/wrapper/instructions/CreateWrapper.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "programs/manifest/src/wrapper/instructions/ClaimSeat.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dhruvja/manifest",
+     "path": "client/ts/src/wrapper/instructions/Withdraw.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saml33/manifest-landing",
+     "path": "client/ts/src/wrapper/instructions/BatchUpdate.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saml33/manifest-landing",
+     "path": "client/ts/src/wrapper/instructions/Deposit.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "saml33/manifest-landing",
+     "path": "client/ts/src/wrapper/instructions/Withdraw.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "web/manifest/src/wrapper/instructions/Deposit.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "web/manifest/src/wrapper/instructions/Withdraw.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jacksturt/player-markets",
+     "path": "programs/Anchor.toml",
+     "class": "reference-code"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "Bonasa-Tech/manifest",
+     "path": "client/idl/wrapper.json",
+     "ok": true,
+     "shaped": true,
+     "instructions": 9,
+     "binding": "declared"
+    }
+   ],
+   "evidence": {
+    "repo": "Bonasa-Tech/manifest",
+    "path": "client/idl/wrapper.json",
+    "instructions": 9,
+    "binding": "declared"
+   },
+   "incomplete": false
+  },
+  {
+   "program": "4pP8eDKACuV7T2rbFPE8CHxGKDYAzSdRsdMsGvz2k4oc",
+   "payloads": 1,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/meteora_amm/swap_mu.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "ChainBuff/yellowstone-grpc",
+     "path": "02-txn-parser/README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/raydiumLiquidityPoolV4_swap_0.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/raydiumLiquidityPoolV4_swap_1.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "Morgandri1/sandwich-relay",
+     "path": "mev-lib/src/programs/pumpfun/mod.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "JulienCouzinie/Grafolana",
+     "path": "GrafolanaBack/domain/transaction/config/dex_programs/swap_programs.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Fbartoli/copySolana",
+     "path": "transaction.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "townie/psc",
+     "path": "market_data/src/solana/pumpfun/log.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "debug/webhook_233008.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "debug/webhook_232946.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "debug/webhook_233102.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "debug/webhook_233105.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "debug/webhook_233029.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "rayaanoidPrime/blockchain-address-classifier",
+     "path": "datasets/sol.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "utx0/surrealdb_serde_issue",
+     "path": "block.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "ZXXYy/Solana_Failed_Tx",
+     "path": "data/top_failed_program/top_failed_program.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_21600s_20260604T092933Z/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_21600s_20260604T092933Z/launch0rt_compact/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "all/transactions_3XXaXtaFtBghZ8NwkTGfNSsijJoWbPhTEAR9cMZdpump.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "Ty-HA/BeChill-web",
+     "path": "src/services/solscan/programs_list_active_users/program_list_active_users.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "yes/transactions_7hn8Zs3yCxE4ucyNyyVFfy3Y2UN5KSDYuZC3pCoTpump_20241102_233532.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "all/later/transactions_GCJKkBHYuBoHKNMGAGwpRspGefrurDq136F2FWKzpump_20241104_074653.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "all/later/transactions_Exb4j3Vq1HoWYzLxdbDDmhoLcgChmhwdbs6LgYWdpump_20241104_074841.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "all/later/transactions_HYmWB6z5fRkxqRvyFJDUzdUjYqanJWdKCyMAeg7ppump_20241104_072606.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "all/later/transactions_2MdBH7FrmxhsYJofrZK9a6a82aKFu5VAytodV5zmpump_20241104_100751.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_21600s_20260604T092933Z/launch0rt_compact/checkpoint.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_21600s_20260604T092933Z/launch0rt_compact/summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_21600s_20260604T092933Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260603T163140Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_10800s_20260604T040225Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "smartcontractkit/chainlink-solana",
+     "path": "pkg/solana/logpoller/log_data_parser_test.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "qvecs/soltxs",
+     "path": "tests/.data/pumpfun_buy_rpc.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "qvecs/soltxs",
+     "path": "tests/.data/pumpfun_buy_geyser.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "qvecs/soltxs",
+     "path": "tests/.data/raydium_amm_v4_rpc.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "qvecs/soltxs",
+     "path": "tests/.data/raydium_amm_v4_geyser.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/meteora_amm/swap_mu.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/meteora_amm/swap_mu.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/raydiumLiquidityPoolV4_swap_0.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "0xjeffro/tx-parser",
+     "path": "solana/data/raydiumLiquidityPoolV4_swap_1.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "Fbartoli/copySolana",
+     "path": "transaction.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "townie/psc",
+     "path": "market_data/src/solana/pumpfun/log.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "GrProg/memecoins",
+     "path": "debug/webhook_233008.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false
+  },
+  {
+   "program": "AxiomxSitiyXyPjKgJ9XSrdhsydtZsskZTEDam3PxKcC",
+   "payloads": 1,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/pump_fun/lp_1.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "cyhapun/solana-tx-tracker",
+     "path": "constants.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cyhapun/solana-tx-tracker",
+     "path": "utils.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "opendex-ws/ombra",
+     "path": "src/lib/utils/entity-icons.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ronaldslwong/copyrust",
+     "path": "src/constants/axiom.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cyhapun/solana-tx-tracker",
+     "path": "all.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "8-1000-e/sendo-wallet-analyser-edits",
+     "path": "src/config/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mifeex/smart-money-copy-trading-bot",
+     "path": "const.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ronaldslwong/copyrust",
+     "path": "src/build_tx/src/constants/axiom.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "shep95/MONAD_OSINT",
+     "path": "Intelligence_Database/Legacy_Targets/Old_Scripts/rpc_data_dump.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "cyhapun/solana-tx-tracker",
+     "path": "transaction_monitor.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "TopTrenDev/solana-dex-data-indexer-substream",
+     "path": "trades.jsonl",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Dannihrafn/solana-dex-parsing",
+     "path": "crates/utils/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "shep95/MONAD_OSINT",
+     "path": "Intelligence_Database/Axiom/Reports/INTELLIGENCE_REPORT_AXIOM.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "shahid-07/zap-mono-1",
+     "path": "config.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "BestDiamond9/Copy_trading_bot",
+     "path": "trading_bot.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "shahid-07/zap-mono-1",
+     "path": "tradingEngine.js.backup",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "BestDiamond9/Copy_trading_bot",
+     "path": "telebot_new/trading_bot.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "shahid-07/zap-mono-1",
+     "path": "backup_20250906_205323/config.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "shep95/MONAD_OSINT",
+     "path": "Intelligence_Database/Axiom/Reports/INTELLIGENCE REPORT ON AXIOM.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "shep95/MONAD_OSINT",
+     "path": "Intelligence_Database/Axiom/Reports/INTELLIGENCE_REPORT_AXIOM.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/pump_fun/lp_1.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "Sendo-labs/plugin-sendo-analyser",
+     "path": "src/config/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/pump_fun/lp_1.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [],
+   "incomplete": false
+  },
+  {
+   "program": "DnqJ15nYEdFYr6ywvvVWfYLdUTb1nqecECCSYmyWiJe9",
+   "payloads": 1,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/raydium/txn_raydium_swap_v2_4nycrrYq3T5QyzBmdBCaR8DhSGTCsqATiRKjdA7x5wBrNV9RZuwbiNnckQTvDp1LHPA9VZRJ9UbtwsrwDG92mTS3.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "ANAVHEOBA/solscanredacted",
+     "path": "bloctest.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "rayaanoidPrime/blockchain-address-classifier",
+     "path": "datasets/sol.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "ZXXYy/Solana_Failed_Tx",
+     "path": "data/top_failed_program/top_failed_program.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/raydium/txn_raydium_swap_v2_4nycrrYq3T5QyzBmdBCaR8DhSGTCsqATiRKjdA7x5wBrNV9RZuwbiNnckQTvDp1LHPA9VZRJ9UbtwsrwDG92mTS3.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/raydium/txn_raydium_swap_v2_4nycrrYq3T5QyzBmdBCaR8DhSGTCsqATiRKjdA7x5wBrNV9RZuwbiNnckQTvDp1LHPA9VZRJ9UbtwsrwDG92mTS3.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [],
+   "incomplete": false
+  },
+  {
+   "program": "2TQ4a9igqmz91BtHjnAk5hk7JjVuRwyQBsQfrGGpcXYK",
+   "payloads": 2,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/saros/txn_saros_4yXrAHKr9GP4VdQbdLxkAAGiqu98hjFkq1anDF3GqEUkRXCDryo9uyWMHKamSz1s57B4GLtEiQz1rgMa1EVMhAa9.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "JulienCouzinie/Grafolana",
+     "path": "GrafolanaBack/domain/transaction/config/dex_programs/swap_programs.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "rayaanoidPrime/blockchain-address-classifier",
+     "path": "datasets/sol.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "ZXXYy/Solana_Failed_Tx",
+     "path": "data/top_failed_program/top_failed_program.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/saros/txn_saros_4yXrAHKr9GP4VdQbdLxkAAGiqu98hjFkq1anDF3GqEUkRXCDryo9uyWMHKamSz1s57B4GLtEiQz1rgMa1EVMhAa9.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/saros/txn_saros_4yXrAHKr9GP4VdQbdLxkAAGiqu98hjFkq1anDF3GqEUkRXCDryo9uyWMHKamSz1s57B4GLtEiQz1rgMa1EVMhAa9.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [],
+   "incomplete": false
+  },
+  {
+   "program": "3s1rAymURnacreXreMy718GfqW6kygQsLNka1xDyW8pC",
+   "payloads": 1,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/sol_balance/sol_balance.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/3s1rAymURnacreXreMy718GfqW6kygQsLNka1xDyW8pC_account.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "opendex-ws/ombra",
+     "path": "src/lib/utils/entity-icons.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mowtiion/meme-quant-lab",
+     "path": "reports/ROUTER_MOVEMENTS_RESOLVED.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mowtiion/meme-quant-lab",
+     "path": "reports/RUNTIME_AND_RESIDUAL_REPORT.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mowtiion/meme-quant-lab",
+     "path": "src/meme_quant/router_movements.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "JulienCouzinie/Grafolana",
+     "path": "GrafolanaBack/domain/transaction/config/dex_programs/swap_programs.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mowtiion/meme-quant-lab",
+     "path": "scripts/diagnose_economic_runtime.py",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ladinglogichq/cockpit-intelligence",
+     "path": "backend/supabase/dataset/solana-programs.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "mowtiion/meme-quant-lab",
+     "path": "reports/ECONOMIC_STREAM_REPLAY.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "lekekbot/fraudwatch",
+     "path": "protocols/sources/orb-programs.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/22_launch_r2_press_window/21_runls13alt_preprocessed_alt_resolution_audit/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Stan-lee13/graphite",
+     "path": "graphite-core/scripts/out/idl_index.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/21_runls13u_preprocessed_unsupported_program_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mowtiion/meme-quant-lab",
+     "path": "reports/ECONOMIC_RUNTIME_DIAGNOSIS.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "ZXXYy/Solana_Failed_Tx",
+     "path": "data/top_failed_program/top_failed_program.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "Stan-lee13/graphite",
+     "path": "graphite-core/scripts/out/onboarding_report.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "Stan-lee13/graphite",
+     "path": "graphite-core/scripts/out/inventory_census.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/22_launch_r2_press_window/21_runls13a_preprocessed_backrun_target_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch_r2_press_window_1h_20260530T155631Z/21_runls13alt_preprocessed_alt_resolution_audit/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launchf_factory_6h_20260529T124709Z/21_runls13alt_preprocessed_alt_resolution_audit/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch_r2_press_window_1h_20260530T155631Z/21_runls13a_preprocessed_backrun_target_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launchf_factory_6h_20260529T124709Z/21_runls13a_preprocessed_backrun_target_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launchf_factory_6h_v2_20260529T164626Z/21_runls13alt_preprocessed_alt_resolution_audit/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_lsprebrinv_factory_6h_fix_20260529T124709Z/21_runls13alt_preprocessed_alt_resolution_audit/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_lsprebrinv_factory_6h_fix_20260529T124709Z/21_runls13u_preprocessed_unsupported_program_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launchf_factory_6h_v2_20260529T164626Z/21_runls13a_preprocessed_backrun_target_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_lsprebrinv_factory_6h_fix_20260529T124709Z/21_runls13a_preprocessed_backrun_target_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_lsprebrinv_factory_6h_corrected_20260530T132005Z/21_runls13alt_preprocessed_alt_resolution_audit/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_lsprebrinv_factory_6h_corrected_20260530T132005Z/21_runls13u_preprocessed_unsupported_program_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_lsprebrinv_factory_6h_corrected_20260530T132005Z/21_runls13a_preprocessed_backrun_target_census/summary.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/22_launch_r2_press_window/21_runls13alt_preprocessed_alt_resolution_audit/runls13alt_preprocessed_alt_resolution_audit_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/21_runls13u_preprocessed_unsupported_program_census/runls13u_preprocessed_unsupported_program_census_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_60s_20260603T162824Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/22_launch_r2_press_window/21_runls13a_preprocessed_backrun_target_census/runls13a_preprocessed_backrun_target_census_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260604T012148Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260603T163140Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch0rt_realtime_birth_rate_probe_60s_20260602T103701Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_10800s_20260604T040225Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch0rt_realtime_birth_rate_probe_600s_20260602T105145Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch0rt_realtime_birth_rate_probe_600s_20260602T135525Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/3s1rAymURnacreXreMy718GfqW6kygQsLNka1xDyW8pC_account.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    },
+    {
+     "repo": "ladinglogichq/cockpit-intelligence",
+     "path": "backend/supabase/dataset/solana-programs.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "mowtiion/meme-quant-lab",
+     "path": "reports/ECONOMIC_STREAM_REPLAY.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "lekekbot/fraudwatch",
+     "path": "protocols/sources/orb-programs.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "Stan-lee13/graphite",
+     "path": "graphite-core/scripts/out/idl_index.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false
+  },
+  {
+   "program": "3JmCcXAjmBpFzHHuUpgJFfTQEQnAR7K1erNLtWV1g7d9",
+   "payloads": 1,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/solend/repay_all.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "solendprotocol/public",
+     "path": "solend-sdk/src/core/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/platform-list",
+     "path": "src/platforms/dumpy.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Henry-E/solend-sdk-modern",
+     "path": "src/core/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "ZXXYy/Solana_Failed_Tx",
+     "path": "data/top_failed_program/top_failed_program.csv",
+     "class": "dataset-trace"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_60s_20260603T162824Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260604T012148Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260603T163140Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_10800s_20260604T040225Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch0rt_realtime_birth_rate_probe_600s_20260602T105145Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch0rt_realtime_birth_rate_probe_900s_20260602T165046Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "quellen-sol/ingestooor",
+     "path": "crates/parsers/tests/solend/repay_all.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "JamesMDunn/ingestooor",
+     "path": "crates/parsers/tests/solend/repay_all.json",
+     "class": "trace-fixture"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_60s_20260603T162824Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260604T012148Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_3600s_20260603T163140Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch62c_pre_migration_watch_10800s_20260604T040225Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    },
+    {
+     "repo": "sellify00/guerrila",
+     "path": "archive/latitude15/Guerrila/g1-host-pack/results/run_launch0rt_realtime_birth_rate_probe_600s_20260602T105145Z/launch0rt_realtime_birth_rate_probe_summary.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "other-program"
+    }
+   ],
+   "incomplete": false
+  },
+  {
+   "program": "SVSPxpvHdN29nkVg9rPapPNDddN5DipNLRUFhyjFThE",
+   "payloads": 2,
+   "verdict": "external-reference-only",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/marginfi/deser_4.json",
+     "crates/parsers/tests/spl/move-lamports.json",
+     "crates/parsers/tests/spl/move-stake.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "guides/ADMIN/DEPLOY_GUIDE_STAGING.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "type-crate/src/pdas.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mrgnlabs/mrgn-ts",
+     "path": "packages/tools/scripts/utils.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mrgnlabs/mrgn-ts",
+     "path": "packages/tools/svsp/LOCALNET_TESTING.MD",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "programs/marginfi/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-program/single-pool",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Fankouzu/solana-basic-ui",
+     "path": "docs/SolanaProgramLibrary/single-pool.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "guides/DEVELOPERS_INTEGRATORS/PACKING_RISK_ACCOUNTS.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/marginfi-v2",
+     "path": "Anchor.toml",
+     "class": "reference-code"
+    },
+    {
+     "repo": "mrgnlabs/mrgn-ts",
+     "path": "packages/mrgn-common/src/constants/program.consts.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-program/single-pool",
+     "path": "program/program-id.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jup-ag/docs",
+     "path": "llms.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Mythic-Project/solana-program-library",
+     "path": "single-pool/program/program-id.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jup-ag/docs",
+     "path": "lend/advanced/native-staked-vault/index.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/p0-ts-sdk",
+     "path": "src/constants/program-keys.consts.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-program/single-pool",
+     "path": "program/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "solana-program/single-pool",
+     "path": "clients/js/src/addresses.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/docs",
+     "path": "lend/advanced/native-staked-vault/withdraw.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jup-ag/platform-list",
+     "path": "src/platforms/solana.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/solana-program-library",
+     "path": "single-pool/program/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jup-ag/docs",
+     "path": "lend/advanced/native-staked-vault/deposit.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/mrgn-ts-scripts",
+     "path": "svsp/LOCALNET_TESTING.MD",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "henryoman/TrenchClaw",
+     "path": ".agents/jupiter-llms.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "flavioespinoza/zero-ts-sdk",
+     "path": "src/constants/program-keys.consts.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/solana-program-library",
+     "path": "single-pool/js/packages/modern/src/addresses.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "DEEPML1818/DeFiSyNc-v.1.2",
+     "path": "my-solana-program/single-pool/program/program-id.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/mrgn-ts-scripts",
+     "path": "scripts/utils/utils.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jonasXchen/solana-sveltekit",
+     "path": "src/lib/utils/staking/constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dikipidorot/AggreMax-marginfi_yield_cpi_integration",
+     "path": "programs/marginfi/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/solana-program-library",
+     "path": "docs/src/single-pool.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "retrovaliks/magnifi-v2",
+     "path": "programs/marginfi/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "zhangdav/marginfi-v2",
+     "path": "programs/marginfi/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/spl-governance-v3.1.3",
+     "path": "single-pool/js/packages/modern/src/addresses.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "reclear-io/llmref",
+     "path": "registry/spl-elgamal-registry/0.5.0/llms-full.txt",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dikipidorot/AggreMax-marginfi_yield_cpi_integration",
+     "path": "guides/DEPLOY_GUIDE_STAGING.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "solana-program/solana-program.github.io",
+     "path": "docs/content/docs/single-pool.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "esterhuizen/sgdi",
+     "path": "docs/MAINTENANCE.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "0dotxyz/mrgn-ts-scripts",
+     "path": "scripts/common/pdas.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Mythic-Project/spl-governance-v3.1.3",
+     "path": "docs/src/single-pool.mdx",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "retrovaliks/magnifi-v2",
+     "path": "guides/ADMIN/DEPLOY_GUIDE_STAGING.md",
+     "class": "reference-doc"
+    }
+   ],
+   "verifications": [],
+   "incomplete": false
+  },
+  {
+   "program": "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY",
+   "payloads": 1,
+   "verdict": "external-interface-published",
+   "premise": {
+    "state": "trace-only",
+    "files": [
+     "crates/parsers/tests/titan/swap_with_fees_2.json"
+    ]
+   },
+   "hits": [
+    {
+     "repo": "vybenetwork/solana-swap-api",
+     "path": "data/program-label-cache.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "solana-foundation/solana-com",
+     "path": "apps/web/src/lib/slot200/programs.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY_account.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "bigmacman1129/solana-arbitrage-trading-bot",
+     "path": "src/chain/keys.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/zerofi/zerofi_solana_base_trades.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/_sector/dex/zerofi/zerofi_solana_stg_raw_swaps.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "bitquery/solana-idl-lib",
+     "path": "zerofi/zerofi.json",
+     "class": "idl-candidate"
+    },
+    {
+     "repo": "cxcx-ai/solana-dex-parser",
+     "path": "src/constants/programId.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "dfinity/oisy-wallet",
+     "path": "src/frontend/src/sol/constants/sol-known-programs.constants.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "duneanalytics/spellbook",
+     "path": "dbt_subprojects/solana/models/jupiter/jupiter_solana_amms.sql",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "A5-/Wallet-Monitoring-TG-bot",
+     "path": "swap-detection/main.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "A5-/Wallet-Monitoring-TG-bot",
+     "path": "transfer-detection/main.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "sepivip/SeekerClaw",
+     "path": "app/src/main/assets/nodejs-project/solana.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "0xalberto/jupiter-arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "mooncitydev/solana-arbitrage-bot-master",
+     "path": "src/constant/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "LimeChain/magnus",
+     "path": "crates/shared/src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Hweippy/prism-client-sdk",
+     "path": "src/markets/zerofi.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "LimeChain/mona",
+     "path": "src/cons.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "captorix/awesome-solana-prop-amms",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "jowency-me/solana-tx-parser",
+     "path": "ammmap.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "kyoshoku/kyo-dex-integrate",
+     "path": "src/lib.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "TraceSVM/propamm-simulator",
+     "path": "src/protocol/zerofi.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "FixedLocally/sandwich-finder",
+     "path": "sandwich-finder/src/events/addresses.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "Sercan0x/opeq",
+     "path": "web/lib/amms.js",
+     "class": "reference-code"
+    },
+    {
+     "repo": "argenestel/tradgents",
+     "path": "docs/VENUES.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "DefaultPerson/solana-dex-parser-go",
+     "path": "constants/programs.go",
+     "class": "reference-code"
+    },
+    {
+     "repo": "apollotoday/Arbitrage-bot-jupiter-aggrigator",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "Hweippy/prism-client-sdk",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "furydotbot/swap-api",
+     "path": "src/index.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "okxlabs/Web3-DEX-Router-Solana-V1",
+     "path": "programs/dex-solana/src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "eabz/evm-indexer",
+     "path": "src/svm/fixtures/phase2.json",
+     "class": "trace-fixture"
+    },
+    {
+     "repo": "ape7054/telbot",
+     "path": "src/core/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "djxbolboli927/4546657",
+     "path": "src/program_registry.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "jowency-me/solana-tx-parser",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "vola-trebla/arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "dexoryn/jupiter-arbitrage-bot",
+     "path": "README.md",
+     "class": "reference-doc"
+    },
+    {
+     "repo": "ape7054/telbot",
+     "path": "src/backup/config.ts",
+     "class": "reference-code"
+    },
+    {
+     "repo": "kyoshoku/tessera-v",
+     "path": "src/constants.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "WorthlessDeveloper/propquote",
+     "path": "crates/propquote-replay/src/venues.rs",
+     "class": "reference-code"
+    },
+    {
+     "repo": "GuiBibeau/solos-data",
+     "path": "docs/adr/0014-spot-swaps.md",
+     "class": "reference-doc"
+    }
+   ],
+   "verifications": [
+    {
+     "repo": "vybenetwork/solana-swap-api",
+     "path": "data/program-label-cache.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    },
+    {
+     "repo": "staccDOTsol/openai-idl-generat00r",
+     "path": "idl_data/ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY_account.json",
+     "ok": true,
+     "shaped": false,
+     "instructions": 0,
+     "binding": "literal-mention"
+    },
+    {
+     "repo": "bitquery/solana-idl-lib",
+     "path": "zerofi/zerofi.json",
+     "ok": true,
+     "shaped": true,
+     "instructions": 2,
+     "binding": "declared"
+    }
+   ],
+   "evidence": {
+    "repo": "bitquery/solana-idl-lib",
+    "path": "zerofi/zerofi.json",
+    "instructions": 2,
+    "binding": "declared"
+   },
+   "incomplete": false
+  }
+ ],
+ "summary": {
+  "programs": 16,
+  "payloads": 28,
+  "byVerdict": {
+   "external-reference-only": 12,
+   "external-interface-published": 4
+  },
+  "payloadsByVerdict": {
+   "external-reference-only": 19,
+   "external-interface-published": 9
+  },
+  "unknown": 0,
+  "verdict": "measured",
+  "externalInterfacePrograms": 4,
+  "externalInterfacePayloads": 9,
+  "foreignRepoSourceFound": 0
+ },
+ "limits": {
+  "index": "GitHub code search, literal (quoted) queries: absence claims are scoped to the indexed surface — unindexed repos cannot answer",
+  "verification": "every idl candidate (max 5/program) fetched; ok = the file really contains the literal; binding from the file itself",
+  "premise": "local git grep against the foreign clone at HEAD; trace-only is verified, not assumed",
+  "indexHits": "code/doc hits are index evidence only; only .json candidates are content-verified"
+ }
+}

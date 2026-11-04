@@ -1444,6 +1444,47 @@ The true acquisition gap for this sweep is now **65 payloads** across 28 program
 all of which have NO published IDL (9 dedicated custom parsers, 3 core runtime,
 16 unrepresented trace programs).
 
+### The 16 unrepresented trace programs, measured against external sources (2026-11-04)
+
+The 16 programs (28 payloads) were labeled `unrepresented-source-gap` because they
+appeared in the foreign repository ONLY inside `crates/parsers/tests/**` transaction
+traces (local premise check: 16/16 verified trace-only via `git grep HEAD`). Rather
+than assuming they have no interface anywhere, `tools/measure-unrepresented-external.mjs`
+scanned GitHub's code index for the literal program address, with a positive control
+(`bitquery/solana-idl-lib solfi/solfi.json` declares `SoLFiHG9Tfgt...` -> 1 index match,
+file readable and declares program -> control resolved; artifact:
+`research/unrepresented-external-sweep-2026-11-04.json`, pinned in
+`test/unrepresented-external.test.mjs`):
+
+- **4 programs (9 payloads)** have a published external interface whose file explicitly
+  **DECLARES** the program (`metadata.address` match, content-verified):
+  - SolFi (`SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe`, 4 payloads): `bitquery/solana-idl-lib solfi/solfi.json`
+  - ZeroFi (`ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY`, 1 payload): `bitquery/solana-idl-lib zerofi/zerofi.json`
+  - HumidiFi (`9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp`, 1 payload): `bitquery/solana-idl-lib humidifi/humidifi.json`
+  - Manifest Wrapper (`wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL`, 3 payloads): `Bonasa-Tech/manifest client/idl/wrapper.json`
+- **12 programs (19 payloads)** have external references (code or docs) but no published IDL file.
+- **0 unknown** (positive control resolved, no partial-sweep claims).
+
+### External adoption preview (falsification against fixture bytes)
+
+Does a declared external interface actually decode the foreign repo's fixture bytes?
+The claim was previewed via `tools/preview-external-adoption.mjs` on a throwaway store
+copy (artifact: `research/external-adoption-preview-2026-11-04.json`, pinned in
+`test/external-adoption-preview.test.mjs`):
+
+- **decoded:** 724 → **732** (+8 payloads decoded: SolFi 4/4, Manifest Wrapper 3/3, ZeroFi 1/1)
+- **gap (`noInterface`):** 65 → **56** (-9 payloads resolved)
+- **decodeErrors:** 17 → **18** — HumidiFi's single payload is **REFUSED BY NAME**:
+  `9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp: unknown instruction discriminator f6dc6...`
+  (an honest refusal, not a silent mis-parse).
+- **disagreements:** 0 (still completely diff-free).
+- **byteExactRate:** 100% (all 8 decoded payloads reproduce byte-for-byte).
+- **isolation:** exactly the 4 adopted programs moved in `byProgram`; 0 unadopted rows shifted.
+- **license gate:** `bitquery/solana-idl-lib` has license `null` (no LICENSE file),
+  `Bonasa-Tech/manifest` is `GPL-3.0`. Neither may be copied into this MIT repository or
+  the published npm package. The preview therefore ran on a throwaway work-dir;
+  the committed store remains untouched (`committedStoreModified: false`, 76 receipts).
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
