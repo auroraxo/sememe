@@ -1,0 +1,34 @@
+{
+  "what": "install-surface measurement: what a consumer who follows the README's Install section can actually run from a bare `npm install github:auroraxo/sememe#v0.4.1` (tarball-equivalent) — measured live, then the three defects fixed and pinned",
+  "date": "2026-11-05",
+  "preFixTree": "222f25b",
+  "method": {
+    "artifact": "npm pack of 222f25b (the bytes a github:-tag install receives): sememe-0.4.1.tgz, 496.4 kB packed / 2.1 MB unpacked, 55 files, shasum 11831838e230e7c51178d381614a60ba53d0f5e7",
+    "consumerDir": "empty app: npm init -y && npm install ./sememe-0.4.1.tgz — no clone, no tools/, no test/, no research/ (T1 pins this)",
+    "repeatablePart": "test/install-surface.test.mjs (T1-T6): T2-T5 RED on 222f25b, GREEN after the README fix; T1/T6 are the guards"
+  },
+  "defectsMeasuredPreFix": {
+    "D1_store_origin_undocumented": "the install section's decode example needs ./store but the install section never creates one; first decode dies: {\"error\":\"no sememe store at ./store: run \\\"sememe pull\\\" first\"} (src/store-read.mjs:78)",
+    "D2_documented_invocation_forms_dead_from_install": "bare `sememe` after plain npm install: command not found (exit 127); `node bin/sememe.mjs` from consumer cwd: MODULE_NOT_FOUND (clone-only); the form that works in BOTH clone and bare install — `npx sememe` (npm exec resolves the root package's own bin) — was documented nowhere (0 hits in README)",
+    "D3_publish_reason_contradicted_own_contract": "README: 'tests, fixtures and qualification harness must not ship as a dependency of anything' — but the files allowlist already ships none of those (55 files: src/interface/vendor/bin/index.mjs/LICENSE/README only), pinned by test/package.test.mjs"
+  },
+  "liveConsumerJourneyMeasuredPostTarballInstall_preFix": {
+    "peerInstall": "npm install @solana/web3.js@1.98.4 into the same app: ok",
+    "pull": "npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store /tmp/stranger-store --rpc https://api.mainnet-beta.solana.com -> exit 0, source metadata, slot 465660779, fingerprint sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f (canonical object byte-identical to the fixture-store object pulled at slot 462039125 on 2026-10-27)",
+    "decode": "npx sememe decode ... --store /tmp/stranger-store: real swap (42 B, byte-exact) and swap_v2 (49 B incl. remaining_accounts_info Some, byte-exact) through the installed CLI",
+    "vendored": "npx sememe decode-native 11111111111111111111111111111111 <43 B System transfer> -> {name: Transfer, selector: 2, lamports 1000000, roundTrip...} offline, no store",
+    "audit": "import('sememe/native-audit').auditNativeInterface() from the install -> {ok:true, checked:2}",
+    "exportMap": "all 13 documented subpaths import from the install except sememe/pull and sememe/gap which refuse with the named peer hint (exit 1) — matching the shipped README's refusal-scope sentence"
+  },
+  "fix": {
+    "files": ["README.md", "test/install-surface.test.mjs"],
+    "installSectionNow": "documents the consumer journey verbatim (npm install + peer, npx sememe pull/decode), names the PATH fact (bare `sememe` not on PATH, node bin/sememe.mjs clone-only, npx sememe works), ties the store-refusal error text to the pull that creates the store, notes the vendored no-store path, and states the measured publish reason (files allowlist already ships no harness; no name squatting)",
+    "ladder": "pre-fix 222f25b: 2/6 (guards green, defect tests red) -> post-fix: 6/6; suite 478 -> 484 pass (486 total, 2 named skips, 0 red)"
+  },
+  "limits": [
+    "own-host measurement; no external user (adoption gate unchanged, verdict still not-distributed-not-consumed)",
+    "npx resolution was measured on npm 8.x behavior (npm exec prefers the local/root package bin); the offline check used npm_config_offline=true",
+    "the tarball measured is `npm pack` of the tree, the same bytes a github:-tag install receives; the live github:-tag install of v0.4.1 (pre-fix README) was measured separately on 2026-11-05 by the stranger-funnel (F2/F3)",
+    "no npm registry publish happened or is proposed; the name `sememe` remains unregistered (registry 404 re-measured 2026-11-05 with UA)"
+  ]
+}
