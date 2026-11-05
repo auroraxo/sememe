@@ -159,9 +159,17 @@ test(`T3: the pinned tag (${PIN}) decode example is complete and runs verbatim a
   assert.match(text, /"roundTripByteExact":\s*true/, 'documented decode must be byte-exact');
 });
 
-test('G1 (guard): the current tree README keeps the runnable consumer journey (npx form + store step)', () => {
+test('G1 (guard): the current tree README keeps the runnable consumer journey (npx form + store step + complete decode line)', () => {
   const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
   const consumer = readme.split('## Working now')[0];
   assert.ok(readme.includes('npx sememe'), 'main README documents the npx form');
   assert.match(consumer, /npx sememe pull/, 'main README consumer journey includes the pull step');
+  const decodeLines = [...consumer.matchAll(/```bash\n([\s\S]*?)```/g)]
+    .flatMap(([, block]) => block.split('\n'))
+    .map((l) => l.trim())
+    .filter((l) => /^npx sememe decode\b/.test(l));
+  assert.ok(decodeLines.length > 0, 'main README documents an npx decode command');
+  for (const line of decodeLines) {
+    assert.ok(!line.includes('...'), `main README decode example must not be elided with "...": ${line}`);
+  }
 });
