@@ -26,8 +26,12 @@ import { canonicalJson } from './canonical.mjs';
 
 export { canonicalJson } from './canonical.mjs';
 
-/** Read and verify one receipt+object pair. Throws with a named reason. */
-async function readVerified(storeDir, program, receiptName) {
+/** Read and verify one receipt+object pair. Throws with a named reason.
+ *
+ * Exported for `src/lock.mjs`: the lock must re-check every receipt through
+ * THIS reader — a second, weaker copy of the checks would recreate the "one
+ * store, two strengths" failure the header warns about. */
+export async function readVerified(storeDir, program, receiptName) {
   let receipt;
   try {
     receipt = JSON.parse(await readFile(path.join(storeDir, 'receipts', receiptName), 'utf8'));

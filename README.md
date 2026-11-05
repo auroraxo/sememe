@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus five programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget) and Raydium AMM v4, all five with wire tables DERIVED from pinned upstream Rust — and all 12,572 unbiased real-mainnet payloads now have an interface to decode against, lifting coverage from 55.5% to 98.6% strict / 100% verified (the last strict refusal, Token-2022's token-metadata fallback, decodes since 2026-11-03) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. Lockfiles, catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic), plus five programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget) and Raydium AMM v4, all five with wire tables DERIVED from pinned upstream Rust — and all 12,572 unbiased real-mainnet payloads now have an interface to decode against, lifting coverage from 55.5% to 98.6% strict / 100% verified (the last strict refusal, Token-2022's token-metadata fallback, decodes since 2026-11-03) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. The fingerprint lockfile ships (`sememe lock` + `sememe verify`, 2026-11-05); catalog import and daemon are still proposals.
 
 ## Quickstart: the copy-paste 1,000-transaction check (2026-11-04)
 
@@ -96,7 +96,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 - **pull:** fetch an interface from an on-chain IDL, a curated catalog, or a local file.
 - **validate:** fingerprint the canonical form, check discriminator uniqueness, cross-check the chain where possible, and tolerate Anchor IDL format changes.
 - **resolve (now implemented for instruction data):** decode and encode locally from the stored IDL, with strict errors instead of guesses. A program without a trustworthy source stays explicitly unverifiable.
-- **store:** keep records under `~/.sememe/`; `sememe.lock` pins exact fingerprints per project.
+- **store:** keep records under `~/.sememe/`; `sememe.lock` pins exact fingerprints per project (**ships** — see *Working now: pin the answers*).
 - **resolve:** decode and encode locally, with strict errors instead of guesses. A program without a trustworthy source stays explicitly unverifiable.
 
 ## Install (as a consumer, not a contributor)
@@ -127,6 +127,21 @@ npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a4
 `./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
 
 Publishing to the npm registry itself is deliberately not done: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), and no registry name squatting is part of the plan. The git tag is the release artifact; `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep it honest.
+
+## Working now: pin the answers (`sememe lock` + `sememe verify`, 2026-11-05)
+
+The idea section promises "`sememe.lock` pins exact fingerprints per project" — this is that file, and it shipped the same day the promise was measured against the tree (the README said it; no implementation answered; `test/lock.test.mjs` was written first and went 0/11 red on the pre-lock tree).
+
+From a clone (after `npm ci`), the two commands, verbatim:
+
+```bash
+node bin/sememe.mjs lock --store /tmp/sememe-demo --out /tmp/sememe-demo.lock
+node bin/sememe.mjs verify --store /tmp/sememe-demo --lock /tmp/sememe-demo.lock
+```
+
+From an install, the same journey runs through `npx sememe lock --store ./store --out ./sememe.lock` and `npx sememe verify --store ./store --lock ./sememe.lock`. `lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (a pinned object fails the re-hash). Extra store programs are reported, never a violation: the lock pins minimums, not store equality. `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
+
+What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4 have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
 
 ## Working now: pull a program's on-chain IDL
 
@@ -190,7 +205,7 @@ The artifact records, per program: verdict (`stored` / `undecodable` / `unknown`
 
 **What a pull does NOT promise:** the pulled IDL describes the program AS PUBLISHED, not as deployed. Measured on the 156-fixture sweep: after pulling all 34, 152 of the 177 payloads decode byte-exactly, but 25 refuse with named reasons — 19 discriminators the deployed program emitted that the published IDL does not list, 6 stale argument layouts — in transactions that SUCCEEDED on chain. Where a first-party published copy exists (the foreign repo ships 13 of them), adopting it next to the pull and decoding through the union closes most of those; see the union section below.
 
-**Limit:** This is acquisition and content-addressed storage, not an independent audit of the on-chain ABI, offline resolver, freshness guarantee or authority check. Fetch responses are trusted to the configured RPC; first-party repo parity has not been established. `resolve`, `decode-tx`, `lock`, `diff` and the optional local daemon remain proposals. (Account and event decoding are NOT proposals: they ship — `decodeStoredAccount` for account state and Anchor `emit_cpi!` event self-CPIs are both on the entry; this sentence said otherwise until 2026-11-05, and the contradiction was measured and pinned by `test/release-surface.test.mjs`.) A later Rust core/TypeScript SDK may replace this Node-based prototype; neither exists yet.
+**Limit:** This is acquisition and content-addressed storage, not an independent audit of the on-chain ABI, offline resolver, freshness guarantee or authority check. Fetch responses are trusted to the configured RPC; first-party repo parity has not been established. `resolve`, `decode-tx`, `diff` and the optional local daemon remain proposals — `lock` no longer does (it ships, see below). (Account and event decoding are NOT proposals: they ship — `decodeStoredAccount` for account state and Anchor `emit_cpi!` event self-CPIs are both on the entry; this sentence said otherwise until 2026-11-05, and the contradiction was measured and pinned by `test/release-surface.test.mjs`.) A later Rust core/TypeScript SDK may replace this Node-based prototype; neither exists yet.
 
 ## Working now: decode instruction data offline from the stored IDL
 
