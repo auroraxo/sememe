@@ -1,0 +1,54 @@
+{
+  "what": "lock-journey measurement: the pinned install must carry the lock the README says ships, and the README's lock section must document a store-creating pull before the commands that need the store",
+  "date": "2026-11-05",
+  "repo": "auroraxo/sememe",
+  "hypothesis": "The lock shipped on main (b8465bf) AFTER the pinned tag v0.4.3 was cut; a stranger following the front-page pin receives a package whose CLI has no lock at all, while the README they read says the lockfile ships.",
+  "preFixTree": "b8465bf (pin #v0.4.3, tag 813a4b8)",
+  "postFixTree": "4a932c5 (pin #v0.4.4, tag v0.4.4 = bd098eb lineage; release page Latest)",
+  "defects": [
+    {
+      "id": "L1-pinned-tag-has-no-lock",
+      "surface": "v0.4.3 packed tarball (the bytes a github:#v0.4.3 install receives), measured via a real npm install of the published tag",
+      "evidence": "src/lock.mjs ABSENT from the v0.4.3 tree (git cat-file: 'exists on disk, but not in v0.4.3'); 'npx sememe lock --store ./store --out ./sememe.lock' on the real install EXIT 2 (usage dump, unknown-command branch); 'npx sememe verify ...' EXIT 2; no lock file written",
+      "fixedIn": "v0.4.4 (tag carries src/lock.mjs; documented commands run verbatim)"
+    },
+    {
+      "id": "L2-lock-section-fresh-machine-dead-end",
+      "surface": "main README lock section (both pre- and post-tag; independent of the tag)",
+      "evidence": "documented block ran verbatim on the fresh tree: 'node bin/sememe.mjs lock --store /tmp/sememe-demo --out /tmp/sememe-demo.lock' -> EXIT 1, {\"error\":\"no sememe store at /tmp/sememe-demo: run \\\"sememe pull\\\" first\"}; the store-creating pull was documented only in a LATER section (the linear-reader error class)",
+      "fixedIn": "the lock section now documents the pull BEFORE lock/verify, in both the clone and the install form"
+    }
+  ],
+  "fix": {
+    "version": "0.4.4",
+    "pinsMoved": 2,
+    "readmeChanges": "clone block = pull -> lock -> verify; install block = npx pull -> npx lock -> npx verify, with the measured refusal named in the prose",
+    "newTest": "test/lock-journey.test.mjs (L1 runs the pinned tag's OWN documented lock journey from the packed tarball against the committed fixture store, offline; L2 refuses a lock section whose store-consuming command has no pull COMMAND before it — prose does not count, the repo's T6 rule; G1 guards main)"
+  },
+  "ladder": [
+    { "tree": "b8465bf pin v0.4.3", "L1": "RED (README lock section unparseable + documented lock exits 2 on the tag install)", "L2": "RED (no pull command before lock)", "G1": "RED (pre-fix section had neither)" },
+    { "tree": "4a932c5 pin v0.4.4 (unpublished)", "L1": "SKIP (named: tag not local and not fetchable from origin)", "L2": "GREEN", "G1": "GREEN" },
+    { "tree": "4a932c5 pin v0.4.4 (published, local)", "L1": "GREEN (journey runs verbatim from the bare install)", "L2": "GREEN", "G1": "GREEN" }
+  ],
+  "mutationsCaught": [
+    { "mutation": "M1: pull commands deleted from the lock section", "expected": "L2 RED", "measured": "L2 RED" },
+    { "mutation": "M2: pull replaced by comment lines only (prose/comments are not commands)", "expected": "L2 RED", "measured": "L2 RED" },
+    { "mutation": "M3: lock/verify moved BEFORE the pull (wrong order)", "expected": "L2 RED", "measured": "L2 RED" },
+    { "mutation": "M4: L1's exit-status assertion swallowed (return on failure) + pin pointed at defective v0.4.3", "expected": "L1 RED (the CLI run is what L1 measures, not file presence)", "measured": "L1 RED" }
+  ],
+  "liveVerification": {
+    "documentedCloneJourneyBeforeTagging": "pull slot 465799518 fingerprint sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f -> lock -> verify 1 pinned 1 verified 0 violations (all exit 0)",
+    "strangerInstallOfPublishedV044": "empty app, npm install github:auroraxo/sememe#v0.4.4 @solana/web3.js (the documented journey), verbatim: pull EXIT 0 slot 465801042 fingerprint sha256:0b886e37…660f -> lock EXIT 0 lockVersion 1 written -> verify EXIT 0 {pinned:1, verified:1, drifted:0, violations:0}",
+    "releaseSurfaceAfter": "clean: newestTag v0.4.4 = latestTag v0.4.4, pinnedTags [v0.4.4], defects []",
+    "releases": { "v0.4.4": "Latest", "v0.4.3": "SUPERSEDED banner -> v0.4.4" }
+  },
+  "suite": { "before": "502: 500 pass / 2 named-skip / 0 fail (b8465bf)", "after": "505: 499 pass / 6 named-skip / 0 fail (4 new skips are the unpublished-tag guard during the pin window; 3 of them green once v0.4.4 published)" },
+  "ci": { "mainFix": "42080930278 success", "tagV044": "42081167356 success", "artifactCommit": "42081471039 (in progress at write time)" },
+  "adoptionGate": "not-distributed-not-consumed (unchanged; measured this pulse via tools/measure-foreign-run.mjs: 0 non-owner signals)",
+  "limits": [
+    "own-host measurement; no external user, no audit",
+    "L1 runs the documented commands against the committed fixture store (offline); the live-pull leg was measured separately on this host and is not part of the offline suite",
+    "the v0.4.3 tag keeps its defect (tags are immutable); its release page carries the SUPERSEDED banner",
+    "lock still has no freshness check and no re-pull protection (documented limits, unchanged)"
+  ]
+}
