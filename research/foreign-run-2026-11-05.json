@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-11-05T02:23:21.390Z",
+  "measuredAt": "2026-11-05T10:29:52.718Z",
   "repo": "auroraxo/sememe",
   "checks": {
     "repoMetadata": {
@@ -27,8 +27,8 @@
         "uniques": 2
       },
       "clones": {
-        "count": 975,
-        "uniques": 256
+        "count": 1156,
+        "uniques": 283
       },
       "caveat": "clone count includes every CI checkout of this repo (own CI pulls it per push); never a consumption signal",
       "externalReferrers": [],
@@ -104,8 +104,8 @@
       "uniques": 2
     },
     "clones": {
-      "count": 975,
-      "uniques": 256
+      "count": 1156,
+      "uniques": 283
     },
     "caveat": "clone count includes every CI checkout of this repo (own CI pulls it per push); never a consumption signal",
     "externalReferrers": [],
