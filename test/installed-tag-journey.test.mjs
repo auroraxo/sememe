@@ -129,6 +129,36 @@ test(`T2: the pinned tag (${PIN}) ships a README whose CLI form runs from an ins
   );
 });
 
+// T3 closes the fourth dead-end of this class, measured live on the packed
+// v0.4.2 tarball (2026-11-05): the journey's decode line carried an ELIDED
+// payload (`2b04ed0b1ac91e62...`), so the third verbatim command a stranger
+// runs ended in `{"error":"invalid base58 character \"0\""}` — the elision's
+// `...` is not base58. A documented example that cannot run is the same
+// defect as a documented command that does not exist.
+test(`T3: the pinned tag (${PIN}) decode example is complete and runs verbatim against the committed fixture store`, { skip: skipReason || false }, () => {
+  const consumer = ctx.readme.split('## Working now')[0];
+  const decodeLines = [...consumer.matchAll(/```bash\n([\s\S]*?)```/g)]
+    .flatMap(([, block]) => block.split('\n'))
+    .map((l) => l.trim())
+    .filter((l) => /^npx sememe decode\b/.test(l));
+  assert.ok(decodeLines.length > 0, 'shipped README consumer section must document an npx decode command');
+
+  for (const line of decodeLines) {
+    assert.ok(!line.includes('...'), `decode example must not be elided with "...": ${line}`);
+  }
+  // The decoded line runs verbatim from the installed tree: the store comes
+  // from the committed fixture (offline — the pull step is T1's contract,
+  // measured live separately), cwd is the bare install, no repo paths.
+  const line = decodeLines[0];
+  const storeDst = path.join(ctx.dir, 'store');
+  fs.rmSync(storeDst, { recursive: true, force: true });
+  fs.cpSync(path.join(ROOT, 'test', 'fixtures', 'traffic-sample-store-2026-11-04'), storeDst, { recursive: true });
+  const out = spawnSync('bash', ['-c', line], { cwd: ctx.dir, encoding: 'utf8' });
+  const text = out.stdout + out.stderr;
+  assert.match(text, /"name":\s*"[a-z_0-9]+"/, `documented decode must decode, got: ${text.slice(0, 400)}`);
+  assert.match(text, /"roundTripByteExact":\s*true/, 'documented decode must be byte-exact');
+});
+
 test('G1 (guard): the current tree README keeps the runnable consumer journey (npx form + store step)', () => {
   const readme = fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8');
   const consumer = readme.split('## Working now')[0];
