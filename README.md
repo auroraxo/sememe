@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.3   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.4   # tagged release; no npm account needed
 ```
 
 ```js
@@ -119,7 +119,7 @@ The pull is the one path that needs a package too, because deriving the Program 
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.3 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.4 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -132,14 +132,23 @@ Publishing to the npm registry itself is deliberately not done: the files allowl
 
 The idea section promises "`sememe.lock` pins exact fingerprints per project" — this is that file, and it shipped the same day the promise was measured against the tree (the README said it; no implementation answered; `test/lock.test.mjs` was written first and went 0/11 red on the pre-lock tree).
 
-From a clone (after `npm ci`), the two commands, verbatim:
+From a clone (after `npm ci`), the full sequence, verbatim — the `pull` creates the store these commands pin (a fresh machine has no `/tmp/sememe-demo` yet; measured 2026-11-05: the lock without the pull died with `no sememe store at /tmp/sememe-demo`, exit 1):
 
 ```bash
+node bin/sememe.mjs pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store /tmp/sememe-demo
 node bin/sememe.mjs lock --store /tmp/sememe-demo --out /tmp/sememe-demo.lock
 node bin/sememe.mjs verify --store /tmp/sememe-demo --lock /tmp/sememe-demo.lock
 ```
 
-From an install, the same journey runs through `npx sememe lock --store ./store --out ./sememe.lock` and `npx sememe verify --store ./store --lock ./sememe.lock`. `lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (a pinned object fails the re-hash). Extra store programs are reported, never a violation: the lock pins minimums, not store equality. `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
+From an install (the peer is needed for the `pull` step only), the same journey, verbatim — the `pull` creates the store these commands pin (a fresh machine has no store yet; measured 2026-11-05: the lock without the pull died with `no sememe store at ./store`, exit 1):
+
+```bash
+npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
+npx sememe lock --store ./store --out ./sememe.lock
+npx sememe verify --store ./store --lock ./sememe.lock
+```
+
+`lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (a pinned object fails the re-hash). Extra store programs are reported, never a violation: the lock pins minimums, not store equality. `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
 
 What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4 have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
 
