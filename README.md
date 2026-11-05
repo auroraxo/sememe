@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.3.0   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.0   # tagged release; no npm account needed
 ```
 
 ```js
@@ -114,7 +114,7 @@ const result = await decodePayload('./store', 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYz
 
 The decode path installs **zero runtime dependencies**: `sememe` itself has none on its entry, and every file it reaches imports only `node:` builtins. Beyond the entry, the package exports `sememe/native` (System + ComputeBudget, derived at import from the pinned upstream sources), `sememe/token` (SPL Token + Token-2022, derived the same way from the pinned interface crates), `sememe/raydium` (Raydium AMM v4, derived from its pinned program source), `sememe/store` (read/verify receipts), `sememe/pull` (acquisition) and the low-level surfaces a consumer may need directly: `sememe/codec`, `sememe/canonical`, `sememe/discriminators`. Two audit surfaces let a consumer falsify the table it was handed instead of trusting it: `sememe/native-corpus` (the real mainnet System/ComputeBudget harvests the decoder was qualified against, re-hashed on every read) and `sememe/native-audit` (re-derive the native tables from the pinned vendored Rust and byte-compare the shipped artifacts — the same audit the suite runs).
 
-**Acquisition is the one path that needs a package**, because deriving the Program Metadata PDA needs ed25519: `npm install github:auroraxo/sememe#v0.3.0 @solana/web3.js`. `@solana/web3.js` is declared as an *optional peer* precisely so a decoder-only consumer is never asked to install it. The CLI refuses `sememe pull` without it, with that instruction, and still runs every other subcommand.
+**Acquisition is the one path that needs a package**, because deriving the Program Metadata PDA needs ed25519: `npm install github:auroraxo/sememe#v0.4.0 @solana/web3.js`. `@solana/web3.js` is declared as an *optional peer* precisely so a decoder-only consumer is never asked to install it. The CLI refuses `sememe pull` without it, with that instruction, and still runs every other subcommand.
 
 Publishing to the npm registry itself is deliberately not done: this repository's tests, fixtures and qualification harness must not ship as a dependency of anything, and no registry name squatting is part of the plan. The git tag is the release artifact; `test/package.test.mjs` (the contract above) and `tools/e2e-package-consumer.mjs` (a real install into an empty directory) keep it honest.
 
@@ -180,7 +180,7 @@ The artifact records, per program: verdict (`stored` / `undecodable` / `unknown`
 
 **What a pull does NOT promise:** the pulled IDL describes the program AS PUBLISHED, not as deployed. Measured on the 156-fixture sweep: after pulling all 34, 152 of the 177 payloads decode byte-exactly, but 25 refuse with named reasons — 19 discriminators the deployed program emitted that the published IDL does not list, 6 stale argument layouts — in transactions that SUCCEEDED on chain. Where a first-party published copy exists (the foreign repo ships 13 of them), adopting it next to the pull and decoding through the union closes most of those; see the union section below.
 
-**Limit:** This is acquisition and content-addressed storage, not an independent audit of the on-chain ABI, offline resolver, freshness guarantee or authority check. Fetch responses are trusted to the configured RPC; first-party repo parity has not been established. Account and event decoding, `resolve`, `decode-tx`, `lock`, `diff` and the optional local daemon remain proposals; only instruction data is decoded today. A later Rust core/TypeScript SDK may replace this Node-based prototype; neither exists yet.
+**Limit:** This is acquisition and content-addressed storage, not an independent audit of the on-chain ABI, offline resolver, freshness guarantee or authority check. Fetch responses are trusted to the configured RPC; first-party repo parity has not been established. `resolve`, `decode-tx`, `lock`, `diff` and the optional local daemon remain proposals. (Account and event decoding are NOT proposals: they ship — `decodeStoredAccount` for account state and Anchor `emit_cpi!` event self-CPIs are both on the entry; this sentence said otherwise until 2026-11-05, and the contradiction was measured and pinned by `test/release-surface.test.mjs`.) A later Rust core/TypeScript SDK may replace this Node-based prototype; neither exists yet.
 
 ## Working now: decode instruction data offline from the stored IDL
 

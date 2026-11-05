@@ -1,0 +1,130 @@
+{
+  "measuredAt": "2026-11-05T05:10:43.974Z",
+  "repo": "auroraxo/sememe",
+  "surfaces": {
+    "releases": [],
+    "tags": [
+      "v0.1.0",
+      "v0.1.1",
+      "v0.2.0",
+      "v0.2.1",
+      "v0.2.2",
+      "v0.3.0"
+    ],
+    "readme": {
+      "installTags": [
+        "v0.3.0"
+      ],
+      "documentedCommands": [
+        "pull",
+        "gap",
+        "decode",
+        "account",
+        "adopt"
+      ],
+      "documentedExports": [
+        "native",
+        "token",
+        "raydium",
+        "store",
+        "pull",
+        "codec",
+        "canonical",
+        "discriminators",
+        "native-corpus",
+        "native-audit"
+      ],
+      "shippedAccountEvent": true,
+      "proposalInstructionOnly": true,
+      "hasQuickstart": true
+    },
+    "trees": {
+      "v0.3.0": {
+        "manifest": {
+          "version": "0.3.0",
+          "private": false
+        },
+        "binCommands": [
+          "account",
+          "adopt",
+          "decode",
+          "decode-native",
+          "decode-token",
+          "native-provenance",
+          "pull",
+          "token-provenance"
+        ],
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.3.0"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "token"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": true,
+          "hasQuickstart": false
+        }
+      }
+    }
+  },
+  "verdict": {
+    "verdict": "defective:missing-release-for-newest-tag+readme-install-tag-missing-command:gap+readme-install-tag-missing-export:raydium+readme-contradiction-decode-scope",
+    "defects": [
+      "missing-release-for-newest-tag",
+      "readme-install-tag-missing-command:gap",
+      "readme-install-tag-missing-export:raydium",
+      "readme-contradiction-decode-scope"
+    ],
+    "newestTag": "v0.3.0",
+    "latestTag": null,
+    "pinnedTags": [
+      "v0.3.0"
+    ]
+  },
+  "perRelease": {},
+  "noVerdict": false,
+  "reason": null
+}
