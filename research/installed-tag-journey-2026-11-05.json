@@ -1,0 +1,52 @@
+{
+  "measuredAt": "2026-11-05T13:10:00Z",
+  "topic": "pinned-install journey: the README the front-page pin delivers must itself run the consumer journey",
+  "hypothesis": "The install-surface fix (97c8c79) repaired the consumer journey on main AFTER v0.4.1 was tagged; a stranger following the front-page pin receives the TAG's README, so the two measured dead-ends still ship to every pinned install.",
+  "method": "git show <tag>:README.md grep counts; npm pack of an exported tag worktree (the bytes a github:#<tag> install receives); fresh installs from the PUBLIC tag into empty apps; journey commands extracted verbatim from the SHIPPED README and executed; contract test written first (test/installed-tag-journey.test.mjs).",
+  "defects": [
+    {
+      "id": "D3-tagreadme-no-store-step",
+      "surface": "v0.4.1 tarball README (what the pinned install ships)",
+      "measured": "consumer section contains no runnable pull command before the decode example that needs ./store; first decode dies with no-sememe-store refusal naming a command the install cannot run",
+      "fixedIn": "v0.4.2 (pin moved; tag README carries the npx pull step)"
+    },
+    {
+      "id": "D4-tagreadme-no-npx",
+      "surface": "v0.4.1 tarball README",
+      "measured": "npx sememe occurrences: 0; bare sememe from install: exit 127; node bin/sememe.mjs resolves only in a clone",
+      "fixedIn": "v0.4.2"
+    },
+    {
+      "id": "D5-elided-payload",
+      "surface": "v0.4.2 tarball README journey (third command)",
+      "measured": "decode example carried elided payload 2b04ed0b1ac91e62...; verbatim run: {\"error\":\"invalid base58 character \\\"0\\\"\"} — the elision dots are not base58",
+      "fixedIn": "v0.4.3 (full measured payload: Whirlpool swap_v2, roundTripByteExact true)"
+    }
+  ],
+  "ladder": [
+    { "tree": "d82c25c (pre-fix, pin v0.4.1)", "T1": "RED", "T2": "RED", "G1": "GREEN" },
+    { "tree": "9391bf2 (pin moved to unpublished v0.4.2)", "T1": "SKIP (tag not resolvable — named skip, never silent green)", "T2": "SKIP", "G1": "GREEN" },
+    { "tree": "v0.4.2 published, pin v0.4.2 (pre-T3-fix)", "T1": "GREEN", "T2": "GREEN", "T3": "RED" },
+    { "tree": "813a4b8 = tag v0.4.3, pin v0.4.3", "T1": "GREEN", "T2": "GREEN", "T3": "GREEN", "G1": "GREEN" }
+  ],
+  "mutations": [
+    { "mutation": "main README payload re-elided (2b04ed0b1ac91e62...)", "result": "G1 RED, T1/T2/T3 GREEN (they measure the tag, not main)", "restored": "byte-identical" }
+  ],
+  "publicInstalls": [
+    { "tag": "v0.4.2", "context": "empty app, no clone", "pull": { "slot": 465711678, "fingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f" } },
+    { "tag": "v0.4.3", "context": "empty app, no clone; all three shipped journey commands verbatim", "pull": { "slot": 465713413, "fingerprint": "sha256:0b886e37…660f (matches documented fixture object)" }, "decode": { "name": "swap_v2", "roundTripByteExact": true } }
+  ],
+  "distributionState": {
+    "releases": { "v0.4.3": "Latest", "v0.4.2": "SUPERSEDED banner -> v0.4.3", "v0.4.1": "SUPERSEDED banner -> v0.4.2" },
+    "releaseSurface": { "verdict": "clean", "newestTag": "v0.4.3", "latestTag": "v0.4.3", "pinnedTags": ["v0.4.3"], "defects": 0 },
+    "adoptionGate": "not-distributed-not-consumed (unchanged; 0 non-owner signals; step#1 and rfq#96 open with 0 non-owner comments)",
+    "npmPublish": "still blocked only by credentials (npm whoami ENEEDAUTH; no token on host)"
+  },
+  "suite": { "before": "486 tests: 484 pass / 2 named-skip / 0 fail (144.6s)", "after": "490 tests: 488 pass / 2 named-skip / 0 fail (129.5s)", "ci": ["9391bf2: 42030049665 + 42030049055 success", "813a4b8: 42031174776 + 42031174266 success", "02a5356 (G1 hardening): pushed, run in progress at artifact time"] },
+  "limits": [
+    "own-host measurement; T3's decode runs offline against the committed fixture store — the live pull step is measured separately, not inside the offline suite",
+    "the journey test proves the shipped README's commands exist and run; it does not prove a stranger's success on a machine that is not this host",
+    "v0.4.1 and v0.4.2 tags keep their defects (tags immutable); their release pages carry SUPERSEDED banners",
+    "npm publish remains blocked by credentials, not by the artifact; no external users, not an audit"
+  ]
+}
