@@ -134,6 +134,7 @@ export function codeBlocks(markdown) {
  *  documentedExports    `sememe/<subpath>` subpaths the README names
  *  shippedAccountEvent  the status line claims account+event decoding ships
  *  proposalInstructionOnly  a stale sentence claims only instruction data decodes
+ *  peerRefusalCommands  commands the refusal sentence names as needing @solana/web3.js
  *  hasQuickstart        a "## Quickstart" section exists
  */
 export function parseReadme(markdown) {
@@ -177,8 +178,27 @@ export function parseReadme(markdown) {
     shippedAccountEvent: /Anchor event self-CPIs and account state/.test(md),
     proposalInstructionOnly: /only instruction data is decoded today/.test(md) ||
       /Account and event decoding[^.]*remain proposals/.test(md),
+    // The refusal-scope sentence names the commands that need the optional
+    // peer. Measured 2026-11-05: it claimed only `sememe pull` while the
+    // tree derives `sememe gap` too — the extraction must carry the claim
+    // so the rule can check it against the real import graph (C6).
+    peerRefusalCommands: extractPeerRefusalCommands(md),
     hasQuickstart: /^##\s+Quickstart/m.test(md),
   };
+}
+
+/** Commands the "The CLI refuses ..." sentence claims as peer-needing. */
+function extractPeerRefusalCommands(md) {
+  const out = [];
+  // SENTENCE-scoped, not line-scoped: measured 2026-11-05 (mutation M6) — a
+  // line-scoped match swallowed `sememe gap` from a parenthetical note on the
+  // same line, so dropping gap from the actual refusal sentence still passed.
+  const sentence = String(md || '').match(/The CLI refuses[^.\n]*\./);
+  if (!sentence) return out;
+  const cmdRe = /`sememe\s+([a-z][a-z0-9-]*)`/g;
+  let c;
+  while ((c = cmdRe.exec(sentence[0]))) if (!out.includes(c[1])) out.push(c[1]);
+  return out;
 }
 
 export function bodyHasLimitStatement(body) {
@@ -293,6 +313,22 @@ export function derive({ releases, tags, readme, trees }) {
     out.defects.push('readme-contradiction-decode-scope');
   }
 
+  // --- C6: the README's refusal-scope sentence must cover every command the
+  // pinned tree really derives as peer-needing. Measured 2026-11-05: the
+  // sentence claimed only `pull` while `gap` lazily imports acquire.mjs, the
+  // one file allowed to import the peer — the copy-paste install (without
+  // the peer) then hits a refusal the README promised would not happen.
+  const claims = Array.isArray(readme.peerRefusalCommands) ? readme.peerRefusalCommands : null;
+  if (pinned.length && claims) {
+    for (const tag of pinned) {
+      const tree = (trees || {})[tag];
+      if (!tree || !tree.peerNeeds || !Array.isArray(tree.peerNeeds.commands)) continue;
+      for (const cmd of tree.peerNeeds.commands) {
+        if (!claims.includes(cmd)) out.defects.push(`readme-peer-scope-claim-false:${cmd}`);
+      }
+    }
+  }
+
   // --- C5: the release bodies
   for (const r of byTag.values()) {
     const tree = (trees || {})[r.tag];
@@ -363,6 +399,117 @@ export function binCommandsOf(source) {
   return [...out].sort();
 }
 
+// The one package the acquisition path needs as an OPTIONAL PEER; the decode
+// core must never reach it (pinned by test/deps.test.mjs).
+const PEER_PKG = '@solana/web3.js';
+
+/**
+ * Which CLI commands really NEED the optional peer, derived statically from
+ * the bin dispatch graph. Measured 2026-11-05: the README's refusal sentence
+ * claimed only `pull` while `gap` (shipped 97cd8f8) lazily imports
+ * acquire.mjs — the one file allowed to import the peer — so a stranger
+ * without the peer hit a refusal the README promised would not happen.
+ *
+ * binSource: the bin's JS. resolve(rel): file content for a bin-relative
+ * specifier, or null when unreadable. Unresolvable graphs are REPORTED in
+ * unknownCommands — never silently read as peer-free. Cycles are bounded by
+ * a visited set. A command whose branch imports nothing at all belongs to
+ * nobody (static imports in the bin's own header are not branch-scoped).
+ */
+export function peerNeedsOf(binSource, resolve) {
+  const src = String(binSource || '');
+  const branches = [];
+  const headRe = /(?:^|[\s;{}])(if|else\s+if)\s*\(\s*command\s*===\s*'([a-z][a-z0-9-]*)'\s*\)\s*\{/g;
+  let m;
+  while ((m = headRe.exec(src))) branches.push({ name: m[2], start: m.index + m[0].length });
+  // close each branch body with a string-aware brace scan
+  for (const br of branches) {
+    let i = br.start, depth = 1, q = null;
+    while (i < src.length && depth > 0) {
+      const ch = src[i];
+      if (q) {
+        if (ch === '\\') { i += 2; continue; }
+        if (ch === q) q = null;
+        i++; continue;
+      }
+      if (ch === "'" || ch === '"' || ch === '`') { q = ch; i++; continue; }
+      if (ch === '/' && src[i + 1] === '/') { while (i < src.length && src[i] !== '\n') i++; continue; }
+      if (ch === '/' && src[i + 1] === '*') { i += 2; while (i < src.length && !(src[i] === '*' && src[i + 1] === '/')) i++; i += 2; continue; }
+      if (ch === '{') depth++;
+      else if (ch === '}') depth--;
+      i++;
+    }
+    br.end = Math.min(i, src.length);
+  }
+
+  const IMPORT_RE = () => /import\s+[^'";]*?from\s*['"]([^'"]+)['"]|import\s*\(\s*['"]([^'"]+)['"]\s*\)|require\(\s*['"]([^'"]+)['"]\s*\)/g;
+  // drop comments and template literals, keep quoted specifiers
+  const strip = (code) => {
+    let out = '', i = 0;
+    while (i < code.length) {
+      const ch = code[i];
+      if (ch === '/' && code[i + 1] === '/') { while (i < code.length && code[i] !== '\n') i++; continue; }
+      if (ch === '/' && code[i + 1] === '*') { i += 2; while (i < code.length && !(code[i] === '*' && code[i + 1] === '/')) i++; i += 2; continue; }
+      if (ch === '`') { i++; while (i < code.length && code[i] !== '`') { if (code[i] === '\\') i++; i++; } i++; out += ' '; continue; }
+      out += ch; i++;
+    }
+    return out;
+  };
+  const needsPeer = (stripped) => {
+    const re = IMPORT_RE();
+    let im;
+    while ((im = re.exec(stripped))) if ((im[1] || im[2] || im[3]) === PEER_PKG) return true;
+    return false;
+  };
+
+  const commands = new Set();
+  const unknownCommands = new Set();
+  // a dispatch found by binCommandsOf but not by the branch shape cannot be
+  // scoped — report it, never silently read as peer-free
+  for (const name of binCommandsOf(src)) if (!branches.some((b) => b.name === name)) unknownCommands.add(name);
+  for (const br of branches) {
+    const body = strip(src.slice(br.start, br.end));
+    let needs = needsPeer(body);
+    // BFS over relative specifiers. resolve(spec) is ALWAYS called with a
+    // path normalized against the IMPORTING file's directory (ESM semantics):
+    // the bin's own imports are bin-relative; a file at src/gap.mjs importing
+    // "./acquire.mjs" resolves to src/acquire.mjs (measured: resolving it
+    // against bin/ made every chain unknown and the derivation lie).
+    const queue = [];
+    const seen = new Set(['<bin>']);
+    const push = (spec, fromFile) => {
+      const joined = path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), spec));
+      if (seen.has(joined)) return; // cycle: bounded, never a hang
+      seen.add(joined);
+      queue.push(joined);
+    };
+    const re = IMPORT_RE();
+    let im;
+    const headSpecs = [];
+    while ((im = re.exec(body))) {
+      const spec = im[1] || im[2] || im[3];
+      if (spec.startsWith('./') || spec.startsWith('../')) headSpecs.push(spec);
+    }
+    for (const spec of headSpecs) push(spec, 'bin/entry.mjs');
+    while (queue.length && !needs) {
+      const resolvedPath = queue.shift();
+      const file = resolve(resolvedPath);
+      if (file === null || file === undefined) { unknownCommands.add(br.name); break; }
+      const stripped = strip(String(file));
+      if (needsPeer(stripped)) { needs = true; break; }
+      const re2 = IMPORT_RE();
+      const nested = [];
+      while ((im = re2.exec(stripped))) {
+        const spec = im[1] || im[2] || im[3];
+        if (spec.startsWith('./') || spec.startsWith('../')) nested.push(spec);
+      }
+      for (const spec of nested) push(spec, resolvedPath);
+    }
+    if (needs) commands.add(br.name);
+  }
+  return { commands: [...commands].sort(), unknownCommands: [...unknownCommands].sort() };
+}
+
 function readTree(tag) {
   const manifestRaw = gitQuiet(['show', `${tag}:package.json`]);
   const binRaw = gitQuiet(['show', `${tag}:bin/sememe.mjs`]);
@@ -375,6 +522,11 @@ function readTree(tag) {
   return {
     manifest: { version: manifest.version, private: manifest.private === true },
     binCommands: binCommandsOf(binRaw),
+    // static derivation of which subcommands need the optional peer; the
+    // README's refusal sentence is checked against this (C6). resolve() gets
+    // an already-normalized path relative to the repo root (bin/x.mjs,
+    // src/y.mjs …) because branch imports start at "bin/".
+    peerNeeds: peerNeedsOf(binRaw, (resolvedPath) => gitQuiet(['show', `${tag}:${resolvedPath}`])),
     // "./native" -> "native", so a documented subpath and an exports-map
     // key can be compared directly (the live run flagged every export as
     // missing before this normalization — measured, fixed).

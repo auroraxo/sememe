@@ -70,6 +70,8 @@ const preReadme = {
   documentedExports: ['token', 'raydium', 'store', 'pull', 'native-corpus', 'native-audit', 'native', 'discriminators', 'codec', 'canonical'],
   shippedAccountEvent: true,
   proposalInstructionOnly: true,
+  // measured: the sentence exists verbatim in the v0.3.0-era README
+  peerRefusalCommands: ['pull'],
 };
 
 // The v0.3.0 tag tree as measured (git show v0.3.0:{package.json,bin/sememe.mjs,README.md}):
@@ -79,6 +81,9 @@ const tagV030Tree = {
   manifest: { version: '0.3.0', private: false },
   binCommands: ['account', 'adopt', 'decode', 'decode-native', 'decode-token', 'native-provenance', 'pull', 'token-provenance'],
   exports: ['.', 'native', 'store', 'pull', 'codec', 'canonical', 'discriminators', 'native-corpus', 'native-audit', 'package.json', 'token'],
+  // measured on the v0.3.0 tree: gap does not exist yet, so the refusal
+  // claim ("refuses sememe pull ... every other subcommand") was TRUE there
+  peerNeeds: { commands: ['pull'], unknownCommands: [] },
   readme: {
     installTags: ['v0.3.0'],
     documentedCommands: ['pull', 'decode', 'account', 'adopt'],
@@ -128,12 +133,14 @@ const postFixInput = {
     documentedExports: ['token', 'raydium', 'store', 'pull', 'native-corpus', 'native-audit', 'native', 'discriminators', 'codec', 'canonical'],
     shippedAccountEvent: true,
     proposalInstructionOnly: false,
+    peerRefusalCommands: ['pull', 'gap'],
   },
   trees: {
     'v0.4.0': {
       manifest: { version: '0.4.0', private: false },
       binCommands: ['account', 'adopt', 'conform', 'decode', 'decode-native', 'decode-raydium', 'decode-token', 'gap', 'native-provenance', 'pull', 'raydium-provenance', 'token-provenance'],
       exports: ['.', 'native', 'store', 'pull', 'codec', 'canonical', 'discriminators', 'native-corpus', 'native-audit', 'package.json', 'token', 'token-metadata', 'raydium', 'gap'],
+      peerNeeds: { commands: ['gap', 'pull'], unknownCommands: [] },
       readme: {
         installTags: ['v0.4.0'],
         documentedCommands: ['pull', 'gap', 'decode', 'account', 'adopt'],
@@ -333,6 +340,81 @@ test('T11: release-body claims are checked where they are checkable', async () =
 
   // the honest body is clean
   assert.deepStrictEqual(bodyDefects('v0.4.0', tree, honestBody('v0.4.0')), []);
+});
+
+test('T13: peerNeedsOf derives the peer-needing commands from the import graph', async () => {
+  // Synthetic graph: bin dispatches pull -> pull.mjs (web3) and gap -> gap.mjs
+  // -> acquire.mjs (web3); every other command resolves to web3-free files.
+  const files = {
+    'bin/src/pull.mjs': "import { PublicKey } from '@solana/web3.js';\nimport { addresses } from './acquire.mjs';\n",
+    'bin/src/gap.mjs': "import { addresses } from './acquire.mjs';\n",
+    'bin/src/acquire.mjs': "import { PublicKey } from '@solana/web3.js';\n",
+    'bin/src/decode.mjs': "import { decodeHex } from './codec.mjs';\n",
+    'bin/src/codec.mjs': "import { canonicalJson } from './canonical.mjs';\n",
+    'bin/src/canonical.mjs': "// node: only\n",
+    'bin/src/conformance.mjs': "import { check } from './account-list.mjs';\n",
+    'bin/src/account-list.mjs': "// node: only\n",
+  };
+  const resolve = (rel) => (rel in files ? files[rel] : null);
+  const bin = [
+    "if (command === 'absent-help') { nope(); }",
+    "else if (command === 'pull') { const m = await import('./src/pull.mjs'); }",
+    "else if (command === 'gap') { const m = await import('./src/gap.mjs'); }",
+    "else if (command === 'adopt') { const m = await import('./src/decode.mjs'); }",
+    "else if (command === 'conform') { const m = await import('./src/conformance.mjs'); }",
+    "else if (command === 'decode') { staticAlready(); }",
+  ].join('\n');
+  const { peerNeedsOf } = await import(new URL(`file://${TOOL}`).href);
+  const needs = peerNeedsOf(bin, resolve);
+  assert.deepStrictEqual(needs.commands, ['gap', 'pull'], `got: ${JSON.stringify(needs)}`);
+  assert.deepStrictEqual(needs.unknownCommands, [], `got: ${JSON.stringify(needs)}`);
+  // a command whose segment has no imports belongs to nobody
+  const bare = peerNeedsOf("if (command === 'decode') { help(); }", resolve);
+  assert.deepStrictEqual(bare.commands, []);
+  // an unresolvable import graph is REPORTED, never silently read as clean
+  const unknown = peerNeedsOf("else if (command === 'gap') { await import('./src/gap.mjs'); }", () => null);
+  assert.deepStrictEqual(unknown.commands, []);
+  assert.deepStrictEqual(unknown.unknownCommands, ['gap']);
+  // a cycle must not hang: gap -> acquire -> gap
+  const cyclic = peerNeedsOf(
+    "else if (command === 'gap') { await import('./src/gap.mjs'); }",
+    (rel) => (rel === 'bin/src/gap.mjs' ? "import { x } from './acquire.mjs';\n" : "import { y } from './gap.mjs';\n"),
+  );
+  assert.deepStrictEqual(cyclic.commands, []);
+  assert.deepStrictEqual(cyclic.unknownCommands, []);
+});
+
+test('T14: the README refusal-scope claim must cover every peer-needing command the pinned tree has', async () => {
+  const base = {
+    releases: [{ tag: 'v0.4.0', body: honestBody('v0.4.0'), draft: false, prerelease: false, publishedAt: '2026-11-05T05:30:00Z' }],
+    tags: ['v0.4.0'],
+    trees: { 'v0.4.0': postFixInput.trees['v0.4.0'] },
+  };
+  // the measured live defect (2026-11-05): claim names only pull, tree needs pull+gap
+  const falseClaim = derive({ ...base, readme: { ...postFixInput.readme, peerRefusalCommands: ['pull'] } });
+  assert.ok(falseClaim.defects.includes('readme-peer-scope-claim-false:gap'), `got: ${falseClaim.defects.join(',')}`);
+  // the fixed world: claim names both -> no defect
+  const trueClaim = derive({ ...base, readme: { ...postFixInput.readme, peerRefusalCommands: ['pull', 'gap'] } });
+  assert.ok(!trueClaim.defects.some((d) => d.startsWith('readme-peer-scope-claim-false')), `got: ${trueClaim.defects.join(',')}`);
+  // guard: no claim sentence at all + peer-free tree -> no defect (rule only binds real peer needs)
+  const peerFree = derive({ ...base, trees: { 'v0.4.0': { ...postFixInput.trees['v0.4.0'], peerNeeds: { commands: [], unknownCommands: [] } } }, readme: { ...postFixInput.readme, peerRefusalCommands: [] } });
+  assert.ok(!peerFree.defects.some((d) => d.startsWith('readme-peer-scope-claim-false')), `got: ${peerFree.defects.join(',')}`);
+});
+
+test('T15: the LIVE repo — README refusal claim covers the pinned tree\'s real peer needs', async () => {
+  const { peerNeedsOf } = await import(new URL(`file://${TOOL}`).href);
+  const liveReadme = parseReadme(readFileSync(path.join(ROOT, 'README.md'), 'utf8'));
+  const show = (p) => execFileSync('git', ['show', `HEAD:${p}`], { cwd: ROOT, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  const resolve = (rel) => {
+    const p = path.posix.normalize(rel);
+    try { return show(p); } catch { return null; }
+  };
+  const needs = peerNeedsOf(show('bin/sememe.mjs'), resolve);
+  assert.deepStrictEqual(needs.unknownCommands, [], `unresolved graph segments must be fixed, got: ${JSON.stringify(needs)}`);
+  for (const cmd of needs.commands) {
+    assert.ok(liveReadme.peerRefusalCommands.includes(cmd),
+      `README claims only ${JSON.stringify(liveReadme.peerRefusalCommands)} refuse without @solana/web3.js, but the tree derives ${cmd} too — copy-paste install yields a gap the README around it does not describe`);
+  }
 });
 
 test('T12: a body whose install command names a tag this repo does not have is a false claim', () => {

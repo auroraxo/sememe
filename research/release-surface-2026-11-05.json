@@ -1,0 +1,151 @@
+{
+  "measuredAt": "2026-11-05T05:34:40.098Z",
+  "repo": "auroraxo/sememe",
+  "surfaces": {
+    "releases": [
+      {
+        "tag": "v0.4.0",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.0\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact. This release exists because `releases/` used to be empty while the README pinned `#v0.3.0` — a tree that shipped neither `sememe gap` nor `sememe/raydium`.\n\n## What's in v0.4.0\n\n- `sememe gap <program>` — classify one program's acquisition gap (pullable / no-interface-published / present-undecodable / vendored / unknown; RPC failure exits 3, never a fake absence).\n- `sememe/raydium` export subpath and `decode-raydium` / `raydium-provenance` commands.\n- Release-surface measurement: `tools/measure-release-surface.mjs` derives the pre-fix verdict defect-by-defect from committed inputs (`research/release-surface-2026-11-05-before.json`).\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement; instruction-data decoding is the proven path, account/event decoding is exercised by tests but not by an outside consumer.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-05T05:34:22Z",
+        "createdAt": "2026-11-05T05:34:11Z"
+      }
+    ],
+    "tags": [
+      "v0.1.0",
+      "v0.1.1",
+      "v0.2.0",
+      "v0.2.1",
+      "v0.2.2",
+      "v0.3.0",
+      "v0.4.0"
+    ],
+    "readme": {
+      "installTags": [
+        "v0.4.0"
+      ],
+      "documentedCommands": [
+        "pull",
+        "gap",
+        "decode",
+        "account",
+        "adopt"
+      ],
+      "documentedExports": [
+        "native",
+        "token",
+        "raydium",
+        "store",
+        "pull",
+        "codec",
+        "canonical",
+        "discriminators",
+        "native-corpus",
+        "native-audit"
+      ],
+      "shippedAccountEvent": true,
+      "proposalInstructionOnly": false,
+      "hasQuickstart": true
+    },
+    "trees": {
+      "v0.4.0": {
+        "manifest": {
+          "version": "0.4.0",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance"
+        ],
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.0"
+          ],
+          "documentedCommands": [
+            "pull",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "hasQuickstart": true
+        }
+      }
+    }
+  },
+  "verdict": {
+    "verdict": "clean",
+    "defects": [],
+    "newestTag": "v0.4.0",
+    "latestTag": "v0.4.0",
+    "pinnedTags": [
+      "v0.4.0"
+    ]
+  },
+  "perRelease": {
+    "v0.4.0": {
+      "defects": []
+    }
+  },
+  "noVerdict": false,
+  "reason": null
+}
