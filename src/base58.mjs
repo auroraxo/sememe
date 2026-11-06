@@ -48,6 +48,22 @@ export function encodeBase58(bytes) {
  * Decode a base58 string into bytes.
  * Throws on an empty string or an invalid character — a payload that cannot
  * be decoded is a caller error, not an empty result.
+ *
+ * The result is a `Buffer`, not a plain `Uint8Array`. That is not cosmetic:
+ * the decode path reads floats with `readFloatLE`/`readDoubleLE` and renders
+ * `bytes` arguments with `toString('base64')`, and it re-encodes and compares
+ * with `Buffer.equals`. A plain `Uint8Array` has none of those, so a
+ * base58-decoded payload failed in three different places while the SAME
+ * bytes as hex (which `decodeHex` produces as a Buffer) decoded fine:
+ *
+ *   - src/union.mjs refused every base58 payload ("unionDecode needs the
+ *     payload bytes as a Buffer"),
+ *   - f32/f64 arguments died with "slice.readDoubleLE is not a function",
+ *   - a `bytes` argument came out as a comma-separated byte list
+ *     ("1,2,3,255") instead of base64 — corruption, not an error.
+ *
+ * Measured against the published v0.4.4 install; fixed in v0.4.5.
+ * A Buffer IS a Uint8Array, so every existing caller keeps working.
  */
 export function decodeBase58(input) {
   if (typeof input !== 'string' || input.length === 0) {
@@ -74,5 +90,7 @@ export function decodeBase58(input) {
   }
   const out = new Uint8Array(zeros + bytes.length);
   for (let index = 0; index < bytes.length; index++) out[zeros + index] = bytes[bytes.length - 1 - index];
-  return out;
+  // A Buffer VIEW over the same bytes: no copy, and the byte order is
+  // exactly what was decoded.
+  return Buffer.from(out.buffer, out.byteOffset, out.byteLength);
 }

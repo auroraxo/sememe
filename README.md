@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.4   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.5   # tagged release; no npm account needed
 ```
 
 ```js
@@ -119,7 +119,7 @@ The pull is the one path that needs a package too, because deriving the Program 
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.4 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.5 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -222,6 +222,30 @@ The artifact records, per program: verdict (`stored` / `undecodable` / `unknown`
 node bin/sememe.mjs decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc \
   2b04ed0b1ac91e62... --store /tmp/sememe-demo   # payload: base58 or hex
 ```
+
+**Base58 and hex are the same payload (fixed 2026-11-06).** The CLI has always
+accepted "base58 or hex" for a payload, but the base58 path decoded to a byte
+array that was not a `Buffer`, and three consumers need `Buffer` methods. So
+the SAME bytes behaved differently depending on how they were written:
+
+- `sememe decode --union <program> <base58>` failed on EVERY base58 payload
+  with `unionDecode needs the payload bytes as a Buffer` (the union path
+  compared the re-encoded bytes with the input), while the same payload as
+  hex decoded fine — so the README's own union walkthrough, which uses a
+  base58 payload, could not run;
+- an `f64`/`f32` argument died with `slice.readDoubleLE is not a function`
+  (measured on OpenBook v2 `stubOracleCreate`);
+- a `bytes` argument came out as a comma-separated byte list (`1,2,3,255`)
+  instead of base64 (`AQID/w==`) — silent corruption, not an error.
+
+All three were measured against the PUBLISHED v0.4.4 install (a pinned
+install of tag `v0.4.4`), not against a working tree.
+v0.4.5 fixes the root cause (`decodeBase58` returns a `Buffer`; a `Buffer` is
+still a `Uint8Array`, so every existing caller keeps working) and adds a
+second guard at each consumption point, so the shape of the input no longer
+decides whether it decodes. `test/base58-payload-bytes.test.mjs` pins the
+equality: for every one of those three cases, the base58 form and the hex form
+must produce the same instruction, the same fields and the same verdict.
 
 `src/codec.mjs` reads the byte layout from the stored IDL itself — no generated code and no third-party codec library — and covers primitives, `option`, `vec`, `array`, `defined` struct/enum types, and both unit, tuple and named enum variants. It is deliberately strict: unknown discriminators, unknown variants, invalid `option` tags, invalid bool bytes, out-of-range integers, unknown types and unknown arguments are errors rather than silent coercions, and hostile field names can never pollute prototypes. Decoded values are JSON-safe: 64/128-bit integers become decimal strings, pubkeys become base58, and re-encoding the decoded value must reproduce the input bytes byte-for-byte (`roundTripByteExact`).
 

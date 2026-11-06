@@ -188,7 +188,20 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
   // still the primary whenever one exists.
   const soleSource = !primary?.idl && secondary?.idl ? secondary : null;
   if (!primary?.idl && !soleSource) throw new UnionRefusal('invalid_input', 'unionDecode needs a primary source');
-  if (!Buffer.isBuffer(bytes)) throw new UnionRefusal('invalid_input', 'unionDecode needs the payload bytes as a Buffer');
+  // The payload bytes are normalized to a Buffer here, not merely CHECKED
+  // for being one. The union path compares the re-encoded bytes with the
+  // input (`reencoded.equals(bytes)`), and a plain Uint8Array has no
+  // `equals`; the old check refused such input outright, which made the
+  // base58 CLI path fail on every payload with "unionDecode needs the
+  // payload bytes as a Buffer" while the same bytes as hex decoded fine.
+  // A caller may hand over any byte array; the shape of the input must not
+  // decide whether it decodes.
+  if (!(bytes instanceof Uint8Array)) {
+    throw new UnionRefusal('invalid_input', 'unionDecode needs the payload bytes as a Buffer');
+  }
+  bytes = Buffer.isBuffer(bytes)
+    ? bytes
+    : Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   // 'error' is the default and keeps the whole product strict. 'report' is the
   // opt-in that lets a source decode a wire form SHORTER than its own layout
   // declares — measured as chain-accepted on mainnet (research/

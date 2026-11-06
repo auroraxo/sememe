@@ -36,7 +36,15 @@ export class CodecError extends Error {
 
 class Cursor {
   constructor(bytes) {
-    this.bytes = bytes;
+    // The bytes are normalized to a Buffer ONCE, here. Everything below
+    // reads them with Buffer methods: `readFloatLE`/`readDoubleLE` for
+    // f32/f64, `toString('base64')` for a `bytes` argument, and
+    // `Buffer.equals` for the round-trip check. A plain Uint8Array has
+    // none of those, so a caller that passed one got "slice.readDoubleLE is
+    // not a function" or a comma-separated byte list instead of base64.
+    // Normalizing at the boundary means the shape of the input cannot
+    // decide whether it decodes.
+    this.bytes = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes.buffer ?? bytes, bytes.byteOffset ?? 0, bytes.byteLength ?? bytes.length);
     this.offset = 0;
   }
   take(count, what) {
