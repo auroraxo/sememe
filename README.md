@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.6   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.7   # tagged release; no npm account needed
 ```
 
 ```js
@@ -121,7 +121,7 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.6 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.7 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -176,7 +176,7 @@ sememe decode: flag "--store" given more than once — pass it once
 
 What is refused, by name: a flag this command does not accept (including a flag belonging to another command, and a flag that is actually a subcommand), a flag given twice — the first value won and the second was silently discarded — a flag with no value, and more positional arguments than the command consumes. What is *not* refused: too few positional arguments, which each command already refuses in its own words (`decode needs a program id`, `pull needs a program id`), so those messages are unchanged.
 
-The rule is the one the repository already applies to stores, receipts and locks: an unrecognized input is refused by name, never tolerated. `src/cli-surface.mjs` is that table — data, not scattered `if`s — so a flag cannot be added to a command without appearing in one place, and `test/flag-surface.test.mjs` (28 tests) pins the refusals and the repair text. Honest limit: this is a behavioural change to argument handling on a package with no external users yet, so nothing downstream has been shown to depend on the old silent acceptance — and none of the five pinned-tag journeys, the lock journeys or the release-surface rules depend on it either (all pass unchanged).
+The rule is the one the repository already applies to stores, receipts and locks: an unrecognized input is refused by name, never tolerated. `src/cli-surface.mjs` is that table — data, not scattered `if`s — so a flag cannot be added to a command without appearing in one place, and `test/flag-surface.test.mjs` (28 tests) pins the refusals and the repair text. Honest limit: this is a behavioural change to argument handling on a package with no external users yet, so nothing downstream has been shown to depend on the old silent acceptance — and none of the five pinned-tag journeys, the lock journeys or the release-surface rules depend on it either (all pass unchanged). It shipped the same day it was measured and `v0.4.7` carries it: `v0.4.6` still accepts the silent typos above (tags are immutable), so a pin behind this tag keeps the old behaviour.
 
 ## Working now: pull a program's on-chain IDL
 
