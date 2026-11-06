@@ -45,7 +45,12 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 const TOOL = path.join(ROOT, 'tools', 'measure-release-surface.mjs');
 const BEFORE = path.join(ROOT, 'research', 'release-surface-2026-11-05-before.json');
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-05.json');
+// The after-artifact moves WITH the release: each one records the surface as
+// it was measured (measuredAt, full release bodies, local tags, HEAD README,
+// the tag trees). The v0.4.4-era record (release-surface-2026-11-05.json) is
+// kept in research/ as history — it still reproduces its own verdict — but the
+// artifact that must be clean is the one committed with the CURRENT release.
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-06.json');
 const NETWORK = process.env.SEMEME_RELEASE_SURFACE_NETWORK === '1';
 
 // On the pre-fix tree the tool module does not exist; the import failure must
@@ -297,7 +302,7 @@ test('T8: the committed before-artifact is the one the tool derives, defects inc
 });
 
 test('T9: the committed after-artifact exists, is clean, and reproduces', () => {
-  assert.ok(existsSync(AFTER), 'research/release-surface-2026-11-05.json must be committed with the release');
+  assert.ok(existsSync(AFTER), 'the after-artifact committed with the current release must be in research/');
   const artifact = JSON.parse(readFileSync(AFTER, 'utf8'));
   assert.strictEqual(artifact.noVerdict, false);
   const { releases, tags, readme, trees } = artifact.surfaces;
