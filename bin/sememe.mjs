@@ -19,6 +19,10 @@ import {
 } from '../src/raydium.mjs';
 import { toJsonSafe } from '../src/codec.mjs';
 import { VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE } from '../src/short-forms.mjs';
+// The DECLARED surface of every command (which flags it takes, how many
+// positionals it consumes). Imported statically: it has no imports of its
+// own, so it stays inside the decode core's zero-dependency guarantee.
+import { parseCommandArgs, UsageError } from '../src/cli-surface.mjs';
 
 const usage = `usage:
   sememe absent-help
@@ -106,43 +110,37 @@ const usage = `usage:
       decodes against that pin. Variants upstream itself refuses stay refused.
   sememe raydium-provenance [program-id]
       print the pinned upstream commit, encoding rule and variant counts for a
-      Raydium program (or for all of them).`; 
+      Raydium program (or for all of them).
 
-const [rawCommand, rawProgram, ...rawArgs] = process.argv.slice(2);
-const command = rawCommand;
-// `decode --union <program> <payload>` puts the flag where the program id
-// would be; strip it up front so either flag position works and the flag can
-// never be mistaken for a program id or a payload.
-let program = rawProgram;
-const args = rawArgs;
-// `lock` and `verify` take NO positional program: their second argv slot is
-// always a flag (`--store`, `--out`, `--lock`, `--mode`). Push it back into
-// the option stream so `option()` sees it instead of the program slot.
-if (program !== undefined && (rawCommand === 'lock' || rawCommand === 'verify') && program.startsWith('-')) {
-  args.unshift(program);
-  program = undefined;
-}
-let unionRequested = false;
-if (program === '--union') {
-  unionRequested = true;
-  program = args.shift();
-}
-for (;;) {
-  const index = args.indexOf('--union');
-  if (index < 0) break;
-  unionRequested = true;
-  args.splice(index, 1);
-}
-const option = (name, fallback) => {
-  const index = args.indexOf(name);
-  if (index < 0) return fallback;
-  const value = args[index + 1];
-  if (value === undefined) throw Error(`missing value for ${name}`);
-  args.splice(index, 2);
-  return value;
-};
+Every command declares the flags it accepts and how many positional arguments
+it consumes. A flag the command does not know, a flag given twice, a flag
+without a value, or a surplus positional argument is REFUSED BY NAME before
+any work happens -- no store is read, no file is written, no RPC is
+contacted. The refusal names the closest supported flag:
+
+  sememe lock --store ./store --o out.lock
+      sememe lock: unknown flag "--o" — did you mean "--out"?
+      supported flags: --store, --out`;
+
+const [command, ...tokens] = process.argv.slice(2);
 
 try {
+  // Parse the whole command line AGAINST THE SPEC, up front, before any
+  // branch runs: an unknown flag, a repeated flag, a missing flag value or a
+  // surplus positional argument is refused here, before a store is read, a
+  // file is written or an RPC is contacted. Previously the flags were
+  // searched for by name, so a typo was silently dropped and the command ran
+  // against whatever it would have done without that flag — a lock written to
+  // a different path than the one the caller named, a pull that touched the
+  // default store after a --stor typo.
+  const { flags, positionals } = parseCommandArgs(command, tokens);
+  const program = positionals[0];
+  // The positionals the branches consume with args.shift(): everything after
+  // the first one. Flags are already separated, so no order matters.
+  const args = positionals.slice(1);
+  const unionRequested = flags['--union'] === true;
+  const option = (name, fallback) => (Object.prototype.hasOwnProperty.call(flags, name) ? flags[name] : fallback);
+
   if (command === 'absent-help') {
     // The evidence behind --absent verified, printed so a user can see WHICH
     // wire forms are licensed before relying on the flag.
@@ -441,6 +439,15 @@ try {
     process.exitCode = 2;
   }
 } catch (error) {
-  console.error(JSON.stringify({ error: String(error?.message ?? error) }));
-  process.exitCode = 1;
+  if (error instanceof UsageError) {
+    // A malformed command line is refused BEFORE any work, and it is a usage
+    // problem, not a failure of the work: plain text on stderr — the same
+    // channel the unknown-command usage dump uses — and exit 2. The machine
+    // readable JSON error channel stays for errors the work itself produced.
+    console.error(error.message);
+    process.exitCode = 2;
+  } else {
+    console.error(JSON.stringify({ error: String(error?.message ?? error) }));
+    process.exitCode = 1;
+  }
 }

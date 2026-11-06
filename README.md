@@ -154,6 +154,30 @@ npx sememe verify --store ./store --lock ./sememe.lock
 
 What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4 have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
 
+## Working now: the CLI refuses what it does not understand (2026-11-07)
+
+A command line you typed wrong must not turn into a *different* command line that happens to run. Measured on the tree before this (v0.4.6, `641b895`): the parser looked flags up **by name anywhere in the argument list** and dropped what it did not find, so an unknown flag was not an error — it was an invisible edit to your request:
+
+- `sememe lock --store ./store --o out.lock` exited **0** and wrote the lock to `./sememe.lock`, not to `out.lock`. You asked for a file at one path, got a file at another, and the success exit said otherwise.
+- `sememe decode <program> <payload> --stro ./store` ignored the typo'd store and read the **default** `~/.sememe`, failing with `no sememe store at /home/…/.sememe` — a message about a directory you never named.
+- `sememe verify … --mod warn` dropped `--mod`, so verify ran in its default `error` mode and exited 1 on a drift you had asked it to only warn about.
+- `sememe native-provenance --store ./store` read the flag's **value** as the program id: `./store is not a native program sememe pins`.
+- `sememe decode --store ./store <program> <payload>` (flag first) made `--store` the program id and `./store` the payload.
+- `sememe pull <program> --stor ./store` dropped the typo and **pulled into the default store** — a write you never asked for, in a directory you never named.
+
+Every command now declares its surface — the flags it accepts and how many positional arguments it consumes — and that surface is checked **before any work happens**: no store is read, no file is written, no RPC is contacted. A refusal names the closest supported flag and the full list, and it exits 2 (the usage channel) rather than the exit 1 reserved for work that actually failed:
+
+```bash
+node bin/sememe.mjs lock --store ./store --o out.lock
+sememe lock: unknown flag "--o" — did you mean "--out"? supported flags: --store, --out
+node bin/sememe.mjs decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b… --store a --store b
+sememe decode: flag "--store" given more than once — pass it once
+```
+
+What is refused, by name: a flag this command does not accept (including a flag belonging to another command, and a flag that is actually a subcommand), a flag given twice — the first value won and the second was silently discarded — a flag with no value, and more positional arguments than the command consumes. What is *not* refused: too few positional arguments, which each command already refuses in its own words (`decode needs a program id`, `pull needs a program id`), so those messages are unchanged.
+
+The rule is the one the repository already applies to stores, receipts and locks: an unrecognized input is refused by name, never tolerated. `src/cli-surface.mjs` is that table — data, not scattered `if`s — so a flag cannot be added to a command without appearing in one place, and `test/flag-surface.test.mjs` (28 tests) pins the refusals and the repair text. Honest limit: this is a behavioural change to argument handling on a package with no external users yet, so nothing downstream has been shown to depend on the old silent acceptance — and none of the five pinned-tag journeys, the lock journeys or the release-surface rules depend on it either (all pass unchanged).
+
 ## Working now: pull a program's on-chain IDL
 
 ```bash
