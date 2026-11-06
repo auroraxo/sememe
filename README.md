@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.5   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.6   # tagged release; no npm account needed
 ```
 
 ```js
@@ -116,12 +116,12 @@ The decode path installs **zero runtime dependencies**: `sememe` itself has none
 
 The pull is the one path that needs a package too, because deriving the Program Metadata PDA needs ed25519: install `@solana/web3.js` next to sememe before it. `@solana/web3.js` is declared as an *optional peer* precisely so a decoder-only consumer is never asked to install it. The CLI refuses `sememe pull` and `sememe gap` without it, with that instruction, and still runs every other subcommand. (Measured 2026-11-05: `sememe gap` probes the same on-chain IDL addresses as `sememe pull`, so it needs the peer too — the sentence here used to name only `sememe pull`; `tools/measure-release-surface.mjs` now derives the peer-needing commands from the import graph and fails this README if the claim drifts again.)
 
-The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` without the peer throws `PeerDependencyMissingError` (code `peer_dependency_missing`) whose message is that exact instruction — not Node's raw `ERR_MODULE_NOT_FOUND` stack trace. (Measured 2026-11-06 from a bare tarball install with the peer absent: both subpaths used to surface `Cannot find package '@solana/web3.js' imported from …` with no install command, while the CLI, which wrapped the same failure, was the only surface that named the fix; `test/acquisition-peer-surface.test.mjs` pins it.) The entry and every decode-only subpath still import zero packages, so this refusal never reaches a decoder-only consumer.
+The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` without the peer throws `PeerDependencyMissingError` (code `peer_dependency_missing`) whose message is that exact instruction — not Node's raw `ERR_MODULE_NOT_FOUND` stack trace. (Measured 2026-11-06 from a bare tarball install with the peer absent: both subpaths used to surface `Cannot find package '@solana/web3.js' imported from …` with no install command, while the CLI, which wrapped the same failure, was the only surface that named the fix; `test/acquisition-peer-surface.test.mjs` pins it on the working tree and `test/peer-tag-journey.test.mjs` pins it on the PINNED install — the fix reached main on 2026-11-06 but the front-page pin still named v0.4.5, whose bytes still leaked the raw loader error, so this sentence described an install a stranger did not receive. v0.4.6 carries it.) The entry and every decode-only subpath still import zero packages, so this refusal never reaches a decoder-only consumer.
 
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.5 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.6 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
