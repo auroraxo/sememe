@@ -1,11 +1,19 @@
 {
-  "measuredAt": "2026-11-06T17:13:05.862Z",
+  "measuredAt": "2026-11-06T19:53:21.759Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
       {
+        "tag": "v0.4.6",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.6\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.6\n\n- **The pinned install now refuses the missing peer in sememe's own voice.** The refusal shipped on main in `src/peer.mjs` (2026-11-06): importing `sememe/pull` or `sememe/gap` without `@solana/web3.js` throws `PeerDependencyMissingError` (code `peer_dependency_missing`) naming the package and the install command. The front-page pin still named `v0.4.5` — a tag cut BEFORE that fix, so the bytes a stranger installed still leaked Node's raw loader error while the README they read described the fixed behaviour. Measured against the PUBLISHED v0.4.5 install (peer absent, the state the optional-peer declaration puts a decoder-only consumer in):\n  - `import('sememe/pull')` → `code: ERR_MODULE_NOT_FOUND`, `name: Error`, `Cannot find package '@solana/web3.js' imported from …/src/pull.mjs`\n  - `import('sememe/gap')` → the same, from `…/src/acquire.mjs`\n  - the CLI on that same install already refused correctly (it wraps the failure itself) — the gap was library-only, exactly what a README sentence about the library promises.\n- **Fourth repetition of the \"fix on main, tag behind it\" class, now pinned.** v0.4.1 (journey dead-ends), v0.4.3 (no lock in the tag), v0.4.4 (elided payload) each shipped the same way. `test/acquisition-peer-surface.test.mjs` packs the working tree and could never see this.\n- **`test/peer-tag-journey.test.mjs` pins the TAG, not the tree.** It packs the pinned tag the way a `github:#<tag>` install receives it, installs it into an empty app with the peer absent, and asserts: both acquisition subpaths refuse with the package AND the install command, never `ERR_MODULE_NOT_FOUND`; the tag's CLI names the instruction exactly once; and a guard test measures the current tree's tarball the same way (the one test expected green while a defective tag is still pinned). Ladder: P1/P2 red against the published v0.4.5 pin, P3 + guard green; removing `src/peer.mjs` turns the guard red, so it is not vacuous.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The defect and the fix were measured on this host — the pinned-tag journey runs the shipped bytes, but it is still one machine and my own account, not a stranger on another host. `@solana/web3.js` remains an optional peer: the decode path installs zero packages and never reaches this refusal. v0.4.5 keeps its defect (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-06T19:51:44Z",
+        "createdAt": "2026-11-06T19:51:11Z"
+      },
+      {
         "tag": "v0.4.5",
-        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.5\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.5\n\n- **A base58 payload is a payload.** The CLI has always documented \"base58 or hex\" for every payload argument, but the base58 path decoded to a byte array that was not a `Buffer`, and three consumers need `Buffer` methods. So the SAME bytes behaved differently depending on how they were written — measured against the PUBLISHED v0.4.4 install (a pinned install of tag `v0.4.4`), not against a working tree:\n  - `sememe decode --union <program> <base58>` failed on EVERY base58 payload with `unionDecode needs the payload bytes as a Buffer`, while the same payload as hex decoded fine. The README's own union walkthrough uses a base58 payload, so it could not run.\n  - an `f64`/`f32` argument died with `slice.readDoubleLE is not a function` (measured on OpenBook v2 `stubOracleCreate`, price 1.5).\n  - a `bytes` argument came out as a comma-separated byte list (`1,2,3,255`) instead of base64 (`AQID/w==`) — silent corruption, not an error.\n- **The fix is in three layers.** Root cause: `decodeBase58` returns a `Buffer` (a `Buffer` IS a `Uint8Array`, so every existing caller keeps working). The codec's `Cursor` normalizes its bytes to a `Buffer` once, so the shape of the input cannot decide whether it decodes. The union path normalizes instead of refusing, and still refuses input that is not a byte array at all.\n- **`test/base58-payload-bytes.test.mjs` pins the equality.** For each of the three cases, the base58 form and the hex form must produce the same instruction, the same fields and the same verdict — plus the CLI end to end. Two mutations (revert `decodeBase58`; remove the `Cursor` guard) must turn the contract red, so the guards are not decorative. Suite: 515 tests, 513 pass, 2 named-skip, 0 fail.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The three defects were measured against the published v0.4.4 install on this host, and the fix is verified by the suite and by a pinned-install journey against the fixture store — not by a stranger on another machine. The fix changes the shape of one internal return value (`decodeBase58` now returns a `Buffer`); `Buffer` is a `Uint8Array`, so no existing caller breaks, but a caller that asserted the exact constructor would see a difference. v0.4.4 keeps its defect (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n",
+        "body": "> **SUPERSEDED — use [v0.4.6](https://github.com/auroraxo/sememe/releases/tag/v0.4.6).**\n>\n> Measured 2026-11-06 against the PUBLISHED v0.4.5 install: the peer refusal\n> (`PeerDependencyMissingError` naming `@solana/web3.js` and the install\n> command) had already shipped on main, but this tag was cut BEFORE it — so\n> `import('sememe/pull')` and `import('sememe/gap')` from this install, with\n> the peer absent, leaked Node's raw `ERR_MODULE_NOT_FOUND` stack trace while\n> the README a stranger reads described the fixed behaviour. The CLI on the\n> same install refused correctly; the gap was library-only. Tags are immutable,\n> so the pin moved to `v0.4.6`, whose tree carries `src/peer.mjs`;\n> `test/peer-tag-journey.test.mjs` now packs the pinned tag and pins it, so a\n> fix that is on main but not in the tag goes red instead of shipping.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.5\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.5\n\n- **A base58 payload is a payload.** The CLI has always documented \"base58 or hex\" for every payload argument, but the base58 path decoded to a byte array that was not a `Buffer`, and three consumers need `Buffer` methods. So the SAME bytes behaved differently depending on how they were written — measured against the PUBLISHED v0.4.4 install (a pinned install of tag `v0.4.4`), not against a working tree:\n  - `sememe decode --union <program> <base58>` failed on EVERY base58 payload with `unionDecode needs the payload bytes as a Buffer`, while the same payload as hex decoded fine. The README's own union walkthrough uses a base58 payload, so it could not run.\n  - an `f64`/`f32` argument died with `slice.readDoubleLE is not a function` (measured on OpenBook v2 `stubOracleCreate`, price 1.5).\n  - a `bytes` argument came out as a comma-separated byte list (`1,2,3,255`) instead of base64 (`AQID/w==`) — silent corruption, not an error.\n- **The fix is in three layers.** Root cause: `decodeBase58` returns a `Buffer` (a `Buffer` IS a `Uint8Array`, so every existing caller keeps working). The codec's `Cursor` normalizes its bytes to a `Buffer` once, so the shape of the input cannot decide whether it decodes. The union path normalizes instead of refusing, and still refuses input that is not a byte array at all.\n- **`test/base58-payload-bytes.test.mjs` pins the equality.** For each of the three cases, the base58 form and the hex form must produce the same instruction, the same fields and the same verdict — plus the CLI end to end. Two mutations (revert `decodeBase58`; remove the `Cursor` guard) must turn the contract red, so the guards are not decorative. Suite: 515 tests, 513 pass, 2 named-skip, 0 fail.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The three defects were measured against the published v0.4.4 install on this host, and the fix is verified by the suite and by a pinned-install journey against the fixture store — not by a stranger on another machine. The fix changes the shape of one internal return value (`decodeBase58` now returns a `Buffer`); `Buffer` is a `Uint8Array`, so no existing caller breaks, but a caller that asserted the exact constructor would see a difference. v0.4.4 keeps its defect (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n\n",
         "draft": false,
         "prerelease": false,
         "publishedAt": "2026-11-06T02:16:13Z",
@@ -64,11 +72,12 @@
       "v0.4.2",
       "v0.4.3",
       "v0.4.4",
-      "v0.4.5"
+      "v0.4.5",
+      "v0.4.6"
     ],
     "readme": {
       "installTags": [
-        "v0.4.5"
+        "v0.4.6"
       ],
       "documentedCommands": [
         "pull",
@@ -89,7 +98,8 @@
         "canonical",
         "discriminators",
         "native-corpus",
-        "native-audit"
+        "native-audit",
+        "gap"
       ],
       "shippedAccountEvent": true,
       "proposalInstructionOnly": false,
@@ -100,6 +110,103 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.6": {
+        "manifest": {
+          "version": "0.4.6",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.6"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.5": {
         "manifest": {
           "version": "0.4.5",
@@ -664,13 +771,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.5",
-    "latestTag": "v0.4.5",
+    "newestTag": "v0.4.6",
+    "latestTag": "v0.4.6",
     "pinnedTags": [
-      "v0.4.5"
+      "v0.4.6"
     ]
   },
   "perRelease": {
+    "v0.4.6": {
+      "defects": []
+    },
     "v0.4.5": {
       "defects": []
     },
