@@ -158,6 +158,11 @@ try {
     try {
       ({ pull } = await import('../src/pull.mjs'));
     } catch (error) {
+      // The library already refuses with a complete sentence naming the fix
+      // (src/peer.mjs); wrapping it again produced a doubled message that
+      // said "install it next to sememe" twice. Anything else still gets the
+      // contextual wrap with the cause appended.
+      if (error?.code === 'peer_dependency_missing') throw error;
       throw Error(`pull needs @solana/web3.js: install it next to sememe (npm i @solana/web3.js@1.98.4) — ${String(error?.message ?? error).slice(0, 120)}`);
     }
     console.log(JSON.stringify(await pull(program, store, rpc), null, 2));
@@ -170,6 +175,7 @@ try {
       ({ probeGap: probe, nextStep } = await import('../src/gap.mjs'));
       ({ addresses: where } = await import('../src/acquire.mjs'));
     } catch (error) {
+      if (error?.code === 'peer_dependency_missing') throw error;
       throw Error(`gap needs @solana/web3.js: install it next to sememe (npm i @solana/web3.js@1.98.4) — ${String(error?.message ?? error).slice(0, 120)}`);
     }
     // The same classifier the qualification report uses, so what a user is

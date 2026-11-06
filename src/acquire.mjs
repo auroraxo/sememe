@@ -6,15 +6,21 @@
 // download the whole qualification harness). `tools/measure.mjs` now imports
 // these helpers back from here; the CLI/manifest logic stays in tools/.
 //
-// Everything here touches the network and the ed25519 curve, so this is the
-// ONLY file in `src/` allowed to import @solana/web3.js (pinned in
+// Everything here touches the network and the ed25519 curve, so src/peer.mjs
+// is the ONLY place a third-party specifier may appear (allowlisted in
 // test/deps.test.mjs). It is deliberately NOT reachable from the package
 // entry (`index.mjs`): a decoder-only consumer installs zero packages, and
 // the acquisition subpath (`sememe/pull`) declares web3.js as an optional
 // peer — pull users install it themselves.
+//
+// 2026-11-06: the peer is loaded through src/peer.mjs, which refuses with a
+// sentence when it is absent (measured: a bare tarball install without the
+// peer used to surface a raw ERR_MODULE_NOT_FOUND from THIS file's import).
+// Importing sememe/pull or sememe/gap still refuses — it now refuses in
+// sememe's voice, at import time, naming the install command.
 import { gunzipSync, inflateSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey } from './peer.mjs';
 
 export const METADATA_PROGRAM = new PublicKey('ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S');
 const ANCHOR_DISCRIMINATOR = Buffer.from([24, 70, 98, 191, 58, 144, 123, 158]);

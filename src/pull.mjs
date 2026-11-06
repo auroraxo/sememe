@@ -3,7 +3,10 @@
 import { createHash } from 'node:crypto';
 import { link, lstat, mkdir, open, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
-import { PublicKey } from '@solana/web3.js';
+// The optional peer, loaded so its ABSENCE is sememe's sentence instead of a
+// Node loader stack trace (src/peer.mjs; measured 2026-11-06 from a bare
+// tarball install without the peer).
+import { PublicKey } from './peer.mjs';
 // Acquisition helpers live IN src/ since 2026-11-01: pull used to import
 // `../tools/measure.mjs`, which broke any consumer installing this package —
 // the file simply would not exist inside node_modules/sememe/src.

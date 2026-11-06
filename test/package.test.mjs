@@ -115,11 +115,16 @@ test('the acquisition path is the only place a package is allowed', async () => 
     for (const match of source.matchAll(/(?:import|export)[\s\S]*?from\s*['"]([^'"]+)['"]/g)) {
       const spec = match[1];
       if (spec.startsWith('node:') || spec.startsWith('.') || spec.startsWith('/')) continue;
-      if (name === 'acquire.mjs' || name === 'pull.mjs') continue;
+      // 2026-11-06: `peer.mjs` is the ONE place a third-party specifier may
+      // appear. It loads the optional peer on demand so that its absence is a
+      // refusal naming the install command (measured: a bare tarball install
+      // without the peer used to surface a raw ERR_MODULE_NOT_FOUND from the
+      // static import in acquire.mjs / pull.mjs).
+      if (name === 'peer.mjs') continue;
       offenders.push(`src/${name} imports ${spec}`);
     }
   }
-  assert.deepEqual(offenders, [], 'only the acquisition path may import a package');
+  assert.deepEqual(offenders, [], 'only peer.mjs may import a package');
 });
 
 test('the package does not ship the qualification harness', async () => {
