@@ -150,9 +150,100 @@ npx sememe lock --store ./store --out ./sememe.lock
 npx sememe verify --store ./store --lock ./sememe.lock
 ```
 
-`lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (a pinned object fails the re-hash), `relabelled` (a pinned DECLARED origin changed), `unbound` (the store declares an origin this lock does not pin, so the gate cannot say whether that label changed — the lock predates origin pinning; the repair is `sememe lock`). Extra store programs are reported, never a violation: the lock pins minimums, not store equality. `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
+`lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (an object fails the re-hash), `relabelled` (a DECLARED origin changed), `unbound` (the store declares an origin this lock does not pin, so the gate cannot say whether that label changed — the lock predates origin pinning; the repair is `sememe lock`). An **extra** store program — one the lock does not pin, because the lock pins minimums, not store equality — is **reported, never a violation for being there**; but if its receipt is DAMAGED, that is a violation like any other, marked `scope: "extra"` so the repair is not mistaken for pin drift (the pin is fine; the store's receipt for an unpinned program has to be re-pulled). `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
+
+**Measured 2026-11-07 (`verify` must not call clean a store the reader refuses):** a store holding Whirlpool (locked) and Jupiter pulled *afterwards*, so Jupiter is an extra, with Jupiter's object rewritten so it no longer re-hashed to its receipt — the store reader refuses that program, and `sememe decode` on it exits 1 with "object and receipt disagree, refusing to decode". On the published `v0.4.10` install: `sememe lock` exited **1** (no lock written) while `sememe verify` exited **0** with **violations 0** — a green CI gate over a program the reader refuses. The cause was structural, not a typo: `writeLock` re-checked **every** receipt, `checkLock` re-checked only the **pinned** ones, so the shared helper was shared but only ever called on one side. Both paths now re-check the extras through the same helper, and only their FAILURES are reported. See [Working now: `verify` agrees with `lock`](README.md#working-now-verify-agrees-with-lock-about-a-store-whose-extra-program-is-damaged-2026-11-07) and [research/extra-damage-2026-11-07-before.json](research/extra-damage-2026-11-07-before.json) (the published install: 3 contract violations) / [research/extra-damage-2026-11-07.json](research/extra-damage-2026-11-07.json) (this tree: 0).
 
 What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4 have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
+
+## Working now: `verify` agrees with `lock` about a store whose EXTRA program is damaged (2026-11-07)
+
+A CI gate is only worth its exit code if it refuses what the product itself
+refuses. Measured on the **published `v0.4.10` install** (its tag installed
+into an empty app, no clone), on a store holding two programs:
+
+- Whirlpool, pinned by a committed `sememe.lock`;
+- Jupiter, pulled **afterwards** — so it is an **extra**: the lock pins
+  minimums, not store equality, and an extra's mere presence is not a
+  violation;
+- Jupiter's `objects/<fingerprint>.json` rewritten so it no longer re-hashes
+  to the fingerprint its receipt claims.
+
+The store reader refuses that program: `sememe decode <jupiter> <payload>`
+exits 1 with `object and receipt disagree, refusing to decode`.
+
+| command | answer | exit |
+|---|---|---|
+| `sememe decode <jupiter> …` | refused, `object and receipt disagree` | 1 |
+| `sememe lock` | refused, no lock written | **1** |
+| `sememe verify --mode error` | **`violations: 0`** | **0** |
+| `sememe verify --mode warn` | `violations: 0`, `extra: [<jupiter>]` | 0 |
+
+The writer refused and the checker passed — the same "one store, two
+verdicts" class this repo killed for the *newest-receipt* path earlier the
+same day, one level down. The cause was structural rather than a typo:
+`writeLock` re-checks **every** receipt of **every** program, `checkLock`
+re-checked only the **pinned** programs, and the shared helper
+(`verifyEveryReceipt`) was therefore only ever called from one side. The
+README's promise — "lock and verify cannot disagree about what a clean store
+is" — held for pinned programs and silently stopped holding for extras.
+
+- **The fix:** `checkLock` runs the extras through the **same helper** and
+  reports only their FAILURES: a damaged extra becomes an `unverified` entry
+  with `scope: "extra"`, counted as a violation, so `--mode error` exits 1.
+  What is *not* done: an extra is never held against the lock's origin pin —
+  an unpinned program has no pin to bind to, and demanding one would turn
+  "someone pulled a program" into a CI failure.
+- **Why `scope` is in the report and in the refusal:** the two failures have
+  different repairs. A *pinned* name means the pin no longer describes the
+  store (`sememe lock`); an `extra` name means the lock is fine and the
+  **store** holds a damaged receipt for a program the lock never pinned
+  (re-pull that program, or drop the receipt). One list, two repairs — the
+  refusal names them separately:
+  `unverified: <jupiter> (extra, receipt <name>)`.
+- **The repair is measured, not asserted:** S4 in the tool clears the
+  violation end to end — drop the damaged receipt+object, re-pull, then
+  `verify --mode error` exits 0 again. A violation nobody can clear is not a
+  gate. (The one-step re-pull was measured to *collide*: `adopt` refuses with
+  `digest collision or corrupted local object`, because the stale bytes still
+  occupy the fingerprint's path — so the repair is remove-then-pull.)
+- **Two guards, green on the pre-fix tree:** an **intact** extra is still
+  never a violation, and a damaged **pinned** program is still named. The fix
+  moved neither.
+
+The measurement ships as a tool and two committed artifacts, following the
+repo's "the tool produces the report" rule:
+
+```bash
+node tools/measure-extra-damage.mjs                                  # this tree → research/extra-damage-2026-11-07.json
+node tools/measure-extra-damage.mjs --bin <installed bin> --tag v0.4.10 --out before.json
+```
+
+[research/extra-damage-2026-11-07-before.json](research/extra-damage-2026-11-07-before.json)
+is the published `v0.4.10` install: **3 contract violations** (error mode
+exited 0, warn mode counted 0, no scope marker), with both controls green;
+[research/extra-damage-2026-11-07.json](research/extra-damage-2026-11-07.json)
+is this tree: **0 violations**.
+`test/extra-damage-measurement.test.mjs` pins both artifacts and fails if a
+committed report stops being what the tool derives (plus a portability check:
+neither artifact may carry a host path — the declared-origin artifact had to
+be fixed for exactly that on 2026-11-07 13:5x); the 6-test ladder plus three
+mutations live in [test/extra-program-damage.test.mjs](test/extra-program-damage.test.mjs).
+
+**Measured cost of the change** (`verify` on a 60-program store, median of 6
+runs after a warm-up): the case the fix adds work to — 1 pinned, 59 extras,
+damaged — **236 ms → 637 ms**; the normal committed-lock case where the lock
+covers the store (0 extras) — **1123 ms → 1064 ms**, i.e. unchanged within
+noise. Extras now cost what pinned programs already cost: one re-hash each.
+
+**Stated limits:** the lock still does not cover vendored programs or check
+freshness against the chain; `scope: "extra"` tells you *where* the damage
+is, not *who* wrote it; and the reported extra is an unpinned program, so a
+store can still gain a program the lock has never seen (by design — that is
+the minimums rule). No third party has run this; there are 0 external users,
+0 stars, and `npm publish` remains credentials-blocked. The published
+`v0.4.10` tag keeps this defect (a tag is immutable); the fix reaches a
+stranger with the next tag.
 
 ## Working now: the CLI refuses what it does not understand (2026-11-07)
 

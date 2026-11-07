@@ -1,0 +1,62 @@
+{
+  "measuredAt": "2026-11-07T18:16:17.363Z",
+  "binary": {
+    "path": "bin/sememe.mjs",
+    "tag": null
+  },
+  "contract": "verify must not call clean a store the store reader refuses, even when the damaged program is an EXTRA the lock never pinned",
+  "defect": {
+    "kind": "verify-green-over-damaged-extra",
+    "description": "checkLock re-verified only PINNED programs; writeLock re-verified every receipt, so lock refused a store verify called clean (violations 0, exit 0) — a green CI gate over a program whose decode exits 1"
+  },
+  "cases": {
+    "s1": {
+      "lockExit": 1,
+      "lockFileWritten": false,
+      "namesProgram": true
+    },
+    "s2": {
+      "verifyErrorExit": 1,
+      "namesProgram": true
+    },
+    "s3": {
+      "verifyWarnExit": 0,
+      "violations": 1,
+      "unverified": [
+        {
+          "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+          "scope": "extra",
+          "receipt": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4-0-metadata-37fa69c115f5883314374e01c4aa8f242778f7aebccd75f5064d6afb0277afee.json"
+        }
+      ],
+      "extra": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ],
+      "hasScope": true
+    },
+    "s4": {
+      "repaired": true,
+      "removedReceipts": 1,
+      "exit": 0
+    }
+  },
+  "controls": {
+    "s5a": {
+      "verifyExit": 0,
+      "violations": 0,
+      "extra": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    "s5b": {
+      "violations": 1,
+      "unverified": [
+        "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+      ]
+    }
+  },
+  "verdict": {
+    "ok": true,
+    "violations": []
+  }
+}

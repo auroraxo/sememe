@@ -209,7 +209,9 @@ try {
         note: `store does not match ${lockFile}: ${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled, ${report.unbound.length} unbound`,
         drifted: report.drifted.map((d) => d.program),
         missing: report.missing,
-        unverified: report.unverified.map((u) => u.program),
+        unverified: report.unverified.map((u) => (u.scope === 'extra'
+          ? `${u.program} (extra: the lock does not pin it — re-pull that program's receipt)`
+          : u.program)),
         relabelled: report.relabelled.map((r) => r.program),
         unbound: report.unbound.map((r) => r.program),
       }));

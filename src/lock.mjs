@@ -19,7 +19,11 @@
 // Violations checkLock reports (each with the program named):
 //   drifted     the store answers the program with a DIFFERENT fingerprint
 //   missing     the store has no verified receipt for a pinned program
-//   unverified  the pinned object fails the store reader's own re-hash check
+//   unverified  an object fails the store reader's own re-hash check. The
+//               entry carries a `scope`: `pinned` (the lock names this
+//               program) or `extra` (the lock does NOT — the store gained the
+//               program later, and its receipt is damaged). The scope is part
+//               of the repair, so the two are never reported alike.
 //   relabelled  a pinned or stored DECLARED origin changed after the fact —
 //               the receipt says "declared" about bytes whose label no longer
 //               matches what was pinned (see src/receipt-digest.mjs)
@@ -312,6 +316,47 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     report.verified.push(program);
   }
 
+  // EXTRA programs are re-checked too. The lock pins MINIMUMS, so a program
+  // the store gained is still only reported (presence is never a violation —
+  // that contract is G1 in test/extra-program-damage.test.mjs and must not
+  // move). But DAMAGE is not presence: measured 2026-11-07 on this tree
+  // (pre-fix 61df87b), a store whose LATER-PULLED extra program carried an
+  // object that no longer re-hashed to its receipt gave
+  //
+  //     sememe lock   -> EXIT 1, no lock written  (writeLock re-checks extras)
+  //     sememe verify -> EXIT 0, violations 0     (checkLock never read them)
+  //
+  // Two commands, two verdicts about ONE store, and a green CI gate over a
+  // program the store reader refuses: `sememe decode` on that same program
+  // exits 1 with "object and receipt disagree, refusing to decode". The
+  // shared helper existed; only the PINNED loop ever called it — the same
+  // "one store, two strengths" class this repo killed for the newest-receipt
+  // path on 2026-11-07, one level down.
+  //
+  // So extras run through the SAME helper, and only their FAILURES are
+  // reported (as `unverified`/`relabelled` with scope `extra`, so pin drift is
+  // not misread as the cause). What is NOT checked for an extra: binding it
+  // against the lock's origin pin — an unpinned program has no pin to bind
+  // to, and demanding one would turn "someone pulled a program" into a CI
+  // failure, which is exactly the equality rule the lock rejects.
+  for (const program of report.extra) {
+    const candidates = receiptNames.filter((name) => name.startsWith(`${program}-`));
+    if (!candidates.length) continue; // no receipt left to check
+    const verdict = await verifyEveryReceipt(storeDir, program, candidates);
+    if (verdict.ok) continue;
+    const entry = {
+      program,
+      receipt: verdict.receipt,
+      reason: verdict.reason,
+      scope: 'extra',
+    };
+    if (verdict.code === 'receipt-relabelled') {
+      report.relabelled.push({ ...entry, scope: 'extra' });
+    } else {
+      report.unverified.push(entry);
+    }
+  }
+
   const violations = report.drifted.length + report.missing.length
     + report.unverified.length + report.relabelled.length + report.unbound.length;
   report.violations = violations;
@@ -321,9 +366,21 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
       parts.push(`drifted: ${report.drifted.map((d) => `${d.program} pinned ${d.pinned} vs store ${d.store}`).join('; ')}`);
     }
     if (report.missing.length) parts.push(`missing: ${report.missing.join(', ')}`);
-    if (report.unverified.length) parts.push(`unverified: ${report.unverified.map((u) => u.program).join(', ')}`);
+    if (report.unverified.length) {
+      // The scope is part of the repair: `extra` means the LOCK is fine and
+      // the STORE holds a damaged receipt for a program the lock never pinned
+      // (re-pull or drop that receipt) — while a pinned name means the pin no
+      // longer describes the store (re-run `sememe lock`). One list, two very
+      // different repairs; the refusal must not make them look alike.
+      // For an extra, the RECEIPT is named too: it is the file in the store
+      // that has to be re-pulled, and its name carries the fingerprint the
+      // receipt claims — the number a reader needs to look the damage up.
+      parts.push(`unverified: ${report.unverified.map((u) => (u.scope === 'extra'
+        ? `${u.program} (extra, receipt ${u.receipt})`
+        : u.program)).join(', ')}`);
+    }
     if (report.relabelled.length) {
-      parts.push(`relabelled (declared origin changed): ${report.relabelled.map((r) => r.program).join(', ')}`);
+      parts.push(`relabelled (declared origin changed): ${report.relabelled.map((r) => (r.scope === 'extra' ? `${r.program} (extra)` : r.program)).join(', ')}`);
     }
     if (report.unbound.length) {
       parts.push(`unbound (declared origin not pinned by the lock): ${report.unbound.map((r) => r.program).join(', ')} — re-run "sememe lock"`);

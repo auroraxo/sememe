@@ -16,9 +16,13 @@
 //     re-checks the store against the pin and refuses drift BY NAME:
 //       drifted    the store answers the program with a DIFFERENT fingerprint
 //       missing    the store has nothing for a pinned program
-//       unverified a pinned object fails the store reader's own re-hash check
-//     extra store programs are reported, never a violation (the lock pins
-//     minimums, not store equality).
+//       unverified an object fails the store reader's own re-hash check
+//     extra store programs are reported, never a violation FOR BEING THERE
+//     (the lock pins minimums, not store equality) — but a DAMAGED extra is
+//     a violation like any other, marked scope `extra` (measured 2026-11-07:
+//     checkLock read only PINNED programs, so a store whose later-pulled
+//     extra was damaged gave `lock` exit 1 and `verify` exit 0 — see
+//     test/extra-program-damage.test.mjs).
 //   - `--mode error` (verify's default) exits 1 on any violation — the CI
 //     gate behaviour; `--mode warn` reports and exits 0.
 //   - The document itself is JSON with `lockVersion: 1`; anything else is

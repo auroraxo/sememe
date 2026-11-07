@@ -1,0 +1,61 @@
+{
+  "measuredAt": "2026-11-07T18:16:14.244Z",
+  "binary": {
+    "path": null,
+    "tag": "v0.4.10",
+    "install": "npm install github:auroraxo/sememe#<tag>"
+  },
+  "contract": "verify must not call clean a store the store reader refuses, even when the damaged program is an EXTRA the lock never pinned",
+  "defect": {
+    "kind": "verify-green-over-damaged-extra",
+    "description": "checkLock re-verified only PINNED programs; writeLock re-verified every receipt, so lock refused a store verify called clean (violations 0, exit 0) — a green CI gate over a program whose decode exits 1"
+  },
+  "cases": {
+    "s1": {
+      "lockExit": 1,
+      "lockFileWritten": false,
+      "namesProgram": true
+    },
+    "s2": {
+      "verifyErrorExit": 0,
+      "namesProgram": true
+    },
+    "s3": {
+      "verifyWarnExit": 0,
+      "violations": 0,
+      "unverified": [],
+      "extra": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ],
+      "hasScope": false
+    },
+    "s4": {
+      "repaired": true,
+      "removedReceipts": 1,
+      "exit": 0
+    }
+  },
+  "controls": {
+    "s5a": {
+      "verifyExit": 0,
+      "violations": 0,
+      "extra": [
+        "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4"
+      ]
+    },
+    "s5b": {
+      "violations": 1,
+      "unverified": [
+        "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+      ]
+    }
+  },
+  "verdict": {
+    "ok": false,
+    "violations": [
+      "S2: verify --mode error exited 0 over a store the reader refuses",
+      "S3: warn mode counted 0 violations over damage",
+      "S3: the damaged extra is not marked scope=extra"
+    ]
+  }
+}
