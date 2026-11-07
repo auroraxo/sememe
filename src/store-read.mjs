@@ -23,6 +23,7 @@ import { createHash } from 'node:crypto';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
+import { compareReceiptNames } from './receipt-order.mjs';
 
 export { canonicalJson } from './canonical.mjs';
 
@@ -84,7 +85,13 @@ async function receiptNames(storeDir, program) {
   }
   const candidates = names.filter((name) => name.startsWith(`${program}-`));
   if (!candidates.length) throw Error(`no stored IDL for program ${program} in ${storeDir}`);
-  candidates.sort();
+  // Numeric slot order, NOT byte order: the slot in the filename is a decimal
+  // NUMBER, and "99999999" sorts after "123456789" as a string — so a plain
+  // sort picks the OLDER receipt as "last = newest" whenever two slot strings
+  // differ in length (measured 2026-11-07: plain decode and lock said slot
+  // 99999999, the union path — which sorts by numeric slot — said 123456789).
+  // ONE ordering, shared with src/lock.mjs via src/receipt-order.mjs.
+  candidates.sort(compareReceiptNames);
   return candidates;
 }
 
@@ -105,12 +112,13 @@ export async function findStoredIdl(storeDir, program) {
  *
  * TWO RULES THAT MUST NOT DIVERGE (measured 2026-11-07, this host):
  *
- *   1. Adopted copies are ordered by RECEIPT FILENAME — the exact rule
- *      `findStoredIdl` (the plain decode) and `src/lock.mjs` apply. They used to
- *      be ordered by their human-readable LABEL, which embeds the ORIGIN the
- *      caller typed: with two adopted copies the union path read the copy the
- *      origin spelling pointed at while the plain decode and the lock read the
- *      copy the fingerprint pointed at. Same store, same bytes, two answers —
+ *   1. Adopted copies are ordered by the SHARED receipt ordering
+ *      (src/receipt-order.mjs) — the exact rule `findStoredIdl` (the plain
+ *      decode) and `src/lock.mjs` apply. They used to be ordered by their
+ *      human-readable LABEL, which embeds the ORIGIN the caller typed: with
+ *      two adopted copies the union path read the copy the origin spelling
+ *      pointed at while the plain decode and the lock read the copy the
+ *      fingerprint pointed at. Same store, same bytes, two answers —
  *      plain `decode` said `sell_v3`, `decode --union` refused the payload.
  *   2. When the store holds NO on-chain receipt and MULTIPLE adopted copies,
  *      the newest adopted copy is the `primary` and the next one the
@@ -153,19 +161,23 @@ export async function findStoredIdls(storeDir, program) {
     else if (/^\d+$/.test(slotSegment)) onChain.push(entry);
     else adopted.push(entry);
   }
-  onChain.sort((a, b) => (a.idlMeta.slot ?? 0) - (b.idlMeta.slot ?? 0));
-  // Receipt FILENAME order, byte-wise — the same order `candidates.sort()`
-  // applies in `findStoredIdl`. Never the label: the label carries the origin
-  // string the caller typed, and two copies of one program then answered from
-  // two different orderings.
-  adopted.sort((a, b) => (a.idlMeta.receipt < b.idlMeta.receipt ? -1
-    : a.idlMeta.receipt > b.idlMeta.receipt ? 1 : 0));
+  // Ordered by the ONE shared rule (numeric slot, filename tiebreak) — the
+  // same order `candidates` already arrives in from `receiptNames`, and the
+  // same order `findStoredIdl` and src/lock.mjs apply. Never the label (it
+  // carries the origin string the caller typed) and never the raw string (it
+  // orders by digits, not by value).
+  onChain.sort((a, b) => compareReceiptNames(a.idlMeta.receipt, b.idlMeta.receipt));
+  // Adopted copies are ordered by the SAME shared rule — numeric slot first
+  // (they all carry filename segment 0), then the filename byte-wise. Never
+  // the label: it carries the origin string the caller typed, and two copies
+  // of one program then answered from two different orderings.
+  adopted.sort((a, b) => compareReceiptNames(a.idlMeta.receipt, b.idlMeta.receipt));
 
   let primary = onChain.length ? onChain[onChain.length - 1] : null;
   let secondary = adopted.length ? adopted[adopted.length - 1] : null;
   if (!primary && adopted.length >= 2) {
     // No pull in the store, but several verified published copies: they ARE the
-    // union's two sources. Ranking them by receipt filename keeps the primary
+    // union's two sources. Ranking them by the shared rule keeps the primary
     // equal to the copy `findStoredIdl` reads, so plain and union decode agree.
     primary = adopted[adopted.length - 1];
     secondary = adopted[adopted.length - 2];

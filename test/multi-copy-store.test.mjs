@@ -302,8 +302,8 @@ async function withMutant(file, name, mutate) {
 
 test('MUTATION X1 (sort the adopted copies by label again) turns M1 red', async () => {
   const mutant = await withMutant('store-read.mjs', 'x1-label-sort', (source) => source.replace(
-    'adopted.sort((a, b) => (a.idlMeta.receipt < b.idlMeta.receipt ? -1',
-    'adopted.sort((a, b) => a.label.localeCompare(b.label)); void ((a, b) => (a.idlMeta.receipt < b.idlMeta.receipt ? -1',
+    'adopted.sort((a, b) => compareReceiptNames(a.idlMeta.receipt, b.idlMeta.receipt));',
+    'adopted.sort((a, b) => a.label.localeCompare(b.label));',
   ));
   const { dir } = await twoAdoptedStore();
   try {

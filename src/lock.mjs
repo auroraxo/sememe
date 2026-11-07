@@ -30,6 +30,7 @@ import { writeFile, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { readVerified } from './store-read.mjs';
+import { compareReceiptNames } from './receipt-order.mjs';
 
 const LOCK_VERSION = 1;
 const HEX64 = /^[a-f0-9]{64}$/;
@@ -41,12 +42,15 @@ function programOfReceiptName(name) {
   return name.split('-')[0];
 }
 
-/** Newest-selection rule, identical to `findStoredIdl`: sorted, take last. */
+/** Newest-selection rule, identical to `findStoredIdl`: sort by the ONE
+ * shared ordering (numeric slot, filename tiebreak), take last. A plain
+ * string sort here would pin "99999999" over "123456789" — two answers from
+ * one store, measured 2026-11-07 (test/slot-order-store.test.mjs O2). */
 async function newestReceipt(storeDir, program) {
   const receipts = path.join(storeDir, 'receipts');
   const names = (await readdir(receipts)).filter((name) => name.startsWith(`${program}-`));
   if (!names.length) return null;
-  names.sort();
+  names.sort(compareReceiptNames);
   return readVerified(storeDir, program, names[names.length - 1]);
 }
 
@@ -160,13 +164,16 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
   const pinnedPrograms = Object.keys(doc.programs).sort();
 
   let receiptNames = [];
-  try { receiptNames = (await readdir(path.join(storeDir, 'receipts'))).sort(); }
+  try { receiptNames = (await readdir(path.join(storeDir, 'receipts'))); }
   catch (error) {
     if (error?.code === 'ENOENT') {
       throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
     }
     throw error;
   }
+  // The same ONE ordering the writer and both readers use, so "newest" means
+  // the same receipt on every side of a lock comparison.
+  receiptNames.sort(compareReceiptNames);
   const storePrograms = [...new Set(receiptNames.map(programOfReceiptName))].sort();
 
   const report = {

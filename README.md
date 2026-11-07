@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.9   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.10   # tagged release; no npm account needed
 ```
 
 ```js
@@ -121,7 +121,7 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.9 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.10 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -756,6 +756,71 @@ this fix makes the label *not decide which copy answers*, which is the part
 that was silently changing decode results; it does not verify the label's
 truth. Adopting published copies for a second program, and honest labelling of
 a declared origin, remain open.
+
+## Working now: one ordering for receipts — slot order is not digit order (2026-11-07)
+
+The receipt filename is `<program>-<slot>-<source>-<fingerprint>.json`, and the
+slot inside it is a decimal **number stored as a string**. Sorting receipt
+names with a plain string comparison therefore orders by **digits, not by
+value**: `…-99999999-…` sorts *after* `…-123456789-…`, so the OLDER receipt
+wins "last position" — and `findStoredIdl` takes the last position as
+"newest". Measured on the PUBLISHED `v0.4.9` install (installed from its git
+tag into an empty app, no clone) with a store holding one program's receipts at slots
+99999999 (older) and 123456789 (newer):
+
+| command | answers | exit |
+|---|---|---|
+| `sememe decode <payload>` | **refused** — it read the OLDER copy, which does not know `sell_v3` | **1** |
+| `sememe decode --union <payload>` | `sell_v3`, slot `123456789` (the NEWER copy) | 0 |
+| `sememe lock` | pinned slot `99999999` — a *different* receipt than the union decode read | 0 |
+| `sememe verify` | clean over that lock | 0 |
+
+One store, three surfaces, two different receipts — and a lock pinning a
+receipt the decoders did not read. The union path has sorted on-chain receipts
+by **numeric slot** since it was written (`onChain.sort((a, b) => a.slot -
+b.slot)`), while the plain reader, `receiptNames()` and `src/lock.mjs` sorted
+by **filename**. The v0.4.9 fix collapsed label-order and filename-order into
+"ONE ordering everywhere (receipt filename)" — true for labels, but filename
+order is digit order, and digit order is not slot order. Same defect shape,
+one dimension over: two sorts, two winners.
+
+**The rule now is one comparator** (`src/receipt-order.mjs`), shared by the
+plain reader, the union path and both lock paths: sort by **slot
+numerically** (adopted copies carry filename segment `0`, so they still sort
+before every real slot — adoption never switches the default source), with the
+rest of the filename as byte-wise tiebreak so equal slots stay deterministic.
+
+The measurement ships as a tool and two committed artifacts, following the
+repo's `tool produces the report` rule:
+
+```bash
+node tools/measure-slot-order.mjs                              # this tree → research/slot-order-2026-11-07.json
+node tools/measure-slot-order.mjs --bin <installed bin> --tag v0.4.9 --out before.json
+```
+
+[research/slot-order-2026-11-07-before.json](research/slot-order-2026-11-07-before.json)
+is the published `v0.4.9` install: **5 contract violations** (plain decode
+refused while union answered, lock pinned a different receipt);
+[research/slot-order-2026-11-07.json](research/slot-order-2026-11-07.json) is
+this tree: **0 violations**, and the equal-length control — what a fresh
+`pull` writes today — stays green on both sides.
+`test/slot-order-measurement.test.mjs` pins both artifacts and fails if the
+committed report stops being what the tool derives; the ladder in
+[test/slot-order-store.test.mjs](test/slot-order-store.test.mjs) pins the
+behaviour (O1/O2/O3 red on the pre-fix tree, O4 control green there, two
+mutations that must each turn a test red), and **O6 pins a SECOND program** —
+whirlpool with two adopted copies, plain/union/lock agreeing and a damaged
+second copy refusing the lock — closing the "adopted copies for more than one
+program" item for the lock contract.
+
+**Reachability, stated honestly rather than sold:** every live slot measured
+on this host is 9 digits (44,661 values in `research/` + fixtures, min
+462039125, max 465713413), so two receipts of one program written by `pull`
+today have equal-length slots and both orderings agree — the defect is latent
+for a fresh pull. It becomes LIVE for any store holding receipts whose slot
+strings differ in length: a receipt carried over from another era or cluster,
+a hand-assembled store, or mainnet slots crossing 1,000,000,000. The contract
+("newest stored IDL") has to hold in that store too.
 
 ## Free and paid
 
