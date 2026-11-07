@@ -246,7 +246,7 @@ function measure() {
     generatedAt: new Date().toISOString(),
     tool: 'tools/measure-declared-origin.mjs',
     question: 'does a declared origin ever read as a verified provenance, and can it be rewritten without the gate noticing?',
-    binary: { path: BIN, tag: TAG },
+    binary: { path: path.relative(ROOT, BIN) || BIN, tag: TAG, tree: BIN.startsWith(ROOT) ? 'this tree' : 'external' },
     fixture: {
       program: PUMP,
       publishedCopy: path.relative(ROOT, PUBLISHED),

@@ -1,10 +1,11 @@
 {
-  "generatedAt": "2026-11-07T12:12:13.158Z",
+  "generatedAt": "2026-11-07T12:33:55.051Z",
   "tool": "tools/measure-declared-origin.mjs",
   "question": "does a declared origin ever read as a verified provenance, and can it be rewritten without the gate noticing?",
   "binary": {
-    "path": "/tmp/sememe-v0410/bin/sememe.mjs",
-    "tag": "v0.4.10"
+    "path": "../../../../tmp/sememe-v0410/bin/sememe.mjs",
+    "tag": "v0.4.10",
+    "tree": "external"
   },
   "fixture": {
     "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
@@ -53,7 +54,7 @@
       "receiptNames": [
         "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json"
       ],
-      "secondErrorHead": "{\"error\":\"digest collision or corrupted local object: /tmp/sememe-origin-measure-vhWuEy/store-two-origins/receipts/6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae8362",
+      "secondErrorHead": "{\"error\":\"digest collision or corrupted local object: /tmp/sememe-origin-measure-UzOMNq/store-two-origins/receipts/6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae8362",
       "secondSaysCollision": true
     }
   },
@@ -77,7 +78,7 @@
       "T2 the rewritten origin was not named as a relabelled origin",
       "T2 verify in error mode exited 0 over a rewritten declared origin",
       "T2 the error does not name the origin: null",
-      "T3 the second adopt of the SAME bytes under a different origin failed: {\"error\":\"digest collision or corrupted local object: /tmp/sememe-origin-measure-vhWuEy/store-two-origins/receipts/6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae8362",
+      "T3 the second adopt of the SAME bytes under a different origin failed: {\"error\":\"digest collision or corrupted local object: /tmp/sememe-origin-measure-UzOMNq/store-two-origins/receipts/6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae8362",
       "T3 a differing declared origin is reported as a digest collision",
       "T3 expected two receipts for the same bytes under two origins, found 1"
     ],

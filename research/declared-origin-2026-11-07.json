@@ -1,10 +1,11 @@
 {
-  "generatedAt": "2026-11-07T12:27:42.351Z",
+  "generatedAt": "2026-11-07T12:33:58.306Z",
   "tool": "tools/measure-declared-origin.mjs",
   "question": "does a declared origin ever read as a verified provenance, and can it be rewritten without the gate noticing?",
   "binary": {
-    "path": "/home/aurora/github_repos/sememe/bin/sememe.mjs",
-    "tag": null
+    "path": "bin/sememe.mjs",
+    "tag": null,
+    "tree": "this tree"
   },
   "fixture": {
     "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
