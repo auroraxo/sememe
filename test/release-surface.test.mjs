@@ -50,7 +50,7 @@ const BEFORE = path.join(ROOT, 'research', 'release-surface-2026-11-05-before.js
 // the tag trees). The v0.4.4-era record (release-surface-2026-11-05.json) is
 // kept in research/ as history — it still reproduces its own verdict — but the
 // artifact that must be clean is the one committed with the CURRENT release.
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-06.json');
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-07.json');
 const NETWORK = process.env.SEMEME_RELEASE_SURFACE_NETWORK === '1';
 
 // On the pre-fix tree the tool module does not exist; the import failure must
