@@ -86,10 +86,13 @@ function packAndInstall({ tag, omitPeer }) {
       source = work;
     }
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sememe-peer-app-'));
-    const out = execFileSync('npm', ['pack', '--silent'], { cwd: source, encoding: 'utf8' })
+    // --pack-destination: pack into THIS test's own directory, never into the
+    // shared source tree — concurrent packs renamed each other's tarball away
+    // (ENOENT, measured 2026-11-07).
+    const out = execFileSync('npm', ['pack', '--silent', '--pack-destination', dir], { cwd: source, encoding: 'utf8' })
       .trim().split('\n').pop().trim();
     const tgz = path.join(dir, 'sememe.tgz');
-    fs.renameSync(path.join(source, out), tgz);
+    fs.renameSync(path.join(dir, out), tgz);
     execFileSync('npm', ['init', '-y'], { cwd: dir, stdio: 'ignore' });
     execFileSync('npm', ['install', '--no-audit', '--no-fund',
       ...(omitPeer ? ['--omit=peer'] : []), path.basename(tgz)], { cwd: dir, stdio: 'ignore' });

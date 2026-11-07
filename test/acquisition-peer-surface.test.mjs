@@ -59,9 +59,11 @@ let NO_PEER = null;
 function withoutPeer() {
   if (NO_PEER) return NO_PEER;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sememe-peer-surface-'));
-  const out = execFileSync('npm', ['pack', '--silent'], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop().trim();
+  // --pack-destination: never pack INTO the shared repo root — concurrent
+  // packs renamed each other's tarball away (ENOENT, measured 2026-11-07).
+  const out = execFileSync('npm', ['pack', '--silent', '--pack-destination', dir], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop().trim();
   const tgz = path.join(dir, 'sememe.tgz');
-  fs.renameSync(path.join(ROOT, out), tgz);
+  fs.renameSync(path.join(dir, out), tgz);
   execFileSync('npm', ['init', '-y'], { cwd: dir, stdio: 'ignore' });
   // --omit=peer: the peer is OPTIONAL in package.json, so this is the state a
   // decoder-only consumer is in. npm would not install it anyway; the flag
@@ -125,9 +127,10 @@ test('L4 GUARD with the peer installed, both subpaths import and expose their do
   // defect is about the ABSENCE of the peer. It exists so a fix that simply
   // broke the acquisition surface would be caught.
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sememe-peer-guard-'));
-  const out = execFileSync('npm', ['pack', '--silent'], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop().trim();
+  // --pack-destination: see withoutPeer() — no packing into the shared root.
+  const out = execFileSync('npm', ['pack', '--silent', '--pack-destination', dir], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop().trim();
   const tgz = path.join(dir, 'sememe.tgz');
-  fs.renameSync(path.join(ROOT, out), tgz);
+  fs.renameSync(path.join(dir, out), tgz);
   execFileSync('npm', ['init', '-y'], { cwd: dir, stdio: 'ignore' });
   execFileSync('npm', ['install', '--no-audit', '--no-fund', path.basename(tgz)], { cwd: dir, stdio: 'ignore' });
   execFileSync('npm', ['install', '--no-audit', '--no-fund', '@solana/web3.js@1.98.4'], { cwd: dir, stdio: 'ignore' });

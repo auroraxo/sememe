@@ -41,9 +41,12 @@ let PACK = null;
 function tarball() {
   if (PACK) return PACK;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'sememe-install-surface-'));
-  const out = execFileSync('npm', ['pack', '--silent'], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop().trim();
+  // --pack-destination: never pack INTO the repo root. Several tests pack in
+  // parallel and each used to RENAME the same `sememe-<version>.tgz` out of
+  // the root — the loser got ENOENT (measured 2026-11-07).
+  const out = execFileSync('npm', ['pack', '--silent', '--pack-destination', dir], { cwd: ROOT, encoding: 'utf8' }).trim().split('\n').pop().trim();
   const tgz = path.join(dir, 'sememe.tgz');
-  fs.renameSync(path.join(ROOT, out), tgz);
+  fs.renameSync(path.join(dir, out), tgz);
   execFileSync('npm', ['init', '-y'], { cwd: dir, stdio: 'ignore' });
   execFileSync('npm', ['install', '--no-audit', '--no-fund', path.basename(tgz)], { cwd: dir, stdio: 'ignore' });
   const app = path.join(dir, 'node_modules', 'sememe');

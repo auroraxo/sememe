@@ -280,8 +280,8 @@ async function withMutant(name, mutate) {
 
 test('MUTATION X1 (do not re-check extra programs) turns T1 and T3 red', async () => {
   const mutant = await withMutant('x1-no-extra-check', (source) => source.replace(
-    '  for (const program of report.extra) {\n    const candidates = receiptNames.filter((name) => name.startsWith(`${program}-`));',
-    '  for (const program of []) {\n    const candidates = receiptNames.filter((name) => name.startsWith(`${program}-`));',
+    '  for (const program of report.extra) {\n    const candidates = validReceipts.filter((name) => name.startsWith(`${program}-`));',
+    '  for (const program of []) {\n    const candidates = validReceipts.filter((name) => name.startsWith(`${program}-`));',
   ));
   const { store, lockPath } = await storeWithExtra({ damageExtra: true });
   try {
