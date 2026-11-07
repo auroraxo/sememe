@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-11-07T12:27:42.351Z",
+  "tool": "tools/measure-declared-origin.mjs",
+  "question": "does a declared origin ever read as a verified provenance, and can it be rewritten without the gate noticing?",
+  "binary": {
+    "path": "/home/aurora/github_repos/sememe/bin/sememe.mjs",
+    "tag": null
+  },
+  "fixture": {
+    "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    "publishedCopy": "test/fixtures/pump-published-idl.json",
+    "declaredOrigin": "solana-labs/anchor@deadbeef/does-not-exist.json",
+    "rewrittenOrigin": "attacker/rewritten-origin",
+    "note": "the declared origin names a repository that does not exist — nothing in sememe checks it, which is the point"
+  },
+  "t1": {
+    "readerSurfaces": {
+      "adoptExit": 0,
+      "adoptOrigin": "solana-labs-anchor-deadbeef-does-not-exist.json",
+      "adoptOriginStatus": "declared",
+      "adoptOriginNote": "declared origin, not verified: sememe did not check that this repository, commit or file exists, and the bytes were not proven to come from it — provenance of bytes, not proof they describe the deployed program",
+      "decodeExit": 0,
+      "idlMetaOrigin": "solana-labs-anchor-deadbeef-does-not-exist.json",
+      "idlMetaOriginStatus": "declared",
+      "readerLabel": "published (adopted, declared origin: solana-labs-anchor-deadbeef-does-not-exist.json)",
+      "unionLabel": "published (adopted, declared origin: solana-labs-anchor-deadbeef-does-not-exist.json)",
+      "unionExit": 0
+    }
+  },
+  "t2": {
+    "rewrittenOrigin": {
+      "lockExit": 0,
+      "verifyBeforeExit": 0,
+      "verifyBeforeViolations": 0,
+      "verifyBeforeVerified": [
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+      ],
+      "verifyAfterExit": 0,
+      "verifyAfterViolations": 1,
+      "verifyAfterVerified": [],
+      "relabelled": [
+        {
+          "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+          "receipt": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json",
+          "reason": "store receipt 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json: the declared origin was rewritten after the receipt was written (the receipt still binds \"sha256:d1953df7d61d452d1646ce638a3789b540745a651e2b0b9602f2d92da52f68",
+          "scope": "receipt"
+        }
+      ],
+      "verifyErrorExit": 1,
+      "verifyErrorHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 1 relabelled) — relabelled (declared origin changed): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\"}"
+    }
+  },
+  "t3": {
+    "twoDeclaredOrigins": {
+      "firstExit": 0,
+      "secondExit": 0,
+      "receipts": 2,
+      "receiptNames": [
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-4e43f7fe4dd0-a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json",
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json"
+      ],
+      "secondErrorHead": null,
+      "secondSaysCollision": false
+    }
+  },
+  "t4": {
+    "control": {
+      "adoptExit": 0,
+      "decodeExit": 0,
+      "decodeInstruction": "sell_v3",
+      "lockExit": 0,
+      "verifyExit": 0
+    }
+  },
+  "verdict": {
+    "violations": [],
+    "ok": true
+  }
+}

@@ -60,6 +60,30 @@ export { unionDecode, UnionRefusal } from './union.mjs';
 export { verifiedShortForm, VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE, describeShortForm, resolveAbsentPolicy } from './short-forms.mjs';
 
 /**
+ * The provenance of the interface that answered — INCLUDING the declared
+ * origin and its status.
+ *
+ * The plain decode quoted only fingerprint/slot/source/receipt, so an ADOPTED
+ * copy's origin (a label the caller typed, never checked) never appeared on
+ * this surface at all: the union path showed it as a bare provenance claim
+ * and the plain path hid it. Both now name the same thing, and the status
+ * says the origin was DECLARED, not verified. An on-chain receipt names no
+ * file, so it carries no origin at all.
+ */
+function provenanceOf(receipt, receiptName) {
+  return {
+    fingerprint: receipt.fingerprint,
+    slot: receipt.slot,
+    source: receipt.source,
+    receipt: receiptName,
+    ...(receipt.origin === undefined || receipt.origin === null ? {} : {
+      origin: receipt.origin,
+      originStatus: receipt.originStatus ?? 'declared',
+    }),
+  };
+}
+
+/**
  * Decode one payload with BOTH verified store sources for the program.
  *
  * Primary = newest on-chain receipt (real slot), secondary = newest adopted
@@ -139,7 +163,7 @@ export async function decodeStoredAccount(storeDir, program, dataInput, { name, 
     discriminator: decoded.discriminator,
     discriminatorSource: filled > 0 ? (conflicts.length ? 'stored+derived' : 'derived') : 'stored',
     discriminatorDerivation: { filledAccounts: filled, conflicts: conflicts.length },
-    idl: { fingerprint: receipt.fingerprint, slot: receipt.slot, source: receipt.source, receipt: receiptName },
+    idl: provenanceOf(receipt, receiptName),
     object: objectPath,
   };
 }
@@ -220,7 +244,7 @@ export async function decodePayload(storeDir, program, payloadInput, { allowTrai
       conflicts: conflicts.length,
     },
     ...(form ? { shortForm: describeShortForm(form, decoded, bytes) } : {}),
-    idl: { fingerprint: receipt.fingerprint, slot: receipt.slot, source: receipt.source, receipt: receiptName },
+    idl: provenanceOf(receipt, receiptName),
     object: objectPath,
   };
 }

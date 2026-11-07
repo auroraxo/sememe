@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-11-07T12:12:13.158Z",
+  "tool": "tools/measure-declared-origin.mjs",
+  "question": "does a declared origin ever read as a verified provenance, and can it be rewritten without the gate noticing?",
+  "binary": {
+    "path": "/tmp/sememe-v0410/bin/sememe.mjs",
+    "tag": "v0.4.10"
+  },
+  "fixture": {
+    "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    "publishedCopy": "test/fixtures/pump-published-idl.json",
+    "declaredOrigin": "solana-labs/anchor@deadbeef/does-not-exist.json",
+    "rewrittenOrigin": "attacker/rewritten-origin",
+    "note": "the declared origin names a repository that does not exist — nothing in sememe checks it, which is the point"
+  },
+  "t1": {
+    "readerSurfaces": {
+      "adoptExit": 0,
+      "adoptOrigin": "solana-labs-anchor-deadbeef-does-not-exist.json",
+      "adoptOriginStatus": null,
+      "adoptOriginNote": null,
+      "decodeExit": 0,
+      "idlMetaOrigin": null,
+      "idlMetaOriginStatus": null,
+      "readerLabel": "published (adopted, solana-labs-anchor-deadbeef-does-not-exist.json)",
+      "unionLabel": "published (adopted, solana-labs-anchor-deadbeef-does-not-exist.json)",
+      "unionExit": 0
+    }
+  },
+  "t2": {
+    "rewrittenOrigin": {
+      "lockExit": 0,
+      "verifyBeforeExit": 0,
+      "verifyBeforeViolations": 0,
+      "verifyBeforeVerified": [
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+      ],
+      "verifyAfterExit": 0,
+      "verifyAfterViolations": 0,
+      "verifyAfterVerified": [
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+      ],
+      "relabelled": null,
+      "verifyErrorExit": 0,
+      "verifyErrorHead": null
+    }
+  },
+  "t3": {
+    "twoDeclaredOrigins": {
+      "firstExit": 0,
+      "secondExit": 1,
+      "receipts": 1,
+      "receiptNames": [
+        "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json"
+      ],
+      "secondErrorHead": "{\"error\":\"digest collision or corrupted local object: /tmp/sememe-origin-measure-vhWuEy/store-two-origins/receipts/6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae8362",
+      "secondSaysCollision": true
+    }
+  },
+  "t4": {
+    "control": {
+      "adoptExit": 0,
+      "decodeExit": 0,
+      "decodeInstruction": "sell_v3",
+      "lockExit": 0,
+      "verifyExit": 0
+    }
+  },
+  "verdict": {
+    "violations": [
+      "T1 adopt did not report the origin as DECLARED (got null)",
+      "T1 adopt did not say the origin was not verified",
+      "T1 the decoded idlMeta does not mark the origin as DECLARED (got null)",
+      "T1 the reader label presents the origin without marking it declared: published (adopted, solana-labs-anchor-deadbeef-does-not-exist.json)",
+      "T1 the union label presents the origin without marking it declared: published (adopted, solana-labs-anchor-deadbeef-does-not-exist.json)",
+      "T2 a rewritten declared origin reported ZERO violations — the CI gate cannot see it",
+      "T2 the rewritten origin was not named as a relabelled origin",
+      "T2 verify in error mode exited 0 over a rewritten declared origin",
+      "T2 the error does not name the origin: null",
+      "T3 the second adopt of the SAME bytes under a different origin failed: {\"error\":\"digest collision or corrupted local object: /tmp/sememe-origin-measure-vhWuEy/store-two-origins/receipts/6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-a35349f371114b52701a3aeae8362",
+      "T3 a differing declared origin is reported as a digest collision",
+      "T3 expected two receipts for the same bytes under two origins, found 1"
+    ],
+    "ok": false
+  }
+}

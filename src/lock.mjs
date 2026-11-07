@@ -20,11 +20,17 @@
 //   drifted     the store answers the program with a DIFFERENT fingerprint
 //   missing     the store has no verified receipt for a pinned program
 //   unverified  the pinned object fails the store reader's own re-hash check
+//   relabelled  a pinned or stored DECLARED origin changed after the fact —
+//               the receipt says "declared" about bytes whose label no longer
+//               matches what was pinned (see src/receipt-digest.mjs)
 // Extra store programs are reported, never a violation: the lock pins
 // minimums, not store equality — a pull that ADDS a program must not fail
 // someone else's CI. writeLock refuses to write a lock over a store it cannot
 // fully verify: every receipt is re-checked through the store reader first,
-// so a lock is a snapshot of VERIFIED answers, never of filenames.
+// so a lock is a snapshot of VERIFIED answers, never of filenames. The lock
+// pins each program's DECLARED origin next to its fingerprint: the fingerprint
+// binds the bytes, the origin pins the label the store answered with, and
+// neither may change silently.
 
 import { writeFile, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -77,10 +83,17 @@ async function verifyEveryReceipt(storeDir, program, names) {
     try {
       await readVerified(storeDir, program, name);
     } catch (error) {
-      return { ok: false, receipt: name, reason: String(error?.message ?? error).slice(0, 300) };
+      // The failure KIND decides which bucket checkLock reports it in: a
+      // rewritten declared origin is a relabel, not an unreadable object.
+      return {
+        ok: false,
+        receipt: name,
+        reason: String(error?.message ?? error).slice(0, 300),
+        code: error?.code ?? null,
+      };
     }
   }
-  return { ok: true, receipt: null, reason: null };
+  return { ok: true, receipt: null, reason: null, code: null };
 }
 
 /** Snapshot every verified receipt of `storeDir` into a lock document.
@@ -114,6 +127,13 @@ export async function writeLock(storeDir, outPath) {
       slot: receipt.slot ?? null,
       receipt: receiptName,
       instructions: Array.isArray(idl.instructions) ? idl.instructions.length : 0,
+      // The DECLARED origin, pinned beside the fingerprint. Absent for an
+      // on-chain receipt (it names no file) and for a legacy adopted receipt
+      // without one; `null` never appears — a pinned origin is a string.
+      ...(receipt.origin === undefined || receipt.origin === null ? {} : {
+        origin: receipt.origin,
+        originStatus: receipt.originStatus ?? 'declared',
+      }),
     };
   }
   const bytes = Buffer.from(`${canonicalJson(doc)}\n`);
@@ -152,6 +172,9 @@ export async function readLock(lockPath) {
     if (!HEX64.test(fingerprint)) {
       throw Error(`sememe lock file ${lockPath} pins ${program} with a malformed fingerprint ${JSON.stringify(entry.fingerprint)} (lock-v1-fingerprint)`);
     }
+    if (entry.origin !== undefined && typeof entry.origin !== 'string') {
+      throw Error(`sememe lock file ${lockPath} pins ${program} with a malformed origin ${JSON.stringify(entry.origin)} (lock-v1-origin)`);
+    }
   }
   return doc;
 }
@@ -185,6 +208,9 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     drifted: [],
     missing: [],
     unverified: [],
+    // A declared origin that is no longer the one that was pinned, or a
+    // receipt whose own declared label no longer matches its digest.
+    relabelled: [],
     extra: storePrograms.filter((program) => !doc.programs[program]),
   };
 
@@ -202,30 +228,68 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     // so "lock" and "verify" cannot disagree about the store.
     const verdict = await verifyEveryReceipt(storeDir, program, candidates);
     if (!verdict.ok) {
-      report.unverified.push({ program, receipt: verdict.receipt, reason: verdict.reason });
+      if (verdict.code === 'receipt-relabelled') {
+        // The declared origin in the receipt no longer matches its own digest:
+        // the label was rewritten after the receipt was written. Reported as
+        // its own violation kind so a caller can see that the BYTES are fine
+        // and the PROVENANCE claim is not.
+        report.relabelled.push({ program, receipt: verdict.receipt, reason: verdict.reason, scope: 'receipt' });
+      } else {
+        report.unverified.push({ program, receipt: verdict.receipt, reason: verdict.reason });
+      }
       continue;
     }
     let source;
     try {
       source = await readVerified(storeDir, program, newest);
     } catch (error) {
-      report.unverified.push({ program, receipt: newest, reason: String(error?.message ?? error).slice(0, 200) });
+      if (error?.code === 'receipt-relabelled') {
+        report.relabelled.push({
+          program,
+          receipt: newest,
+          reason: String(error?.message ?? error).slice(0, 300),
+          scope: 'receipt',
+        });
+      } else {
+        report.unverified.push({ program, receipt: newest, reason: String(error?.message ?? error).slice(0, 200) });
+      }
       continue;
     }
     const storeFingerprint = source.receipt.fingerprint.replace(/^sha256:/, '');
-    if (storeFingerprint === pinnedFingerprint) {
-      report.verified.push(program);
-    } else {
+    if (storeFingerprint !== pinnedFingerprint) {
       report.drifted.push({
         program,
         pinned: `sha256:${pinnedFingerprint}`,
         store: `sha256:${storeFingerprint}`,
         storeReceipt: newest,
       });
+      continue;
     }
+    // Fingerprint matches: now the DECLARED ORIGIN must still be the pinned
+    // one. The receipt's own digests catch an edited receipt; this catches a
+    // receipt that was rewritten AND re-digested after the lock was written —
+    // the layer a self-digest alone cannot cover, because the attacker holds
+    // the same hashing function.
+    const pinnedOrigin = doc.programs[program].origin;
+    if (typeof pinnedOrigin === 'string') {
+      const storeOrigin = source.receipt.origin ?? null;
+      if (storeOrigin !== pinnedOrigin) {
+        report.relabelled.push({
+          program,
+          receipt: newest,
+          pinned: pinnedOrigin,
+          store: storeOrigin,
+          reason: `the store no longer declares origin ${JSON.stringify(pinnedOrigin)} for ${program} — the store answers ${storeOrigin === null ? 'no origin' : JSON.stringify(storeOrigin)}`,
+          scope: 'lock',
+        });
+        continue;
+      }
+    }
+    report.verified.push(program);
   }
 
-  const violations = report.drifted.length + report.missing.length + report.unverified.length;
+  const violations = report.drifted.length + report.missing.length
+    + report.unverified.length + report.relabelled.length;
   report.violations = violations;
   if (mode === 'error' && violations > 0) {
     const parts = [];
@@ -234,7 +298,10 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     }
     if (report.missing.length) parts.push(`missing: ${report.missing.join(', ')}`);
     if (report.unverified.length) parts.push(`unverified: ${report.unverified.map((u) => u.program).join(', ')}`);
-    throw Error(`store does not match sememe.lock (${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified) — ${parts.join(' | ')}`);
+    if (report.relabelled.length) {
+      parts.push(`relabelled (declared origin changed): ${report.relabelled.map((r) => r.program).join(', ')}`);
+    }
+    throw Error(`store does not match sememe.lock (${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled) — ${parts.join(' | ')}`);
   }
   return report;
 }

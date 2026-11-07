@@ -688,7 +688,10 @@ headline count with a message saying what a regression would mean. Suite:
 **Limits, stated:** one program, one harvest window, both sources are mine (on-chain
 pull + first-party published copy), no outside user. Account decoding still reads a
 single receipt — union arbitration is not wired for accounts. An adopted receipt's
-`origin` is a declared label, not a verified origin.
+`origin` is a declared label, not a verified origin — it is now *marked* as declared
+everywhere it is shown and *bound* so it cannot be rewritten silently (see
+"Working now: a declared origin is declared, and cannot be rewritten silently"),
+but its truth is still not checked.
 
 ## Working now: one store, one answer — multiple copies of one program (2026-11-07)
 
@@ -754,8 +757,9 @@ the same measurement against the bytes a stranger installs — red against
 **Stated limit:** `origin` is still a declared label, not a verified origin —
 this fix makes the label *not decide which copy answers*, which is the part
 that was silently changing decode results; it does not verify the label's
-truth. Adopting published copies for a second program, and honest labelling of
-a declared origin, remain open.
+truth. The labelling of a declared origin is now done (a later fix marks it
+declared and binds it); what remains open is verifying the label's truth,
+and adopting published copies for a second program.
 
 ## Working now: one ordering for receipts — slot order is not digit order (2026-11-07)
 
@@ -825,6 +829,62 @@ for a fresh pull. It becomes LIVE for any store holding receipts whose slot
 strings differ in length: a receipt carried over from another era or cluster,
 a hand-assembled store, or mainnet slots crossing 1,000,000,000. The contract
 ("newest stored IDL") has to hold in that store too.
+
+## Working now: a declared origin is declared, and cannot be rewritten silently (2026-11-07)
+
+`sememe adopt` writes a receipt whose `origin` is whatever the caller typed.
+Every reader surface then presented that string as where the bytes came from:
+`"origin": "solana-labs-anchor-deadbeef-does-not-exist.json"`, reader label
+`published (adopted, solana-labs-...)`, union view `primary.label = ...`.
+Nothing checked that the named repository exists, that the file is there, or
+that the bytes came from it at all.
+
+Measured on the published `v0.4.10` tag:
+
+1. **A caller-typed string was shown as provenance without qualification.**
+   The CLI said `"origin": "..."` and reader labels said
+   `published (adopted, ...)`.
+2. **The origin was covered by NOTHING.** The fingerprint covers the
+   object (the canonical IDL bytes); the receipt was covered by nothing.
+   Rewriting `origin` in a receipt to `attacker/rewritten-origin` and running
+   `sememe verify --mode warn` reported **violations: 0, verified: ["6EF8rrec..."]**;
+   `sememe verify --mode error` exited **0**. The CI gate was green over a
+   rewritten provenance label.
+3. **Adopting the SAME bytes under two declared origins was a false collision.**
+   The second adopt failed with `"digest collision or corrupted local object"`
+   because both wrote the same receipt filename with different content.
+
+The fix:
+
+- **Every reader surface marks the origin as DECLARED** (`originStatus: "declared"`,
+  reader label `published (adopted, declared origin: ...)`), and the CLI prints
+  the advisory note that sememe did not check that the repo, commit or file
+  exists.
+- **The receipt carries its own digests** (`originDigest` binds the declared
+  origin; `receiptDigest` binds the whole receipt body). A receipt edited
+  afterwards is refused on every read with a named reason; `sememe lock` pins
+  the declared origin alongside the fingerprint, and `sememe verify` names a
+  rewritten origin as `relabelled`, exiting 1 in error mode.
+- **Two declared origins for one set of bytes are two receipts.** The second
+  adopt writes `<prog>-0-<source>-<originKey>-<fingerprint>.json`, where
+  `originKey` is a short digest of the declared origin. Both receipts keep
+  the same fingerprint, so which of them sorts last cannot change a decoded
+  byte — only which declared label is shown first.
+
+[research/declared-origin-2026-11-07-before.json](research/declared-origin-2026-11-07-before.json)
+is the published `v0.4.10` tag: **12 contract violations**;
+[research/declared-origin-2026-11-07.json](research/declared-origin-2026-11-07.json)
+is this tree: **0 violations**, and the control — an untouched store — stays
+green on both sides.
+`test/declared-origin-measurement.test.mjs` pins both artifacts;
+[test/declared-origin.test.mjs](test/declared-origin.test.mjs) pins the
+behaviour (P1/P2/P3/P3b/P4/P4b red on the pre-fix tree, P5 control green there).
+
+**Stated limit:** an adopted copy's origin is still not verified by this fix.
+What the fix does is stop presenting a typed string as a checked fact, and
+stop letting the string change without the CI gate noticing. Verification of
+provenance remains first-party adoption with a recorded commit and the
+on-chain pull, which needs no label at all.
 
 ## Free and paid
 
@@ -1721,5 +1781,5 @@ copy (artifact: `research/external-adoption-preview-2026-11-04.json`, pinned in
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
 2. **Whirlpool pull + content fingerprint has landed, the instruction decoder decodes real mainnet bytes, one own consumer reads the stored artifact for BOTH checking and producing, and the decoder is verified against an independent oracle across 1,000+ transactions** (see sections above): `solana-tx-remix` uses the pinned IDL for its single-program Whirlpool path (verifier + emitter), and `tools/tx-diff.mjs` verifies 1,119 real mainnet payloads from 1,029 transactions (sampled across 40,013 mainnet transactions in 148 finalized blocks) with 0 naming disagreements, 0 value disagreements, 0 byte mismatches, and 33 unexplained trailing-byte payloads (2.95%). Still to do, in order: migrate the remaining own decoder paths; then seek an outside user. The selected-sample threshold does not validate other program families. The `41 paths` figure above is an unverified note estimate; the computed scan in [research/decoder-sites-2026-10-27.json](research/decoder-sites-2026-10-27.json) reports **42 (file, class) decoder sites across 35 files in 5 own repositories**, of which 36 sit in `solana-tx-remix` + `sememe` — the counting unit matters and the two numbers are not interchangeable.
 3. **Account decoding has landed** (see "Accounts: state, not just calls"): 39 real mainnet accounts across three programs, 39/39 re-encoded byte-exact, values checked against anchor-ts, 29/29 account discriminators matching anchor-ts's own computation. Still open: `repr(C)`/`packed` accounts, non-Anchor account framing, and the report path for account bytes the IDL does not describe (no real data has exercised it yet — 0 trailing bytes observed).
-4. **Union decode has landed** (see "Working now: union decode"): `sememe adopt` puts a first-party published copy in the store, `sememe decode --union` answers from both verified sources with byte-evidence arbitration and a reported drift ledger — measured 915/996 decoded on real pump.fun traffic (the on-chain account alone decodes 669, the published copy alone 880). Still open: the same arbitration for account decoding (accounts still read a single receipt), adopting published copies for more than one program, and an honest label for a declared `origin` that no reader verifies.
+4. **Union decode has landed** (see "Working now: union decode"): `sememe adopt` puts a first-party published copy in the store, `sememe decode --union` answers from both verified sources with byte-evidence arbitration and a reported drift ledger — measured 915/996 decoded on real pump.fun traffic (the on-chain account alone decodes 669, the published copy alone 880). The declared-origin qualification has landed too (see "Working now: a declared origin is declared, and cannot be rewritten silently"): reader surfaces mark it as declared, the receipt carries its own digests, `sememe verify` names rewritten origins as relabelled, and the false collision on identical bytes is gone. Still open: the same arbitration for account decoding (accounts still read a single receipt), adopting published copies for more than one program, and verifying an adopted copy's provenance against its upstream source.
 5. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.

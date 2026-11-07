@@ -17,6 +17,13 @@
 //     valid JSON, one instruction renamed — was decoded happily and its
 //     tampered name reported as provenance)
 //   - an object declaring a different program than the receipt binds
+//   - a receipt whose DECLARED origin or body no longer matches its own
+//     digest (src/receipt-digest.mjs): the fingerprint covers the OBJECT, so
+//     before the receipt carried a digest, rewriting `origin` in the receipt
+//     left `sememe verify` green over a rewritten provenance label — measured
+//     2026-11-07: violations 0 after `origin` was changed to
+//     `attacker/rewritten-origin`. A legacy receipt without digests is read as
+//     it always was: its origin is then declared WITHOUT a binding.
 // An unreadable or tampered store must never become another source's names.
 
 import { createHash } from 'node:crypto';
@@ -24,6 +31,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
+import { receiptIntegrity } from './receipt-digest.mjs';
 
 export { canonicalJson } from './canonical.mjs';
 
@@ -41,6 +49,16 @@ export async function readVerified(storeDir, program, receiptName) {
   }
   if (receipt?.program !== program) {
     throw Error(`store receipt ${receiptName} names program ${receipt?.program} — it is not a receipt for ${program}`);
+  }
+  // The receipt's OWN integrity, before it is allowed to name anything. A
+  // rewritten declared origin is refused HERE, on every read — decode, union
+  // and verify all see the same refusal, and the reason says which kind of
+  // rewrite happened (the lock reports the two differently).
+  const integrity = receiptIntegrity(receipt);
+  if (integrity) {
+    const error = Error(`store receipt ${receiptName}: ${integrity.reason}`);
+    error.code = integrity.code;
+    throw error;
   }
   const fingerprint = String(receipt.fingerprint).replace(/^sha256:/, '');
   if (!/^[a-f0-9]{64}$/.test(fingerprint)) throw Error(`store receipt has a malformed fingerprint: ${receipt.fingerprint}`);
@@ -144,8 +162,11 @@ export async function findStoredIdls(storeDir, program) {
     const source = await readVerified(storeDir, program, name);
     const entry = {
       // Human-readable provenance; the receipt filename stays in idlMeta.receipt.
+      // An ADOPTED origin is DECLARED, never verified — the label says so, so no
+      // reader can present a caller-typed string as a checked fact. A legacy
+      // receipt without originStatus is declared too (adopt never verified it).
       label: source.receipt.slot === null || source.receipt.slot === undefined
-        ? `${source.receipt.source} (adopted, ${source.receipt.origin ?? source.receipt.fingerprint.slice(0, 12)})`
+        ? `${source.receipt.source} (adopted, declared origin: ${source.receipt.origin ?? source.receipt.fingerprint.slice(0, 12)})`
         : `${source.receipt.source} @slot ${source.receipt.slot}`,
       idl: source.idl,
       idlMeta: {
@@ -153,6 +174,8 @@ export async function findStoredIdls(storeDir, program) {
         slot: source.receipt.slot ?? null,
         source: source.receipt.source,
         origin: source.receipt.origin ?? null,
+        originStatus: source.receipt.originStatus
+          ?? (source.receipt.origin !== undefined && source.receipt.origin !== null ? 'declared' : null),
         receipt: source.receiptName,
       },
       objectPath: source.objectPath,

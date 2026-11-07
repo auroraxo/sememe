@@ -206,10 +206,11 @@ try {
     console.log(JSON.stringify(report, null, 2));
     if (report.violations > 0) {
       console.error(JSON.stringify({
-        note: `store does not match ${lockFile}: ${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified`,
+        note: `store does not match ${lockFile}: ${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled`,
         drifted: report.drifted.map((d) => d.program),
         missing: report.missing,
         unverified: report.unverified.map((u) => u.program),
+        relabelled: report.relabelled.map((r) => r.program),
       }));
       // The note goes to stderr as a WARNING. The exit stays 0: in error mode
       // checkLock already threw above (that is the gate), so reaching here
@@ -223,10 +224,20 @@ try {
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const source = option('--source', 'published');
     const origin = option('--origin', undefined);
-    console.log(JSON.stringify(await adopt(program, file, store, {
+    const adopted = await adopt(program, file, store, {
       source,
       ...(origin === undefined ? {} : { origin }),
-    }), null, 2));
+    });
+    // The origin's STATUS travels with the result: a declared label is a
+    // claim the caller typed, not a provenance sememe checked. The CLI says
+    // so out loud, so an adopter cannot mistake a stored string for a
+    // verified one.
+    console.log(JSON.stringify({
+      ...adopted,
+      originStatus: adopted.originStatus ?? 'declared',
+      originNote: adopted.originNote
+        ?? 'declared origin, not verified: sememe did not check that this repository, commit or file exists — provenance of bytes, not proof they describe the deployed program',
+    }, null, 2));
   } else if (command === 'decode') {
     if (!program) throw Error('decode needs a program id');
     const payload = args.shift();

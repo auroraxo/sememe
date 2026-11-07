@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-07T03:45:56.279Z",
+ "generatedAt": "2026-11-07T12:26:47.399Z",
  "tool": "tools/measure-multi-copy-store.mjs",
  "question": "does one store answer with one answer, whichever entry point asks?",
  "binary": {
