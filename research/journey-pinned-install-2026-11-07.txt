@@ -1,0 +1,21 @@
+PIN v0.4.8
+install: npm install github:auroraxo/sememe#v0.4.8 (the published tag, not a working tree)
+== installing the published tag into /tmp/sememe-jrn-pin
+
+added 1 package in 8s
+  OK   installed version is 0.4.8
+== D1: base58 payload on the union path (v0.4.4 refused every one)
+  OK   not refused
+  OK   instruction
+  OK   roundTripByteExact
+== D2: base58 f64 argument (v0.4.4 died with readDoubleLE is not a function)
+  OK   no readDoubleLE failure
+  OK   price is 1.5
+== D3: base58 bytes argument as base64 (v0.4.4 printed a comma list)
+  OK   data is base64 3q2+7w==
+  OK   no comma list
+== equivalence: base58 output is byte-identical to hex output
+  OK   openbook f64 identical
+  OK   farms bytes identical
+
+JOURNEY PASS

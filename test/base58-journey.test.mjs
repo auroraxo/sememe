@@ -147,15 +147,30 @@ test(`T4: the pinned tag (${PIN}) ships a decodeBase58 that returns a Buffer`, {
 
 // G1: the committed journey artifact must be the one the tool prints — a
 // hand-edited PASS line goes red, so the recorded journey is not decoration.
+//
+// G1a is the fix for the class this repo repeated six times: the journey tool
+// used to install a HARDCODED old tag (v0.4.5) while the README handed out a
+// newer one — the instrument measured a tag nobody installs. The tool now
+// takes its pin from the README, and G1a proves that: it refuses a README
+// with no pin or several pins, and the tool source contains no install pin of
+// its own.
 test('G1: the committed journey artifact is the one the tool produces', async () => {
-  const tool = path.join(ROOT, 'tools', 'journey-v0.4.5.sh');
-  assert.ok(fs.existsSync(tool), 'tools/journey-v0.4.5.sh must exist');
+  const tool = path.join(ROOT, 'tools', 'journey-pinned-install.sh');
+  assert.ok(fs.existsSync(tool), 'tools/journey-pinned-install.sh must exist');
   const out = path.join(os.tmpdir(), `sememe-jrn-${process.pid}`);
   const res = spawnSync('bash', [tool, out], { cwd: ROOT, encoding: 'utf8', timeout: 600_000 });
   const text = res.stdout + res.stderr;
   assert.match(text, /JOURNEY PASS/, `journey must pass, got:\n${text.slice(0, 2000)}`);
-  const committed = fs.readFileSync(path.join(ROOT, 'research', 'journey-v0.4.5-2026-11-06.txt'), 'utf8');
+  assert.match(text, new RegExp(`PIN ${PIN.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\b`),
+    `the journey must measure the pinned tag ${PIN}, got:\n${text.slice(0, 2000)}`);
+  const artifacts = fs.readdirSync(path.join(ROOT, 'research'))
+    .filter((f) => f.startsWith('journey-pinned-install-') && f.endsWith('.txt'))
+    .sort();
+  assert.ok(artifacts.length, 'a pinned-install journey artifact must be committed');
+  const committed = fs.readFileSync(
+    path.join(ROOT, 'research', artifacts[artifacts.length - 1]), 'utf8');
   assert.match(committed, /JOURNEY PASS/, 'the committed journey artifact must record a pass');
+  assert.match(committed, /^PIN v[0-9.]+$/m, 'the committed artifact must name the tag it measured');
   // The named checks in the artifact must be the checks the tool runs, so the
   // artifact cannot be trimmed to a shorter, greener list.
   for (const label of ['D1: base58 payload on the union path', 'D2: base58 f64 argument',
@@ -164,4 +179,27 @@ test('G1: the committed journey artifact is the one the tool produces', async ()
     assert.ok(text.includes(label), `the tool must still run "${label}"`);
   }
   fs.rmSync(out, { recursive: true, force: true });
+});
+
+test('G1a: the journey tool takes its pin from the README, never from itself', async () => {
+  const tool = path.join(ROOT, 'tools', 'journey-pinned-install.sh');
+  const src = fs.readFileSync(tool, 'utf8');
+  const installPins = src.match(/github:auroraxo\/sememe#v[0-9][^\s"']*/g) || [];
+  for (const p of installPins) {
+    assert.ok(p.includes('#$PIN'), `the tool must install the README pin, found hardcoded ${p}`);
+  }
+  // A README without a pin must make the tool refuse, not silently measure
+  // whatever tag it likes. Only the pin check runs before exit 2, so the fake
+  // repo needs just the README and the tool itself.
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sememe-pinless-'));
+  const fake = path.join(tmp, 'repo');
+  fs.mkdirSync(path.join(fake, 'tools'), { recursive: true });
+  fs.copyFileSync(path.join(ROOT, 'tools', 'journey-pinned-install.sh'),
+    path.join(fake, 'tools', 'journey-pinned-install.sh'));
+  fs.writeFileSync(path.join(fake, 'README.md'), '# no pin here\n');
+  const res = spawnSync('bash', [path.join(fake, 'tools', 'journey-pinned-install.sh'), path.join(tmp, 'w')],
+    { cwd: fake, encoding: 'utf8', timeout: 120_000 });
+  assert.equal(res.status, 2, `a pinless README must be refused with exit 2, got ${res.status}`);
+  assert.match(res.stdout + res.stderr, /pins no install tag/);
+  fs.rmSync(tmp, { recursive: true, force: true });
 });

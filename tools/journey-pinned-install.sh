@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
-# The pinned-install journey for v0.4.5: the three base58 defects, measured
-# against the PUBLISHED install (npm install github:auroraxo/sememe#v0.4.5),
-# not against a working tree.
+# The pinned-install journey: the three base58 defects, measured against the
+# PUBLISHED install a stranger receives (npm install
+# github:auroraxo/sememe#<pinned tag>), not against a working tree.
 #
-# Run: bash tools/journey-v0.4.5.sh [workdir]
+# The tag comes from README.md — the same pin the front page hands out. It is
+# never hardcoded here: a script that keeps installing v0.4.5 while the README
+# pins v0.4.9 measures a tag nobody installs, which is the "instrument points
+# at the old tag" class this repo has already repeated six times.
+#
+# Run: bash tools/journey-pinned-install.sh [workdir]
 # Exit 0 = every case decoded, base58 and hex byte-identical.
 set -u
 
-WORK="${1:-$(mktemp -d /tmp/sememe-journey-v045-XXXXXX)}"
-FIXTURE="$(cd "$(dirname "$0")/.." && pwd)/test/fixtures/traffic-sample-store-2026-11-04-pulled"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+WORK="${1:-$(mktemp -d /tmp/sememe-journey-pin-XXXXXX)}"
+FIXTURE="$ROOT/test/fixtures/traffic-sample-store-2026-11-04-pulled"
 STORE="$WORK/store"
 FAIL=0
 say() { printf '%s\n' "$*"; }
@@ -17,13 +23,24 @@ check() { # check <label> <expected> <actual>
   else say "  FAIL $1 (expected [$2], got [$3])"; FAIL=1; fi
 }
 
+# Exactly one install pin in the README, or this journey refuses to guess.
+PIN="$(grep -o 'github:auroraxo/sememe#v[0-9.]*[-A-Za-z0-9.]*' "$ROOT/README.md" \
+  | sed 's/.*#//' | sort -u)"
+case "$PIN" in
+  '') say "FAIL: README pins no install tag"; exit 2 ;;
+  *$'\n'*) say "FAIL: README pins several tags: $(printf '%s' "$PIN" | tr '\n' ' ')"; exit 2 ;;
+esac
+VERSION="${PIN#v}"
+say "PIN $PIN"
+say "install: npm install github:auroraxo/sememe#$PIN (the published tag, not a working tree)"
+
 mkdir -p "$WORK"
 if [ ! -d "$WORK/node_modules/sememe" ]; then
   say "== installing the published tag into $WORK"
   (cd "$WORK" && npm init -y >/dev/null 2>&1 &&
-    npm install --no-audit --no-fund github:auroraxo/sememe#v0.4.5 2>&1 | tail -2) || exit 2
+    npm install --no-audit --no-fund "github:auroraxo/sememe#$PIN" 2>&1 | tail -2) || exit 2
 fi
-check "installed version is 0.4.5" "0.4.5" \
+check "installed version is $VERSION" "$VERSION" \
   "$(node -e "console.log(require('$WORK/node_modules/sememe/package.json').version)")"
 cp -r "$FIXTURE" "$STORE"
 cd "$WORK"

@@ -273,6 +273,17 @@ decides whether it decodes. `test/base58-payload-bytes.test.mjs` pins the
 equality: for every one of those three cases, the base58 form and the hex form
 must produce the same instruction, the same fields and the same verdict.
 
+The install-level half of that measurement is `tools/journey-pinned-install.sh`,
+and it takes the tag it installs from the README — the same pin the front page
+hands out — instead of naming one itself. That was a measured defect, not a
+preference: the script used to install `v0.4.5` by name while the README pinned
+a newer tag, so it was measuring an install nobody received (the same class as
+every pinned-tag defect above, one level down, in the instrument). It now
+refuses to run when the README pins no tag or more than one, and
+`test/base58-journey.test.mjs` (G1a) keeps it honest: the script may contain
+no install pin of its own, and a README without one must fail the run with
+exit 2.
+
 `src/codec.mjs` reads the byte layout from the stored IDL itself — no generated code and no third-party codec library — and covers primitives, `option`, `vec`, `array`, `defined` struct/enum types, and both unit, tuple and named enum variants. It is deliberately strict: unknown discriminators, unknown variants, invalid `option` tags, invalid bool bytes, out-of-range integers, unknown types and unknown arguments are errors rather than silent coercions, and hostile field names can never pollute prototypes. Decoded values are JSON-safe: 64/128-bit integers become decimal strings, pubkeys become base58, and re-encoding the decoded value must reproduce the input bytes byte-for-byte (`roundTripByteExact`).
 
 **Bytes the IDL does not describe are reported, not guessed and not dropped.** A payload can carry more bytes than the stored IDL explains; sememe decodes the described prefix and returns the remainder under `trailing: {count, hex}`, with `describedRoundTripByteExact` covering the part the IDL does describe. `--trailing error` (or `{trailing: 'error'}`) restores whole-payload refusal when a caller wants it.
