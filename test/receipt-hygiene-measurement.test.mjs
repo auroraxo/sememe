@@ -8,6 +8,8 @@
 //   research/receipt-hygiene-2026-11-07-before.json  the PUBLISHED v0.4.10
 //       install (github:auroraxo/sememe#v0.4.10, no clone)
 //   research/receipt-hygiene-2026-11-07.json          the FIXED tree
+//   research/receipt-hygiene-2026-11-07-v0.4.11.json  the PUBLISHED v0.4.11
+//       tag — the fix on the bytes a stranger actually installs
 //
 // WHAT WAS MEASURED on v0.4.10 — sememe's OWN writer (src/store-write.mjs)
 // installs every receipt through a temporary file `<name>.tmp-<pid>-<hex>` in
@@ -46,9 +48,11 @@ const ROOT = path.resolve(HERE, '..');
 const TOOL = path.join(ROOT, 'tools', 'measure-receipt-hygiene.mjs');
 const BEFORE = path.join(ROOT, 'research', 'receipt-hygiene-2026-11-07-before.json');
 const AFTER = path.join(ROOT, 'research', 'receipt-hygiene-2026-11-07.json');
+const TAGGED = path.join(ROOT, 'research', 'receipt-hygiene-2026-11-07-v0.4.11.json');
 
 const before = JSON.parse(await readFile(BEFORE, 'utf8'));
 const after = JSON.parse(await readFile(AFTER, 'utf8'));
+const tagged = JSON.parse(await readFile(TAGGED, 'utf8'));
 
 test('the BEFORE artifact records the defect on the PUBLISHED v0.4.10 install', () => {
   assert.equal(before.binary.tag, 'v0.4.10',
@@ -137,7 +141,7 @@ test('the AFTER artifact records the fix: every surface survives, the debris is 
 });
 
 test('neither artifact carries a host path — a committed artifact with an absolute path is a snapshot', () => {
-  for (const [name, artifact] of [['before', before], ['after', after]]) {
+  for (const [name, artifact] of [['before', before], ['after', after], ['tagged', tagged]]) {
     const serialized = JSON.stringify(artifact);
     assert.ok(!serialized.includes('/home/aurora/'),
       `the ${name}-artifact carries an absolute host path — it will not reproduce on CI`);
@@ -148,4 +152,28 @@ test('neither artifact carries a host path — a committed artifact with an abso
     'the after-artifact must name the binary relative to the repo');
   assert.equal(before.binary.path, null,
     'a foreign install has no path inside the repo; it is named by its tag');
+});
+
+test('the PUBLISHED v0.4.11 tag carries the fix to a stranger\'s install', () => {
+  // The fix is only real on the bytes a stranger installs. This artifact is
+  // measured against npm install github:auroraxo/sememe#v0.4.11 in an empty
+  // app — the same shape as the before-artifact, so the two are comparable.
+  assert.equal(tagged.binary.tag, 'v0.4.11',
+    'the tagged artifact must be measured on the published tag');
+  assert.equal(tagged.binary.path, null,
+    'a foreign install has no path inside the repo');
+  assert.equal(tagged.verdict.ok, true,
+    'the published tag must meet the contract — a fix left only on main is not delivered');
+  assert.deepEqual(tagged.verdict.violations, []);
+  // The same surfaces that were red on v0.4.10 are green on the tag.
+  assert.equal(tagged.cases.h1.decodeExit, 0);
+  assert.equal(tagged.cases.h2.unionDecodeExit, 0);
+  assert.equal(tagged.cases.h3.lockExit, 0);
+  assert.equal(tagged.cases.h4.verifyErrorExit, 0);
+  assert.equal(tagged.cases.h4.verifyWarnViolations, 0);
+  assert.equal(tagged.cases.h5.stray[0]?.kind, 'debris',
+    'the published tag must report the debris by kind');
+  // And the guard did not move on the tag either.
+  assert.equal(tagged.controls.h7.violations, 1,
+    'the published tag must still refuse a damaged receipt');
 });
