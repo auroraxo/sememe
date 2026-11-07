@@ -71,7 +71,7 @@ export { verifiedShortForm, VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE, describeSho
  * gets BOTH sources' verdicts in the failure, not just an error string.
  */
 export async function decodeUnionPayload(storeDir, program, payloadInput, options = {}) {
-  const { primary, secondary } = await findStoredIdls(storeDir, program);
+  const { primary, secondary, additional } = await findStoredIdls(storeDir, program);
   const bytes = parsePayload(payloadInput);
   // 'verified' is evidence-gated: only payload shapes with a chain witness in
   // src/short-forms.mjs may decode with an absent field; every other payload
@@ -80,7 +80,7 @@ export async function decodeUnionPayload(storeDir, program, payloadInput, option
   // source happens to win.
   const { policy, form } = resolveAbsentPolicy(program, bytes, options.absent);
   try {
-    const result = unionDecode({ program, primary, secondary, bytes, absent: policy });
+    const result = unionDecode({ program, primary, secondary, additional, bytes, absent: policy });
     if (form) {
       // 'verified' is a promise about EVIDENCE, not a hint. If the decode did
       // not reproduce the measured absence the witness supports, there is no

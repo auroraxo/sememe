@@ -176,7 +176,7 @@ function resultEnvelope(program, fields, winnerSource, view) {
  * | 'single_source'; throws `UnionRefusal` for 'name_conflict', a secondary
  * fallback without byte evidence, and total refusal.
  */
-export function unionDecode({ program, primary, secondary, bytes, absent }) {
+export function unionDecode({ program, primary, secondary, bytes, absent, additional = [] }) {
   // An adopted copy is a VERIFIED source like any other: it may stand alone
   // when there is no on-chain pull to sit next to. The acquisition gap
   // (a program with no pullable IDL account — measured for Jupiter Liquidity
@@ -212,6 +212,12 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
   }
   const prim = prepare(soleSource ?? primary);
   const sec = secondary?.idl && secondary !== soleSource ? prepare(secondary) : null;
+  // Whether the sources that answered came from the chain at all. A source with
+  // no slot is an ADOPTED copy, and a store holding only adopted copies has no
+  // on-chain answer — the verdict must say so even when the pair is full.
+  const primAdopted = prim.idlMeta?.slot === null || prim.idlMeta?.slot === undefined;
+  const secAdopted = !sec || sec.idlMeta?.slot === null || sec.idlMeta?.slot === undefined;
+  const adoptedOnly = primAdopted && secAdopted;
 
   const primProbe = probe(prim, bytes, absentPolicy);
   const secProbe = sec ? probe(sec, bytes, absentPolicy) : null;
@@ -221,6 +227,12 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
     : {
       label: source.label,
       present: true,
+      // The copy this view describes, named by content. A view that only
+      // carries a LABEL cannot be compared with the plain reader's answer:
+      // the label holds the origin the caller typed, the fingerprint holds
+      // the bytes. The disagreement this fixes was invisible without it.
+      fingerprint: source.idlMeta?.fingerprint ?? null,
+      receipt: source.idlMeta?.receipt ?? null,
       decoded: probeResult.ok,
       refusedReason: probeResult.ok ? undefined : probeResult.reason,
       name: probeResult.ok ? probeResult.decoded.kind === 'instruction'
@@ -235,6 +247,15 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
     primary: sourceView(prim, primProbe),
     secondary: sourceView(sec, secProbe),
     sourcesAgree: null,
+    // Every source that answered came from an adopted copy iff no real slot
+    // is behind either consulted source — set once, for every verdict, so the
+    // flag cannot disagree with the sources that were actually read.
+    adoptedOnly,
+    additionalSources: additional.map((a) => ({
+      label: a.label,
+      fingerprint: a.idlMeta?.fingerprint,
+      receipt: a.idlMeta?.receipt,
+    })),
   };
 
   // Single source: behave like a plain decode, but say so.
@@ -246,7 +267,7 @@ export function unionDecode({ program, primary, secondary, bytes, absent }) {
     }
     const fields = decodeFields(prim, primProbe, bytes);
     view.verdict = 'single_source';
-    view.adoptedOnly = Boolean(soleSource);
+    view.adoptedOnly = adoptedOnly;
     view.arbitration = { winner: prim.label, basis: 'only_source', evidence: primProbe.fullExact ? 'full_roundtrip' : 'described_roundtrip' };
     return resultEnvelope(program, fields, prim, view);
   }

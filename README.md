@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.8   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.9   # tagged release; no npm account needed
 ```
 
 ```js
@@ -121,7 +121,7 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.8 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.9 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -689,6 +689,73 @@ headline count with a message saying what a regression would mean. Suite:
 pull + first-party published copy), no outside user. Account decoding still reads a
 single receipt — union arbitration is not wired for accounts. An adopted receipt's
 `origin` is a declared label, not a verified origin.
+
+## Working now: one store, one answer — multiple copies of one program (2026-11-07)
+
+A store may hold **more than one adopted copy of the same program** (a docs
+pair, or a pull plus a copy adopted again under a different origin). Measured
+on the PUBLISHED `v0.4.8` release (installed from its tag into an empty app,
+no clone) — with two adopted copies of pump.fun in one store:
+
+| command | answer | exit |
+|---|---|---|
+| `sememe decode <payload>` | `sell_v3`, fingerprint `a35349f3…` | 0 |
+| `sememe decode --union <payload>` | **REFUSED** `unknown instruction discriminator 1c92de7726c469d5 (47 known, …)` | **1** |
+| `sememe lock` | pinned `a35349f3…` over a store whose **second copy was damaged** | **0** |
+| `sememe verify` | `violations: 0`, `verified: [pump.fun]` | **0** |
+
+One store, two verdicts depending on the flag you passed — and a green CI gate
+over damage. Both holes are named, in `src/store-read.mjs` and `src/lock.mjs`:
+
+- **The adopted copies were sorted by LABEL, not by content.** `findStoredIdls`
+  sorted adopted receipts by `label.localeCompare(label)` — and the label
+  embeds the **origin the caller typed** (`published (adopted, sdk-copy)`),
+  while the plain reader (`findStoredIdl`) and `src/lock.mjs` sorted by
+  **receipt filename**, which ends in the fingerprint. Two sorts, two winners,
+  no disagreement reported: the union path read the copy the origin spelling
+  pointed at, the plain path and the lock read the copy the content pointed
+  at. The rule is now one ordering everywhere — receipt filename — and when a
+  store holds no on-chain receipt and several adopted copies, they form the
+  arbitrated pair instead of one of them being consulted and the rest dropped.
+  Whatever the pair does not consult is returned as `additionalSources`, so a
+  store holding three copies never reads as a two-source store.
+- **The lock re-checked only the newest receipt per program.** README already
+  promised `every receipt is re-checked through the store reader first, so a
+  store the reader refuses produces NO lock, never a lock over damage` — but
+  `writeLock` only re-verified `names[names.length - 1]`, so a damaged
+  **second** copy (the very copy union decode reads as its secondary) was
+  skipped in silence. `writeLock` and `checkLock` now share ONE helper
+  (`verifyEveryReceipt`), so lock and verify cannot disagree about what a
+  clean store is: a damaged copy refuses the lock **and** is named `unverified`
+  at verify time, and `--mode error` exits 1.
+
+The measurement ships as a tool and two committed artifacts, following the
+repo's `tool produces the report` rule:
+
+```bash
+node tools/measure-multi-copy-store.mjs                       # this tree → research/multi-copy-store-2026-11-07.json
+node tools/measure-multi-copy-store.mjs --bin <installed bin> --tag v0.4.8 --out before.json
+```
+
+[research/multi-copy-store-2026-11-07-before.json](research/multi-copy-store-2026-11-07-before.json)
+is the published `v0.4.8` install: **7 contract violations** (union refused,
+two different copies named, lock written over damage, verify green over
+damage); [research/multi-copy-store-2026-11-07.json](research/multi-copy-store-2026-11-07.json)
+is this tree: **0 violations**, and the single-copy control stays green in both.
+`test/multi-copy-store-measurement.test.mjs` pins both artifacts and fails if
+the committed report stops being what the tool derives; the 11-test ladder in
+[ test/multi-copy-store.test.mjs ](test/multi-copy-store.test.mjs) pins the
+behaviour with three mutations that must each turn a test red (label sort →
+M1 red, newest-only lock → M3 red, dropped second source → M2 red), and
+`test/multi-copy-store-tag-journey.test.mjs` packs the **pinned tag** and runs
+the same measurement against the bytes a stranger installs — red against
+`v0.4.8` by design, green from `v0.4.9` on.
+
+**Stated limit:** `origin` is still a declared label, not a verified origin —
+this fix makes the label *not decide which copy answers*, which is the part
+that was silently changing decode results; it does not verify the label's
+truth. Adopting published copies for a second program, and honest labelling of
+a declared origin, remain open.
 
 ## Free and paid
 

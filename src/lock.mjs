@@ -50,6 +50,35 @@ async function newestReceipt(storeDir, program) {
   return readVerified(storeDir, program, names[names.length - 1]);
 }
 
+/** Every receipt of `program`, re-checked through the store reader.
+ *
+ * Measured 2026-11-07 (this host): a store may hold SEVERAL receipts for one
+ * program — a pull plus a published copy, or two published copies. `writeLock`
+ * re-checked only the NEWEST of them, so a DAMAGED second copy was skipped in
+ * silence: `sememe lock` exited 0 and `sememe verify` reported 0 violations
+ * over a store whose union decode refused to decode. The README's claim
+ * ("every receipt is re-checked through the store reader first, so a store the
+ * reader refuses produces NO lock, never a lock over damage") was therefore
+ * true of one receipt out of several.
+ *
+ * Every receipt is checked here, so a lock is a snapshot of VERIFIED answers
+ * over the WHOLE store, not of the receipt that happened to sort last.
+ *
+ * ONE helper for BOTH lock paths on purpose: `writeLock` (refuse to write) and
+ * `checkLock` (name the damage) must agree about what a clean store is. Two
+ * separate loops is how the store ended up "locked clean" and "verified
+ * damaged" in the same run. */
+async function verifyEveryReceipt(storeDir, program, names) {
+  for (const name of names) {
+    try {
+      await readVerified(storeDir, program, name);
+    } catch (error) {
+      return { ok: false, receipt: name, reason: String(error?.message ?? error).slice(0, 300) };
+    }
+  }
+  return { ok: true, receipt: null, reason: null };
+}
+
 /** Snapshot every verified receipt of `storeDir` into a lock document.
  * Returns the document; `outPath` receives exactly its canonical bytes. */
 export async function writeLock(storeDir, outPath) {
@@ -66,7 +95,14 @@ export async function writeLock(storeDir, outPath) {
   const doc = { lockVersion: LOCK_VERSION, programs: {} };
   for (const program of programs) {
     // Full verification through the store reader: a tampered object or a
-    // dangling receipt must fail the LOCK, not silently enter it.
+    // dangling receipt must fail the LOCK, not silently enter it — and that
+    // holds for EVERY receipt of the program, not only the newest one.
+    const candidates = names.filter((name) => name.startsWith(`${program}-`));
+    const verdict = await verifyEveryReceipt(storeDir, program, candidates);
+    if (!verdict.ok) {
+      // Refuse the lock: a store the reader refuses must produce NO lock.
+      throw Error(verdict.reason);
+    }
     const { idl, receipt, receiptName } = await newestReceipt(storeDir, program);
     doc.programs[program] = {
       fingerprint: receipt.fingerprint,
@@ -153,6 +189,15 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
       continue;
     }
     const newest = candidates[candidates.length - 1];
+    // Every receipt of this program is re-checked, not only the newest: a
+    // damaged SECOND copy is a damaged store, and reporting it as clean is the
+    // green lie this gate exists to prevent. The SAME helper the writer uses,
+    // so "lock" and "verify" cannot disagree about the store.
+    const verdict = await verifyEveryReceipt(storeDir, program, candidates);
+    if (!verdict.ok) {
+      report.unverified.push({ program, receipt: verdict.receipt, reason: verdict.reason });
+      continue;
+    }
     let source;
     try {
       source = await readVerified(storeDir, program, newest);
