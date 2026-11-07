@@ -47,10 +47,13 @@ const TOOL = path.join(ROOT, 'tools', 'measure-release-surface.mjs');
 const BEFORE = path.join(ROOT, 'research', 'release-surface-2026-11-05-before.json');
 // The after-artifact moves WITH the release: each one records the surface as
 // it was measured (measuredAt, full release bodies, local tags, HEAD README,
-// the tag trees). The v0.4.4-era record (release-surface-2026-11-05.json) is
-// kept in research/ as history — it still reproduces its own verdict — but the
-// artifact that must be clean is the one committed with the CURRENT release.
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-07.json');
+// the tag trees). Older records stay in research/ as history — they still
+// reproduce their own verdict — but the artifact that must be clean is the
+// one committed with the CURRENT release. Two releases were cut on
+// 2026-11-07, so the record is date-suffixed: release-surface-2026-11-07.json
+// is the v0.4.7-era record (superseded that same day),
+// release-surface-2026-11-07b.json is the v0.4.8 one this file pins.
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-07b.json');
 const NETWORK = process.env.SEMEME_RELEASE_SURFACE_NETWORK === '1';
 
 // On the pre-fix tree the tool module does not exist; the import failure must
