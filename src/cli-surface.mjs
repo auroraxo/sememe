@@ -191,14 +191,24 @@ export function closestFlag(flag, supported) {
   return bestDistance <= limit ? best : null;
 }
 
-/** The refusal for a flag the command does not accept. */
+/**
+ * The refusal for a flag the command does not accept.
+ *
+ * The supported list appears exactly ONCE. Measured on the published
+ * v0.4.7 install 2026-11-07 (a defect found by running the README examples
+ * verbatim against the packed tarball, not by a unit test): the first
+ * version printed the list in the no-suggestion clause AND again at the end,
+ * so `decode … --rpc` printed the same four flags twice in one line.
+ */
 export function unknownFlagMessage(command, flag, supported) {
-  const list = supported.length ? supported.join(', ') : '(none)';
   const suggestion = closestFlag(flag, supported);
-  const repair = suggestion
-    ? `did you mean "${suggestion}"?`
-    : `this command accepts: ${list}`;
-  return `sememe ${command}: unknown flag "${flag}" — ${repair} supported flags: ${list}`;
+  if (suggestion) {
+    return `sememe ${command}: unknown flag "${flag}" — did you mean "${suggestion}"? supported flags: ${supported.join(', ')}`;
+  }
+  if (!supported.length) {
+    return `sememe ${command}: unknown flag "${flag}" — this command accepts no flags`;
+  }
+  return `sememe ${command}: unknown flag "${flag}" — supported flags: ${supported.join(', ')}`;
 }
 
 /** The refusal for a surplus positional argument. */

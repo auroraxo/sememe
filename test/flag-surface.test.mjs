@@ -117,6 +117,25 @@ test('U8: parseCommandArgs refuses a missing flag value', () => {
   );
 });
 
+test('U9: the supported flag list is printed EXACTLY ONCE per refusal', () => {
+  // Measured on the published v0.4.7 install (2026-11-07): the first
+  // version printed the list twice in one line — once in the "this command
+  // accepts: ..." clause and once after "supported flags: ...". A duplicated
+  // list is noise in the one message a caller reads, and a test that only
+  // greps for the list cannot see it.
+  const msg = unknownFlagMessage('decode', '--rpc', ['--store', '--trailing', '--absent', '--union']);
+  const occurrences = msg.split('--store, --trailing, --absent, --union').length - 1;
+  assert.equal(occurrences, 1, `the flag list must appear once, saw ${occurrences}: ${msg}`);
+  // and the same for the suggestion branch
+  const suggested = unknownFlagMessage('decode', '--stro', ['--store', '--trailing']);
+  const suggestedOccurrences = suggested.split('--store, --trailing').length - 1;
+  assert.equal(suggestedOccurrences, 1, `the flag list must appear once, saw ${suggestedOccurrences}: ${suggested}`);
+  // a command with no flags at all says so, without an empty list
+  const none = unknownFlagMessage('native-provenance', '--store', []);
+  assert.match(none, /accepts no flags/);
+  assert.doesNotMatch(none, /supported flags:/);
+});
+
 // -----------------------------------------------------------------------------
 // Defect tests (T1-T9): must fail on pre-fix tree
 // -----------------------------------------------------------------------------
