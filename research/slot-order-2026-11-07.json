@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-07T12:26:49.182Z",
+ "generatedAt": "2026-11-07T17:12:27.923Z",
  "tool": "tools/measure-slot-order.mjs",
  "question": "does one store answer with one answer when two slot strings differ in length?",
  "binary": {

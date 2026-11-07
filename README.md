@@ -150,7 +150,7 @@ npx sememe lock --store ./store --out ./sememe.lock
 npx sememe verify --store ./store --lock ./sememe.lock
 ```
 
-`lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (a pinned object fails the re-hash). Extra store programs are reported, never a violation: the lock pins minimums, not store equality. `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
+`lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (a pinned object fails the re-hash), `relabelled` (a pinned DECLARED origin changed), `unbound` (the store declares an origin this lock does not pin, so the gate cannot say whether that label changed — the lock predates origin pinning; the repair is `sememe lock`). Extra store programs are reported, never a violation: the lock pins minimums, not store equality. `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
 
 What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4 have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
 
@@ -865,6 +865,12 @@ The fix:
   afterwards is refused on every read with a named reason; `sememe lock` pins
   the declared origin alongside the fingerprint, and `sememe verify` names a
   rewritten origin as `relabelled`, exiting 1 in error mode.
+- **An existing user's committed lock (which predates origin pinning) does
+  not silently certify the label.** `sememe verify` reports an adopted copy
+  whose lock pins no origin as `unbound`, exiting 1 with the one-command
+  repair (`sememe lock`) named in the refusal. The pre-fix gate passed over
+  the rewrite (measured: exit 0, `verified: [program]`), certifying a
+  provenance label it never pinned.
 - **Two declared origins for one set of bytes are two receipts.** The second
   adopt writes `<prog>-0-<source>-<originKey>-<fingerprint>.json`, where
   `originKey` is a short digest of the declared origin. Both receipts keep
@@ -879,6 +885,13 @@ green on both sides.
 `test/declared-origin-measurement.test.mjs` pins both artifacts;
 [test/declared-origin.test.mjs](test/declared-origin.test.mjs) pins the
 behaviour (P1/P2/P3/P3b/P4/P4b red on the pre-fix tree, P5 control green there).
+[research/legacy-unbound-origin-2026-11-07.json](research/legacy-unbound-origin-2026-11-07.json)
+records the legacy case: pre-fix exit 0 (the defect), post-fix exit 1
+(`unbound`, with the one-command repair named), the control (lock first ->
+`relabelled`), and the false-positive guard (a pull-only store declares no
+origin and stays clean). `test/legacy-unbound-measurement.test.mjs` pins that
+artifact; [test/legacy-origin-binding.test.mjs](test/legacy-origin-binding.test.mjs)
+pins the behaviour.
 
 **Stated limit:** an adopted copy's origin is still not verified by this fix.
 What the fix does is stop presenting a typed string as a checked fact, and

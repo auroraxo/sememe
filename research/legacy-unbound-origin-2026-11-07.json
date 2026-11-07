@@ -1,0 +1,77 @@
+{
+  "tool": "tools/measure-legacy-unbound.mjs",
+  "question": "does an existing user's committed sememe.lock certify a declared origin it never pinned?",
+  "preFix": {
+    "commit": "f700942",
+    "tree": "extracted from git history with `git archive`"
+  },
+  "postFix": {
+    "tree": "this tree",
+    "binary": "bin/sememe.mjs"
+  },
+  "setup": {
+    "receiptFields": [
+      "fingerprint",
+      "instructionCount",
+      "origin",
+      "program",
+      "slot",
+      "source"
+    ],
+    "receiptHasOriginDigest": false,
+    "lockPinsOrigin": false,
+    "note": "built by this tree, then downgraded to a legacy receipt + legacy lock, so BOTH gates see identical files"
+  },
+  "t1": {
+    "question": "the PRE-FIX gate over a legacy store whose declared origin was rewritten",
+    "exit": 0,
+    "violations": 0,
+    "verified": [
+      "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
+    ],
+    "relabelled": 0,
+    "unbound": null,
+    "hasUnboundField": false,
+    "stderrHead": "",
+    "note": "exit 0 with `verified: [program]` is the defect: the gate certified a label it never pinned"
+  },
+  "t2": {
+    "question": "the POST-FIX gate over the SAME files",
+    "exit": 1,
+    "violations": 1,
+    "verified": [],
+    "unbound": 1,
+    "reason": "the store declares origin \"attacker-rewritten-origin\" for 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P, but sememe.lock does not pin it — this lock predates origin pinning, so a rewritten origin here cannot be detected; re-run \"sememe lock\" to bind it",
+    "stderrHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 0 relabelled, 1 unbound) — unbound (declared origin not pinned by the lock): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P — re-run \\\"sememe lock\\\"\"}\n"
+  },
+  "t3": {
+    "question": "what the one-command repair actually binds",
+    "repairExit": 0,
+    "lockPinsOriginalLabelOnCleanStore": "pump-fun-pump-public-docs",
+    "cleanLockExit": 0,
+    "verifyAfterRepairOnCleanStore": 0,
+    "verifyAfterAttackingTheRepair": 1,
+    "boundTheAttackerLabelAfterAttack": "attacker-rewritten-origin",
+    "limit": "`sememe lock` is a SNAPSHOT of what the store says now, not a proof of what it said before — re-running it after an attack binds the attacker's label. The guarantee comes from committing the lock BEFORE any rewrite (measured: that path refuses with exit 1); the repair restores a working gate, it does not recover a lost origin."
+  },
+  "t4": {
+    "question": "control — a lock written by the FIXED code first, then the same rewrite",
+    "lockPinsOrigin": "pump-fun-pump-public-docs",
+    "exit": 1,
+    "relabelled": 1,
+    "unbound": 0,
+    "stderrHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 1 relabelled, 0 unbound) — relabelled (declared origin changed): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\"}\n",
+    "note": "this is the case the 2026-11-07 fix already covered: the pinned origin makes it `relabelled`, not `unbound`"
+  },
+  "t5": {
+    "question": "control — a store that declares NO origin (what every `sememe pull` produces)",
+    "exit": 0,
+    "lockPinsOrigin": null,
+    "note": "reporting this as unbound would fail every pull-only store: a false positive, not a guarantee"
+  },
+  "verdict": {
+    "violations": [],
+    "preFixExits": 0,
+    "postFixExits": 1
+  }
+}

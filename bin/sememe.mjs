@@ -206,11 +206,12 @@ try {
     console.log(JSON.stringify(report, null, 2));
     if (report.violations > 0) {
       console.error(JSON.stringify({
-        note: `store does not match ${lockFile}: ${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled`,
+        note: `store does not match ${lockFile}: ${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled, ${report.unbound.length} unbound`,
         drifted: report.drifted.map((d) => d.program),
         missing: report.missing,
         unverified: report.unverified.map((u) => u.program),
         relabelled: report.relabelled.map((r) => r.program),
+        unbound: report.unbound.map((r) => r.program),
       }));
       // The note goes to stderr as a WARNING. The exit stays 0: in error mode
       // checkLock already threw above (that is the gate), so reaching here

@@ -23,6 +23,13 @@
 //   relabelled  a pinned or stored DECLARED origin changed after the fact —
 //               the receipt says "declared" about bytes whose label no longer
 //               matches what was pinned (see src/receipt-digest.mjs)
+//   unbound     the store declares an origin the lock does NOT pin, so the
+//               gate cannot say whether that label changed. A lock written
+//               before origin pinning (every existing user's committed lock)
+//               pins no origin; a legacy receipt carries no self-digest, so
+//               nothing covers the label at all. Reported instead of passing,
+//               because "verified" over a claim that was never checked is the
+//               green lie this gate exists to prevent. Repair: `sememe lock`. 
 // Extra store programs are reported, never a violation: the lock pins
 // minimums, not store equality — a pull that ADDS a program must not fail
 // someone else's CI. writeLock refuses to write a lock over a store it cannot
@@ -211,6 +218,9 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     // A declared origin that is no longer the one that was pinned, or a
     // receipt whose own declared label no longer matches its digest.
     relabelled: [],
+    // A declared origin the lock does not pin at all: the gate cannot
+    // certify a label it never recorded.
+    unbound: [],
     extra: storePrograms.filter((program) => !doc.programs[program]),
   };
 
@@ -271,8 +281,8 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     // the layer a self-digest alone cannot cover, because the attacker holds
     // the same hashing function.
     const pinnedOrigin = doc.programs[program].origin;
+    const storeOrigin = source.receipt.origin ?? null;
     if (typeof pinnedOrigin === 'string') {
-      const storeOrigin = source.receipt.origin ?? null;
       if (storeOrigin !== pinnedOrigin) {
         report.relabelled.push({
           program,
@@ -284,12 +294,26 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
         });
         continue;
       }
+    } else if (storeOrigin !== null) {
+      // The store answers with a DECLARED origin this lock does not pin. For
+      // a legacy receipt there is no self-digest either, so this label is
+      // covered by nothing: a rewrite of it would look exactly like the
+      // untouched case. Say so, and name the one command that binds it —
+      // writeLock already pins `receipt.origin`, so the repair really works.
+      report.unbound.push({
+        program,
+        receipt: newest,
+        store: storeOrigin,
+        reason: `the store declares origin ${JSON.stringify(storeOrigin)} for ${program}, but sememe.lock does not pin it — this lock predates origin pinning, so a rewritten origin here cannot be detected; re-run "sememe lock" to bind it`,
+        scope: 'lock',
+      });
+      continue;
     }
     report.verified.push(program);
   }
 
   const violations = report.drifted.length + report.missing.length
-    + report.unverified.length + report.relabelled.length;
+    + report.unverified.length + report.relabelled.length + report.unbound.length;
   report.violations = violations;
   if (mode === 'error' && violations > 0) {
     const parts = [];
@@ -301,7 +325,10 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     if (report.relabelled.length) {
       parts.push(`relabelled (declared origin changed): ${report.relabelled.map((r) => r.program).join(', ')}`);
     }
-    throw Error(`store does not match sememe.lock (${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled) — ${parts.join(' | ')}`);
+    if (report.unbound.length) {
+      parts.push(`unbound (declared origin not pinned by the lock): ${report.unbound.map((r) => r.program).join(', ')} — re-run "sememe lock"`);
+    }
+    throw Error(`store does not match sememe.lock (${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled, ${report.unbound.length} unbound) — ${parts.join(' | ')}`);
   }
   return report;
 }
