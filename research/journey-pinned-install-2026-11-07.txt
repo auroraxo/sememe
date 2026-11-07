@@ -1,9 +1,9 @@
-PIN v0.4.8
-install: npm install github:auroraxo/sememe#v0.4.8 (the published tag, not a working tree)
-== installing the published tag into /tmp/sememe-jrn-pin
+PIN v0.4.9
+install: npm install github:auroraxo/sememe#v0.4.9 (the published tag, not a working tree)
+== installing the published tag into /tmp/sememe-jrn-art-Nfrr
 
-added 1 package in 8s
-  OK   installed version is 0.4.8
+added 1 package in 7s
+  OK   installed version is 0.4.9
 == D1: base58 payload on the union path (v0.4.4 refused every one)
   OK   not refused
   OK   instruction
