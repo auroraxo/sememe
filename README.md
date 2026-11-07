@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.10   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.11   # tagged release; no npm account needed
 ```
 
 ```js
@@ -121,7 +121,7 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.10 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.11 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -242,8 +242,8 @@ is, not *who* wrote it; and the reported extra is an unpinned program, so a
 store can still gain a program the lock has never seen (by design — that is
 the minimums rule). No third party has run this; there are 0 external users,
 0 stars, and `npm publish` remains credentials-blocked. The published
-`v0.4.10` tag keeps this defect (a tag is immutable); the fix reaches a
-stranger with the next tag.
+`v0.4.10` tag keeps this defect (a tag is immutable); `v0.4.11` carries
+the fix.
 
 ## Working now: a crashed write must not brick the store (2026-11-07)
 
@@ -252,7 +252,7 @@ Every receipt and object is installed through a temporary file
 a `finally`. A crash between the write and the cleanup (SIGKILL, OOM, power
 loss) leaves that file behind **forever** — and until now every reader
 treated EVERY file in `receipts/` as a receipt. Measured on the published
-`v0.4.10` install (`npm install github:auroraxo/sememe#v0.4.10` into an empty
+`v0.4.10` install (the published v0.4.10 tag, installed into an empty
 app), one leftover `.tmp-4711-9f2c1a` file broke every surface at once:
 
 ```
@@ -301,7 +301,8 @@ Measurements: [research/receipt-hygiene-2026-11-07-before.json](research/receipt
 [research/receipt-hygiene-2026-11-07.json](research/receipt-hygiene-2026-11-07.json)
 (this tree: 0). Honest limits: 0 external users, no audit, the grammar check
 against 256 real receipt names found 0 mismatches but no store outside this
-host has been observed, and `v0.4.10` keeps the defect (tags are immutable).
+host has been observed, and `v0.4.10` keeps the defect (tags are immutable);
+`v0.4.11` carries the fix.
 
 ## Working now: the CLI refuses what it does not understand (2026-11-07)
 
