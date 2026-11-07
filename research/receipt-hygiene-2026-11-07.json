@@ -1,0 +1,56 @@
+{
+  "measuredAt": "2026-11-07T19:53:57.548Z",
+  "binary": {
+    "path": "bin/sememe.mjs",
+    "tag": null
+  },
+  "contract": "a file in receipts/ that is not a receipt must not brick any surface, and a receipt that IS damaged must still be refused",
+  "defect": {
+    "kind": "receipt-directory-read-as-receipts",
+    "description": "every reader treated EVERY file in receipts/ as a receipt; sememe's own crashed write (.tmp-<pid>-<hex>) left one behind forever, so decode/union/lock all exited 1 and verify turned a clean store red while .DS_Store became a phantom program"
+  },
+  "cases": {
+    "h1": {
+      "decodeExit": 0
+    },
+    "h2": {
+      "unionDecodeExit": 0
+    },
+    "h3": {
+      "lockExit": 0,
+      "lockFileWritten": true
+    },
+    "h4": {
+      "verifyErrorExit": 0,
+      "verifyWarnViolations": 0
+    },
+    "h5": {
+      "stray": [
+        {
+          "name": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc-0-metadata-0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f.json.tmp-4711-9f2c1a",
+          "kind": "debris"
+        }
+      ]
+    }
+  },
+  "controls": {
+    "h6": {
+      "verifyErrorExit": 0,
+      "violations": 0,
+      "extra": [],
+      "stray": [
+        ".DS_Store"
+      ]
+    },
+    "h7": {
+      "violations": 1,
+      "unverified": [
+        "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc"
+      ]
+    }
+  },
+  "verdict": {
+    "ok": true,
+    "violations": []
+  }
+}

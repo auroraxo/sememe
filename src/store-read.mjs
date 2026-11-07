@@ -31,6 +31,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
+import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
 import { receiptIntegrity } from './receipt-digest.mjs';
 
 export { canonicalJson } from './canonical.mjs';
@@ -101,7 +102,7 @@ async function receiptNames(storeDir, program) {
     if (error?.code === 'ENOENT') throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
     throw error;
   }
-  const candidates = names.filter((name) => name.startsWith(`${program}-`));
+  const candidates = names.filter((name) => name.startsWith(`${program}-`) && isReceiptFile(name));
   if (!candidates.length) throw Error(`no stored IDL for program ${program} in ${storeDir}`);
   // Numeric slot order, NOT byte order: the slot in the filename is a decimal
   // NUMBER, and "99999999" sorts after "123456789" as a string — so a plain

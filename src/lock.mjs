@@ -48,6 +48,7 @@ import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { readVerified } from './store-read.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
+import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
 
 const LOCK_VERSION = 1;
 const HEX64 = /^[a-f0-9]{64}$/;
@@ -65,7 +66,7 @@ function programOfReceiptName(name) {
  * one store, measured 2026-11-07 (test/slot-order-store.test.mjs O2). */
 async function newestReceipt(storeDir, program) {
   const receipts = path.join(storeDir, 'receipts');
-  const names = (await readdir(receipts)).filter((name) => name.startsWith(`${program}-`));
+  const names = (await readdir(receipts)).filter((name) => name.startsWith(`${program}-`) && isReceiptFile(name));
   if (!names.length) return null;
   names.sort(compareReceiptNames);
   return readVerified(storeDir, program, names[names.length - 1]);
@@ -119,13 +120,13 @@ export async function writeLock(storeDir, outPath) {
     }
     throw error;
   }
-  const programs = [...new Set(names.map(programOfReceiptName))].sort();
+  const programs = [...new Set(names.filter(isReceiptFile).map(programOfReceiptName))].sort();
   const doc = { lockVersion: LOCK_VERSION, programs: {} };
   for (const program of programs) {
     // Full verification through the store reader: a tampered object or a
     // dangling receipt must fail the LOCK, not silently enter it — and that
     // holds for EVERY receipt of the program, not only the newest one.
-    const candidates = names.filter((name) => name.startsWith(`${program}-`));
+    const candidates = names.filter((name) => name.startsWith(`${program}-`) && isReceiptFile(name));
     const verdict = await verifyEveryReceipt(storeDir, program, candidates);
     if (!verdict.ok) {
       // Refuse the lock: a store the reader refuses must produce NO lock.
@@ -207,8 +208,15 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
   }
   // The same ONE ordering the writer and both readers use, so "newest" means
   // the same receipt on every side of a lock comparison.
-  receiptNames.sort(compareReceiptNames);
-  const storePrograms = [...new Set(receiptNames.map(programOfReceiptName))].sort();
+  // Stray files (sememe's own uncommitted .tmp- debris from a crash, or a
+  // file that carries no slot segment) are partitioned off: they are not
+  // receipts and reading them as receipts would fail the gate over a clean
+  // store (measured 2026-11-07). Malformed receipts (a slot segment but bad
+  // hex/suffix) stay in `receiptNames` and are refused by name — they are
+  // damage to the store, not uncommitted writes.
+  const { receipts: validReceipts, stray } = classifyReceiptFiles(receiptNames);
+  validReceipts.sort(compareReceiptNames);
+  const storePrograms = [...new Set(validReceipts.map(programOfReceiptName))].sort();
 
   const report = {
     lock: path.resolve(lockPath),
@@ -226,11 +234,15 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     // certify a label it never recorded.
     unbound: [],
     extra: storePrograms.filter((program) => !doc.programs[program]),
+    // Non-receipt files found in receipts/ (sememe's own .tmp- crash debris,
+    // foreign files): reported by name and kind, never a violation — an
+    // uncommitted write is safe to ignore.
+    stray,
   };
 
   for (const program of pinnedPrograms) {
     const pinnedFingerprint = doc.programs[program].fingerprint.replace(/^sha256:/, '');
-    const candidates = receiptNames.filter((name) => name.startsWith(`${program}-`));
+    const candidates = validReceipts.filter((name) => name.startsWith(`${program}-`));
     if (!candidates.length) {
       report.missing.push(program);
       continue;
@@ -340,7 +352,7 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
   // to, and demanding one would turn "someone pulled a program" into a CI
   // failure, which is exactly the equality rule the lock rejects.
   for (const program of report.extra) {
-    const candidates = receiptNames.filter((name) => name.startsWith(`${program}-`));
+    const candidates = validReceipts.filter((name) => name.startsWith(`${program}-`));
     if (!candidates.length) continue; // no receipt left to check
     const verdict = await verifyEveryReceipt(storeDir, program, candidates);
     if (verdict.ok) continue;

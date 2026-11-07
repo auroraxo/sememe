@@ -245,6 +245,64 @@ the minimums rule). No third party has run this; there are 0 external users,
 `v0.4.10` tag keeps this defect (a tag is immutable); the fix reaches a
 stranger with the next tag.
 
+## Working now: a crashed write must not brick the store (2026-11-07)
+
+Every receipt and object is installed through a temporary file
+`<name>.tmp-<pid>-<random>` in the SAME `receipts/` directory and removed in
+a `finally`. A crash between the write and the cleanup (SIGKILL, OOM, power
+loss) leaves that file behind **forever** — and until now every reader
+treated EVERY file in `receipts/` as a receipt. Measured on the published
+`v0.4.10` install (`npm install github:auroraxo/sememe#v0.4.10` into an empty
+app), one leftover `.tmp-4711-9f2c1a` file broke every surface at once:
+
+```
+sememe decode <program> <payload>   -> EXIT 1  "store receipt <tmp file> is unreadable: Unexpected token"
+sememe decode --union <program> ... -> EXIT 1  same refusal
+sememe lock                         -> EXIT 1  "Cannot destructure property 'idl' ... as it is null"
+sememe verify --mode error          -> EXIT 1  "unverified: <program>"   <- the worst one
+```
+
+The last line is the damage: the gate went **red over an intact program**
+and named no repair — the user is told to re-pull a store that is perfectly
+healthy. One crashed write permanently bricked a working store. The same
+root cause made foreign files phantom programs: `.DS_Store` showed up as
+`extra`, and `my-file.json` became a phantom program `my` that failed the
+gate over a file that was never a receipt.
+
+The fix is a single classifier, `src/receipt-name.mjs`, used by every reader
+(`store-read`, `lock`), with the rule kept narrow on purpose:
+
+- `receipt` — a well-formed name (`<program>-<slot>-<source>-<64 hex>.json`):
+  read and verified exactly as before.
+- `malformed` — receipt-shaped (it carries a slot segment) but not
+  well-formed: this may be a renamed or corrupted receipt, so it stays in the
+  verified set and is **refused by name** — ignoring it would be a new green
+  lie, letting a receipt vanish from the store's answers in silence.
+- `debris` — sememe's own `.tmp-<pid>-<hex>` leftover: safe to ignore,
+  because `store-write.mjs` installs by **hard-linking** the temporary to its
+  final name first. Died before the link and only the temp exists (the write
+  was never committed); died after the link and the temp is a byte-identical
+  copy of the committed receipt. Either way it carries no information the
+  final name does not.
+- `foreign` — anything else (`.DS_Store`, a README): not a program, never
+  read as one.
+
+Debris and foreign files are ignored **but never silently**: `verify`'s
+report gains a `stray` field naming each file and its kind, so a user can see
+and delete them. Measured afterwards: decode, union-decode, lock and
+`verify --mode error` all answer green over a store with crash debris, while
+a damaged receipt is still refused and named (the guard did not move).
+
+Ladder: `test/receipt-hygiene.test.mjs` (13 tests — G1-G3 green on the
+pre-fix tree, T1-T6 red there, 4 mutations caught) and
+`test/receipt-hygiene-measurement.test.mjs` (4 tests pinning the artifacts).
+Measurements: [research/receipt-hygiene-2026-11-07-before.json](research/receipt-hygiene-2026-11-07-before.json)
+(published `v0.4.10`: 6 contract violations) /
+[research/receipt-hygiene-2026-11-07.json](research/receipt-hygiene-2026-11-07.json)
+(this tree: 0). Honest limits: 0 external users, no audit, the grammar check
+against 256 real receipt names found 0 mismatches but no store outside this
+host has been observed, and `v0.4.10` keeps the defect (tags are immutable).
+
 ## Working now: the CLI refuses what it does not understand (2026-11-07)
 
 A command line you typed wrong must not turn into a *different* command line that happens to run. Measured on the tree before this (v0.4.6, `641b895`): the parser looked flags up **by name anywhere in the argument list** and dropped what it did not find, so an unknown flag was not an error — it was an invisible edit to your request:
