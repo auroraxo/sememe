@@ -804,7 +804,11 @@ refused while union answered, lock pinned a different receipt);
 [research/slot-order-2026-11-07.json](research/slot-order-2026-11-07.json) is
 this tree: **0 violations**, and the equal-length control — what a fresh
 `pull` writes today — stays green on both sides.
-`test/slot-order-measurement.test.mjs` pins both artifacts and fails if the
+[research/slot-order-2026-11-07-v0.4.10.json](research/slot-order-2026-11-07-v0.4.10.json)
+is the **published `v0.4.10` tag** installed into an empty app: **0
+violations** — the fix is in the bytes a stranger receives, not only in this
+tree.
+`test/slot-order-measurement.test.mjs` pins all three artifacts and fails if a
 committed report stops being what the tool derives; the ladder in
 [test/slot-order-store.test.mjs](test/slot-order-store.test.mjs) pins the
 behaviour (O1/O2/O3 red on the pre-fix tree, O4 control green there, two

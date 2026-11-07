@@ -1,0 +1,58 @@
+{
+ "generatedAt": "2026-11-07T07:19:19.270Z",
+ "tool": "tools/measure-slot-order.mjs",
+ "question": "does one store answer with one answer when two slot strings differ in length?",
+ "binary": {
+  "path": "../../../../tmp/slotorder-v0410/node_modules/sememe/bin/sememe.mjs",
+  "tag": "v0.4.10",
+  "tree": "external"
+ },
+ "contract": {
+  "T1": "plain decode and union decode of one store whose slot strings differ in length name the SAME, NUMERICALLY NEWEST receipt",
+  "T2": "lock pins the numerically newest receipt — the one the decoders read",
+  "T3": "verify is clean over the store it just locked",
+  "T4": "control: a store with equal-length slots still decodes, locks and verifies green"
+ },
+ "mixedDigitSlots": {
+  "t1": {
+   "plainExit": 0,
+   "unionExit": 0,
+   "plainSlot": 123456789,
+   "unionSlot": 123456789,
+   "plainFingerprint": "sha256:a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818",
+   "unionFingerprint": "sha256:a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818",
+   "plainInstruction": "sell_v3",
+   "unionInstruction": "sell_v3",
+   "sameReceipt": true
+  },
+  "t2": {
+   "lockExit": 0,
+   "lockedSlot": 123456789,
+   "lockedFingerprint": "sha256:a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818"
+  },
+  "t3": {
+   "verifyExit": 0,
+   "verifyFailed": false,
+   "verifyErrorHead": null
+  }
+ },
+ "controlEqualDigitSlots": {
+  "plainExit": 0,
+  "unionExit": 0,
+  "plainSlot": 465713413,
+  "unionSlot": 465713413,
+  "sameReceipt": true,
+  "lockedSlot": 465713413,
+  "lockExit": 0,
+  "verifyExit": 0
+ },
+ "fixture": {
+  "olderReceipt": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-99999999-on-chain-5a00cdb86fcd0e8efac99ffb2f8a51a9b0e9093008466f4666a1e5058513ec52.json",
+  "newerReceipt": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-123456789-on-chain-a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json",
+  "note": "both receipts are REAL pull-format filenames; only the slot digit lengths differ"
+ },
+ "verdict": {
+  "violations": [],
+  "ok": true
+ }
+}

@@ -5,6 +5,8 @@
 //   research/slot-order-2026-11-07-before.json  the PUBLISHED v0.4.9 install
 //       (github:auroraxo/sememe#v0.4.9 in an empty app, no clone)
 //   research/slot-order-2026-11-07.json          the FIXED tree
+//   research/slot-order-2026-11-07-v0.4.10.json  the PUBLISHED v0.4.10 tag
+//       (github:auroraxo/sememe#v0.4.10 in an empty app, no clone)
 //
 // WHAT WAS MEASURED — a store whose two ON-CHAIN receipts of one program carry
 // slot strings of different digit length (99999999 older, 123456789 newer):
@@ -36,9 +38,15 @@ const ROOT = path.resolve(HERE, '..');
 const TOOL = path.join(ROOT, 'tools', 'measure-slot-order.mjs');
 const BEFORE = path.join(ROOT, 'research', 'slot-order-2026-11-07-before.json');
 const AFTER = path.join(ROOT, 'research', 'slot-order-2026-11-07.json');
+// The RELEASE artifact: the fix is only real once a stranger can install it.
+// Measured on the published v0.4.10 tag installed into an empty app, so the
+// bytes measured are the bytes `npm install github:auroraxo/sememe#v0.4.10`
+// hands over — not this working tree.
+const TAG = path.join(ROOT, 'research', 'slot-order-2026-11-07-v0.4.10.json');
 
 const before = JSON.parse(await readFile(BEFORE, 'utf8'));
 const after = JSON.parse(await readFile(AFTER, 'utf8'));
+const tag = JSON.parse(await readFile(TAG, 'utf8'));
 
 const NEW_SLOT = 123456789;
 const OLD_SLOT = 99999999;
@@ -133,4 +141,43 @@ test('the fix is visible in the measurement, not only in the unit tests', () => 
   assert.equal(before.controlEqualDigitSlots.plainSlot, after.controlEqualDigitSlots.plainSlot,
     'the control must be untouched by the fix');
   assert.equal(before.controlEqualDigitSlots.verifyExit, after.controlEqualDigitSlots.verifyExit);
+});
+
+test('the PUBLISHED v0.4.10 tag satisfies the whole contract — the fix a stranger gets', () => {
+  assert.equal(tag.binary.tag, 'v0.4.10',
+    'the release artifact must be measured on the published tag, not on this tree');
+  assert.equal(tag.verdict.ok, true,
+    `the published v0.4.10 violated the contract: ${JSON.stringify(tag.verdict.violations)}`);
+
+  // Same numbers as the tree, measured on the installed bytes: the tag
+  // carries the fix, it is not the tree that carries it.
+  const t1 = tag.mixedDigitSlots.t1;
+  assert.equal(t1.plainExit, 0);
+  assert.equal(t1.plainSlot, NEW_SLOT);
+  assert.equal(t1.unionSlot, NEW_SLOT);
+  assert.equal(t1.sameReceipt, true);
+  assert.equal(t1.plainInstruction, 'sell_v3');
+  assert.equal(t1.unionInstruction, 'sell_v3');
+
+  const t2 = tag.mixedDigitSlots.t2;
+  assert.equal(t2.lockExit, 0);
+  assert.equal(t2.lockedSlot, NEW_SLOT);
+  assert.equal(t2.lockedFingerprint, t1.plainFingerprint);
+
+  const t3 = tag.mixedDigitSlots.t3;
+  assert.equal(t3.verifyExit, 0, 'verify must be clean over the store it just locked');
+
+  const t4 = tag.controlEqualDigitSlots;
+  assert.equal(t4.plainSlot, CTL_NEW_SLOT);
+  assert.equal(t4.lockedSlot, CTL_NEW_SLOT);
+  assert.equal(t4.verifyExit, 0);
+
+  // And the tag must NOT reproduce the defect the before-artifact records.
+  assert.notEqual(tag.mixedDigitSlots.t1.plainSlot, before.mixedDigitSlots.t1.plainSlot,
+    'the published tag must not read the older receipt the v0.4.9 install read');
+  assert.equal(tag.mixedDigitSlots.t1.sameReceipt, true);
+  assert.equal(tag.mixedDigitSlots.t2.lockedSlot, NEW_SLOT,
+    'the published tag pins the newest receipt, not the one v0.4.9 pinned');
+  assert.notEqual(tag.mixedDigitSlots.t2.lockedSlot, before.mixedDigitSlots.t2.lockedSlot,
+    'the published tag must pin a different receipt than v0.4.9 did');
 });
