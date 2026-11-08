@@ -1,0 +1,491 @@
+{
+ "generatedAt": "2026-11-08T07:49:32.140Z",
+ "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+ "claim": "account bytes arbitrated across TWO verified interface copies: the on-chain IDL copy and the first-party published copy, with byte evidence picking the winner",
+ "sources": {
+  "onchain": {
+   "file": "test/fixtures/pump-idl.json",
+   "instructions": 47,
+   "accounts": 7
+  },
+  "published": {
+   "file": "test/fixtures/pump-published-idl.json",
+   "instructions": 56,
+   "accounts": 7
+  }
+ },
+ "harvest": {
+  "file": "test/fixtures/accounts-pump-2026-11-08.json",
+  "harvestedAt": "2026-11-08T07:45:56.404Z",
+  "rpc": "https://solana-rpc.publicnode.com",
+  "method": "getSignaturesForAddress -> getTransaction -> getMultipleAccounts (owner-filtered)",
+  "count": 12
+ },
+ "limits": [
+  "a byte-exact round trip proves the bytes are REPRODUCED, not that the field names mean what the program intends",
+  "the published copy is adopted content: its origin is declared, never verified against the deployed program",
+  "one program, one account window: this measures a drift that exists, not how common it is across the ecosystem"
+ ],
+ "summary": {
+  "accounts": 12,
+  "singleSourceLeftBytesOn": 12,
+  "singleSourceByteExact": 0,
+  "unionByteExact": 6,
+  "unionVerdicts": {
+   "layout_drift": 6,
+   "agree": 6
+  },
+  "recoveredByArbitration": 6,
+  "byAccountType": {
+   "BondingCurve": 5,
+   "UserVolumeAccumulator": 6,
+   "Global": 1
+  }
+ },
+ "rows": [
+  {
+   "address": "C1btqBDZWeVDj2G5mHiraJp4rmqttycY4osRneAkUnco",
+   "bytes": 166,
+   "account": "BondingCurve",
+   "discriminator": "17b7f83760d8ac60",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 125,
+    "trailing": 41,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "layout_drift",
+    "winner": "published (adopted, declared origin: pump-published-idl.json)",
+    "basis": "byte_evidence_full_roundtrip",
+    "evidence": "full_roundtrip",
+    "sourcesAgree": false,
+    "consumed": 166,
+    "trailing": 0,
+    "roundTripByteExact": true,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 41,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "full_roundtrip",
+     "trailingBytes": 0,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "CZPQPJwmHtdciqtmXEz4AzibNmTFLUm23RfkcQgmwJ9S",
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "discriminator": "56ff700e66359afa",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "agree",
+    "winner": "metadata @slot 466833000",
+    "basis": "primary_by_default",
+    "evidence": "described_roundtrip",
+    "sourcesAgree": true,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+   "bytes": 1088,
+   "account": "Global",
+   "discriminator": "a7e8e8b1c86c727f",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 1087,
+    "trailing": 1,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "layout_drift",
+    "winner": "published (adopted, declared origin: pump-published-idl.json)",
+    "basis": "byte_evidence_full_roundtrip",
+    "evidence": "full_roundtrip",
+    "sourcesAgree": false,
+    "consumed": 1088,
+    "trailing": 0,
+    "roundTripByteExact": true,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 1,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "full_roundtrip",
+     "trailingBytes": 0,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "5dBdMPDAGQPbNf56UtZkdZ7SZ9ght3ZCfCjxWrP8RvFL",
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "discriminator": "56ff700e66359afa",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "agree",
+    "winner": "metadata @slot 466833000",
+    "basis": "primary_by_default",
+    "evidence": "described_roundtrip",
+    "sourcesAgree": true,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "3BoUrTE1dsnyb3svX4AMJJqLsGtSenH8CjwfgvhxTQ5S",
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "discriminator": "56ff700e66359afa",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "agree",
+    "winner": "metadata @slot 466833000",
+    "basis": "primary_by_default",
+    "evidence": "described_roundtrip",
+    "sourcesAgree": true,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "3vSMZqpAmbhMF7oaeQBGzhvXP5L6sG9HtPAQbcufpxG9",
+   "bytes": 166,
+   "account": "BondingCurve",
+   "discriminator": "17b7f83760d8ac60",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 125,
+    "trailing": 41,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "layout_drift",
+    "winner": "published (adopted, declared origin: pump-published-idl.json)",
+    "basis": "byte_evidence_full_roundtrip",
+    "evidence": "full_roundtrip",
+    "sourcesAgree": false,
+    "consumed": 166,
+    "trailing": 0,
+    "roundTripByteExact": true,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 41,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "full_roundtrip",
+     "trailingBytes": 0,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "EyLb8kktD2nMY8cyNrKuJQLA4zJgJpvwvStDoyxr42t5",
+   "bytes": 166,
+   "account": "BondingCurve",
+   "discriminator": "17b7f83760d8ac60",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 125,
+    "trailing": 41,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "layout_drift",
+    "winner": "published (adopted, declared origin: pump-published-idl.json)",
+    "basis": "byte_evidence_full_roundtrip",
+    "evidence": "full_roundtrip",
+    "sourcesAgree": false,
+    "consumed": 166,
+    "trailing": 0,
+    "roundTripByteExact": true,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 41,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "full_roundtrip",
+     "trailingBytes": 0,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "FGFrX2q1iAjyAojjeyFDxXqdmvegjPpSWsrPmrJjeQ2f",
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "discriminator": "56ff700e66359afa",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "agree",
+    "winner": "metadata @slot 466833000",
+    "basis": "primary_by_default",
+    "evidence": "described_roundtrip",
+    "sourcesAgree": true,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "E6PZ6dktyCU1GtNndjUjhMQRaJDRcqgYEF69tcKPDKJq",
+   "bytes": 166,
+   "account": "BondingCurve",
+   "discriminator": "17b7f83760d8ac60",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 125,
+    "trailing": 41,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "layout_drift",
+    "winner": "published (adopted, declared origin: pump-published-idl.json)",
+    "basis": "byte_evidence_full_roundtrip",
+    "evidence": "full_roundtrip",
+    "sourcesAgree": false,
+    "consumed": 166,
+    "trailing": 0,
+    "roundTripByteExact": true,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 41,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "full_roundtrip",
+     "trailingBytes": 0,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "FamhUfmii1CQ85jAAdPHwUUzYMANPHoJGPHyLrGSBWv5",
+   "bytes": 166,
+   "account": "BondingCurve",
+   "discriminator": "17b7f83760d8ac60",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 125,
+    "trailing": 41,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "layout_drift",
+    "winner": "published (adopted, declared origin: pump-published-idl.json)",
+    "basis": "byte_evidence_full_roundtrip",
+    "evidence": "full_roundtrip",
+    "sourcesAgree": false,
+    "consumed": 166,
+    "trailing": 0,
+    "roundTripByteExact": true,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 41,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "full_roundtrip",
+     "trailingBytes": 0,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "BKtwu1QcRYqSzAQqQewy74pSR1iD1FsPapW23poA36XJ",
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "discriminator": "56ff700e66359afa",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "agree",
+    "winner": "metadata @slot 466833000",
+    "basis": "primary_by_default",
+    "evidence": "described_roundtrip",
+    "sourcesAgree": true,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    }
+   }
+  },
+  {
+   "address": "6Syd2pTdJAJRQ9yUXevtHj69Mkx7eZvejRtG9PxfxRy9",
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "discriminator": "56ff700e66359afa",
+   "singleSource": {
+    "source": "metadata",
+    "slot": 466833000,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false
+   },
+   "union": {
+    "verdict": "agree",
+    "winner": "metadata @slot 466833000",
+    "basis": "primary_by_default",
+    "evidence": "described_roundtrip",
+    "sourcesAgree": true,
+    "consumed": 106,
+    "trailing": 31,
+    "roundTripByteExact": false,
+    "primary": {
+     "source": "metadata @slot 466833000",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    },
+    "secondary": {
+     "source": "published (adopted, declared origin: pump-published-idl.json)",
+     "decoded": true,
+     "evidence": "described_roundtrip",
+     "trailingBytes": 31,
+     "refusedReason": null
+    }
+   }
+  }
+ ]
+}

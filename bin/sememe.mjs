@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 // only — the common case — must be able to run `sememe decode` without any
 // package installed at all, so the acquisition dependency is never loaded
 // unless a pull is actually requested.
-import { decodePayload, decodeStoredAccount, decodeUnionPayload, adopt, parsePayload } from '../src/decode.mjs';
+import { decodePayload, decodeStoredAccount, decodeUnionPayload, decodeUnionStoredAccount, adopt, parsePayload } from '../src/decode.mjs';
 import {
   decodeNativeInstruction, nativeProvenance, nativePrograms, isNativeProgram,
 } from '../src/native.mjs';
@@ -77,6 +77,11 @@ const usage = `usage:
       account-data: base64 account bytes (as getMultipleAccounts returns them)
           or hex. Without --name the account's 8-byte discriminator picks the
           account type from the stored IDL.
+  sememe account --union <program-id> <account-data> [--store <directory>]
+      decode against BOTH stored sources (on-chain + adopted), like
+      "sememe decode --union". The result names the source that answered, the
+      other source's verdict, and any layout drift between them. Byte evidence
+      arbitrates; a name conflict is refused.
   sememe conform <transaction.json> [--store <directory>] [--only <program-id>]
       transaction.json: an RPC getTransaction/getBlock response entry
           (encoding "json") with its meta — as saved by any RPC client.
@@ -437,8 +442,16 @@ try {
     if (trailing !== undefined && trailing !== 'report' && trailing !== 'error') {
       throw Error('--trailing must be "report" or "error"');
     }
-    const decoded = await decodeStoredAccount(store, program, data,
-      name === undefined ? { trailing } : { name, trailing });
+    // The union path reads BOTH verified store sources for the program (the
+    // on-chain pull and the adopted published copy) and arbitrates by byte
+    // evidence, exactly like `sememe decode --union`. Without it the account
+    // path read ONE receipt, so a store holding two copies of a program had
+    // two opinions about an account's layout and only one was consulted.
+    const decoded = unionRequested
+      ? await decodeUnionStoredAccount(store, program, data,
+        name === undefined ? { trailing } : { name, trailing })
+      : await decodeStoredAccount(store, program, data,
+        name === undefined ? { trailing } : { name, trailing });
     console.log(JSON.stringify(decoded, null, 2));
     if (decoded.trailing.count > 0 && trailing !== 'error') {
       console.error(JSON.stringify({

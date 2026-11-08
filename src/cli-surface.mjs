@@ -137,7 +137,7 @@ export const COMMAND_SPECS = {
     positionalNames: ['program id', 'payload'],
   },
   account: {
-    flags: { '--store': 'value', '--name': 'value', '--trailing': 'value' },
+    flags: { '--store': 'value', '--name': 'value', '--trailing': 'value', '--union': 'boolean' },
     positionals: 2,
     positionalNames: ['program id', 'account data'],
   },

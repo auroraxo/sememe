@@ -50,6 +50,21 @@ async function rpc(method, params, tries = 6) {
       await sleep(1200 * (attempt + 1));
       continue;
     }
+    // A public endpoint that CAPS getMultipleAccounts (measured on
+    // 2026-11-08: "A maximum of 10 accounts is allowed", code -32602) is a
+    // batch-size limit, not a defect in the query. Before this, the harvest
+    // died on the first batch over the cap — it never wrote the fixture and
+    // the refusal carried no hint that the cap was the whole story. The limit
+    // is read from the server's own sentence and handed back to the caller,
+    // which retries with a smaller batch (see `batchLimit` below).
+    if (method === 'getMultipleAccounts' && body.error.code === -32602) {
+      const match = /maximum of (\d+)/.exec(String(body.error.message));
+      if (match) {
+        const error = Error(`batch_limit:${match[1]}`);
+        error.batchLimit = Number(match[1]);
+        throw error;
+      }
+    }
     throw Error(`${method}: ${JSON.stringify(body.error)}`);
   }
   throw Error(`${method}: rate limited after retries`);
@@ -79,10 +94,27 @@ const transactions = await mapLimit(signatures.slice(0, 40), 2, async (entry) =>
 const keys = [...new Set(transactions.filter(Boolean)
   .flatMap((tx) => tx.transaction.message.accountKeys.map((key) => key.pubkey ?? key)))];
 
+// `getMultipleAccounts` in chunks whose size adapts to what the endpoint
+// advertises: 100 is the comfortable default, and a server that answers "a
+// maximum of N accounts" teaches us its cap for the rest of this run. The
+// chunk loop advances by the ACTUAL chunk used, so a shrink never skips keys
+// — a shrink that skipped keys would silently under-sample the harvest and
+// report fewer accounts as if that were all there were.
+let batchLimit = 100;
 const owned = new Map();
-for (let offset = 0; offset < keys.length && owned.size < want; offset += 100) {
-  const batch = keys.slice(offset, offset + 100);
-  const response = await rpc('getMultipleAccounts', [batch]);
+for (let offset = 0; offset < keys.length && owned.size < want;) {
+  const batch = keys.slice(offset, offset + batchLimit);
+  let response;
+  try {
+    response = await rpc('getMultipleAccounts', [batch]);
+  } catch (error) {
+    if (typeof error.batchLimit === 'number' && error.batchLimit > 0 && error.batchLimit < batch.length) {
+      batchLimit = error.batchLimit;
+      continue; // same offset, smaller batch — nothing skipped
+    }
+    throw error;
+  }
+  offset += batch.length;
   response.value.forEach((account, index) => {
     if (account && account.owner === program && !owned.has(batch[index])) owned.set(batch[index], account);
   });
@@ -105,6 +137,9 @@ const output = {
   harvestedAt: new Date().toISOString(),
   rpc: rpcUrl,
   method: 'getSignaturesForAddress -> getTransaction -> getMultipleAccounts (owner-filtered)',
+  // Which chunk size this endpoint actually accepted: a harvest that had to
+  // shrink records it, so a reader can tell a small `count` from a capped run.
+  batchLimit,
   count: accounts.length,
   accounts,
 };

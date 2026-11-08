@@ -20,6 +20,7 @@ import {
 import { decodeBase58 } from './base58.mjs';
 import { findStoredIdl, findStoredIdls } from './store-read.mjs';
 import { unionDecode, UnionRefusal } from './union.mjs';
+import { unionAccountDecode } from './account-union.mjs';
 import { withDerivedDiscriminators } from './discriminators.mjs';
 import { resolveAbsentPolicy, describeShortForm, assertShortFormEvidence } from './short-forms.mjs';
 import {
@@ -57,6 +58,7 @@ export function parsePayload(input) {
 export { findStoredIdl, findStoredIdls } from './store-read.mjs';
 export { adopt } from './adopt.mjs';
 export { unionDecode, UnionRefusal } from './union.mjs';
+export { unionAccountDecode } from './account-union.mjs';
 export { verifiedShortForm, VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE, describeShortForm, resolveAbsentPolicy } from './short-forms.mjs';
 
 /**
@@ -137,11 +139,7 @@ export async function decodeUnionPayload(storeDir, program, payloadInput, option
 export async function decodeStoredAccount(storeDir, program, dataInput, { name, trailing } = {}) {
   const { idl: storedIdl, receipt, receiptName, objectPath } = await findStoredIdl(storeDir, program);
   const { idl, filled, conflicts } = withDerivedAccountDiscriminators(storedIdl);
-  const bytes = typeof dataInput === 'string'
-    ? (dataInput.startsWith('data:') || /[^0-9a-fA-F]/.test(dataInput.trim())
-      ? Buffer.from(dataInput.trim().replace(/^base64,/, ''), 'base64')
-      : decodeHex(dataInput))
-    : Buffer.from(dataInput);
+  const bytes = parseAccountBytes(dataInput);
   const identified = name ? { name } : identifyAccount(idl, bytes);
   if (!identified) {
     throw Error(`no account type in the stored IDL matches the first 8 bytes of these ${bytes.length} byte(s)`);
@@ -166,6 +164,44 @@ export async function decodeStoredAccount(storeDir, program, dataInput, { name, 
     idl: provenanceOf(receipt, receiptName),
     object: objectPath,
   };
+}
+
+/** Parse account bytes the way the CLI documents: base64 (as
+ *  `getMultipleAccounts` returns them) or hex. Kept in ONE place so the
+ *  single-source and union paths cannot disagree about what "account bytes"
+ *  means — two parsers for one input shape is how a caller ends up decoding
+ *  something other than the bytes they pasted. */
+function parseAccountBytes(dataInput) {
+  if (dataInput instanceof Uint8Array) return Buffer.from(dataInput);
+  if (typeof dataInput !== 'string') throw Error('account data must be a string or byte array');
+  return dataInput.startsWith('data:') || /[^0-9a-fA-F]/.test(dataInput.trim())
+    ? Buffer.from(dataInput.trim().replace(/^base64,/, ''), 'base64')
+    : decodeHex(dataInput);
+}
+
+/**
+ * Decode one account's data with BOTH verified store sources for the program.
+ *
+ * Primary = newest on-chain receipt (real slot), secondary = newest adopted
+ * published copy — the same pairing `decodeUnionPayload` reads, so the two
+ * union surfaces can never consult different copies of one store (measured
+ * hazard class: src/store-read.mjs, rules 1 and 2). Without a second source
+ * this is exactly the plain single-source decode, labelled
+ * `view.verdict: 'single_source'` so a caller can tell the difference instead
+ * of assuming arbitration happened.
+ *
+ * Refusals from `unionAccountDecode` are re-thrown with `view` attached: the
+ * caller gets BOTH sources' verdicts in the failure, not just an error string.
+ */
+export async function decodeUnionStoredAccount(storeDir, program, dataInput, { name, trailing } = {}) {
+  const { primary, secondary, additional } = await findStoredIdls(storeDir, program);
+  const bytes = parseAccountBytes(dataInput);
+  try {
+    return unionAccountDecode({ program, primary, secondary, additional, bytes, name, trailing });
+  } catch (error) {
+    if (error instanceof UnionRefusal) error.view = error.details?.view;
+    throw error;
+  }
 }
 
 /**
