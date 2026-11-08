@@ -1105,8 +1105,34 @@ either side of their fix):
 
 **Stated limits:** a byte-exact round trip proves the bytes are *reproduced*,
 not that the field names mean what the program intends; the published copy is
-adopted content whose origin stays declared, never verified; one program, one
-account window — this measures a drift that exists, not how common it is.
+adopted content whose origin stays declared, never verified.
+
+**Does this generalize beyond pump.fun?** Measured 2026-11-08 across all 6
+programs with committed account fixtures (74 real mainnet accounts,
+`research/account-union-cross-2026-11-08.json`, `tools/measure-account-union-cross.mjs`,
+pinned in `test/account-union-cross-measurement.test.mjs`):
+
+| program | two sources? | plain byte-exact | union byte-exact | recovery | verdict |
+|---|---|---|---|---|---|
+| **pump.fun** | yes (12 accts) | 0 / 12 | **6 / 12** | **+6** | `layout_drift` 6, `agree` 6 |
+| **meteora-vault** | yes (12 accts) | 0 / 12 | 0 / 12 | 0 | `primary_only` 12 (copy renames `Vault` -> `vault`) |
+| **meteora-damm-v1** | yes (11 accts) | 0 / 11 | 0 / 11 | 0 | `layout_drift` 11 (both leave 77/512 bytes unexplained) |
+| **openbook-v2** | yes (4 accts) | 4 / 4 | 4 / 4 | 0 | `agree` 4 (both copies already byte-exact) |
+| **whirlpool** | control (27 accts) | 27 / 27 | 27 / 27 | 0 | `single_source` 27 (plain answer untouched) |
+| **kamino-lend** | control (8 accts) | 8 / 8 | 8 / 8 | 0 | `single_source` 8 (plain answer untouched) |
+
+The honest finding: **arbitration recovered a byte-exact answer on exactly 1 of
+the 4 two-source programs.** On the other three, the second copy agreed (openbook-v2),
+disagreed without either side being byte-exact (meteora-damm-v1), or could not
+even identify the account because the copy renames it (meteora-vault: Anchor
+derives the discriminator from the exact name, so `vault` derives `ded54f7c…`
+and can never match the deployed bytes which carry `Vault`'s `d308e82b…` — the
+reader now diagnoses this mechanism explicitly instead of reporting "no such
+account"). The four regression invariants (union never answers worse than
+plain, never refuses what plain answered, never changes single-source
+verdicts, never names a different account type) hold at 0 failures across all
+74 accounts.
+
 
 ## Free and paid
 
@@ -2003,5 +2029,5 @@ copy (artifact: `research/external-adoption-preview-2026-11-04.json`, pinned in
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
 2. **Whirlpool pull + content fingerprint has landed, the instruction decoder decodes real mainnet bytes, one own consumer reads the stored artifact for BOTH checking and producing, and the decoder is verified against an independent oracle across 1,000+ transactions** (see sections above): `solana-tx-remix` uses the pinned IDL for its single-program Whirlpool path (verifier + emitter), and `tools/tx-diff.mjs` verifies 1,119 real mainnet payloads from 1,029 transactions (sampled across 40,013 mainnet transactions in 148 finalized blocks) with 0 naming disagreements, 0 value disagreements, 0 byte mismatches, and 33 unexplained trailing-byte payloads (2.95%). Still to do, in order: migrate the remaining own decoder paths; then seek an outside user. The selected-sample threshold does not validate other program families. The `41 paths` figure above is an unverified note estimate; the computed scan in [research/decoder-sites-2026-10-27.json](research/decoder-sites-2026-10-27.json) reports **42 (file, class) decoder sites across 35 files in 5 own repositories**, of which 36 sit in `solana-tx-remix` + `sememe` — the counting unit matters and the two numbers are not interchangeable.
 3. **Account decoding has landed** (see "Accounts: state, not just calls"): 39 real mainnet accounts across three programs, 39/39 re-encoded byte-exact, values checked against anchor-ts, 29/29 account discriminators matching anchor-ts's own computation. Still open: `repr(C)`/`packed` accounts, non-Anchor account framing, and the report path for account bytes the IDL does not describe (no real data has exercised it yet — 0 trailing bytes observed).
-4. **Union decode has landed** (see "Working now: union decode"): `sememe adopt` puts a first-party published copy in the store, `sememe decode --union` answers from both verified sources with byte-evidence arbitration and a reported drift ledger — measured 915/996 decoded on real pump.fun traffic (the on-chain account alone decodes 669, the published copy alone 880). The declared-origin qualification has landed too (see "Working now: a declared origin is declared, and cannot be rewritten silently"): reader surfaces mark it as declared, the receipt carries its own digests, `sememe verify` names rewritten origins as relabelled, and the false collision on identical bytes is gone. **The account half has landed too (2026-11-08, see "Working now: account union"): `sememe account --union` arbitrates the same two sources over account bytes — measured on 12 real mainnet pump.fun accounts, the single-receipt path was byte-exact on 0 of 12 and the union path on 6 of 12, with the drift named per account.** Still open: adopting published copies for more than one program, and verifying an adopted copy's provenance against its upstream source.
+4. **Union decode has landed** (see "Working now: union decode"): `sememe adopt` puts a first-party published copy in the store, `sememe decode --union` answers from both verified sources with byte-evidence arbitration and a reported drift ledger — measured 915/996 decoded on real pump.fun traffic (the on-chain account alone decodes 669, the published copy alone 880). The declared-origin qualification has landed too (see "Working now: a declared origin is declared, and cannot be rewritten silently"): reader surfaces mark it as declared, the receipt carries its own digests, `sememe verify` names rewritten origins as relabelled, and the false collision on identical bytes is gone. **The account half has landed too (2026-11-08, see "Working now: account union"): `sememe account --union` arbitrates the same two sources over account bytes — measured on 12 real mainnet pump.fun accounts, the single-receipt path was byte-exact on 0 of 12 and the union path on 6 of 12, with the drift named per account.** A cross-program re-measurement over all 6 programs with account fixtures (74 accounts, `research/account-union-cross-2026-11-08.json`) put the honest bound on that number: recovery happened on 1 of 4 two-source programs, the other three agreed, disagreed without deciding, or could not name the account because the copy renames it — with 0 failures on the four regression invariants. Still open: verifying an adopted copy's provenance against its upstream source.
 5. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.

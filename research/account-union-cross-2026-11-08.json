@@ -1,0 +1,2756 @@
+{
+ "measuredAt": "2026-11-08T09:04:40.307Z",
+ "claim": "account-union arbitration measured across EVERY program with real account bytes in the repo: per-program recovery, agreement, and refusal — with regression invariants that must stay 0",
+ "method": {
+  "store": "built from committed fixtures, no network: on-chain copy as a pulled receipt under a synthetic slot, published copy via sememe adopt",
+  "slotKind": "synthetic",
+  "slot": 466833000,
+  "fixtures": "test/fixtures"
+ },
+ "totals": {
+  "programs": 6,
+  "accounts": 74,
+  "twoSourcePrograms": 4,
+  "controlPrograms": 2,
+  "plainByteExact": 39,
+  "unionByteExact": 45,
+  "recoveredByArbitration": 6,
+  "twoSourceProgramsWithRecovery": 1
+ },
+ "invariants": {
+  "unionRegressedWherePlainWasExact": [],
+  "unionRefusedWherePlainAnswered": [],
+  "controlVerdictNotSingleSource": [],
+  "plainUnionNameMismatch": []
+ },
+ "invariantFailures": {
+  "unionRegressedWherePlainWasExact": 0,
+  "unionRefusedWherePlainAnswered": 0,
+  "controlVerdictNotSingleSource": 0,
+  "plainUnionNameMismatch": 0
+ },
+ "ok": true,
+ "limits": [
+  "fixture bytes, not a live harvest: the accounts were harvested on the dates their fixture names carry, from the RPC each fixture records",
+  "a synthetic slot stands in for a real pull — it changes which receipt is \"newest\", it must not change which source answers (that is what the controls check)",
+  "a byte-exact round trip proves the bytes are REPRODUCED, not that the field names mean what the program intends",
+  "the published copy is adopted content: its origin is declared, never verified against the deployed program",
+  "only programs with committed account fixtures are measured — absence of a program here is absence of data, not a verdict"
+ ],
+ "programs": [
+  {
+   "name": "pump.fun",
+   "role": "the program the feature was built on",
+   "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+   "sources": {
+    "onchain": "pump-idl.json",
+    "published": "pump-published-idl.json",
+    "twoSource": true
+   },
+   "accounts": 12,
+   "summary": {
+    "plainDecoded": 12,
+    "plainRefused": 0,
+    "plainLeftBytesOn": 12,
+    "plainByteExact": 0,
+    "unionByteExact": 6,
+    "recoveredByArbitration": 6,
+    "verdicts": {
+     "layout_drift": 6,
+     "agree": 6
+    },
+    "secondaryRefused": 0
+   },
+   "rows": [
+    {
+     "address": "C1btqBDZWeVDj2G5mHiraJp4rmqttycY4osRneAkUnco",
+     "bytes": 166,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "BondingCurve",
+      "consumed": 125,
+      "trailing": 41,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "BondingCurve",
+      "consumed": 166,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": false,
+      "basis": "byte_evidence_full_roundtrip",
+      "winner": "published (adopted, declared origin: pump-published-idl.json)",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 41
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "CZPQPJwmHtdciqtmXEz4AzibNmTFLUm23RfkcQgmwJ9S",
+     "bytes": 137,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "4wTV1YmiEkRvAtNtsSGPtUrqRYQMe5SKy2uB4Jjaxnjf",
+     "bytes": 1088,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Global",
+      "consumed": 1087,
+      "trailing": 1,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Global",
+      "consumed": 1088,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": false,
+      "basis": "byte_evidence_full_roundtrip",
+      "winner": "published (adopted, declared origin: pump-published-idl.json)",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 1
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "5dBdMPDAGQPbNf56UtZkdZ7SZ9ght3ZCfCjxWrP8RvFL",
+     "bytes": 137,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "3BoUrTE1dsnyb3svX4AMJJqLsGtSenH8CjwfgvhxTQ5S",
+     "bytes": 137,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "3vSMZqpAmbhMF7oaeQBGzhvXP5L6sG9HtPAQbcufpxG9",
+     "bytes": 166,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "BondingCurve",
+      "consumed": 125,
+      "trailing": 41,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "BondingCurve",
+      "consumed": 166,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": false,
+      "basis": "byte_evidence_full_roundtrip",
+      "winner": "published (adopted, declared origin: pump-published-idl.json)",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 41
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "EyLb8kktD2nMY8cyNrKuJQLA4zJgJpvwvStDoyxr42t5",
+     "bytes": 166,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "BondingCurve",
+      "consumed": 125,
+      "trailing": 41,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "BondingCurve",
+      "consumed": 166,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": false,
+      "basis": "byte_evidence_full_roundtrip",
+      "winner": "published (adopted, declared origin: pump-published-idl.json)",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 41
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "FGFrX2q1iAjyAojjeyFDxXqdmvegjPpSWsrPmrJjeQ2f",
+     "bytes": 137,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "E6PZ6dktyCU1GtNndjUjhMQRaJDRcqgYEF69tcKPDKJq",
+     "bytes": 166,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "BondingCurve",
+      "consumed": 125,
+      "trailing": 41,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "BondingCurve",
+      "consumed": 166,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": false,
+      "basis": "byte_evidence_full_roundtrip",
+      "winner": "published (adopted, declared origin: pump-published-idl.json)",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 41
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "FamhUfmii1CQ85jAAdPHwUUzYMANPHoJGPHyLrGSBWv5",
+     "bytes": 166,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "BondingCurve",
+      "consumed": 125,
+      "trailing": 41,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "BondingCurve",
+      "consumed": 166,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": false,
+      "basis": "byte_evidence_full_roundtrip",
+      "winner": "published (adopted, declared origin: pump-published-idl.json)",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 41
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "BKtwu1QcRYqSzAQqQewy74pSR1iD1FsPapW23poA36XJ",
+     "bytes": 137,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "6Syd2pTdJAJRQ9yUXevtHj69Mkx7eZvejRtG9PxfxRy9",
+     "bytes": 137,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "UserVolumeAccumulator",
+      "consumed": 106,
+      "trailing": 31,
+      "roundTripByteExact": false,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: pump-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 31
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    }
+   ]
+  },
+  {
+   "name": "meteora-vault",
+   "role": "second two-source program, fresh harvest",
+   "program": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+   "sources": {
+    "onchain": "meteora-vault-idl.json",
+    "published": "meteora-vault-published-idl.json",
+    "twoSource": true
+   },
+   "accounts": 12,
+   "summary": {
+    "plainDecoded": 12,
+    "plainRefused": 0,
+    "plainLeftBytesOn": 12,
+    "plainByteExact": 0,
+    "unionByteExact": 0,
+    "recoveredByArbitration": 0,
+    "verdicts": {
+     "primary_only": 12
+    },
+    "secondaryRefused": 12
+   },
+   "rows": [
+    {
+     "address": "wVjGtGxD1Hrp4oqC4JKwZMzrChnECGRy2aJ8evtmCyb",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "FERjPVNEa7Udq8CEv68h6tPL46Tq7ieE49HrE2wea3XT",
+     "bytes": 10240,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 9013
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "kxsyGhMnuUYBiDFiWTCWyNYpbSti7MieWRJSAqbKHdf",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "3ESUFCnRNgZ7Mn2mPPUMmXYaKU8jpnV9VtA17M7t2mHQ",
+     "bytes": 10240,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 9013
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "ELkDMADJDuMLLdnnLEQ8FkArCfurmhRuYgBppVX6SV1y",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "CBbKwhgoDebvd3iNaTLsdgJgxfsrgXjn3nJbW1z3QBD7",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "mPWBpKzzchEjitz7x4Q2d7cbQ3fHibF2BHWbWk8YGnH",
+     "bytes": 10240,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 9013
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "EJtuJUyXuCoauNYQuh8ZCT1L2UKRnBHuT7YXfJj4B1uf",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "GtfRmygGFEDpKWquanEPoCkLLxbzJ3vK764E1kt9xAt4",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "377zeHxF4WZgAkxEiMxs8jFgko9HRubiLnhRTjUw7HeD",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "DU5poZQoqteQtBVbmb7skLQiFE8B34eiAQJqba6aSASD",
+     "bytes": 1232,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 5,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 5
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "5XCP3oD3JAuQyDpfBFFVUxsBxNjPQojpKuL4aVhHsDok",
+     "bytes": 10240,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "primary_only",
+      "account": "Vault",
+      "consumed": 1227,
+      "trailing": 9013,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "secondary_refused",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 9013
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-vault-published-idl.json)",
+       "decoded": false,
+       "refusedReason": "no account type in this source matches the first 8 bytes (d308e82b02987577); this copy DOES declare the account, as \"vault\" — but Anchor derives an account discriminator from the exact name, so \"vault\" derives ded54f7cd8eeee83 and these bytes carry d308e82b02987577 (the other copy identifies them as \"Vault\")",
+       "trailingBytes": null
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    }
+   ]
+  },
+  {
+   "name": "meteora-damm-v1",
+   "role": "third two-source program, fresh harvest",
+   "program": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+   "sources": {
+    "onchain": "meteora-damm-v1-idl.json",
+    "published": "meteora-damm-v1-published-idl.json",
+    "twoSource": true
+   },
+   "accounts": 11,
+   "summary": {
+    "plainDecoded": 11,
+    "plainRefused": 0,
+    "plainLeftBytesOn": 11,
+    "plainByteExact": 0,
+    "unionByteExact": 0,
+    "recoveredByArbitration": 0,
+    "verdicts": {
+     "layout_drift": 11
+    },
+    "secondaryRefused": 0
+   },
+   "rows": [
+    {
+     "address": "FTrCSibBA4nQbjnE9HAPaPs4NMVVMtkHqL8n63DeCZo1",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "DP8YpvcXHi3ycTxSTfPmzGo1EPuzrhpwRsip88Ps8GFm",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "B9hs5ZKxxZX8smVjXhBNfVk4ViqhjFfbCfAqTRww3Wrm",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "2JvKzDTiUgUqu33nF7fciEZFVF3nBUHeio6GYPr4nnqg",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "83qA2dA8ah9rL2SyBgMhxNRRyb8SuKKW5miAJMykWE3T",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "C5Zzo6XHXZVEah1RVAa5cnXHU8kMW3CJ8hijPuipQRd1",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "5NQTw1WqVEt6wP1LmohsrYDyJp2NDipdv6eULVNByXMb",
+     "bytes": 1387,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 512,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 512,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 512
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 512
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "32D4zRxNc1EssbJieVHfPhZM3rH6CzfUPrWUuWxD9prG",
+     "bytes": 1387,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 925,
+      "trailing": 462,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 925,
+      "trailing": 462,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 462
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 462
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "CYbcsnzUQMxnQvmzCds6ChR31B2jWkoguUFhzDCockAM",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "HcjZvfeSNJbNkfLD4eEcRBr96AD3w1GpmMppaeRZf7ur",
+     "bytes": 1387,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 925,
+      "trailing": 462,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 925,
+      "trailing": 462,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 462
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 462
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "BBG5UKhhmMe3P7uvrouM5i13Mh4coRS6D9K11Csrtvpn",
+     "bytes": 952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "layout_drift",
+      "account": "Pool",
+      "consumed": 875,
+      "trailing": 77,
+      "roundTripByteExact": false,
+      "sourcesAgree": false,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: meteora-damm-v1-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 77
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    }
+   ]
+  },
+  {
+   "name": "openbook-v2",
+   "role": "second two-source program, older harvest",
+   "program": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+   "sources": {
+    "onchain": "openbook-v2-idl.json",
+    "published": "openbook-v2-published-idl.json",
+    "twoSource": true
+   },
+   "accounts": 4,
+   "summary": {
+    "plainDecoded": 4,
+    "plainRefused": 0,
+    "plainLeftBytesOn": 0,
+    "plainByteExact": 4,
+    "unionByteExact": 4,
+    "recoveredByArbitration": 0,
+    "verdicts": {
+     "agree": 4
+    },
+    "secondaryRefused": 0
+   },
+   "rows": [
+    {
+     "address": "NNDqH7pdetS4AufzSQPs1oAVA8SghkaeZw6cw9AbFFz",
+     "bytes": 91288,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "EventHeap",
+      "consumed": 91288,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "EventHeap",
+      "consumed": 91288,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: openbook-v2-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "iscXZbk8NZdrA1WhMcM1gHvdMoawJprYDgWzkZVtg4e",
+     "bytes": 848,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Market",
+      "consumed": 848,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "Market",
+      "consumed": 848,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: openbook-v2-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "vUHAZPVDVNF8BneUbbijJ4UeH4G4cCermGDM3DuU2AS",
+     "bytes": 1264,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "OpenOrdersAccount",
+      "consumed": 1264,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "OpenOrdersAccount",
+      "consumed": 1264,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: openbook-v2-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "6aiAK74QKZLCjWqfc32VjoaaBQdM6VnHY3xm9JHQRzBe",
+     "bytes": 90952,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "BookSide",
+      "consumed": 90952,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "agree",
+      "account": "BookSide",
+      "consumed": 90952,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": true,
+      "basis": "primary_by_default",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": {
+       "label": "published (adopted, declared origin: openbook-v2-published-idl.json)",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      }
+     },
+     "unionError": null,
+     "unionCode": null
+    }
+   ]
+  },
+  {
+   "name": "whirlpool",
+   "role": "single-source control: no published copy exists",
+   "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+   "sources": {
+    "onchain": "whirlpool-idl.json",
+    "published": null,
+    "twoSource": false
+   },
+   "accounts": 27,
+   "summary": {
+    "plainDecoded": 27,
+    "plainRefused": 0,
+    "plainLeftBytesOn": 0,
+    "plainByteExact": 27,
+    "unionByteExact": 27,
+    "recoveredByArbitration": 0,
+    "verdicts": {
+     "single_source": 27
+    },
+    "secondaryRefused": 0
+   },
+   "rows": [
+    {
+     "address": "31KrYUDzgEQhEgr1JSNVfHAknWACcF97CtUaU8enKQsy",
+     "bytes": 653,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Whirlpool",
+      "consumed": 653,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Whirlpool",
+      "consumed": 653,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "4GXVcXkrStPmtw5jyVhZNGv2wbYhRVzkaantbSk5q7jG",
+     "bytes": 254,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Oracle",
+      "consumed": 254,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Oracle",
+      "consumed": 254,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "7ME7zsYEjMWXDxqR2qKSgBGxDLQVgyuZaZnNNGZxh3jE",
+     "bytes": 4628,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 4628,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 4628,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "81DB9ngt4CZ82UPPCpiEPQtvzuCz2VWggEiFyP79Y2Ys",
+     "bytes": 2388,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 2388,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 2388,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "BZhTVmuzrzGdpR1vbyXBTUH9gVAbA6K4VGQTZgnnbzg7",
+     "bytes": 260,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 260,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 260,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "BraJq2Gk1eojuY6Jg2GKyYShXmvgLuoTkpKPBT4T6U7V",
+     "bytes": 3620,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 3620,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 3620,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "CbWQBsWUZywFVVGFeytxWwCvzAeyEt1ExGJpx4udELGR",
+     "bytes": 9988,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "TickArray",
+      "consumed": 9988,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "TickArray",
+      "consumed": 9988,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "GK1CsJsqXwKwvHqHeqXfAcaY9bULvniHFtkPdakimUeD",
+     "bytes": 708,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 708,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 708,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "qU3qrrbXyLckXxkX5qp3ELxezyyQaneqP3N5j7kBF8C",
+     "bytes": 2164,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 2164,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 2164,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "58iQRQbAKgPU2ADzRLS4QJxBS2RsdUTEd567dPpMcLHe",
+     "bytes": 653,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Whirlpool",
+      "consumed": 653,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Whirlpool",
+      "consumed": 653,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "7zCEjVwziN4tDw8mtZsZdCpjW6RQZHRDP8ahLCorb5n9",
+     "bytes": 2164,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 2164,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 2164,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "DW6vjqQQ6rBYiB8XmcUdyStvKNc8GzoKYu2RRuXspWPK",
+     "bytes": 3060,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 3060,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 3060,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "26UY4D6pBHgxYdPWuBP3sfyc4jJf6qQjPDxCJPhtUx3H",
+     "bytes": 653,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Whirlpool",
+      "consumed": 653,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Whirlpool",
+      "consumed": 653,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "5irW2Ny4e3GFELpdhPqX26zidmY5JiQ7fXRacTiAArnY",
+     "bytes": 254,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Oracle",
+      "consumed": 254,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Oracle",
+      "consumed": 254,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "7gKNEqHH7rhcLWq7uLXpPruzFZQo9SDfW5CR4YecG7cN",
+     "bytes": 148,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 148,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 148,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "F5LHSwqss8amLQKk4V3yCAfVy8h7NpeHrcBsDdwHzfkj",
+     "bytes": 3956,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 3956,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 3956,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "GePe2mha8rCb88jcFPNJJQ3hCYmmxaqXbecG7ooYdHXi",
+     "bytes": 148,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 148,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 148,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "326kPG1Ey81bPmK6FRHfRote14gC23jTBbAiuzA9AqCy",
+     "bytes": 1492,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 1492,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 1492,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "3x478ZMCNf7UamVPM7FDGYZzasEepHi6oaBF27tYCohR",
+     "bytes": 2164,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 2164,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 2164,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "DBbY2T6MFf6w7Mua9SmWh5G5Mu8dK8WfUtTjSaCisLxJ",
+     "bytes": 1268,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 1268,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 1268,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "DGk2R8sSwDwYfcu4NoyNHLUhmHzq1d4sfN4AAN3HRB3J",
+     "bytes": 2500,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 2500,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 2500,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "Gmc6MFn7MM7FS6fubMpvf1t1axkswozZnZGmcvtVeiyW",
+     "bytes": 1044,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 1044,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 1044,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "HrytwiH74JoEcjRyeTTomP1y7cKXKUctGPUuGrh8dYkT",
+     "bytes": 1380,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 1380,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 1380,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "Hw2xQiZunHwJx4swKyoNh1e9a64MbPmUJua8WEhKAfnx",
+     "bytes": 5300,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 5300,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 5300,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "7emQoPr6giEwk7qXdNVKaVNak56JNYgsJoWCE32Ufqtj",
+     "bytes": 1156,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 1156,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 1156,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "9YC2VdcDqvyzfhu6gA5e2z3TE8Msw9DNAaiacNKQWZds",
+     "bytes": 596,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "DynamicTickArray",
+      "consumed": 596,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "DynamicTickArray",
+      "consumed": 596,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "6j6mdENfUJAPmVbfLs5Cq2nRhKiqFGegH9G8bMYuhSTj",
+     "bytes": 254,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Oracle",
+      "consumed": 254,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Oracle",
+      "consumed": 254,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    }
+   ]
+  },
+  {
+   "name": "kamino-lend",
+   "role": "single-source control: no published copy exists",
+   "program": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD",
+   "sources": {
+    "onchain": "kamino-lend-idl.json",
+    "published": null,
+    "twoSource": false
+   },
+   "accounts": 8,
+   "summary": {
+    "plainDecoded": 8,
+    "plainRefused": 0,
+    "plainLeftBytesOn": 0,
+    "plainByteExact": 8,
+    "unionByteExact": 8,
+    "recoveredByArbitration": 0,
+    "verdicts": {
+     "single_source": 8
+    },
+    "secondaryRefused": 0
+   },
+   "rows": [
+    {
+     "address": "FqUqPtqnDneeAhtcMQKVbwDx5iZvQFiX95vMobDWUMFD",
+     "bytes": 3344,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Obligation",
+      "consumed": 3344,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Obligation",
+      "consumed": 3344,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "93twBAQZCzYmNe4rrdZuQdjxCHoxkP9MFuNLQEwkTBGi",
+     "bytes": 1032,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserMetadata",
+      "consumed": 1032,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "UserMetadata",
+      "consumed": 1032,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "d4A2prbA2whesmvHaL88BH6Ewn5N4bTSU2Ze8P6Bc4Q",
+     "bytes": 8624,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Reserve",
+      "consumed": 8624,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Reserve",
+      "consumed": 8624,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF",
+     "bytes": 4664,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "LendingMarket",
+      "consumed": 4664,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "LendingMarket",
+      "consumed": 4664,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "9dAj2Aq3e8K1GKP1a61smvSkMQs8haehzeLjHyvf1D3T",
+     "bytes": 8624,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Reserve",
+      "consumed": 8624,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Reserve",
+      "consumed": 8624,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "HMNm3ZrAvG4zKVv5zpMDA6DKduc612156RUsdAAZf4TC",
+     "bytes": 4664,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "LendingMarket",
+      "consumed": 4664,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "LendingMarket",
+      "consumed": 4664,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "4mqWAPiNseJzsLHxG6JhgJ4spWSCXcFioHCbhHXQkRsj",
+     "bytes": 1032,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "UserMetadata",
+      "consumed": 1032,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "UserMetadata",
+      "consumed": 1032,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    },
+    {
+     "address": "6pCHU7ZCYZGW384fPGHnKWLeyvEbK8iHTLv4CWm1pwny",
+     "bytes": 3344,
+     "plain": {
+      "source": "metadata",
+      "slot": 466833000,
+      "account": "Obligation",
+      "consumed": 3344,
+      "trailing": 0,
+      "roundTripByteExact": true
+     },
+     "plainError": null,
+     "union": {
+      "verdict": "single_source",
+      "account": "Obligation",
+      "consumed": 3344,
+      "trailing": 0,
+      "roundTripByteExact": true,
+      "sourcesAgree": null,
+      "basis": "only_source",
+      "winner": "metadata @slot 466833000",
+      "primary": {
+       "label": "metadata @slot 466833000",
+       "decoded": true,
+       "refusedReason": null,
+       "trailingBytes": 0
+      },
+      "secondary": null
+     },
+     "unionError": null,
+     "unionCode": null
+    }
+   ]
+  }
+ ]
+}

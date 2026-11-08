@@ -110,11 +110,58 @@ function probeAccount(source, bytes, forcedName) {
 /** Fill discriminator gaps for this source only, keeping the source's identity. */
 function prepareAccountSource(source) {
   const { idl, filled, conflicts } = withDerivedAccountDiscriminators(source.idl);
+  // Which accounts carried a STORED discriminator before filling — the line
+  // between "this copy derives its discriminator from the name" (so a renamed
+  // copy can never match) and "this copy pins a value that disagrees with the
+  // bytes" (a drifted copy). The rename diagnosis below must only claim the
+  // first mechanism when it is the first mechanism.
+  const storedAccountNames = new Set(
+    (source.idl?.accounts ?? [])
+      .filter((a) => Array.isArray(a?.discriminator) && a.discriminator.length === 8)
+      .map((a) => a.name),
+  );
   return {
     ...source,
     idl,
+    storedAccountNames,
     discriminatorDerivation: { filledAccounts: filled, conflicts: conflicts.length },
   };
+}
+
+/**
+ * The refusing copy may well KNOW this account — under a different spelling.
+ * Anchor derives an account discriminator from the EXACT name, so a copy that
+ * spells it `vault` instead of `Vault` derives a different 8 bytes and can
+ * never identify the deployed account, no matter how good its layout is.
+ * Reporting that as "no account type matches these bytes" is true of the
+ * discriminator but hides the mechanism from the user, who then cannot tell a
+ * missing account from a RENAMED one (measured on 12 real meteora-vault
+ * accounts, research/account-union-cross-2026-11-08.json).
+ *
+ * Called only when the OTHER source identified these bytes: a name is what
+ * makes the comparison possible. Two sources that both fail tell us nothing
+ * about each other (see the R3 control).
+ */
+function diagnoseRename(failedProbe, failedSource, bytes, otherName) {
+  if (!otherName) return;
+  const accounts = failedSource.idl?.accounts ?? [];
+  const variant = accounts.find((a) => typeof a?.name === 'string'
+    && a.name !== otherName
+    && a.name.toLowerCase() === otherName.toLowerCase());
+  if (!variant) return;
+  const head = bytes.subarray(0, 8).toString('hex');
+  const declared = Buffer.from(variant.discriminator ?? []).toString('hex');
+  if (failedSource.storedAccountNames?.has(variant.name)) {
+    // A stored value that disagrees is a different phenomenon (drift), not a
+    // rename: say that instead of blaming the derivation.
+    failedProbe.reason += `; this copy DOES declare the account, as "${variant.name}", with stored `
+      + `discriminator ${declared} which does not match these bytes (${head}) — the other copy `
+      + `identifies them as "${otherName}"`;
+    return;
+  }
+  failedProbe.reason += `; this copy DOES declare the account, as "${variant.name}" — but Anchor `
+    + `derives an account discriminator from the exact name, so "${variant.name}" derives `
+    + `${declared} and these bytes carry ${head} (the other copy identifies them as "${otherName}")`;
 }
 
 function accountView(source, probeResult) {
@@ -208,6 +255,14 @@ export function unionAccountDecode({ program, primary, secondary, bytes, name: f
 
   const primProbe = probeAccount(prim, bytes, forcedName);
   const secProbe = sec ? probeAccount(sec, bytes, forcedName) : null;
+
+  // A refusal that is really a RENAME must say so (see diagnoseRename): only
+  // when the other side identified the bytes do we have a name to compare with.
+  if (primProbe.ok && secProbe && !secProbe.ok) {
+    diagnoseRename(secProbe, sec, bytes, primProbe.decoded.name);
+  } else if (secProbe?.ok && !primProbe.ok) {
+    diagnoseRename(primProbe, prim, bytes, secProbe.decoded.name);
+  }
 
   const view = {
     primary: accountView(prim, primProbe),
