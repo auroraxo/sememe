@@ -1,0 +1,163 @@
+{
+ "generatedAt": "2026-11-08T08:19:42.540Z",
+ "tag": "v0.4.12",
+ "install": "npm install github:auroraxo/sememe#v0.4.12 (empty directory, no clone)",
+ "installedVersion": "0.4.12",
+ "claim": "the account union a stranger receives from the documented install command arbitrates the two verified sources over account bytes",
+ "featureOnInstalledBytes": {
+  "entryExportsUnion": true,
+  "declaresUnionFlag": true
+ },
+ "cliUnionExit": 0,
+ "cliUnionVerdict": "layout_drift",
+ "cliUnionByteExact": true,
+ "summary": {
+  "accounts": 12,
+  "singleSourceByteExact": 0,
+  "singleSourceLeftBytesOn": 12,
+  "unionByteExact": 6,
+  "verdicts": {
+   "layout_drift": 6,
+   "agree": 6
+  }
+ },
+ "rows": [
+  {
+   "bytes": 166,
+   "account": "BondingCurve",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 41,
+   "unionByteExact": true,
+   "unionTrailing": 0,
+   "verdict": "layout_drift",
+   "basis": "byte_evidence_full_roundtrip",
+   "evidence": "full_roundtrip"
+  },
+  {
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 31,
+   "unionByteExact": false,
+   "unionTrailing": 31,
+   "verdict": "agree",
+   "basis": "primary_by_default",
+   "evidence": "described_roundtrip"
+  },
+  {
+   "bytes": 1088,
+   "account": "Global",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 1,
+   "unionByteExact": true,
+   "unionTrailing": 0,
+   "verdict": "layout_drift",
+   "basis": "byte_evidence_full_roundtrip",
+   "evidence": "full_roundtrip"
+  },
+  {
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 31,
+   "unionByteExact": false,
+   "unionTrailing": 31,
+   "verdict": "agree",
+   "basis": "primary_by_default",
+   "evidence": "described_roundtrip"
+  },
+  {
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 31,
+   "unionByteExact": false,
+   "unionTrailing": 31,
+   "verdict": "agree",
+   "basis": "primary_by_default",
+   "evidence": "described_roundtrip"
+  },
+  {
+   "bytes": 166,
+   "account": "BondingCurve",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 41,
+   "unionByteExact": true,
+   "unionTrailing": 0,
+   "verdict": "layout_drift",
+   "basis": "byte_evidence_full_roundtrip",
+   "evidence": "full_roundtrip"
+  },
+  {
+   "bytes": 166,
+   "account": "BondingCurve",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 41,
+   "unionByteExact": true,
+   "unionTrailing": 0,
+   "verdict": "layout_drift",
+   "basis": "byte_evidence_full_roundtrip",
+   "evidence": "full_roundtrip"
+  },
+  {
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 31,
+   "unionByteExact": false,
+   "unionTrailing": 31,
+   "verdict": "agree",
+   "basis": "primary_by_default",
+   "evidence": "described_roundtrip"
+  },
+  {
+   "bytes": 166,
+   "account": "BondingCurve",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 41,
+   "unionByteExact": true,
+   "unionTrailing": 0,
+   "verdict": "layout_drift",
+   "basis": "byte_evidence_full_roundtrip",
+   "evidence": "full_roundtrip"
+  },
+  {
+   "bytes": 166,
+   "account": "BondingCurve",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 41,
+   "unionByteExact": true,
+   "unionTrailing": 0,
+   "verdict": "layout_drift",
+   "basis": "byte_evidence_full_roundtrip",
+   "evidence": "full_roundtrip"
+  },
+  {
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 31,
+   "unionByteExact": false,
+   "unionTrailing": 31,
+   "verdict": "agree",
+   "basis": "primary_by_default",
+   "evidence": "described_roundtrip"
+  },
+  {
+   "bytes": 137,
+   "account": "UserVolumeAccumulator",
+   "singleSourceByteExact": false,
+   "singleSourceTrailing": 31,
+   "unionByteExact": false,
+   "unionTrailing": 31,
+   "verdict": "agree",
+   "basis": "primary_by_default",
+   "evidence": "described_roundtrip"
+  }
+ ],
+ "limits": [
+  "this measures the tag as installed on this host, not the tag as installed anywhere else",
+  "the store is built from committed fixtures, so the two sources are the fixture copies",
+  "byte-exact means the bytes are reproduced, not that the field names mean what the program intends"
+ ]
+}
