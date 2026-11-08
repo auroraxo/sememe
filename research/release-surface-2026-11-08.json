@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-08T08:10:27.811Z",
+  "measuredAt": "2026-11-08T08:13:52.457Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.12",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.12\n```\n\n```js\nimport { decodePayload, decodeUnionStoredAccount } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.12\n\n**Account union — two verified sources, one account, byte evidence decides.**\n\nUnion decode has covered instructions and events since v0.4.0. Accounts never got the second half: `sememe account` read exactly ONE receipt, so a store holding two verified copies of a program had two opinions about an account's layout and only one of them was ever consulted. This release closes that half.\n\n```bash\nnpx sememe account --union 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P <base64> --store ./store\n```\n\n**Measured on 12 real mainnet pump.fun accounts** (`research/account-union-2026-11-08.json`; the two committed copies genuinely disagree about `BondingCurve` — 13 fields on chain, 19 in the published copy):\n\n| | single receipt (before) | `account --union` |\n|---|---|---|\n| byte-exact | **0 / 12** | **6 / 12** |\n| bytes left unexplained | **12 / 12** | 6 / 12 |\n| verdict | one source, no verdict | `layout_drift` 6, `agree` 6 |\n\nThe 6 recovered accounts are the ones where the published copy reproduces every byte and the on-chain copy leaves 41 (and 1) unexplained — byte evidence picks the published copy and records why. The 6 `UserVolumeAccumulator` accounts read `agree`: both copies say the same thing and **both** leave 31 bytes unexplained. Agreement is reported, never papered over as coverage.\n\n**The rules, because an arbitration is only as good as its refusals:**\n\n- **A fallback needs byte evidence.** A source that names an account it cannot reproduce is refused. The honest no-evidence state is reachable and is pinned with a real codec property rather than a mock: an `f32` field holding a *signalling* NaN decodes to `null` and re-encodes to a different bit pattern — the decode succeeds, consumes the whole account, and reproduces nothing.\n- **When the evidence ties, the primary stands.** Two layouts can serialise to the same bytes and decode to different values (`u32` vs `i32` over `0xffffffff`): both are `full_roundtrip`, so the on-chain pull answers and the drift is reported — never resolved by preference.\n- **Two different account names for the same 8 bytes is a hard refusal**, not a decision to make.\n- **The plain path is untouched.** `sememe account` still reads one receipt and carries no `view`; the union is a flag, not a behaviour change.\n\n**The harvester no longer dies on a public endpoint's batch cap.** `tools/account-harvest.mjs` died on its first oversized `getMultipleAccounts` batch (one public endpoint caps it at 10) — no fixture written, and a refusal that did not name the cap as the whole story. The cap is now read from the server's own sentence and the batch shrinks **without skipping keys** (a shrink that skipped would silently under-sample and report fewer accounts as if that were all there were); the fixture records the batch size it actually got.\n\n14 new tests pin the behaviour, each asserting a VERDICT rather than just a decode, and two mutations were verified red on either side of their fix before landing.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. A byte-exact round trip proves the bytes are *reproduced*, not that the field names mean what the program intends. The published copy is adopted content whose origin stays **declared**, never verified against the deployed program — that item remains open. One program, one account window: this measures a drift that exists, not how common it is across the ecosystem. `v0.4.11` and earlier keep their behaviour (tags are immutable); their limits are named on their own pages.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-08T08:13:44Z",
+        "createdAt": "2026-11-08T08:12:42Z"
+      },
       {
         "tag": "v0.4.11",
         "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.11\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.11\n\nFive measured fixes, all of them found by running the product against a store it should have handled — not by reading the code.\n\n- **A crashed write must not brick the store.** sememe installs every receipt through a temporary file `<name>.tmp-<pid>-<random>` in the SAME `receipts/` directory and removes it in a `finally`; a crash between the write and the cleanup (SIGKILL, OOM, power loss) leaves that file behind forever — and every reader treated EVERY file in `receipts/` as a receipt. Measured on the published `v0.4.10` install, one leftover `.tmp-4711-9f2c1a` file broke every surface at once: `sememe decode` exited 1 (\"store receipt … is unreadable\"), `sememe decode --union` exited 1, `sememe lock` exited 1 (\"Cannot destructure property 'idl'\"), and `sememe verify --mode error` went **red over a perfectly intact program** while naming no repair. One classifier (`src/receipt-name.mjs`) now separates four kinds: a well-formed `receipt` (read as before), a `malformed` receipt-shaped name (DAMAGE — still refused by name, because ignoring it would be a new green lie), sememe's own `debris` (safe to ignore: the install hard-links the temporary to its final name, so the temp never holds information the committed receipt does not), and `foreign` (never a program). Debris and foreign files are ignored but never silently — `verify`'s report gains a `stray` field naming each file and its kind.\n- **A CI gate must not be green over a store the reader refuses.** `writeLock` re-checked every receipt, `checkLock` only the pinned ones: `sememe lock` exited 1 while `sememe verify` exited 0 with violations 0 — a green CI gate over a program whose decode exits 1. Extras now run through the same helper; damage in an unpinned program is a violation marked `scope: \"extra\"`, so pin drift is not misread as the cause.\n- **A lock that pins no origin must not certify a declared origin.** A legacy lock (written before origin pinning) left the comparison unrun, so a rewritten `receipt.origin` passed the gate as verified. The store now reports `unbound` — exit 1, repair named.\n- **A declared origin is declared, not verified.** Origins are qualified as `declared` on every reader surface and bound to the receipt by digest; rewriting one is reported as `relabelled`.\n- **The test harness no longer races itself.** Six test files packed into the shared repo root and renamed each other's tarball away (ENOENT under a parallel suite); each now packs into its own directory.\n\nThe measurement ships as an instrument, not a claim: `tools/measure-receipt-hygiene.mjs` derives both committed artifacts — `research/receipt-hygiene-2026-11-07-before.json` (the published v0.4.10 install: 6 contract violations) and `research/receipt-hygiene-2026-11-07.json` (this tag: 0) — and `test/receipt-hygiene-measurement.test.mjs` fails if a committed report stops being what the tool derives. Seventeen new tests pin the behaviour (three green guards that must stay green on the pre-fix tree, six that were red there, four mutations that must each turn a test red, four pinning the artifacts).\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The before/after artifacts were both measured on this host; the tag journeys measure the exact bytes an install receives, but it is still one machine and my own account. The classifier was checked against 256 real receipt names (0 unmatched), but no store outside this host has been observed. An adopted receipt's `origin` remains a declared label, not a verified origin — honest labelling of provenance is still open. `v0.4.10` and earlier keep their behaviour (tags are immutable); their defects are named on this page, and the v0.4.10 release page carries a SUPERSEDED banner pointing here.\n",
@@ -111,6 +119,7 @@
       "v0.4.1",
       "v0.4.10",
       "v0.4.11",
+      "v0.4.12",
       "v0.4.2",
       "v0.4.3",
       "v0.4.4",
@@ -122,7 +131,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.11"
+        "v0.4.12"
       ],
       "documentedCommands": [
         "pull",
@@ -155,6 +164,105 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.12": {
+        "manifest": {
+          "version": "0.4.12",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.12"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.11": {
         "manifest": {
           "version": "0.4.11",
@@ -1301,13 +1409,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.11",
-    "latestTag": "v0.4.11",
+    "newestTag": "v0.4.12",
+    "latestTag": "v0.4.12",
     "pinnedTags": [
-      "v0.4.11"
+      "v0.4.12"
     ]
   },
   "perRelease": {
+    "v0.4.12": {
+      "defects": []
+    },
     "v0.4.11": {
       "defects": []
     },

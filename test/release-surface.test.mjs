@@ -56,9 +56,10 @@ const BEFORE = path.join(ROOT, 'research', 'release-surface-2026-11-05-before.js
 // release-surface-2026-11-07c.json the v0.4.8-era re-measure after the
 // pin-derived journey, release-surface-2026-11-07d.json is the v0.4.9 one,
 // and release-surface-2026-11-07e.json is the v0.4.10 one,
-// and release-surface-2026-11-07f.json the v0.4.11 one this file pins
-// (newest = latest = pinned = v0.4.11).
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-07f.json');
+// and release-surface-2026-11-07f.json the v0.4.11 one,
+// and release-surface-2026-11-08.json the v0.4.12 one this file pins
+// (newest = latest = pinned = v0.4.12).
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-08.json');
 const NETWORK = process.env.SEMEME_RELEASE_SURFACE_NETWORK === '1';
 
 // On the pre-fix tree the tool module does not exist; the import failure must
