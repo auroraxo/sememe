@@ -1,0 +1,76 @@
+{
+  "tool": "tools/measure-conform-filter-tag.mjs",
+  "measuredAt": "2026-11-09T19:05:33.585Z",
+  "tags": [
+    {
+      "tag": "v0.4.12",
+      "installedVersion": "0.4.12",
+      "cases": {
+        "filterMiss": {
+          "exit": 0,
+          "instructions": 0,
+          "rows": 0,
+          "refusalReason": null
+        },
+        "filterGarbage": {
+          "exit": 0,
+          "instructions": 0,
+          "rows": 0,
+          "refusalReason": null
+        },
+        "match": {
+          "exit": 0,
+          "instructions": 5,
+          "rows": 5,
+          "refusalReason": null
+        },
+        "noFilter": {
+          "exit": 1,
+          "instructions": 12,
+          "rows": 12,
+          "refusalReason": null
+        }
+      },
+      "greenOverNothing": [
+        "filterMiss",
+        "filterGarbage"
+      ],
+      "controlsBroken": [],
+      "verdict": "carries-the-defect"
+    },
+    {
+      "tag": "v0.4.13",
+      "installedVersion": "0.4.13",
+      "cases": {
+        "filterMiss": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "refusalReason": "filter-matched-no-instruction"
+        },
+        "filterGarbage": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "refusalReason": "filter-is-not-a-program-id"
+        },
+        "match": {
+          "exit": 0,
+          "instructions": 5,
+          "rows": 5,
+          "refusalReason": null
+        },
+        "noFilter": {
+          "exit": 1,
+          "instructions": 12,
+          "rows": 12,
+          "refusalReason": null
+        }
+      },
+      "greenOverNothing": [],
+      "controlsBroken": [],
+      "verdict": "refuses"
+    }
+  ],
+  "ok": true
+}
