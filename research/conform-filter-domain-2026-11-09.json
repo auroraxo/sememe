@@ -1,0 +1,133 @@
+{
+  "tool": "tools/measure-conform-filter.mjs",
+  "measuredAt": "2026-11-09T18:46:46.746Z",
+  "prefix": {
+    "commit": "58d3228",
+    "greenOverNothing": [
+      "filterMiss",
+      "filterGarbage"
+    ]
+  },
+  "worktree": {
+    "greenOverNothing": [],
+    "refusals": {
+      "filterMiss": {
+        "refused": true,
+        "reason": "filter-matched-no-instruction",
+        "cliReason": "filter-matched-no-instruction"
+      },
+      "filterGarbage": {
+        "refused": true,
+        "reason": "filter-is-not-a-program-id",
+        "cliReason": "filter-is-not-a-program-id"
+      }
+    }
+  },
+  "cases": {
+    "prefix": {
+      "cases": {
+        "filterMiss": {
+          "library": {
+            "refused": false,
+            "reason": null
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 0,
+            "refusalReason": null
+          }
+        },
+        "filterGarbage": {
+          "library": {
+            "refused": false,
+            "reason": null
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 0,
+            "refusalReason": null
+          }
+        },
+        "match": {
+          "library": {
+            "refused": false,
+            "reason": null
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 5,
+            "refusalReason": null
+          }
+        },
+        "noFilter": {
+          "library": {
+            "refused": false,
+            "reason": null
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "refusalReason": null
+          }
+        }
+      }
+    },
+    "worktree": {
+      "cases": {
+        "filterMiss": {
+          "library": {
+            "refused": true,
+            "reason": "filter-matched-no-instruction"
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "refusalReason": "filter-matched-no-instruction"
+          }
+        },
+        "filterGarbage": {
+          "library": {
+            "refused": true,
+            "reason": "filter-is-not-a-program-id"
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "refusalReason": "filter-is-not-a-program-id"
+          }
+        },
+        "match": {
+          "library": {
+            "refused": false,
+            "reason": null
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 5,
+            "refusalReason": null
+          }
+        },
+        "noFilter": {
+          "library": {
+            "refused": false,
+            "reason": null
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "refusalReason": null
+          }
+        }
+      }
+    }
+  },
+  "falsifications": {
+    "worktreeGreenOverNothingCount": 0,
+    "worktreeGreenOverNothing": [],
+    "worktreeRefusesMatchingFilter": false,
+    "refusalReasonDrift": [],
+    "guardRegression": false,
+    "prefixShowsNoDefect": false
+  },
+  "ok": true
+}

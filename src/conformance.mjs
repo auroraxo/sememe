@@ -30,6 +30,7 @@
 import { checkAccountList, instructionByDiscriminator, declaredAccounts, summarizeConformance } from './account-list.mjs';
 import { withDerivedDiscriminators } from './discriminators.mjs';
 import { findStoredIdls } from './store-read.mjs';
+import { isProgramId } from './program-id.mjs';
 
 export class ConformanceRefusal extends Error {
   constructor(reason, detail = '') {
@@ -153,11 +154,28 @@ export function discriminatorOf(dataBase58) {
  * Check every instruction of a transaction against the interfaces stored for
  * the programs it invokes.
  *
+ * WHAT THIS REFUSES (measured 2026-11-09 on the published v0.4.12 install):
+ * a report over ZERO instructions used to exit 0 — a green CI gate over a
+ * check that never ran. Two ways to get there, both silent:
+ *
+ *   * `--only <program>` where the program is never invoked by this
+ *     transaction -> `rows: []`, `summary.instructions: 0`, exit 0, no
+ *     disagreement reported, because there was nothing to disagree about;
+ *   * `--only <not-a-program-id>` -> the same empty green, and the value
+ *     could not even be a program id.
+ *
+ * The rule is the one this file already states for an unknown SHAPE: an
+ * empty check is not a clean bill of health. When nothing can be checked,
+ * the transaction (or the filter) is REFUSED with a named reason that
+ * carries the repair — for a filter miss, the program ids the transaction
+ * actually invokes, so a typo is visible instead of green.
+ *
  * @param {object}   transaction  an RPC `encoding: "json"` transaction
  * @param {string}   storeDir     a sememe store directory
  * @param {object}   [options]
  * @param {string[]} [options.only]  restrict to these program ids
  * @returns {Promise<{ rows: object[], summary: object }>}
+ * @throws {ConformanceRefusal} when the check would cover no instruction
  */
 export async function checkTransaction(transaction, storeDir, options = {}) {
   const { only = null } = options;
@@ -165,6 +183,44 @@ export async function checkTransaction(transaction, storeDir, options = {}) {
   const executed = transaction?.meta?.err === null || transaction?.meta?.err === undefined
     ? true
     : false;
+
+  // Decide what CAN be checked before reading the store: an empty check is a
+  // refusal, and the refusal must not depend on which interfaces happen to be
+  // stored (that would make the verdict about the store, not about the filter).
+  if (only !== null) {
+    for (const entry of only) {
+      if (!isProgramId(entry)) {
+        throw new ConformanceRefusal(
+          'filter-is-not-a-program-id',
+          `${JSON.stringify(String(entry))} — a program id is 32 bytes in base58; ` + 'this filter can never match an instruction',
+        );
+      }
+    }
+  }
+  const invoked = [...new Set(instructions.map((i) => i.programId).filter(Boolean))];
+  const eligible = instructions.filter((i) => i.programId && (!only || only.includes(i.programId)));
+  if (eligible.length === 0) {
+    if (!instructions.length) {
+      throw new ConformanceRefusal(
+        'transaction-has-no-instruction',
+        'the transaction exposes no instruction to check — nothing here can be reported as conforming',
+      );
+    }
+    if (!invoked.length) {
+      throw new ConformanceRefusal(
+        'transaction-has-no-resolvable-program-id',
+        `all ${instructions.length} instruction(s) lack a program id that resolves inside message.accountKeys — `
+          + 'this shape cannot be checked',
+      );
+    }
+    if (only) {
+      throw new ConformanceRefusal(
+        'filter-matched-no-instruction',
+        `--only ${JSON.stringify(only)} selects none of this transaction's instructions; it invokes: ${invoked.join(', ')}`,
+      );
+    }
+    throw new ConformanceRefusal('no-instruction-is-checkable', `the transaction invokes: ${invoked.join(', ')}`);
+  }
 
   const rows = [];
   const idlCache = new Map();

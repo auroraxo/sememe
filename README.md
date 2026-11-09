@@ -1909,6 +1909,60 @@ are reported per position but never decide a verdict (the runtime enforces from
 the transaction, not the IDL); a failed transaction can have been rejected FOR
 one of these reasons, and `executed` is carried so a reader can tell.
 
+## A filter that selects nothing is a refusal, not a green CI gate (2026-11-09)
+
+`sememe conform` is a CI gate: exit 1 on any disagreement, exit 0 when the
+checked instructions agree with the store. `--only <program-id>` narrows the
+check to one program. Measured on the published `v0.4.12` install, a filter
+that selected **zero** instructions still exited **0**:
+
+```
+sememe conform tx.json --store ./store --only 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P
+  -> { "rows": [], "summary": { "instructions": 0, "executed": { "disagreements": 0 } } }
+  -> exit 0
+```
+
+The program id above is a real one — it is just not invoked by that
+transaction. A caller who mistyped the id they meant to gate on was told the
+transaction conformed: a green gate over a check that never ran. The second
+face of the same defect: `--only not-a-program-id` produced the identical
+empty green, and the value was never validated as a program id at all — it
+could not be one.
+
+This is the class this repository has already measured twice (`sememe verify`
+green over a store the reader refuses, 2026-11-07; `conform` refusing an
+unreadable transaction SHAPE but not an empty selection). The rule is the one
+this file already states for an unknown shape: an empty check is not a clean
+bill of health.
+
+**What changed.** Two refusals, both before the store is read:
+
+- a filter that is not a canonical 32-byte base58 program id is refused by
+  name (`filter-is-not-a-program-id`) — the check is dependency-free
+  (`src/program-id.mjs` round-trips the base58 itself), because the decode
+  core is imported by consumers with no npm dependencies at all and a CLI
+  refusal must not be the thing that makes them install a peer;
+- a filter that selects none of the transaction's instructions is refused with
+  `filter-matched-no-instruction`, and the refusal **names the programs the
+  transaction actually invokes**, so a typo is visible instead of green.
+
+The unfiltered path is untouched, and a filter that does match still runs.
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-filter.mjs` derives
+[research/conform-filter-domain-2026-11-09.json](research/conform-filter-domain-2026-11-09.json)
+by running the SAME probe file in the pre-fix tree (`git archive 58d3228`) and
+in this tree: on the pre-fix tree both defect cases exited 0 over 0
+instructions; in this tree both are refused with the reason named above, and
+the unfiltered run's exit code and instruction count are unchanged. The tool
+fails if the baseline ever shows no defect, and
+`test/conformance-filter-measurement.test.mjs` fails if the committed
+artifact stops being what the tool derives. The ladder
+`test/conformance-filter-domain.test.mjs` is 6 red on the pre-fix tree and
+11 green here; `tools/mutation-ladder-conform-filter.sh` catches 5/5
+mutations (the empty-selection guard, the program-id check, the reason name,
+the invoked-program detail, and the filter actually applying).
+
 ## The largest publish-nothing gap decodes in its own dialect: shank (2026-11-04)
 
 The acquisition-gap classification left one program standing at the top of the
