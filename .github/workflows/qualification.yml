@@ -9,6 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The drift-naming measurement extracts the pre-fix tree (74ca535)
+          # with `git archive` — a shallow checkout cannot resolve it, and
+          # GitHub refuses a raw-SHA fetch. Full history makes the measurement
+          # reproducible in CI, not only on the owner's machine.
+          fetch-depth: 0
       # The full-foreign-set sweep test reads step-finance-oss/step-ingestooor
       # (MIT) fixtures from a clone checked out NEXT to this repository — the
       # same layout as the local ~/github_repos convention.

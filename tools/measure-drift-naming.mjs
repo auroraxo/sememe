@@ -88,10 +88,22 @@ class Unmeasurable extends Error {}
 function extractPrefix(commit, dir) {
   const probe = spawnSync('git', ['cat-file', '-e', `${commit}^{commit}`], { cwd: ROOT });
   if (probe.status !== 0) {
+    // `git fetch origin <sha>` fails on servers that do not allow fetching a
+    // raw SHA (GitHub answers "couldn't find remote ref"). A shallow checkout
+    // — every CI runner starts with one — therefore cannot reach the prefix
+    // commit by SHA: fetch the HISTORY, then recheck.
     spawnSync('git', ['fetch', '--depth=50', 'origin', commit], { cwd: ROOT, stdio: 'ignore' });
-    const recheck = spawnSync('git', ['cat-file', '-e', `${commit}^{commit}`], { cwd: ROOT });
+    let recheck = spawnSync('git', ['cat-file', '-e', `${commit}^{commit}`], { cwd: ROOT });
     if (recheck.status !== 0) {
-      throw new Unmeasurable(`the pre-fix commit ${commit} is neither local nor fetchable from origin`);
+      spawnSync('git', ['fetch', '--unshallow', 'origin'], { cwd: ROOT, stdio: 'ignore' });
+      recheck = spawnSync('git', ['cat-file', '-e', `${commit}^{commit}`], { cwd: ROOT });
+    }
+    if (recheck.status !== 0) {
+      spawnSync('git', ['fetch', 'origin'], { cwd: ROOT, stdio: 'ignore' });
+      recheck = spawnSync('git', ['cat-file', '-e', `${commit}^{commit}`], { cwd: ROOT });
+    }
+    if (recheck.status !== 0) {
+      throw new Unmeasurable(`the pre-fix commit ${commit} is neither local nor fetchable from origin (tried sha fetch, --unshallow, full fetch)`);
     }
   }
   const archive = spawnSync('git', ['archive', commit], { cwd: ROOT, maxBuffer: 256 * 1024 * 1024 });
