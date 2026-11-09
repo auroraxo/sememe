@@ -1,0 +1,243 @@
+{
+  "measuredAt": "2026-11-09T04:39:37.630Z",
+  "program": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+  "accountsCount": 12,
+  "offlineProof": {
+    "totalAccounts": 12,
+    "phantomMatchesDecomposed": 12,
+    "allVersionIsOne": true,
+    "allPaddingIsZero": true,
+    "ok": true
+  },
+  "liveOracle": {
+    "phantomAccountsChecked": 12,
+    "phantomAccountsExisting": 0,
+    "realStrategyAccountsChecked": 348,
+    "realStrategyAccountsExisting": 348,
+    "liveVaultMatchesLiveMintSupply": 9,
+    "frozenHarvestMatchesLiveMintSupply": 0,
+    "allPhantomsNonExistent": true,
+    "allRealStrategiesExist": true,
+    "ok": true,
+    "details": [
+      {
+        "address": "wVjGtGxD1Hrp4oqC4JKwZMzrChnECGRy2aJ8evtmCyb",
+        "phantomExists": false,
+        "frozenHarvestSupply": "28783841269933",
+        "liveVaultSupply": "25282985808651",
+        "liveMintSupply": "25282985808651",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "FERjPVNEa7Udq8CEv68h6tPL46Tq7ieE49HrE2wea3XT",
+        "phantomExists": false,
+        "frozenHarvestSupply": "220099668782921",
+        "liveVaultSupply": "218481804643695",
+        "liveMintSupply": "218481501912260",
+        "liveVaultMatchesMint": false,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "kxsyGhMnuUYBiDFiWTCWyNYpbSti7MieWRJSAqbKHdf",
+        "phantomExists": false,
+        "frozenHarvestSupply": "50379090448101",
+        "liveVaultSupply": "49798116914274",
+        "liveMintSupply": "49798116914274",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "3ESUFCnRNgZ7Mn2mPPUMmXYaKU8jpnV9VtA17M7t2mHQ",
+        "phantomExists": false,
+        "frozenHarvestSupply": "7874908400042",
+        "liveVaultSupply": "7834648683928",
+        "liveMintSupply": "7834646673110",
+        "liveVaultMatchesMint": false,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "ELkDMADJDuMLLdnnLEQ8FkArCfurmhRuYgBppVX6SV1y",
+        "phantomExists": false,
+        "frozenHarvestSupply": "128123391081964",
+        "liveVaultSupply": "128545869239449",
+        "liveMintSupply": "128545869239449",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "CBbKwhgoDebvd3iNaTLsdgJgxfsrgXjn3nJbW1z3QBD7",
+        "phantomExists": false,
+        "frozenHarvestSupply": "10434854061335",
+        "liveVaultSupply": "10411868941500",
+        "liveMintSupply": "10411868941500",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "mPWBpKzzchEjitz7x4Q2d7cbQ3fHibF2BHWbWk8YGnH",
+        "phantomExists": false,
+        "frozenHarvestSupply": "94090500",
+        "liveVaultSupply": "94478076",
+        "liveMintSupply": "94478076",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "EJtuJUyXuCoauNYQuh8ZCT1L2UKRnBHuT7YXfJj4B1uf",
+        "phantomExists": false,
+        "frozenHarvestSupply": "1624916062",
+        "liveVaultSupply": "1629169801",
+        "liveMintSupply": "1629169801",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "GtfRmygGFEDpKWquanEPoCkLLxbzJ3vK764E1kt9xAt4",
+        "phantomExists": false,
+        "frozenHarvestSupply": "729433941204988556",
+        "liveVaultSupply": "731568282680412780",
+        "liveMintSupply": "731568282680412780",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "377zeHxF4WZgAkxEiMxs8jFgko9HRubiLnhRTjUw7HeD",
+        "phantomExists": false,
+        "frozenHarvestSupply": "938006798475873206",
+        "liveVaultSupply": "938006798470370706",
+        "liveMintSupply": "938006798470370706",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "DU5poZQoqteQtBVbmb7skLQiFE8B34eiAQJqba6aSASD",
+        "phantomExists": false,
+        "frozenHarvestSupply": "944839758725962295",
+        "liveVaultSupply": "944839758699490993",
+        "liveMintSupply": "944839758699490993",
+        "liveVaultMatchesMint": true,
+        "frozenHarvestMatchesMint": false
+      },
+      {
+        "address": "5XCP3oD3JAuQyDpfBFFVUxsBxNjPQojpKuL4aVhHsDok",
+        "phantomExists": false,
+        "frozenHarvestSupply": "750681625444",
+        "liveVaultSupply": "744206066534",
+        "liveMintSupply": "744204041806",
+        "liveVaultMatchesMint": false,
+        "frozenHarvestMatchesMint": false
+      }
+    ]
+  },
+  "rows": [
+    {
+      "address": "wVjGtGxD1Hrp4oqC4JKwZMzrChnECGRy2aJ8evtmCyb",
+      "lpMint": "XcuvRECwd9Fg3Kc3gmMd7p8gQqQeTXckt7K3p4AAZH3",
+      "phantomStrategy": "7YiXaMC8kqmQyqRkmXKMRu9JdoVi1ZRqCaQZeyGVjef",
+      "version": 1,
+      "totalLpSupply": "28783841269933",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "FERjPVNEa7Udq8CEv68h6tPL46Tq7ieE49HrE2wea3XT",
+      "lpMint": "FZN7QZ8ZUUAxMPfxYEYkH3cXUASzH8EqA6B4tyCL8f1j",
+      "phantomStrategy": "62aQ5JA4BPWpjTrgTfc9MEcL8hy5qv654cfwArerKtK",
+      "version": 1,
+      "totalLpSupply": "220099668782921",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "kxsyGhMnuUYBiDFiWTCWyNYpbSti7MieWRJSAqbKHdf",
+      "lpMint": "2J6QpKxXhWrjbsaZGDZPJCCJESBUZQEKjyfwLSxhkeMD",
+      "phantomStrategy": "8QD6wZqHnHfh55qcM72ji6yBXBTszGUKRP9F4rfvVcT",
+      "version": 1,
+      "totalLpSupply": "50379090448101",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "3ESUFCnRNgZ7Mn2mPPUMmXYaKU8jpnV9VtA17M7t2mHQ",
+      "lpMint": "3RpEekjLE5cdcG15YcXJUpxSepemvq2FpmMcgo342BwC",
+      "phantomStrategy": "7Vu7wTXWVk1GPZxZhE7ucdPXNbuhMq9mmSgr8hP3i6j",
+      "version": 1,
+      "totalLpSupply": "7874908400042",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "ELkDMADJDuMLLdnnLEQ8FkArCfurmhRuYgBppVX6SV1y",
+      "lpMint": "BUPP59LNFuwSetQ49ZZmWGXYMMZQY1i43Vi4UNBqXPAc",
+      "phantomStrategy": "8WZUNnx6LE8qM1uhBRkhvfmaEtCEknTHaeA4Twsk22B",
+      "version": 1,
+      "totalLpSupply": "128123391081964",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "CBbKwhgoDebvd3iNaTLsdgJgxfsrgXjn3nJbW1z3QBD7",
+      "lpMint": "HVjpmAp7G1p9E2CkdmTNqpxf47X9dUbn6YfHcGR61R5L",
+      "phantomStrategy": "5Fmbm8FUiFQ4iuoCSmT7oxxnJSay5kVeg55KPjZf7oD",
+      "version": 1,
+      "totalLpSupply": "10434854061335",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "mPWBpKzzchEjitz7x4Q2d7cbQ3fHibF2BHWbWk8YGnH",
+      "lpMint": "4nCGSVN8ZGuewX36TznzisceaNYzURWPesxyGtDvA2iP",
+      "phantomStrategy": "4yaDbzXTtfJffwquuHqpZTD6P4tD7cD6zzGyfvfWy3d",
+      "version": 1,
+      "totalLpSupply": "94090500",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "EJtuJUyXuCoauNYQuh8ZCT1L2UKRnBHuT7YXfJj4B1uf",
+      "lpMint": "E6rLsVzbjzPdrtN8SX4LQWMGz6dtLR4QYVgy9yog7pBi",
+      "phantomStrategy": "6LmREANb5k6pxAgvkzTVVpjb4xfH4sNPCNfsxcAYhLB",
+      "version": 1,
+      "totalLpSupply": "1624916062",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "GtfRmygGFEDpKWquanEPoCkLLxbzJ3vK764E1kt9xAt4",
+      "lpMint": "B4s175Rrb5gC48Xe2uKzFWzifyqFPfgkxrTeuFm1gEUb",
+      "phantomStrategy": "744dhW42zRQ3cTDx6bkGywuD9JVQ4ofjmiHzrRoVWJK",
+      "version": 1,
+      "totalLpSupply": "729433941204988556",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "377zeHxF4WZgAkxEiMxs8jFgko9HRubiLnhRTjUw7HeD",
+      "lpMint": "GxniUAidymNfCNWnWrQLN2J1Q5rRQS7nLCnphJf59zW5",
+      "phantomStrategy": "7gdU21vq5pw1R1kFscTgaGaUivhaBkJuFvXz9YWcU1D",
+      "version": 1,
+      "totalLpSupply": "938006798475873206",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "DU5poZQoqteQtBVbmb7skLQiFE8B34eiAQJqba6aSASD",
+      "lpMint": "33emqRMzJeXh7nevwcY92rDN8MNMGrqaBFgbpz6HDz3q",
+      "phantomStrategy": "5kogjGrhNQdkG8simihEDBcYzXg5n9AwFzpxcy2MRKV",
+      "version": 1,
+      "totalLpSupply": "944839758725962295",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    },
+    {
+      "address": "5XCP3oD3JAuQyDpfBFFVUxsBxNjPQojpKuL4aVhHsDok",
+      "lpMint": "EZun6G5514FeqYtUv26cBHWLqXjAEdjGuoX6ThBpBtKj",
+      "phantomStrategy": "6SMg3mVpypBLDJBsfqLUBUDaRAygzofT3DrzaBtVp95",
+      "version": 1,
+      "totalLpSupply": "750681625444",
+      "padding0AllZero": true,
+      "offlineMatch": true
+    }
+  ]
+}

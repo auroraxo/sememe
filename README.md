@@ -1133,6 +1133,54 @@ plain, never refuses what plain answered, never changes single-source
 verdicts, never names a different account type) hold at 0 failures across all
 74 accounts.
 
+### The stale layout behind the rename, measured (2026-11-09)
+
+The `meteora-vault` rename is not only a spelling difference. Measured on the
+same 12 accounts (`research/stale-layout-2026-11-09.json`,
+`tools/measure-stale-layout.mjs`, pinned in
+`test/stale-layout-measurement.test.mjs`):
+
+- the **live on-chain IDL is frozen at v0.7.2** and declares
+  `strategies: publicKey[30]` — a 30th strategy slot that the deployed program
+  never filled;
+- the **published copy** declares `strategies: publicKey[29]` followed by
+  `version: u8`, `totalLpSupply: u64` and `padding0: [u8; 23]` — the same
+  960 bytes, read three more fields;
+- **offline proof, 12 / 12 accounts**: the 32 bytes the old layout calls
+  `strategies[29]` decompose *exactly* as `version || totalLpSupply || padding0`;
+  `version == 1` in 12 / 12 and `padding0` is all zero in 12 / 12;
+- **live oracle on mainnet, 2026-11-09**: the phantom 30th strategy account
+  exists in **0 / 12** vaults, while the 29 real strategy accounts exist in
+  **348 / 348**; the live `totalLpSupply` equals the live LP mint supply in
+  **9 / 12** vaults (the other 3 grew after their harvest, which is why the
+  frozen bytes no longer match the chain).
+
+So the published copy describes the deployed program and the frozen on-chain
+IDL does not. **The verdict still does not move.** The account union refuses
+the renamed copy (Anchor derives the discriminator from the exact name, so
+`vault` can never match the deployed bytes), and `primary_only` stands. The
+layout is reported as `view.declaredLayout` — a *report*, not evidence: it
+says "the answer you got is contested, field by field", and it is attached
+only when a rename was actually diagnosed, never invented.
+
+The rules this report obeys (`test/account-union-stale-layout.test.mjs`, 8
+tests, 2 mutations verified red):
+
+- **the report never arbitrates.** `primary_only` stays `primary_only`; a
+  copy that explains more bytes does not become the winner.
+- **naming style is not a layout difference.** Fields are paired by
+  normalised spelling, so `totalAmount` vs `total_amount` is not reported as
+  drift; a field only one copy declares, or one both declare with a different
+  type, is.
+- **no rename, no report.** The field exists only when a rename was really
+  diagnosed.
+
+**Stated limits:** the on-chain IDL being stale is a claim about the
+*program's* published artifact, not about the deployed program — the
+decomposition above is measured from the harvested bytes and confirmed against
+the chain, but the upstream Meteora IDL is not this repository's to fix. The
+staleness is reported, never repaired here.
+
 
 ## Free and paid
 

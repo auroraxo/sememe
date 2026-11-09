@@ -143,12 +143,12 @@ function prepareAccountSource(source) {
  * about each other (see the R3 control).
  */
 function diagnoseRename(failedProbe, failedSource, bytes, otherName) {
-  if (!otherName) return;
+  if (!otherName) return null;
   const accounts = failedSource.idl?.accounts ?? [];
   const variant = accounts.find((a) => typeof a?.name === 'string'
     && a.name !== otherName
     && a.name.toLowerCase() === otherName.toLowerCase());
-  if (!variant) return;
+  if (!variant) return null;
   const head = bytes.subarray(0, 8).toString('hex');
   const declared = Buffer.from(variant.discriminator ?? []).toString('hex');
   if (failedSource.storedAccountNames?.has(variant.name)) {
@@ -157,11 +157,98 @@ function diagnoseRename(failedProbe, failedSource, bytes, otherName) {
     failedProbe.reason += `; this copy DOES declare the account, as "${variant.name}", with stored `
       + `discriminator ${declared} which does not match these bytes (${head}) — the other copy `
       + `identifies them as "${otherName}"`;
-    return;
+    return variant.name;
   }
   failedProbe.reason += `; this copy DOES declare the account, as "${variant.name}" — but Anchor `
     + `derives an account discriminator from the exact name, so "${variant.name}" derives `
     + `${declared} and these bytes carry ${head} (the other copy identifies them as "${otherName}")`;
+  return variant.name;
+}
+
+/**
+ * Format one field's declared type as the reader sees it in the IDL, so two
+ * copies' declarations can be compared line by line (`publicKey[30]`, `u64`,
+ * `VaultBumps`, `struct{4}`).
+ */
+function formatFieldType(type, depth = 0) {
+  if (typeof type === 'string') return type;
+  if (depth > 6) return '…';
+  if (Array.isArray(type)) return type.map((t) => formatFieldType(t, depth + 1)).join(', ');
+  if (type && typeof type === 'object') {
+    if (Array.isArray(type.array)) return `${formatFieldType(type.array[0], depth + 1)}[${type.array[1]}]`;
+    if (type.vec !== undefined) return `${formatFieldType(type.vec, depth + 1)}[]`;
+    if (type.option !== undefined) return `${formatFieldType(type.option, depth + 1)}?`;
+    if (type.defined !== undefined) {
+      return typeof type.defined === 'string' ? type.defined : (type.defined?.name ?? JSON.stringify(type.defined));
+    }
+    if (Array.isArray(type.fields)) return `struct{${type.fields.length}}`;
+    if (type.kind) return `${type.kind}`;
+  }
+  return JSON.stringify(type);
+}
+
+/** The declared field list of one account type in one copy (inline or types). */
+function declaredFields(idl, accountName) {
+  const account = (idl?.accounts ?? []).find((a) => a?.name === accountName);
+  const inline = account?.type && typeof account.type === 'object' ? account.type : null;
+  const typedef = (idl?.types ?? []).find((t) => t?.name === accountName);
+  const type = inline ?? (typedef?.type ?? null);
+  if (!type || !Array.isArray(type.fields)) return null;
+  return type.fields;
+}
+
+/**
+ * Compare two copies' DECLARED layout for the same account — nothing is
+ * decoded, no byte decides anything here.
+ *
+ * This is the fact the rename diagnosis could see but not state: a copy that
+ * can never identify the deployed bytes may still declare a different layout
+ * for them. Reporting it keeps the verdict `primary_only` (the report is not
+ * evidence) while telling the reader that the answer they got is contested
+ * field by field. Measured on 12 meteora-vault accounts: 30 keys vs 29 keys
+ * plus `version`, `totalLpSupply`, `padding0` — 960 bytes either way.
+ *
+ * Fields are paired by NORMALISED spelling so that a pure rename
+ * (`totalAmount` vs `total_amount`) is not reported as a layout difference;
+ * a field only one copy declares, or one both declare with different types,
+ * is.
+ */
+function diffDeclaredLayout(primaryIdl, primaryName, secondaryIdl, secondaryName) {
+  const primaryFields = declaredFields(primaryIdl, primaryName);
+  const secondaryFields = declaredFields(secondaryIdl, secondaryName);
+  if (!primaryFields || !secondaryFields) return null;
+
+  const normalise = (key) => String(key).replace(/^_+/, '')
+    .replace(/_+([a-z0-9])/g, (m, c) => c.toUpperCase());
+  const present = (field) => `${formatFieldType(field.type)}`;
+
+  const secondaryByNorm = new Map(secondaryFields.map((f) => [normalise(f.name), f]));
+  const matchedNorm = new Set();
+  const diffs = [];
+
+  for (const field of primaryFields) {
+    const key = normalise(field.name);
+    const other = secondaryByNorm.get(key);
+    if (!other) {
+      diffs.push({ path: field.name, primary: present(field), secondary: null });
+      continue;
+    }
+    matchedNorm.add(key);
+    if (present(field) !== present(other)) {
+      diffs.push({ path: field.name, primary: present(field), secondary: present(other) });
+    }
+  }
+  for (const field of secondaryFields) {
+    if (matchedNorm.has(normalise(field.name))) continue; // paired above
+    diffs.push({ path: field.name, primary: null, secondary: present(field) });
+  }
+
+  return {
+    primary: { account: primaryName, fields: primaryFields.length },
+    secondary: { account: secondaryName, fields: secondaryFields.length },
+    differs: diffs.length > 0,
+    diffs,
+  };
 }
 
 function accountView(source, probeResult) {
@@ -258,10 +345,15 @@ export function unionAccountDecode({ program, primary, secondary, bytes, name: f
 
   // A refusal that is really a RENAME must say so (see diagnoseRename): only
   // when the other side identified the bytes do we have a name to compare with.
+  // The rename also tells us WHICH account the other copy declares — and that
+  // copy may declare a DIFFERENT LAYOUT for it (see diffDeclaredLayout). The
+  // report is NOT evidence and never enters the arbitration: it only tells the
+  // reader that the answer they got is contested, field by field.
+  let renamedTo = null;
   if (primProbe.ok && secProbe && !secProbe.ok) {
-    diagnoseRename(secProbe, sec, bytes, primProbe.decoded.name);
+    renamedTo = diagnoseRename(secProbe, sec, bytes, primProbe.decoded.name);
   } else if (secProbe?.ok && !primProbe.ok) {
-    diagnoseRename(primProbe, prim, bytes, secProbe.decoded.name);
+    renamedTo = diagnoseRename(primProbe, prim, bytes, secProbe.decoded.name);
   }
 
   const view = {
@@ -275,6 +367,16 @@ export function unionAccountDecode({ program, primary, secondary, bytes, name: f
       receipt: a.idlMeta?.receipt,
     })),
   };
+
+  // The layout the OTHER copy declares for the account it could not identify
+  // — a report, never evidence: `primary_only`/`fallback_secondary` still stand
+  // exactly as the byte arbitration decides them below.
+  if (renamedTo) {
+    const primaryName = primProbe.ok ? primProbe.decoded.name : renamedTo;
+    const secondaryName = secProbe?.ok ? secProbe.decoded.name : renamedTo;
+    const declared = diffDeclaredLayout(prim.idl, primaryName, sec.idl, secondaryName);
+    if (declared) view.declaredLayout = declared;
+  }
 
   const finish = (winner, probe, verdict, basis, evidence) => {
     const fields = accountFields(probe, bytes);
