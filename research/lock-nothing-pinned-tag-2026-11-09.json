@@ -1,0 +1,96 @@
+{
+  "tool": "tools/measure-lock-nothing-pinned-tag.mjs",
+  "measuredAt": "2026-11-09T22:21:32.693Z",
+  "tags": [
+    {
+      "tag": "v0.4.13",
+      "installedVersion": "0.4.13",
+      "cases": {
+        "lockEmptyStore": {
+          "exit": 0,
+          "reason": null,
+          "pinned": null,
+          "violations": null,
+          "lockFileWritten": true,
+          "lockPinnedPrograms": 0
+        },
+        "verifyEmptyLock": {
+          "exit": 0,
+          "reason": null,
+          "pinned": 0,
+          "violations": 0
+        },
+        "verifyEmptyLockWarn": {
+          "exit": 0,
+          "reason": null,
+          "pinned": 0,
+          "violations": 0
+        },
+        "guardRealLock": {
+          "lock": {
+            "exit": 0,
+            "reason": null,
+            "pinned": null,
+            "violations": null
+          },
+          "verify": {
+            "exit": 0,
+            "reason": null,
+            "pinned": 18,
+            "violations": 0
+          }
+        }
+      },
+      "greenOverNothing": [
+        "lockEmptyStore",
+        "verifyEmptyLock",
+        "verifyEmptyLockWarn"
+      ],
+      "guardBroken": false,
+      "verdict": "carries-the-defect"
+    },
+    {
+      "tag": "v0.4.14",
+      "installedVersion": "0.4.14",
+      "cases": {
+        "lockEmptyStore": {
+          "exit": 1,
+          "reason": "lock-pins-nothing",
+          "pinned": null,
+          "violations": null,
+          "lockFileWritten": false
+        },
+        "verifyEmptyLock": {
+          "exit": 1,
+          "reason": "lock-pins-nothing",
+          "pinned": null,
+          "violations": null
+        },
+        "verifyEmptyLockWarn": {
+          "exit": 1,
+          "reason": "lock-pins-nothing",
+          "pinned": null,
+          "violations": null
+        },
+        "guardRealLock": {
+          "lock": {
+            "exit": 0,
+            "reason": null,
+            "pinned": null,
+            "violations": null
+          },
+          "verify": {
+            "exit": 0,
+            "reason": null,
+            "pinned": 18,
+            "violations": 0
+          }
+        }
+      },
+      "greenOverNothing": [],
+      "guardBroken": false,
+      "verdict": "refuses"
+    }
+  ],
+  "ok": true
+}
