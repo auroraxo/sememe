@@ -34,6 +34,7 @@
 
 import { decodeData, encodeInstructionData, encodeEventData, toJsonSafe } from './codec.mjs';
 import { withDerivedDiscriminators, snakeCase, globalDiscriminator } from './discriminators.mjs';
+import { diffArgsByNormalisedName } from './drift.mjs';
 
 const MAX_DIFF_PATHS = 20;
 
@@ -104,28 +105,22 @@ function prepare(source) {
 }
 
 /** Field paths where two decoded arg trees disagree (bounded, stable order). */
+/**
+ * Field paths where two decoded instruction or event trees disagree,
+ * compared by NORMALISED spelling (src/drift.mjs).
+ *
+ * `paths.paths` lists the REAL differences in data or shape;
+ * `paths.spellingOnly` lists the fields both copies declare under different
+ * names. Returns the existing `{ paths, truncated }` shape tests pin.
+ */
 function diffPaths(primaryArgs, secondaryArgs) {
-  const paths = [];
-  const walk = (a, b, path) => {
-    if (paths.length >= MAX_DIFF_PATHS) return;
-    const aIsObj = a !== null && typeof a === 'object';
-    const bIsObj = b !== null && typeof b === 'object';
-    if (!aIsObj || !bIsObj) {
-      if (JSON.stringify(a) !== JSON.stringify(b)) paths.push(path || '(root)');
-      return;
-    }
-    if (Array.isArray(a) !== Array.isArray(b)) {
-      paths.push(path || '(root)');
-      return;
-    }
-    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
-    for (const key of keys) {
-      if (paths.length >= MAX_DIFF_PATHS) return;
-      walk(a[key], b[key], path ? `${path}.${key}` : key);
-    }
+  const diff = diffArgsByNormalisedName(primaryArgs, secondaryArgs, { max: MAX_DIFF_PATHS });
+  return {
+    paths: diff.paths,
+    truncated: diff.truncated,
+    differs: diff.differs,
+    spellingOnly: diff.spellingOnly,
   };
-  walk(primaryArgs, secondaryArgs, '');
-  return { paths, truncated: paths.length >= MAX_DIFF_PATHS };
 }
 
 function decodeFields(source, probeResult, bytes) {
@@ -391,7 +386,18 @@ export function unionDecode({ program, primary, secondary, bytes, absent, additi
     evidence = `trailing ${secTrailing} < ${primTrailing}`;
   }
 
-  const argsAgree = JSON.stringify(primFields.args) === JSON.stringify(secFields.args);
+  // The two copies AGREE about the data or they do not. A field that one
+  // copy spells `inAmount` and the other spells `in_amount` is the same
+  // field; the spelling is not a disagreement about the bytes. Before this
+  // rule the union compared the two argument trees with raw JSON equality,
+  // so a naming difference produced the verdict `layout_drift` with paths
+  // that listed only the differing spellings (measured 2026-11-09: ALL 643
+  // meteora-damm-v1 instruction rows were pure spelling differences —
+  // `inAmount` in one, `in_amount` in the other, both decoding to the same
+  // values). The report told the caller the two copies disagreed about the
+  // data about fields whose data was identical.
+  const diff = diffPaths(primFields.args, secFields.args);
+  const argsAgree = !diff.differs;
   const fields = winner === prim ? primFields : secFields;
   view.sourcesAgree = argsAgree;
   view.arbitration = { winner: winner.label, basis, evidence };
@@ -399,7 +405,7 @@ export function unionDecode({ program, primary, secondary, bytes, absent, additi
   if (!argsAgree) {
     view.verdict = 'layout_drift';
     view.drift = {
-      paths: diffPaths(primFields.args, secFields.args),
+      paths: diff,
       primaryExplainsFully: primProbe.fullExact,
       secondaryExplainsFully: secProbe.fullExact,
       primaryTrailingBytes: primTrailing,
@@ -408,6 +414,12 @@ export function unionDecode({ program, primary, secondary, bytes, absent, additi
     };
   } else {
     view.verdict = 'agree';
+    if (diff.spellingOnly.length > 0) {
+      view.naming = {
+        spellingOnly: diff.spellingOnly,
+        note: 'the two copies spell the same fields differently and decode them to the same values; the naming difference is reported, it is not a disagreement about the data',
+      };
+    }
   }
   return resultEnvelope(program, fields, winner, view);
 }

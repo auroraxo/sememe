@@ -1,0 +1,597 @@
+{
+ "measuredAt": "2026-11-09T13:39:06.901Z",
+ "claim": "a field-name spelling difference is reported as NAMING, not as a disagreement about the data — measured on both trees with the same probe",
+ "method": {
+  "probe": "tools/drift-naming-probe.mjs, byte-identical file copied into both trees",
+  "prefixTree": {
+   "commit": "74ca535",
+   "tree": "extracted from git history with `git archive`"
+  },
+  "worktreeTree": "this working tree",
+  "fixtures": "test/fixtures (committed), no network",
+  "store": "on-chain copy as a pulled receipt under a synthetic slot, published copy via sememe adopt",
+  "slotKind": "synthetic",
+  "slot": 466833000
+ },
+ "prefix": {
+  "tool": "drift-naming-probe",
+  "tree": "prefix-74ca535",
+  "oracle": "pairing by normalised spelling, implemented in this probe; decodes via src/codec.mjs + src/discriminators.mjs + src/account.mjs (byte-identical across the compared trees)",
+  "programs": [
+   {
+    "name": "pump.fun",
+    "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    "instructions": {
+     "payloads": 996,
+     "decoded": 915,
+     "refused": 81,
+     "verdictCounts": {
+      "fallback_secondary": 246,
+      "layout_drift": 88,
+      "agree": 546,
+      "primary_only": 35
+     },
+     "driftRows": 88,
+     "reportedPaths": 88,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 546,
+      "realDiff": 88,
+      "undecidable": 362
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 88,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    },
+    "accounts": {
+     "accounts": 12,
+     "decoded": 12,
+     "refused": 0,
+     "verdictCounts": {
+      "layout_drift": 6,
+      "agree": 6
+     },
+     "driftRows": 6,
+     "reportedPaths": 31,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 6,
+      "realDiff": 6,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 31,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   },
+   {
+    "name": "meteora-vault",
+    "program": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+    "instructions": {
+     "payloads": 1290,
+     "decoded": 1290,
+     "refused": 0,
+     "verdictCounts": {
+      "agree": 1290
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 1290,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    },
+    "accounts": {
+     "accounts": 12,
+     "decoded": 12,
+     "refused": 0,
+     "verdictCounts": {
+      "primary_only": 12
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 0,
+      "realDiff": 0,
+      "undecidable": 12
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   },
+   {
+    "name": "meteora-damm-v1",
+    "program": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+    "instructions": {
+     "payloads": 643,
+     "decoded": 643,
+     "refused": 0,
+     "verdictCounts": {
+      "layout_drift": 643
+     },
+     "driftRows": 643,
+     "reportedPaths": 2546,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 643,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 643,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    },
+    "accounts": {
+     "accounts": 11,
+     "decoded": 11,
+     "refused": 0,
+     "verdictCounts": {
+      "layout_drift": 11
+     },
+     "driftRows": 11,
+     "reportedPaths": 220,
+     "spellingOnly": 0,
+     "truncatedRows": 11,
+     "oracle": {
+      "namingOnly": 0,
+      "realDiff": 11,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 33,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   },
+   {
+    "name": "openbook-v2",
+    "program": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+    "instructions": {
+     "payloads": 600,
+     "decoded": 600,
+     "refused": 0,
+     "verdictCounts": {
+      "agree": 600
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 600,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    },
+    "accounts": {
+     "accounts": 4,
+     "decoded": 4,
+     "refused": 0,
+     "verdictCounts": {
+      "agree": 4
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 4,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   }
+  ],
+  "totals": {
+   "instructionPayloads": 3529,
+   "instructionDriftRows": 731,
+   "instructionUnjustifiedDriftRows": 643,
+   "instructionHiddenRealDiffRows": 0,
+   "instructionReportedPaths": 2634,
+   "instructionSpellingOnly": 0,
+   "instructionOracleNamingOnly": 3079,
+   "instructionOracleRealDiff": 88,
+   "accountRows": 39,
+   "accountDriftRows": 17,
+   "accountUnjustifiedDriftRows": 0,
+   "accountHiddenRealDiffRows": 0,
+   "accountReportedPaths": 251,
+   "accountSpellingOnly": 0,
+   "accountOracleNamingOnly": 10,
+   "accountOracleRealDiff": 17,
+   "accountRealPathsCrowdedOut": 33,
+   "accountRealPathsNamed": 31,
+   "accountRealPathsUnnamed": 0,
+   "instructionRealPathsCrowdedOut": 0,
+   "instructionRealPathsNamed": 88,
+   "instructionRealPathsUnnamed": 0,
+   "instructionAgreeRowsNamingFieldDifferences": 0,
+   "instructionAgreeRowSpellingOnly": 0,
+   "accountAgreeRowsNamingFieldDifferences": 0,
+   "accountAgreeRowSpellingOnly": 0
+  }
+ },
+ "worktree": {
+  "tool": "drift-naming-probe",
+  "tree": "worktree",
+  "oracle": "pairing by normalised spelling, implemented in this probe; decodes via src/codec.mjs + src/discriminators.mjs + src/account.mjs (byte-identical across the compared trees)",
+  "programs": [
+   {
+    "name": "pump.fun",
+    "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+    "instructions": {
+     "payloads": 996,
+     "decoded": 915,
+     "refused": 81,
+     "verdictCounts": {
+      "fallback_secondary": 246,
+      "layout_drift": 88,
+      "agree": 546,
+      "primary_only": 35
+     },
+     "driftRows": 88,
+     "reportedPaths": 88,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 546,
+      "realDiff": 88,
+      "undecidable": 362
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 88,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    },
+    "accounts": {
+     "accounts": 12,
+     "decoded": 12,
+     "refused": 0,
+     "verdictCounts": {
+      "layout_drift": 6,
+      "agree": 6
+     },
+     "driftRows": 6,
+     "reportedPaths": 31,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 6,
+      "realDiff": 6,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 31,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   },
+   {
+    "name": "meteora-vault",
+    "program": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi",
+    "instructions": {
+     "payloads": 1290,
+     "decoded": 1290,
+     "refused": 0,
+     "verdictCounts": {
+      "agree": 1290
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 1290,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    },
+    "accounts": {
+     "accounts": 12,
+     "decoded": 12,
+     "refused": 0,
+     "verdictCounts": {
+      "primary_only": 12
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 0,
+      "realDiff": 0,
+      "undecidable": 12
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   },
+   {
+    "name": "meteora-damm-v1",
+    "program": "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB",
+    "instructions": {
+     "payloads": 643,
+     "decoded": 643,
+     "refused": 0,
+     "verdictCounts": {
+      "agree": 643
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 643,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 643,
+     "agreeRowSpellingOnly": 1273
+    },
+    "accounts": {
+     "accounts": 11,
+     "decoded": 11,
+     "refused": 0,
+     "verdictCounts": {
+      "layout_drift": 11
+     },
+     "driftRows": 11,
+     "reportedPaths": 33,
+     "spellingOnly": 353,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 0,
+      "realDiff": 11,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 33,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   },
+   {
+    "name": "openbook-v2",
+    "program": "opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb",
+    "instructions": {
+     "payloads": 600,
+     "decoded": 600,
+     "refused": 0,
+     "verdictCounts": {
+      "agree": 600
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 600,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    },
+    "accounts": {
+     "accounts": 4,
+     "decoded": 4,
+     "refused": 0,
+     "verdictCounts": {
+      "agree": 4
+     },
+     "driftRows": 0,
+     "reportedPaths": 0,
+     "spellingOnly": 0,
+     "truncatedRows": 0,
+     "oracle": {
+      "namingOnly": 4,
+      "realDiff": 0,
+      "undecidable": 0
+     },
+     "unjustifiedDriftRows": 0,
+     "hiddenRealDiffRows": 0,
+     "realPathsCrowdedOut": 0,
+     "realPathsNamed": 0,
+     "realPathsUnnamed": 0,
+     "realPathExamples": [],
+     "driftRowsNamingNoField": 0,
+     "agreeRowsNamingFieldDifferences": 0,
+     "agreeRowSpellingOnly": 0
+    }
+   }
+  ],
+  "totals": {
+   "instructionPayloads": 3529,
+   "instructionDriftRows": 88,
+   "instructionUnjustifiedDriftRows": 0,
+   "instructionHiddenRealDiffRows": 0,
+   "instructionReportedPaths": 88,
+   "instructionSpellingOnly": 0,
+   "instructionOracleNamingOnly": 3079,
+   "instructionOracleRealDiff": 88,
+   "accountRows": 39,
+   "accountDriftRows": 17,
+   "accountUnjustifiedDriftRows": 0,
+   "accountHiddenRealDiffRows": 0,
+   "accountReportedPaths": 64,
+   "accountSpellingOnly": 353,
+   "accountOracleNamingOnly": 10,
+   "accountOracleRealDiff": 17,
+   "accountRealPathsCrowdedOut": 0,
+   "accountRealPathsNamed": 64,
+   "accountRealPathsUnnamed": 0,
+   "instructionRealPathsCrowdedOut": 0,
+   "instructionRealPathsNamed": 88,
+   "instructionRealPathsUnnamed": 0,
+   "instructionAgreeRowsNamingFieldDifferences": 643,
+   "instructionAgreeRowSpellingOnly": 1273,
+   "accountAgreeRowsNamingFieldDifferences": 0,
+   "accountAgreeRowSpellingOnly": 0
+  }
+ },
+ "delta": {
+  "instructionDriftRows": {
+   "prefix": 731,
+   "worktree": 88
+  },
+  "instructionUnjustifiedDriftRows": {
+   "prefix": 643,
+   "worktree": 0
+  },
+  "instructionSpellingOnly": {
+   "prefix": 0,
+   "worktree": 0
+  },
+  "accountDriftRows": {
+   "prefix": 17,
+   "worktree": 17
+  },
+  "accountReportedPaths": {
+   "prefix": 251,
+   "worktree": 64
+  },
+  "accountSpellingOnly": {
+   "prefix": 0,
+   "worktree": 353
+  },
+  "accountRealPathsNamed": {
+   "prefix": 31,
+   "worktree": 64
+  },
+  "accountRealPathsCrowdedOut": {
+   "prefix": 33,
+   "worktree": 0
+  },
+  "accountRealPathsUnnamed": {
+   "prefix": 0,
+   "worktree": 0
+  }
+ },
+ "falsifications": {
+  "driftRowsLostWithoutAgree": [],
+  "driftRowsGained": [],
+  "worktreeUnjustifiedDriftRows": 0,
+  "worktreeHiddenRealDiffRows": 0,
+  "oracleDisagreesBetweenRuns": false,
+  "prefixShowsNoDefect": false,
+  "fixedRowsNamingNoField": 0
+ },
+ "ok": true,
+ "limits": [
+  "fixture bytes from the harvests named in the fixtures, not a live pull: this measures the decoder rule, not the current state of the chain",
+  "the pairing normalises case and leading underscores; it does not decide which spelling is the CORRECT one — both spellings are reported",
+  "a field only one copy declares is still a real difference and is still reported: naming normalisation does not make a missing field present",
+  "the probe counts verdicts and report shapes; the ladder tests (test/drift-naming.test.mjs) pin the behaviour of individual cases",
+  "pre-fix tree 74ca535 keeps its behaviour: tags and history are immutable, this measures what changed between two trees"
+ ]
+}

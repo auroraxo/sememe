@@ -46,30 +46,33 @@
 import { decodeAccountData, withDerivedAccountDiscriminators, identifyAccount } from './account.mjs';
 import { toJsonSafe } from './codec.mjs';
 import { UnionRefusal } from './union.mjs';
+import { diffArgsByNormalisedName } from './drift.mjs';
 
 const reasonOf = (error) => String(error?.message ?? error).slice(0, 200);
 
-/** Field paths where two decoded account trees disagree (bounded, stable). */
+/**
+ * Field paths where two decoded account trees disagree, plus the fields the
+ * two copies name differently.
+ *
+ * The comparison is by NORMALISED spelling (src/drift.mjs): a field both
+ * copies declare — `lpMint` in one, `lp_mint` in the other — is the same
+ * field, and a difference in its NAME is not a difference in the account.
+ * What lands in `paths` is a difference in VALUE or SHAPE, or a field only one
+ * copy declares; what lands in `spellingOnly` is the naming difference itself.
+ *
+ * Measured 2026-11-09 (research/drift-naming-2026-11-09.json): before this
+ * rule, meteora-damm-v1's 11 drift rows filled the 20-path cap (11/11
+ * truncated, 220 paths), and 33 REAL differences were crowded out because the
+ * cap was filled with spelling differences.
+ */
 export function diffAccountPaths(primaryArgs, secondaryArgs) {
-  const paths = [];
-  const MAX = 20;
-  const walk = (a, b, path) => {
-    if (paths.length >= MAX) return;
-    const aIsObj = a !== null && typeof a === 'object';
-    const bIsObj = b !== null && typeof b === 'object';
-    if (!aIsObj || !bIsObj) {
-      if (JSON.stringify(a) !== JSON.stringify(b)) paths.push(path || '(root)');
-      return;
-    }
-    if (Array.isArray(a) !== Array.isArray(b)) { paths.push(path || '(root)'); return; }
-    const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
-    for (const key of keys) {
-      if (paths.length >= MAX) return;
-      walk(a[key], b[key], path ? `${path}.${key}` : key);
-    }
+  const diff = diffArgsByNormalisedName(primaryArgs, secondaryArgs);
+  return {
+    paths: diff.paths,
+    truncated: diff.truncated,
+    differs: diff.differs,
+    spellingOnly: diff.spellingOnly,
   };
-  walk(primaryArgs, secondaryArgs, '');
-  return { paths, truncated: paths.length >= MAX };
 }
 
 /** One source's account probe: identify the type in THIS source's table, then
@@ -447,7 +450,13 @@ export function unionAccountDecode({ program, primary, secondary, bytes, name: f
 
   const primFields = accountFields(primProbe, bytes);
   const secFields = accountFields(secProbe, bytes);
-  const argsAgree = JSON.stringify(primFields.args) === JSON.stringify(secFields.args);
+  // Same rule as the instruction union: a field one copy spells `lpMint` and
+  // the other `lp_mint` is the same field. Raw JSON equality made a naming
+  // difference into the verdict `layout_drift` (measured 2026-11-09: 11/11
+  // meteora-damm-v1 account rows filled the 20-path cap, and 33 REAL
+  // differences were crowded out by spelling paths).
+  const diff = diffAccountPaths(primFields.args, secFields.args);
+  const argsAgree = !diff.differs;
 
   // Arbitration by bytes, strongest evidence first (see the header).
   let winner = prim;
@@ -477,17 +486,25 @@ export function unionAccountDecode({ program, primary, secondary, bytes, name: f
   if (!argsAgree) {
     view.verdict = 'layout_drift';
     view.drift = {
-      ...diffAccountPaths(primFields.args, secFields.args),
+      ...diff,
       primaryExplainsFully: primProbe.fullExact,
       secondaryExplainsFully: secProbe.fullExact,
       primaryTrailingBytes: primTrailing,
       secondaryTrailingBytes: secTrailing,
       note: 'both sources decoded the same account bytes to different values; '
         + 'the winner was chosen by byte evidence where it decides, otherwise the primary stands '
-        + 'and the drift is reported',
+        + 'and the drift is reported. `paths` names the fields whose VALUES differ or that only '
+        + 'one copy declares; `spellingOnly` names the fields both copies declare under '
+        + 'different spellings — a naming style, not a layout difference',
     };
   } else {
     view.verdict = 'agree';
+    if (diff.spellingOnly.length > 0) {
+      view.naming = {
+        spellingOnly: diff.spellingOnly,
+        note: 'the two copies spell the same fields differently and decode them to the same values; the naming difference is reported, it is not a disagreement about the data',
+      };
+    }
   }
   view.arbitration = { winner: winner.label, basis, evidence };
   if (trailing === 'error') {
