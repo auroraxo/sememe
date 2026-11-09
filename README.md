@@ -1963,6 +1963,70 @@ artifact stops being what the tool derives. The ladder
 mutations (the empty-selection guard, the program-id check, the reason name,
 the invoked-program detail, and the filter actually applying).
 
+## A lock that pins nothing is a refusal, not a green CI gate (2026-11-09)
+
+`sememe lock` + `sememe verify --mode error` is the CI gate the section above
+(*pin the answers*) tells a stranger to run after checkout. Two faces of ONE
+defect made that gate able to pass without checking anything:
+
+```bash
+npx sememe lock --store ./store --out ./sememe.lock   # store: receipts/ exists, no receipt in it
+  -> { "lockVersion": 1, "programs": {} }
+  -> exit 0
+
+npx sememe verify --store ./store --lock ./empty.lock --mode error   # empty.lock pins 0 programs
+  -> { "pinned": 0, "violations": 0, "extra": [ ...18 real programs... ] }
+  -> exit 0
+```
+
+The first command wrote a lock pinning **zero** answers: no fingerprint, no
+receipt, no origin — nothing a drifted store could ever contradict. The second
+command then certified a **real 18-program store** as clean against it: every
+program appeared as an `extra`, extras are never violations for being there
+(that rule is correct and stayed), so the report even *looked* informative
+while pinning nothing. `--mode warn` did the same. This is the same class this
+repository has measured three times: `verify` green over a store the reader
+refuses (2026-11-07), `conform --only` green over a filter selecting nothing
+(fixed in v0.4.13), and now `lock`/`verify` green over a lock pinning nothing.
+
+**What changed.** Two refusals, both named `lock-pins-nothing`:
+
+- `sememe lock` over a store with no receipt **refuses and writes no file** —
+  the repair (a `sememe pull` first) is named in the refusal. A lock over a
+  store whose `receipts/` directory does not exist is still refused as
+  `no sememe store`: the two refusals have different repairs and must not
+  collapse into one message;
+- `sememe verify` against a lock whose `programs` map is empty **refuses in
+  both modes** — the defect is a property of the DOCUMENT, not of the store,
+  so `--mode warn` (which exists to downgrade *store* violations) does not
+  certify it either. The check runs after the `lockVersion` check, so an
+  unsupported version is still reported as a version problem.
+
+The ordinary journey is untouched: locking a real store writes a lock pinning
+every program, and verifying it against an intact store still exits 0.
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-lock-nothing-pinned.mjs` derives
+[research/lock-nothing-pinned-2026-11-09.json](research/lock-nothing-pinned-2026-11-09.json)
+by running the SAME probe file in the pre-fix tree (`git archive f22dbf5`) and
+in this tree: on the pre-fix tree **all three defect faces are green** (lock
+exit 0 writing a 0-program file; verify exit 0 with `pinned: 0` in both modes);
+in this tree all three are refused with `lock-pins-nothing`, and the ordinary
+lock-then-verify journey exits 0 with 18 programs pinned in BOTH trees. The
+tool fails if the baseline ever shows no defect, and
+`test/lock-nothing-pinned-measurement.test.mjs` fails if the committed artifact
+stops being what the tool derives. The ladder
+`test/lock-nothing-pinned.test.mjs` is 5 red on the pre-fix tree and 12 green
+here; `tools/mutation-ladder-lock-nothing-pinned.sh` catches 5/5 mutations
+(the writer's guard, the reader's guard, the reason name, the repair sentence,
+and the empty check running after the version check).
+
+The delivery side is measured separately, because "main fixed, the pin behind
+it" is this repository's most-repeated defect: `tools/measure-lock-nothing-pinned-tag.mjs`
+installs PUBLISHED TAGS into an empty directory and runs the same cases against
+the bytes a stranger receives — see
+[research/lock-nothing-pinned-tag-2026-11-09.json](research/lock-nothing-pinned-tag-2026-11-09.json).
+
 ## The largest publish-nothing gap decodes in its own dialect: shank (2026-11-04)
 
 The acquisition-gap classification left one program standing at the top of the

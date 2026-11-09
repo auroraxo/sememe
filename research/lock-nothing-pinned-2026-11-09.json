@@ -1,0 +1,113 @@
+{
+  "tool": "tools/measure-lock-nothing-pinned.mjs",
+  "measuredAt": "2026-11-09T22:09:12.313Z",
+  "prefix": {
+    "commit": "f22dbf5",
+    "greenOverNothing": [
+      "lockEmptyStore",
+      "verifyEmptyLock",
+      "verifyEmptyLockWarn"
+    ],
+    "cases": {
+      "lockEmptyStore": {
+        "exit": 0,
+        "reason": null,
+        "pinned": null,
+        "violations": null,
+        "lockFileWritten": true,
+        "lockPinnedPrograms": 0
+      },
+      "verifyEmptyLock": {
+        "exit": 0,
+        "reason": null,
+        "pinned": 0,
+        "violations": null
+      },
+      "verifyEmptyLockWarn": {
+        "exit": 0,
+        "reason": null,
+        "pinned": 0,
+        "violations": null
+      },
+      "guardRealLock": {
+        "lock": {
+          "exit": 0,
+          "reason": null,
+          "pinned": null,
+          "violations": null
+        },
+        "verify": {
+          "exit": 0,
+          "reason": null,
+          "pinned": 18,
+          "violations": null
+        }
+      }
+    }
+  },
+  "worktree": {
+    "greenOverNothing": [],
+    "refusals": {
+      "lockEmptyStore": {
+        "refused": true,
+        "reason": "lock-pins-nothing",
+        "exit": 1
+      },
+      "verifyEmptyLock": {
+        "refused": true,
+        "reason": "lock-pins-nothing",
+        "exit": 1
+      },
+      "verifyEmptyLockWarn": {
+        "refused": true,
+        "reason": "lock-pins-nothing",
+        "exit": 1
+      }
+    },
+    "cases": {
+      "lockEmptyStore": {
+        "exit": 1,
+        "reason": "lock-pins-nothing",
+        "pinned": null,
+        "violations": null,
+        "lockFileWritten": false
+      },
+      "verifyEmptyLock": {
+        "exit": 1,
+        "reason": "lock-pins-nothing",
+        "pinned": null,
+        "violations": null
+      },
+      "verifyEmptyLockWarn": {
+        "exit": 1,
+        "reason": "lock-pins-nothing",
+        "pinned": null,
+        "violations": null
+      },
+      "guardRealLock": {
+        "lock": {
+          "exit": 0,
+          "reason": null,
+          "pinned": null,
+          "violations": null
+        },
+        "verify": {
+          "exit": 0,
+          "reason": null,
+          "pinned": 18,
+          "violations": null
+        }
+      }
+    }
+  },
+  "falsifications": {
+    "worktreeGreenOverNothingCount": 0,
+    "worktreeGreenOverNothing": [],
+    "worktreeRefusalsMissingCount": 0,
+    "worktreeRefusalsMissing": [],
+    "refusalReasonDrift": [],
+    "guardRegression": false,
+    "prefixShowsNoDefect": false
+  },
+  "ok": true
+}

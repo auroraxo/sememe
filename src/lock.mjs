@@ -16,6 +16,13 @@
 //   lock-v1-parse       the file is not JSON
 //   lock-v1-shape       the document is not a v1 lock (programs map etc.)
 //   lock-v1-fingerprint a pinned fingerprint is not sha256:<64 hex>
+//   lock-pins-nothing   the lock pins ZERO programs, so it can never detect
+//                       drift — a green gate over a check that never ran
+//                       (measured 2026-11-09: `sememe lock` on a store with
+//                       no receipts wrote `{"lockVersion":1,"programs":{}}`
+//                       and exited 0, and `sememe verify --mode error` over
+//                       that lock exited 0 with `pinned: 0, violations: 0`
+//                       against a real 18-program store)
 // Violations checkLock reports (each with the program named):
 //   drifted     the store answers the program with a DIFFERENT fingerprint
 //   missing     the store has no verified receipt for a pinned program
@@ -121,6 +128,22 @@ export async function writeLock(storeDir, outPath) {
     throw error;
   }
   const programs = [...new Set(names.filter(isReceiptFile).map(programOfReceiptName))].sort();
+  // A lock that pins NOTHING is not a lock: it can never detect a drifted
+  // fingerprint, a missing receipt or a rewritten origin. Measured
+  // 2026-11-09: `sememe lock` over a store whose receipts/ directory holds
+  // no receipt wrote `{"lockVersion":1,"programs":{}}` and exited 0 — and
+  // `sememe verify --mode error` over that lock exited 0 with
+  // `pinned: 0, violations: 0` against a REAL 18-program store, reporting
+  // every program as an `extra` (extras are never violations). The gate was
+  // green over a check that never ran, and it LOOKED informative. So a lock
+  // over an empty store is REFUSED and no file is written: the repair is to
+  // pull a program first, not to commit a lock that certifies nothing.
+  if (programs.length === 0) {
+    throw Error(
+      `the store at ${storeDir} pins nothing: it holds no receipt, so a lock over it could never detect drift `
+      + `(lock-pins-nothing) — run "sememe pull <program-id> --store ${storeDir}" first, then lock again`,
+    );
+  }
   const doc = { lockVersion: LOCK_VERSION, programs: {} };
   for (const program of programs) {
     // Full verification through the store reader: a tampered object or a
@@ -175,6 +198,20 @@ export async function readLock(lockPath) {
   }
   if (!doc.programs || typeof doc.programs !== 'object' || Array.isArray(doc.programs)) {
     throw Error(`sememe lock file ${lockPath} has no programs map (lock-v1-shape)`);
+  }
+  // A lock that pins ZERO programs certifies nothing: there is no pinned
+  // answer a drifted store could contradict, so every store would pass it.
+  // Measured 2026-11-09 (this host, published v0.4.13 AND main): an empty
+  // `programs` map made `sememe verify --mode error` exit 0 with
+  // `pinned: 0, violations: 0` against a real 18-program store — a green CI
+  // gate over a check that never ran. The refusal is about the DOCUMENT, not
+  // about the store, so it applies in `--mode warn` too: warn mode exists to
+  // downgrade STORE violations, not to certify a lock that pins nothing.
+  if (Object.keys(doc.programs).length === 0) {
+    throw Error(
+      `sememe lock file ${lockPath} pins no program (lock-pins-nothing): a lock over zero answers can never `
+      + `detect drift — re-create it with "sememe lock" over a store that holds at least one receipt`,
+    );
   }
   for (const [program, entry] of Object.entries(doc.programs)) {
     if (!entry || typeof entry !== 'object') {

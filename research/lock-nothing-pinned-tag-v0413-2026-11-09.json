@@ -1,0 +1,54 @@
+{
+  "tool": "tools/measure-lock-nothing-pinned-tag.mjs",
+  "measuredAt": "2026-11-09T22:13:22.780Z",
+  "tags": [
+    {
+      "tag": "v0.4.13",
+      "installedVersion": "0.4.13",
+      "cases": {
+        "lockEmptyStore": {
+          "exit": 0,
+          "reason": null,
+          "pinned": null,
+          "violations": null,
+          "lockFileWritten": true,
+          "lockPinnedPrograms": 0
+        },
+        "verifyEmptyLock": {
+          "exit": 0,
+          "reason": null,
+          "pinned": 0,
+          "violations": 0
+        },
+        "verifyEmptyLockWarn": {
+          "exit": 0,
+          "reason": null,
+          "pinned": 0,
+          "violations": 0
+        },
+        "guardRealLock": {
+          "lock": {
+            "exit": 0,
+            "reason": null,
+            "pinned": null,
+            "violations": null
+          },
+          "verify": {
+            "exit": 0,
+            "reason": null,
+            "pinned": 18,
+            "violations": 0
+          }
+        }
+      },
+      "greenOverNothing": [
+        "lockEmptyStore",
+        "verifyEmptyLock",
+        "verifyEmptyLockWarn"
+      ],
+      "guardBroken": false,
+      "verdict": "carries-the-defect"
+    }
+  ],
+  "ok": false
+}
