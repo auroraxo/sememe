@@ -102,7 +102,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.14   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.15   # tagged release; no npm account needed
 ```
 
 ```js
@@ -121,7 +121,7 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.14 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.15 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
