@@ -232,7 +232,34 @@ export async function checkTransaction(transaction, storeDir, options = {}) {
       try {
         const sources = await findStoredIdls(storeDir, instruction.programId);
         idl = sources.primary?.idl ?? sources.secondary?.idl ?? null;
-      } catch {
+      } catch (error) {
+        // THE READER'S REFUSAL IS NOT A VERDICT ABOUT THE TRANSACTION.
+        //
+        // findStoredIdls is the ONE store reader that refuses damage by name
+        // (src/store-read.mjs): a receipt whose object no longer re-hashes to
+        // its fingerprint, a receipt bound to another program, a missing
+        // object, a malformed receipt, a rewritten origin. Swallowing that
+        // here turned every refusal into `no-stored-interface` and the gate
+        // exited 0 — measured 2026-11-10 on the order-engine fixture: a
+        // tampered receipt made the transaction's REAL disagreement
+        // (undeclared-signing-account) disappear behind 12
+        // `no-stored-interface` rows and a green exit.
+        //
+        // Exactly ONE failure is not damage: the store holds no receipt for
+        // this program (code `no-stored-idl`). That is an honest acquisition
+        // gap and keeps its own verdict below. A missing store
+        // (`no-sememe-store`) and every reader refusal are REFUSED by name,
+        // carrying the reader's own message and the repair.
+        const code = error?.code ?? null;
+        if (code !== 'no-stored-idl') {
+          const reason = code === 'no-sememe-store' ? 'no-sememe-store' : 'store-reader-refused';
+          throw new ConformanceRefusal(
+            reason,
+            `${instruction.programId}: ${String(error?.message ?? error)} — ` +
+              'the conformance gate cannot read this program from the store, so it cannot say the transaction conforms; ' +
+              'repair: restore the receipt (re-run "sememe pull") or point --store at a verified store',
+          );
+        }
         idl = null;
       }
       idlCache.set(instruction.programId, idl);

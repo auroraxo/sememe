@@ -99,11 +99,28 @@ async function receiptNames(storeDir, program) {
   let names;
   try { names = await readdir(receipts); }
   catch (error) {
-    if (error?.code === 'ENOENT') throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
+    if (error?.code === 'ENOENT') {
+      // `code` names the KIND of failure so a caller can distinguish "this
+      // store does not exist" from the absence of "this program is not in it"
+      // WITHOUT parsing prose — src/conformance.mjs needs exactly that
+      // (measured 2026-11-10: it swallowed both and reported a green gate).
+      // The message is unchanged: it is quoted by bin/sememe.mjs, the README
+      // and several tests.
+      const missing = Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
+      missing.code = 'no-sememe-store';
+      throw missing;
+    }
     throw error;
   }
   const candidates = names.filter((name) => name.startsWith(`${program}-`) && isReceiptFile(name));
-  if (!candidates.length) throw Error(`no stored IDL for program ${program} in ${storeDir}`);
+  if (!candidates.length) {
+    // The store EXISTS and simply holds no receipt for this program: an
+    // acquisition gap, never damage. Callers must be able to report it as
+    // such instead of mistaking it for a reader refusal.
+    const absent = Error(`no stored IDL for program ${program} in ${storeDir}`);
+    absent.code = 'no-stored-idl';
+    throw absent;
+  }
   // Numeric slot order, NOT byte order: the slot in the filename is a decimal
   // NUMBER, and "99999999" sorts after "123456789" as a string — so a plain
   // sort picks the OLDER receipt as "last = newest" whenever two slot strings

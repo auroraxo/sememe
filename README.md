@@ -2027,6 +2027,106 @@ installs PUBLISHED TAGS into an empty directory and runs the same cases against
 the bytes a stranger receives — see
 [research/lock-nothing-pinned-tag-2026-11-09.json](research/lock-nothing-pinned-tag-2026-11-09.json).
 
+## A store the reader refuses cannot pass the conformance gate (2026-11-10)
+
+`sememe conform <tx.json> --store <dir>` is a CI gate: exit 1 on any
+disagreement, exit 0 when the checked instructions agree with the store. The
+gate read the store through **one line that swallowed every failure**:
+
+```js
+const sources = await findStoredIdls(storeDir, instruction.programId);
+idl = sources.primary?.idl ?? sources.secondary?.idl ?? null;
+// ... inside:  } catch { idl = null; }
+```
+
+`findStoredIdls` is the ONE store reader that refuses damage by name
+(`src/store-read.mjs`: a receipt whose object no longer re-hashes to its
+fingerprint, a receipt bound to another program, a missing object, a
+malformed receipt, a rewritten origin). `sememe decode` on such a store exits
+1 with the reader's own message. `sememe conform` on the **same store** turned
+that refusal into a verdict and exited 0.
+
+Three faces of ONE defect, measured on the committed fixture transaction
+([test/fixtures/order-engine-conformance-tx.json](test/fixtures/order-engine-conformance-tx.json),
+which invokes `2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1`):
+
+```bash
+# the store the fixture reports a REAL disagreement against:
+npx sememe conform tx.json --store ./store --only 2En5Y11…
+  -> { "byVerdict": { "undeclared-signing-account": 1 } }   # exit 1  (correct)
+
+# one receipt's fingerprint tampered (the reader already refuses it on decode):
+npx sememe conform tx.json --store ./store-damaged --only 2En5Y11…
+  -> { "byVerdict": { "no-stored-interface": 1 } }          # exit 0  (green)
+
+# the --store directory does not exist, or has objects/ but no receipts/:
+npx sememe conform tx.json --store ./nowhere
+  -> 12 rows, all "no-stored-interface", disagreements 0     # exit 0  (green)
+```
+
+The tampered-receipt face is the one a real user hits, and it is worse than a
+false green: the transaction's actual disagreement **disappeared**. The gate
+reported "12 instructions, 0 disagreements" for a transaction that
+demonstrably disagrees, because the program it could no longer read was
+reported as a program the store never held. Damage was indistinguishable from
+an acquisition gap — so the gap verdict, which is honest and useful, was
+carrying a lie.
+
+This is the same class this repository has measured four times before:
+`verify` green over a store the reader refuses (2026-11-07), `conform --only`
+green over a filter selecting nothing (v0.4.13), `lock`/`verify` green over a
+lock pinning nothing (v0.4.14) — and structurally the same as the
+`receipt-hygiene` finding: one reader's refusal being dropped by a caller.
+
+**What changed.** The store reader's two *absence* errors now carry a machine
+readable `code` (`no-sememe-store`, `no-stored-idl`) so a caller can tell
+them apart **without parsing prose** — their messages are byte-identical to
+before, because `bin/sememe.mjs`, this README and several tests quote them.
+`checkTransaction` then distinguishes exactly three cases:
+
+- **the store holds no receipt for this program** (`no-stored-idl`) — an
+  honest acquisition gap, unchanged: the row keeps its
+  `no-stored-interface` verdict and the gate keeps running;
+- **the store does not exist** (`no-sememe-store`) — refused as
+  `no-sememe-store`;
+- **anything else the reader refuses** — refused as `store-reader-refused`.
+
+Both refusals are `ConformanceRefusal` and **lead with the program id**,
+followed by the reader's own message and the repair, so the CLI exits 1 with
+`conformance refused: <reason>` instead of printing a clean report.
+
+**The limits of this fix, in the same breath.** A refusal means the gate could
+not answer — it is not a statement that the transaction disagrees. The gate
+now fails CLOSED on stores it cannot read; it does not decide anything about
+the transaction in that case. A program the store genuinely does not hold
+still produces `no-stored-interface` (exit 0 when nothing else disagrees),
+because that is the acquisition gap the coverage numbers depend on: the fix
+had to separate the two without collapsing either. `--only` filtering still
+applies before the store is read, so a filter that matches no instruction is
+refused first (`filter-matched-no-instruction`), and this fix does not change
+the `unknown-instruction` / `unknown-discriminator` verdicts.
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-store-damage.mjs` derives
+[research/conform-store-damage-2026-11-10.json](research/conform-store-damage-2026-11-10.json)
+by running the SAME probe file in the pre-fix tree (`git archive 3d386b2`) and
+in this tree: on the pre-fix tree **all three defect faces are green** (exit 0
+over a store the reader refused); in this tree all three are refused with the
+named reasons, and both controls — the honest acquisition gap and the real
+disagreement on an intact store — are byte-identical between the trees. The
+tool also counts the measured HARM directly (`hiddenDisagreement`): the
+pre-fix intact store showed `undeclared-signing-account` and the pre-fix
+damaged store showed nothing. The tool fails if the baseline ever shows no
+defect, and `test/conform-store-damage-measurement.test.mjs` fails if the
+committed artifact stops being what the tool derives. The ladder
+`test/conform-store-damage.test.mjs` is 7 red on the pre-fix tree and 11 green
+here; `tools/mutation-ladder-conform-store-damage.sh` catches 5/5 mutations.
+
+The delivery side is measured separately, because "main fixed, the pin behind
+it" is this repository's most-repeated defect:
+`tools/measure-conform-store-damage-tag.mjs` installs PUBLISHED TAGS into an
+empty directory and runs the same cases against the bytes a stranger receives.
+
 ## The largest publish-nothing gap decodes in its own dialect: shank (2026-11-04)
 
 The acquisition-gap classification left one program standing at the top of the
