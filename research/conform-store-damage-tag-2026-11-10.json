@@ -1,0 +1,127 @@
+{
+  "tool": "tools/measure-conform-store-damage-tag.mjs",
+  "measuredAt": "2026-11-10T06:46:11.130Z",
+  "tags": [
+    {
+      "tag": "v0.4.14",
+      "installedVersion": "0.4.14",
+      "cases": {
+        "damagedReceipt": {
+          "exit": 0,
+          "instructions": 1,
+          "rows": 1,
+          "byVerdict": {
+            "no-stored-interface": 1
+          },
+          "disagreementKinds": [],
+          "refusalReason": null
+        },
+        "missingStore": {
+          "exit": 0,
+          "instructions": 12,
+          "rows": 12,
+          "byVerdict": {
+            "no-stored-interface": 12
+          },
+          "disagreementKinds": [],
+          "refusalReason": null
+        },
+        "noReceiptsDir": {
+          "exit": 0,
+          "instructions": 12,
+          "rows": 12,
+          "byVerdict": {
+            "no-stored-interface": 12
+          },
+          "disagreementKinds": [],
+          "refusalReason": null
+        },
+        "honestGap": {
+          "exit": 0,
+          "instructions": 5,
+          "rows": 5,
+          "byVerdict": {
+            "no-stored-interface": 5
+          },
+          "disagreementKinds": [],
+          "refusalReason": null
+        },
+        "intactViolation": {
+          "exit": 1,
+          "instructions": 1,
+          "rows": 1,
+          "byVerdict": {
+            "undeclared-signing-account": 1
+          },
+          "disagreementKinds": [
+            "undeclared-signing-account"
+          ],
+          "refusalReason": null
+        }
+      },
+      "greenOverUnreadableStore": [
+        "damagedReceipt",
+        "missingStore",
+        "noReceiptsDir"
+      ],
+      "controlsBroken": [],
+      "verdict": "carries-the-defect"
+    },
+    {
+      "tag": "v0.4.15",
+      "installedVersion": "0.4.15",
+      "cases": {
+        "damagedReceipt": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "disagreementKinds": null,
+          "refusalReason": "store-reader-refused"
+        },
+        "missingStore": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "disagreementKinds": null,
+          "refusalReason": "no-sememe-store"
+        },
+        "noReceiptsDir": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "disagreementKinds": null,
+          "refusalReason": "no-sememe-store"
+        },
+        "honestGap": {
+          "exit": 0,
+          "instructions": 5,
+          "rows": 5,
+          "byVerdict": {
+            "no-stored-interface": 5
+          },
+          "disagreementKinds": [],
+          "refusalReason": null
+        },
+        "intactViolation": {
+          "exit": 1,
+          "instructions": 1,
+          "rows": 1,
+          "byVerdict": {
+            "undeclared-signing-account": 1
+          },
+          "disagreementKinds": [
+            "undeclared-signing-account"
+          ],
+          "refusalReason": null
+        }
+      },
+      "greenOverUnreadableStore": [],
+      "controlsBroken": [],
+      "verdict": "refuses"
+    }
+  ],
+  "ok": true
+}
