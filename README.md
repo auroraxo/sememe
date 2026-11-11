@@ -2209,6 +2209,18 @@ an instruction that omits both `programId` and `programIdIndex` lands in the
 same refusal (`(none)` in the detail). One transaction fixture, committed —
 no live RPC shape was sampled for this pulse.
 
+The delivery side is measured separately, because "main fixed, the pin behind
+it" is this repository's most-repeated defect:
+`tools/measure-conform-unresolvable-tag.mjs` installs PUBLISHED TAGS into an
+empty directory and runs the same defect cases against the bytes a stranger
+receives — see
+[research/conform-unresolvable-tag-2026-11-11.json](research/conform-unresolvable-tag-2026-11-11.json).
+v0.4.15 is shown to carry the defect on all three dropped shapes (and exits 0
+with the disagreement hidden on the worst face); v0.4.16 refuses all three
+with `instruction-program-id-unresolvable`, with both controls unchanged.
+`test/conform-unresolvable-tag-measurement.test.mjs` fails if those roles ever
+blur.
+
 ## The largest publish-nothing gap decodes in its own dialect: shank (2026-11-04)
 
 The acquisition-gap classification left one program standing at the top of the

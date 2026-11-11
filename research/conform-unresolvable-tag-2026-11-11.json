@@ -1,0 +1,137 @@
+{
+  "tool": "tools/measure-conform-unresolvable-tag.mjs",
+  "measuredAt": "2026-11-11T00:06:51.089Z",
+  "tags": [
+    {
+      "tag": "v0.4.15",
+      "installedVersion": "0.4.15",
+      "cases": {
+        "droppedFill": {
+          "exit": 0,
+          "instructions": 11,
+          "rows": 11,
+          "byVerdict": {
+            "no-stored-interface": 11
+          },
+          "refusalReason": null,
+          "transactionInstructions": 12,
+          "subsetReport": true
+        },
+        "droppedCpi": {
+          "exit": 1,
+          "instructions": 11,
+          "rows": 11,
+          "byVerdict": {
+            "no-stored-interface": 10,
+            "undeclared-signing-account": 1
+          },
+          "refusalReason": null,
+          "transactionInstructions": 12,
+          "subsetReport": true
+        },
+        "droppedAppended": {
+          "exit": 1,
+          "instructions": 12,
+          "rows": 12,
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "undeclared-signing-account": 1
+          },
+          "refusalReason": null,
+          "transactionInstructions": 13,
+          "subsetReport": true
+        },
+        "intactControl": {
+          "exit": 1,
+          "instructions": 12,
+          "rows": 12,
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "undeclared-signing-account": 1
+          },
+          "refusalReason": null,
+          "transactionInstructions": 12,
+          "subsetReport": false
+        },
+        "allDroppedControl": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "refusalReason": "transaction-has-no-resolvable-program-id",
+          "transactionInstructions": 12,
+          "subsetReport": false
+        }
+      },
+      "greenOverDropped": [
+        "droppedFill"
+      ],
+      "subsetReports": [
+        "droppedFill",
+        "droppedCpi",
+        "droppedAppended"
+      ],
+      "controlsBroken": [],
+      "verdict": "carries-the-defect"
+    },
+    {
+      "tag": "v0.4.16",
+      "installedVersion": "0.4.16",
+      "cases": {
+        "droppedFill": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "refusalReason": "instruction-program-id-unresolvable",
+          "transactionInstructions": 12,
+          "subsetReport": false
+        },
+        "droppedCpi": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "refusalReason": "instruction-program-id-unresolvable",
+          "transactionInstructions": 12,
+          "subsetReport": false
+        },
+        "droppedAppended": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "refusalReason": "instruction-program-id-unresolvable",
+          "transactionInstructions": 13,
+          "subsetReport": false
+        },
+        "intactControl": {
+          "exit": 1,
+          "instructions": 12,
+          "rows": 12,
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "undeclared-signing-account": 1
+          },
+          "refusalReason": null,
+          "transactionInstructions": 12,
+          "subsetReport": false
+        },
+        "allDroppedControl": {
+          "exit": 1,
+          "instructions": null,
+          "rows": null,
+          "byVerdict": null,
+          "refusalReason": "transaction-has-no-resolvable-program-id",
+          "transactionInstructions": 12,
+          "subsetReport": false
+        }
+      },
+      "greenOverDropped": [],
+      "subsetReports": [],
+      "controlsBroken": [],
+      "verdict": "refuses"
+    }
+  ],
+  "ok": true
+}

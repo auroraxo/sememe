@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-11T00:04:19.560Z",
+  "measuredAt": "2026-11-11T00:08:48.961Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.16",
+        "body": "## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.16\n```\n\n## The defect this release refuses (measured, not asserted)\n\n`sememe conform <tx> --store <dir>` resolves each instruction's program from `instruction.programId` or by `programIdIndex` into the canonical key list. An index past the end of the list resolves to nothing — and the row loop **stepped over it**:\n\n```js\nfor (const instruction of instructions) {\n  if (!instruction.programId) continue;   // no row, no count, no refusal\n```\n\nThe instruction vanished from `rows`, from `summary.instructions`, and from every verdict count. The report covered a **subset of the transaction it was handed** while describing itself as a check of that transaction.\n\nWorst face, on the committed order-engine fixture (the fill instruction is the ONE instruction with a real disagreement — an undeclared signing account):\n\n| case | v0.4.15 (published) | v0.4.16 |\n|---|---|---|\n| intact transaction | rows 12, `undeclared-signing-account: 1`, exit 1 | unchanged |\n| fill index pushed past `accountKeys` | rows 11, `{no-stored-interface: 11}`, **exit 0** — the disagreement is HIDDEN | exit 1, `instruction-program-id-unresolvable` |\n| extra appended instruction with a bad index | exit 0, rows 12 of 13 | exit 1, same reason |\n| CPI (inner) instruction with a bad index | exit 0, rows 11 of 12 | exit 1, same reason |\n\n## What changed\n\nOne refusal, `instruction-program-id-unresolvable`, raised **before** the store is read and **before** the filter selection. It names each offending instruction by position (top-level or `CPI of top-level #n`) and by the raw `programIdIndex` value it carried, plus the repair. The **all**-unresolvable case keeps its existing reason (`transaction-has-no-resolvable-program-id`) — pinned as a guard so the refusal does not drift. A filter that selects nothing still fires its own reason for callers whose argument is the problem.\n\n## Evidence\n\n- `research/conform-unresolvable-2026-11-11.json` — the SAME probe run in the pre-fix tree (`git archive 94aa00b`) and this tree: pre-fix exits 0 over the dropped instruction and the report **hides** the real finding; this tree refuses all three defect cases with the named reason; the intact control still exits 1 with its disagreement and the all-dropped control keeps its reason in **both** trees.\n- Ladder `test/conform-unresolvable-program-id.test.mjs`: 6 red on the pre-fix tree → 16 green here (6 defect cases, 4 guards green on both trees).\n- `test/conform-unresolvable-measurement.test.mjs` fails if the committed artifact stops being what the tool derives.\n- Delivery measured on PUBLISHED TAGS (`tools/measure-conform-unresolvable-tag.mjs`, `research/conform-unresolvable-tag-2026-11-11.json`): v0.4.15 `carries-the-defect` — a subset report on all three dropped shapes, exit 0 with the real disagreement hidden on the worst face; v0.4.16 `refuses` — all three named refusals, no subset report, both controls unchanged.\n- Tag pin `test/conform-unresolvable-tag-measurement.test.mjs`: 5 checks, including a falsification that the two tags' roles are not interchangeable.\n- `tools/mutation-ladder-conform-unresolvable.sh`: 6/6 mutations caught (the refusal itself, the reason name, the refusal order vs the filter, the detail naming positions, the all-dropped reason staying put, CPI coverage).\n- Full suite: 791 tests, 787 pass, 0 fail, 4 named network skips.\n\n## Limits\n\nOne committed transaction fixture — no live RPC shape was sampled for this pulse. The refusal does not decide which program id is *right*, only that the gate must not guess about a shape it cannot read. Lookup-table addresses are still resolved through `meta.loadedAddresses` first (unchanged). No external users yet (user zero only), 0 stars, no audit — an own-host measurement on one machine with one account, not a statement that any third-party transaction shape behaves the same. v0.4.15 and older keep the defect (tags are immutable). npm registry publish is still credentials-blocked; the git tag is the release artifact.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-11T00:05:09Z",
+        "createdAt": "2026-11-11T00:04:51Z"
+      },
       {
         "tag": "v0.4.15",
         "body": "## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.15\n```\n\n## The defect this release refuses (measured, not asserted)\n\n`sememe conform <tx> --store <dir>` is a CI gate: exit 1 on any disagreement, exit 0 when the checked instructions agree. It read the store through **one line that swallowed every failure** — `} catch { idl = null; }` — while `findStoredIdls` is the one store reader that refuses damage *by name* (a receipt whose object no longer re-hashes to its fingerprint, a receipt bound to another program, a missing object, a malformed receipt, a rewritten origin). `sememe decode` on such a store exits 1 with the reader's message; `sememe conform` on the **same store** turned that refusal into a verdict and exited 0.\n\nThree faces of one defect, on the committed order-engine fixture:\n\n| case | v0.4.14 (published) | v0.4.15 |\n|---|---|---|\n| tampered receipt fingerprint | exit 0, all `no-stored-interface` | exit 1, `store-reader-refused` |\n| `--store` directory does not exist | exit 0 | exit 1, `no-sememe-store` |\n| `objects/` but no `receipts/` | exit 0 | exit 1, `no-sememe-store` |\n\nThe tampered-receipt face is worse than a false green: the transaction's real disagreement (`undeclared-signing-account`) **disappeared** behind 12 green rows. Damage was indistinguishable from an acquisition gap — so the honest gap verdict was carrying a lie.\n\n## What changed\n\nThe reader's two *absence* errors now carry machine-readable codes (`no-sememe-store`, `no-stored-idl`) with byte-identical messages. `checkTransaction` distinguishes exactly three cases: no receipt for this program → honest `no-stored-interface` row (the acquisition gap the coverage numbers depend on, unchanged); missing store → refused `no-sememe-store`; any other reader refusal → refused `store-reader-refused`. Both refusals exit 1, lead with the program id, and carry the reader's message plus the repair. The gate fails **closed** on stores it cannot read — a refusal is not a statement that the transaction disagrees.\n\n## Evidence\n\n- `research/conform-store-damage-2026-11-10.json` — same probe in the pre-fix tree and this tree: 3/3 faces green over an unreadable store before → 0/3 after, controls byte-identical, `hiddenDisagreement` measured.\n- Ladder `test/conform-store-damage.test.mjs`: 7 red on the pre-fix tree → 11 green here; measurement test pins the committed artifact.\n- `tools/mutation-ladder-conform-store-damage.sh`: 5/5 mutations caught.\n- Full suite: 770 tests, 766 pass, 0 fail, 4 named network skips.\n\n## Limits\n\nNo external users yet (user zero only), 0 stars, no audit — this is an own-host measurement on one machine with one account, not an audit and not a statement that any third-party store behaves the same. A refusal means the gate could not answer — it decides nothing about the transaction in that case. `--only` filtering still applies before the store is read. A program the store genuinely does not hold still produces `no-stored-interface`. Older tags keep their defects (tags are immutable). No npm registry publish; the git tag is the release artifact.",
@@ -147,6 +155,7 @@
       "v0.4.13",
       "v0.4.14",
       "v0.4.15",
+      "v0.4.16",
       "v0.4.2",
       "v0.4.3",
       "v0.4.4",
@@ -158,7 +167,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.15"
+        "v0.4.16"
       ],
       "documentedCommands": [
         "pull",
@@ -191,6 +200,105 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.16": {
+        "manifest": {
+          "version": "0.4.16",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.16"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.15": {
         "manifest": {
           "version": "0.4.15",
@@ -1733,13 +1841,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.15",
-    "latestTag": "v0.4.15",
+    "newestTag": "v0.4.16",
+    "latestTag": "v0.4.16",
     "pinnedTags": [
-      "v0.4.15"
+      "v0.4.16"
     ]
   },
   "perRelease": {
+    "v0.4.16": {
+      "defects": []
+    },
     "v0.4.15": {
       "defects": []
     },

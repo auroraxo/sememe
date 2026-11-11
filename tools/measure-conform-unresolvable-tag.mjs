@@ -96,7 +96,7 @@ function makeTxFiles(dir) {
   };
 }
 
-function runCase(cwd, txFile) {
+function runCase(cwd, txFile, total) {
   const result = spawnSync(
     process.execPath,
     [path.join(cwd, 'node_modules', 'sememe', 'bin', 'sememe.mjs'), 'conform', txFile, '--store', STORE_SRC],
@@ -112,6 +112,11 @@ function runCase(cwd, txFile) {
     rows: Array.isArray(parsed?.rows) ? parsed.rows.length : null,
     byVerdict: parsed?.summary?.byVerdict ?? null,
     refusalReason: reason,
+    // The transaction holds this many instructions (top level + CPI). A
+    // report over FEWER of them is a SUBSET report: the instruction the gate
+    // could not resolve is missing from the report, whatever the exit code.
+    transactionInstructions: total,
+    subsetReport: parsed !== null && Array.isArray(parsed?.rows) && parsed.rows.length < total,
   };
 }
 
@@ -126,17 +131,28 @@ function measureTag(tag) {
     }
     const pkg = JSON.parse(fs.readFileSync(path.join(work, 'node_modules', 'sememe', 'package.json'), 'utf8'));
     const files = makeTxFiles(work);
+    const totals = {
+      droppedFill: 12,
+      droppedCpi: 12,
+      droppedAppended: 13,
+      intactControl: 12,
+      allDroppedControl: 12,
+    };
 
     const cases = {
-      droppedFill: runCase(work, files.droppedFill),
-      droppedCpi: runCase(work, files.droppedCpi),
-      droppedAppended: runCase(work, files.droppedAppended),
-      intactControl: runCase(work, files.intactControl),
-      allDroppedControl: runCase(work, files.allDroppedControl),
+      droppedFill: runCase(work, files.droppedFill, totals.droppedFill),
+      droppedCpi: runCase(work, files.droppedCpi, totals.droppedCpi),
+      droppedAppended: runCase(work, files.droppedAppended, totals.droppedAppended),
+      intactControl: runCase(work, files.intactControl, totals.intactControl),
+      allDroppedControl: runCase(work, files.allDroppedControl, totals.allDroppedControl),
     };
 
     const DEFECT_CASES = ['droppedFill', 'droppedCpi', 'droppedAppended'];
     const greenOverDropped = DEFECT_CASES.filter((n) => cases[n].exit === 0);
+    // A subset report is the shape of the defect even when the exit code
+    // happens to be 1: the dropped instruction is missing from the report, and
+    // the exit code then reflects the OTHER instructions only.
+    const subsetReports = DEFECT_CASES.filter((n) => cases[n].subsetReport === true);
     const controlsBroken = [];
     if (cases.intactControl.exit !== 1) controlsBroken.push('intactControl');
     if (cases.allDroppedControl.exit !== 1 || cases.allDroppedControl.refusalReason !== 'transaction-has-no-resolvable-program-id') {
@@ -147,7 +163,15 @@ function measureTag(tag) {
       ? 'carries-the-defect'
       : (controlsBroken.length > 0 ? 'broken-controls' : 'refuses');
 
-    return { tag, installedVersion: pkg.version, cases, greenOverDropped, controlsBroken, verdict };
+    return {
+      tag,
+      installedVersion: pkg.version,
+      cases,
+      greenOverDropped,
+      subsetReports,
+      controlsBroken,
+      verdict,
+    };
   } finally {
     fs.rmSync(work, { recursive: true, force: true });
   }
