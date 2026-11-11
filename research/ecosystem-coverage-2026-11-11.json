@@ -1,0 +1,1851 @@
+{
+ "generatedAt": "2026-11-11T20:55:33.905Z",
+ "sample": {
+  "file": "test/fixtures/ecosystem-sample-2026-11-11.json",
+  "store": "test/fixtures/ecosystem-store-2026-11-11",
+  "samplePathNote": "paths are recorded relative to the repo when they live inside it, so the artifact is the same from any checkout location",
+  "capturedAt": "2026-11-11T20:44:59.527Z",
+  "slots": [
+   468261981,
+   468261980,
+   468261979,
+   468261978,
+   468261977,
+   468261976
+  ],
+  "blocksWithTraffic": 6,
+  "transactionsInBlocks": 2436,
+  "distinctProgramsSeen": 192,
+  "measuredPrograms": 46,
+  "method": "getBlock finalized full encoding:json maxSupportedTransactionVersion:1 rewards:false; contiguous newest finalized slots minus 2",
+  "selection": "curated watchlist + top-volume traffic programs outside it; ranked by observed instruction count, bounded by count and byte budget; the store was never consulted during selection",
+  "measurementPath": "the product entry points (decodeUnionPayload / native decoder / token decoder / raydium decoder) against the captured store; interfaces installed through the product write path (installIdl)"
+ },
+ "headline": {
+  "allPayloadsSeen": 22265,
+  "measuredPayloads": 21350,
+  "notMeasuredPayloads": 915,
+  "decoded": 16148,
+  "refused": 1258,
+  "noInterface": 3944,
+  "coveredPctOfMeasured": 75.6,
+  "coveredPctOfAllSeen": 72.5,
+  "byteExact": 14981,
+  "byteExactPctOfDecoded": 92.8,
+  "shortForm": 55,
+  "chainVerified": 55,
+  "absentPolicy": "verified",
+  "watchlist": {
+   "payloads": 16382,
+   "decoded": 15797,
+   "refused": 582,
+   "noInterface": 3,
+   "coveredPct": 96.4
+  },
+  "outsideWatchlist": {
+   "payloads": 4968,
+   "decoded": 351,
+   "refused": 676,
+   "noInterface": 3941,
+   "coveredPct": 7.1
+  },
+  "note": "coverage = payloads an available interface could NAME. \"refused\" (interface present, bytes refused) and \"no-interface\" (no interface acquirable at all) are counted separately because they need different fixes. watchlist vs outsideWatchlist split exists because the committed 100% claim was measured on the first and never on the second."
+ },
+ "trafficNotMeasured": {
+  "distinctPrograms": 152,
+  "instructions": 915,
+  "transactions": 726,
+  "note": "counted in the traffic inventory, bytes NOT stored (count/byte bounds). NOT in the measured denominator — reported separately so the denominator stays honest."
+ },
+ "notMeasured": [
+  {
+   "id": "73qPnAnBSBY6G4Y2xVrMvWsddCmGYnArH9K3VZg2C5fT",
+   "payloadCount": 31,
+   "txCount": 31
+  },
+  {
+   "id": "261eMUSHi6432WL4KbRDiZacnw9HqJLXeWRvN4iJXWW1",
+   "payloadCount": 31,
+   "txCount": 31
+  },
+  {
+   "id": "HVi6VyyLvTtFTA8f8atavxVjUKi8WjmnydfKgoZKzt7H",
+   "payloadCount": 27,
+   "txCount": 27
+  },
+  {
+   "id": "HHDh9z1FXpDKdaeCPDC6bF4EPU2wssY7E3aZAoM63sEL",
+   "payloadCount": 27,
+   "txCount": 18
+  },
+  {
+   "id": "6Vo3245eszAb5wuqEMw8mGdbfRUdKbHhDHP5LcaGuTAB",
+   "payloadCount": 26,
+   "txCount": 26
+  },
+  {
+   "id": "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
+   "payloadCount": 26,
+   "txCount": 4
+  },
+  {
+   "id": "3TK9D8aoBFYjYZtKCjciPrVrRStsnvo7KmpcJqDavpaU",
+   "payloadCount": 24,
+   "txCount": 24
+  },
+  {
+   "id": "phDEVv4w6BcfkLrLNeXr8HhhgQxnxziVGXpGPcaadMf",
+   "payloadCount": 22,
+   "txCount": 7
+  },
+  {
+   "id": "CZqFPJ35PQT1Jx2o3QAirY8pdTQp7tErJsiQm2GD6xw5",
+   "payloadCount": 21,
+   "txCount": 21
+  },
+  {
+   "id": "7mt2FkDfmgpNNBU7R4BFgE89b5FRjkU9GjS2RFVdDQjh",
+   "payloadCount": 21,
+   "txCount": 21
+  },
+  {
+   "id": "HgFifdfTMQY7F2F6JeVi4xJbWGenycD91jwh2iFo4fTc",
+   "payloadCount": 21,
+   "txCount": 7
+  },
+  {
+   "id": "2vMRKW921MjQuUTAc2MdheBCHhSXHHGcKw2SLKtMyz8S",
+   "payloadCount": 21,
+   "txCount": 7
+  },
+  {
+   "id": "EHbpdi8WraHgjcQebkPTjgRQEHUhiayDr3SXFyc2uPpr",
+   "payloadCount": 20,
+   "txCount": 20
+  },
+  {
+   "id": "SAGE2HAwep459SNq61LHvjxPk4pLPEJLoMETef7f7EE",
+   "payloadCount": 20,
+   "txCount": 16
+  },
+  {
+   "id": "6boYuqKaxxj7vQFZgCQJKvGSX44xAkHg5oBFkHPHc6uD",
+   "payloadCount": 20,
+   "txCount": 20
+  },
+  {
+   "id": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+   "payloadCount": 19,
+   "txCount": 17
+  },
+  {
+   "id": "FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9",
+   "payloadCount": 18,
+   "txCount": 9
+  },
+  {
+   "id": "tickUcsEQegChaAuo9VYQQztB4ZGApY6ZT4FkULWY6N",
+   "payloadCount": 16,
+   "txCount": 16
+  },
+  {
+   "id": "DZNTS5ujuiyx1mazqCPdYPzEyE2VrTPPb6QbqBUftJbY",
+   "payloadCount": 16,
+   "txCount": 16
+  },
+  {
+   "id": "SCoRcH8c2dpjvcJD6FiPbCSQyQgu3PcUAWj2Xxx3mqn",
+   "payloadCount": 16,
+   "txCount": 16
+  },
+  {
+   "id": "goonuddtQRrWqqn5nFyczVKaie28f3kDkHWkHtURSLE",
+   "payloadCount": 16,
+   "txCount": 15
+  },
+  {
+   "id": "Cargo2VNTPPTi9c1vq1Jw5d3BWUNr18MjRtSupAghKEk",
+   "payloadCount": 15,
+   "txCount": 9
+  },
+  {
+   "id": "3PcaFZVKYozNUqVdviP6i7NkoCd5gJ358uxR5icqqvWq",
+   "payloadCount": 14,
+   "txCount": 14
+  },
+  {
+   "id": "8HYMd3SeijBjvZzMDj3o1sYxwwRZiPEUW8SbxFv5SUMf",
+   "payloadCount": 13,
+   "txCount": 13
+  },
+  {
+   "id": "term9YPb9mzAsABaqN71A4xdbxHmpBNZavpBiQKZzN3",
+   "payloadCount": 12,
+   "txCount": 6
+  },
+  {
+   "id": "DhpyNWkdxFh3DRPsBrwRwrK3TYC5t7Q4arnSvf3t84HY",
+   "payloadCount": 11,
+   "txCount": 11
+  },
+  {
+   "id": "9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp",
+   "payloadCount": 10,
+   "txCount": 10
+  },
+  {
+   "id": "Point2iBvz7j5TMVef8nEgpmz4pDr7tU7v3RjAfkQbM",
+   "payloadCount": 10,
+   "txCount": 4
+  },
+  {
+   "id": "BLXJD1miMgFTjCNR9B9KRPnhXMQZQaANvC7EGRVeTphD",
+   "payloadCount": 10,
+   "txCount": 2
+  },
+  {
+   "id": "DoVEsk76QybCEHQGzkvYPWLQu9gzNoZZZt3TPiL597e",
+   "payloadCount": 10,
+   "txCount": 1
+  },
+  {
+   "id": "3yGCLwQWdeS6jQvPgPYb7eDW1TQ9otWnuyyZFRC9K6K6",
+   "payloadCount": 9,
+   "txCount": 9
+  },
+  {
+   "id": "idemJL67fKhpev5vKcxHrosuVyTat6wVC9sFfoPVg3Y",
+   "payloadCount": 9,
+   "txCount": 9
+  },
+  {
+   "id": "BPFLoaderUpgradeab1e11111111111111111111111",
+   "payloadCount": 9,
+   "txCount": 9
+  },
+  {
+   "id": "mmm3XBJg5gk8XJxEKBvdgptZz6SgK4tXvn36sodowMc",
+   "payloadCount": 8,
+   "txCount": 5
+  },
+  {
+   "id": "fastC7gqs2WUXgcyNna2BZAe9mte4zcTGprv3mv18N3",
+   "payloadCount": 8,
+   "txCount": 8
+  },
+  {
+   "id": "FLiNTXPwppyoJabCoxc2uiiRygAHpmMXajiDXo2Ub1z",
+   "payloadCount": 8,
+   "txCount": 4
+  },
+  {
+   "id": "9FPt1KYwAx1K8pB1SfroCHyeyppiLL7bXpxfwf4vA9UL",
+   "payloadCount": 8,
+   "txCount": 2
+  },
+  {
+   "id": "HBVw6bZtcCaezhcBrmfyXBSBRWCdv72271xQ4GPvms2z",
+   "payloadCount": 8,
+   "txCount": 4
+  },
+  {
+   "id": "HpNfyc2Saw7RKkQd8nEL4khUcuPhQ7WwY1B2qjx8jxFq",
+   "payloadCount": 8,
+   "txCount": 8
+  },
+  {
+   "id": "BoobsBSMpFRBA91sNwKLYShRRQPH5GjoCH4NhLUt4yRo",
+   "payloadCount": 7,
+   "txCount": 7
+  },
+  {
+   "id": "ALPHAQmeA7bjrVuccPsYPiCvsi428SNwte66Srvs4pHA",
+   "payloadCount": 7,
+   "txCount": 7
+  },
+  {
+   "id": "MktiyFj9mVdLQgj45AXvJdoaHvF9PkuU1UmA2uwPJWM",
+   "payloadCount": 7,
+   "txCount": 7
+  },
+  {
+   "id": "pyt2F414BA6dPttK6RddPZUdHfapoBN24GL5wbrPCou",
+   "payloadCount": 7,
+   "txCount": 4
+  },
+  {
+   "id": "rec2HHDDnjLfj4kE7VyEtFA1HPGQLK33259532cRyHp",
+   "payloadCount": 7,
+   "txCount": 4
+  },
+  {
+   "id": "SiVKATvf95TNna4ZbqPBNonsuyJLmawEPP7TRRwdZCc",
+   "payloadCount": 7,
+   "txCount": 4
+  },
+  {
+   "id": "ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY",
+   "payloadCount": 6,
+   "txCount": 5
+  },
+  {
+   "id": "BevFQ2LKT3riywRANkmWWKE5dksoTkpCtn7B1uzp56A3",
+   "payloadCount": 6,
+   "txCount": 6
+  },
+  {
+   "id": "J7pourVwqP1VtRNBiFNqbdGxwkx7ta2LHAURURRRJqmd",
+   "payloadCount": 6,
+   "txCount": 5
+  },
+  {
+   "id": "8RmQgRKZuPehkQgiULJ5yKcWhYL4KXue8ALydwpzgqXe",
+   "payloadCount": 5,
+   "txCount": 2
+  },
+  {
+   "id": "HDw2E7P8X1SkCyjvoGsfBGAVUutKcj874bXjHrpVYrVL",
+   "payloadCount": 5,
+   "txCount": 3
+  },
+  {
+   "id": "FoaFt2Dtz58RA6DPjbRb9t9z8sLJRChiGFTv21EfaseZ",
+   "payloadCount": 5,
+   "txCount": 5
+  },
+  {
+   "id": "FRG9UngRAARaEXNay8a3gueom23JaZkLoaG3KK1qCaQN",
+   "payloadCount": 5,
+   "txCount": 2
+  },
+  {
+   "id": "EmTX93xYtDE3h7G5EF2m9VRPE1UT1XBoohpVmEzE4oEU",
+   "payloadCount": 5,
+   "txCount": 3
+  },
+  {
+   "id": "4KRSet9YXoCKDamKQfoTc4MsnPU4w847KhPoYBcrRooY",
+   "payloadCount": 5,
+   "txCount": 5
+  },
+  {
+   "id": "T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT",
+   "payloadCount": 5,
+   "txCount": 4
+  },
+  {
+   "id": "B3111yJCeHBcA1bizdJjUFPALfhAfSRnAbJzGUtnt56A",
+   "payloadCount": 4,
+   "txCount": 2
+  },
+  {
+   "id": "HuTkmnrv4zPnArMqpbMbFhfwzTR7xfWQZHH1aQKzDKFZ",
+   "payloadCount": 4,
+   "txCount": 2
+  },
+  {
+   "id": "GMGNreQcJFufBiCTLDBgKhYEfEe9B454UjpDr5CaSLA1",
+   "payloadCount": 4,
+   "txCount": 4
+  },
+  {
+   "id": "T1pyyaTNZsKv2WcRAB8oVnk93mLJw2XzjtVYqCsaHqt",
+   "payloadCount": 4,
+   "txCount": 2
+  },
+  {
+   "id": "E2uCGJ4TtYyKPGaK57UMfbs9sgaumwDEZF1aAY6fF3mS",
+   "payloadCount": 4,
+   "txCount": 4
+  },
+  {
+   "id": "GKybPT5ZzV5NgkXy1Pa8Bnu14MS7euEtK8j9zWHzYJpx",
+   "payloadCount": 4,
+   "txCount": 2
+  },
+  {
+   "id": "BZCjgSRmWWGijSDrSBEzx47Yx9WTvqrhWCff5kVA7VsM",
+   "payloadCount": 4,
+   "txCount": 2
+  },
+  {
+   "id": "HDwcJBJXjL9FpJ7UBsYBtaDjsBUhuLCUYoz3zr8SWWaQ",
+   "payloadCount": 4,
+   "txCount": 1
+  },
+  {
+   "id": "AQU1FRd7papthgdrwPTTq5JacJh8YtwEXaBfKU3bTz45",
+   "payloadCount": 4,
+   "txCount": 4
+  },
+  {
+   "id": "ccvrfu3fSpbnPLiUqdWAt85Zn9nq96ekwGTbHqGtdgQ",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "SySTEM1eSU2p4BGQfQpimFEWWSC1XDFeun3Nqzz3rT7",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "compr6CUsB5m2jS4Y3831ztGSTnDpnKJTKS95d64XVq",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "9VX8EKBg6vM6tA68xaDsPkbrx26XConZjkQmhVApUptc",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "riptK81hDxhe5pW5jSzSM9iRA8azgEgLJ4dXkPtBS7j",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "vELoC1audYbSYVRXn1vPaV8Axoa9oU6BYmNGZZBDZ1P",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "REALQqNEomY6cQGZJUGwywTBD2UmDT32rZcNnfxQ5N2",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "DRVSpZ2YUYYKgZP8XtLhAGtT1zYSCKzeHfb4DgRnrgqD",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "Send9wszHjEiS3hwKcPeSLsPRu5Gb62iCrJEcG4Mq3b",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "pytd2yyk641x7ak7mkaasSJVXh6YYZnC7wTmtgAyxPt",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "99vQwtBwYtrqqD9YSXbdum3KBdxPAVxYTaQ3cfnJSrN2",
+   "payloadCount": 3,
+   "txCount": 3
+  },
+  {
+   "id": "FqGg2Y1FNxMiGd51Q6UETixQWkF5fB92MysbYogRJb3P",
+   "payloadCount": 3,
+   "txCount": 2
+  },
+  {
+   "id": "EZiUb6ydWpR3ciizBTJ1J36KCqLyPKVjh4yZEJbs5Uno",
+   "payloadCount": 3,
+   "txCount": 2
+  },
+  {
+   "id": "ATM777JFemuQUEUHeoxz3KBjh147sXnX5cQk3csnup57",
+   "payloadCount": 3,
+   "txCount": 2
+  },
+  {
+   "id": "SV2EYYJyRz2YhfXwXnhNAevDEui5Q6yrfyo13WtupPF",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "LiveiNLxbiyvZECvKAnhmuSzR4t9CWNY7Rj7XbThu9j",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "AddressLookupTab1e1111111111111111111111111",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "M2mx93ekt1fmXSVkTrUL9xVFHkmME8HTUi5Cyc5aF7K",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "GPPnw16FoEXZyfWb1oUtU7YWidSByfmdw1RZ48BQw5S3",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "QuaNtZsgYRe5Z9Bk4LZ4cTD9tbkVoyCNf1R2BN9bBDv",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "CxvksNjwhdHDLr3qbCXNKVdeYACW8cs93vFqLqtgyFE5",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "4Qv3mbzcq1bKmrhGG4voS3EemfPd7f838FLUU7wBHSyi",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "TCMPhJdwDryooaGtiocG1u3xcYbRpiJzb283XfCZsDp",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "6gY1osmP4FMSrTgzGjPhaSGTKXZgVZwAE71v6DJc3vFi",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "41Pr4XqEcmgV1PqZF9yccpuFvxF7PpKLGfTD9jWJBn1q",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "yoLovHV5eT4DNPMG2Bu1NLmq8nVygEAPrNT1Rx6vWFA",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "NinafKYvKDCH26v6uEpfDjyuDjjpbdfhiPjrJV6FTFs",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "hydHwdP54fiTbJ5QXuKDLZFLY5m8pqx15RSmWcL1yAJ",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "DPArtTLbEqa6EuXHfL5UFLBZhFjiEXWRudhvXDrjwXUr",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "Memo4c2pN8afCj432Lb7RMVKi9PbQnnW7ewFFaV3oAH",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "68kTkdQsd9WhXgsg5X9untjvpSinwAMrJgYHXG9NRQmD",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "CLEANALo6FtS6quqTTEXDGFFTuSKMkeKGgcweeiPRJzK",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "oreV3EG1i9BEgiAJ8b177Z2S2rMarzak4NMv1kULvWv",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "CatUnFa3qmfQKw4k9cowvhyKjTUMhc7d3rCwto7HfPnD",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "E52MR3wWQJG7mdBxLbw5tLcpF7DNzBWFKfacQ1HFSVrv",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "HFn8GnPADiny6XqUoWE8uRPPxb29ikn4yTuPa9MF2fWJ",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "sattCHvHkM4XHLyadnU4KQtuNWZbWVDKzuPhmJBXCkq",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "9WUyNREiPDMgwMh5Gt81Fd3JpiCKxpjZ5Dpq9Bo1RhMV",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "SKRskrmtL83pcL4YqLWt6iPefDqwXQWHSw9S9vz94BZ",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "Dsug6JqUcLJaTJCx7ufPREeHjnMakmVEAYSi5oaAEnzK",
+   "payloadCount": 2,
+   "txCount": 1
+  },
+  {
+   "id": "Ed25519SigVerify111111111111111111111111111",
+   "payloadCount": 2,
+   "txCount": 2
+  },
+  {
+   "id": "C4LZf8E3Q32hZrMhaYD3RH59uFubVYBvXTJL535b26LV",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "CHMxPm7vP1FWy15B9bNsegw5NLKvCFLT3WqoJ37BhfLZ",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "2JtMppBtTWr4q7va4Tq3Kv4qm3iQS6ibeAyeZnVh1Z1M",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "xmm9LkUX7yWLoMNEpeGwxtVF8BZjJsNUih5bqx1in1Z",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "6MhUmVgpajwh6ys4PJLf8x9g1M1x1omfeFm5bp3z5B9f",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "HbPEwwAbEqbTJ3H8gJc7VYw1VB7ZMTRAm5u1QvQiUk4E",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "FAdo9NCw1ssek6Z6yeWzWjhLVsr8uiCwcWNUnKgzTnHe",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "RangohQxaWip6i1twAAnRVLmob9j88fid7sq2DMAATW",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "A9bP78C3BxX8k5Hq71YDF1aPoi75nPwQntqS69rMSpSc",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "routeUGWgWzqBWFcrCfv8tritsqukccJPu3q5GPP3xS",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "FRaAMKd655X65wHFBSvyaCQwa7Gi27MZU13wkb9oE3yz",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "Fje1uTQYPhWvNDy5w9PwM1w1QhV9vEDjgE81YCWDbkjE",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "9VFiimgx8hReh6TqamMFXFRXrtsZUfFGuoBTcW3jb7n8",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "EyxPPowqBRTpZpiDb2ixUR6XUU1VJwTCNgJdK8eyc6kc",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "TPTRj55vJcFY28zt1PFF28g9KEmwAcJK3eDywJZeKZF",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "BacXPELoM1jQBgDQERtirmoazb7b9q79yXjpJH1E2j2R",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "FDF8AxHB8UK7RS6xay6aBvwS3h7kez9gozqz14JyfKsg",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "pythWSnswVUd12oZpeFP8e9CVaEqJg25g1Vtc2biRsT",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "noopb9bkMVfRPU8AsbpTUg8AQkHtKwMYZiFUjNRtMmV",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "GjJrUcnv4p161TqSnMK4QWhrm3FN3JAsgcNxFxKpPFKB",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "TwobwMYkKbT8uMWqgPrEPXTPoyYsKAPmaWun6T2WT4A",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "BMofZXeaBSzWWdSnMbnRQNFCabDfziwxMMeS32jKUoyf",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "sa12qbQyuQqEaDcEqEPKmZEGTdzSMaqj87nKRYbE3QE",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "va1t8sdGkReA6XFgAeZGXmdQoiEtMirwy4ifLv7yGdH",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "DvtCHYizicjpX3dSLkXVsS1Y5RGRHGahGirAsRjVbEVg",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "E7JfLPY91FVUDn2T8JtMhoHG8xm5KJPac8GJMVD62y6f",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "MantRCCmk1RtTuLQZfJ7KVQhECoUsavXdhzQdWfd3QY",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "UzNSgNyiSnVGtq7KpFXZKrdk86Yj47wi9K4txNKyb2c",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "CwrwJXstqcWa1ZSeeBLJTHYELsz3cdSRj8WWde3oWCDM",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "BHR9WYvLAxK9cdjW9HLrPunfTSywjQZDApspa8ezFP1Q",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "REDSTBDUecGjwXd6YGPzHSvEUBHQqVRfCcjUVgPiHsr",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "EKp6MT2stJ7Ysc63hbXDqRhzaRnVs5ykFW2T85YT8kqr",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "Fvxx5b3MctFPJhtQTAp7wEPCgsyuT75vrGBgveXZF2Gn",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "GnZr2LD3N1F7mr5mNdgN7doBMxFNAF9dKtpoNHGCkrx2",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "DEXYosS6oEGvk8uCDayvwEZz4qEyDJRf9nFgYCaqPMTm",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "BFL1msJg6SjDjeAQdokvNRXVrBd1mvgninGgPqncjDjN",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "Gt9S41PtjR58CbG9JhJ3J6vxesqrNAswbWYbLNTMZA3c",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "5uJgCDrQHfA58fPqLsuU14Srg9quxXNHz91cZ54cq4pK",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "G2E4eoenFMirpFKRfHNo2koDP7mrhnNWVwxyHASSpjQD",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "EpEEdmjbLsZFCaGgHHnwaysW9bKWNcdm3bxs6HXAQwSk",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "DeJBGdMFa1uynnnKiwrVioatTuHmNLpyFKnmB5kaFdzQ",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "jupZ4m2GqUCJ5iueMfzQf8khFfH31d4XAQt3RzCT9Vd",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "pegVkBpfR9GFi5Jaa9YXAHACyM9CzCNvhc5bf8GWNyW",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "YaFeDUHr9B9zrBHQVBcFmXyHsrLQaTSBkMSULASFjMd",
+   "payloadCount": 1,
+   "txCount": 1
+  },
+  {
+   "id": "97V7JsExNC6yFWu5KjK1FLfVkNVvtMpAFL5QkLWKEGxY",
+   "payloadCount": 1,
+   "txCount": 1
+  }
+ ],
+ "captureMeta": {
+  "capturedAt": "2026-11-11T20:44:59.527Z",
+  "rpc": "https://api.mainnet-beta.solana.com",
+  "method": "getBlock finalized full encoding:json maxSupportedTransactionVersion:1 rewards:false; contiguous newest finalized slots minus 2",
+  "requestedSlots": [
+   468261981,
+   468261980,
+   468261979,
+   468261978,
+   468261977,
+   468261976
+  ],
+  "blocksWithTraffic": 6,
+  "transactionsInBlocks": 2436,
+  "transactionsWithMeasuredTraffic": 2353,
+  "distinctProgramsSeen": 192,
+  "watchedPrograms": 22,
+  "measuredPrograms": 46,
+  "extraProgramsMeasured": 24,
+  "byteBudget": 30000000,
+  "selection": "curated watchlist + top-volume traffic programs outside it; ranked by observed instruction count, bounded by count and byte budget; the store was never consulted during selection"
+ },
+ "refusalReasons": [
+  {
+   "reason": "no-interface: no stored IDL for program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL in test/fixtures/ecosystem-store-2026-1",
+   "count": 1410
+  },
+  {
+   "reason": "no-interface: no stored IDL for program L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95 in test/fixtures/ecosystem-store-2026-11",
+   "count": 1214
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 9aed8a5ca",
+   "count": 459
+  },
+  {
+   "reason": "no-interface: no stored IDL for program MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms in test/fixtures/ecosystem-store-2026-11",
+   "count": 307
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator e1f7501ed",
+   "count": 251
+  },
+  {
+   "reason": "no-interface: no stored IDL for program FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9 in test/fixtures/ecosystem-store-2026-1",
+   "count": 134
+  },
+  {
+   "reason": "no-interface: no stored IDL for program DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z in test/fixtures/ecosystem-store-2026-1",
+   "count": 102
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 20f6bf340",
+   "count": 98
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 1c92de772",
+   "count": 84
+  },
+  {
+   "reason": "no-interface: no stored IDL for program W1LDCARDa67SPBG7TFpQivHnEZXRtxCFP13ysEd1bWR in test/fixtures/ecosystem-store-2026-11",
+   "count": 83
+  },
+  {
+   "reason": "no-interface: no stored IDL for program Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy in test/fixtures/ecosystem-store-2026-1",
+   "count": 83
+  },
+  {
+   "reason": "no-interface: no stored IDL for program ojh19ojaKduoJZuaJADhcVGp4xt1TcdAvZmpVsCorch in test/fixtures/ecosystem-store-2026-11",
+   "count": 71
+  },
+  {
+   "reason": "no-interface: no stored IDL for program Tri3NG4HkZ6DddYPKoX2ehgkqFtDuej9Aspw5BmvSo4 in test/fixtures/ecosystem-store-2026-11",
+   "count": 68
+  },
+  {
+   "reason": "no-interface: no stored IDL for program Cvf5Gb7wgS3LvCDeecw5yoaAWo8SyPG3624CzRFkrfZp in test/fixtures/ecosystem-store-2026-1",
+   "count": 66
+  },
+  {
+   "reason": "no-interface: no stored IDL for program dijkbkCAKfFTCxQg3u1pg82gVU1jJGHBBRcteD11mBu in test/fixtures/ecosystem-store-2026-11",
+   "count": 58
+  },
+  {
+   "reason": "no-interface: no stored IDL for program MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e in test/fixtures/ecosystem-store-2026-11",
+   "count": 58
+  },
+  {
+   "reason": "no-interface: no stored IDL for program BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi in test/fixtures/ecosystem-store-2026-1",
+   "count": 56
+  },
+  {
+   "reason": "no-interface: no stored IDL for program MEViEnscUm6tsQRoGd9h6nLQaQspKj7DB2M5FwM3Xvz in test/fixtures/ecosystem-store-2026-11",
+   "count": 56
+  },
+  {
+   "reason": "no-interface: no stored IDL for program orafZ4BdfzikRRg498P23vG3EdEyMR7bYoYcD2zcwiD in test/fixtures/ecosystem-store-2026-11",
+   "count": 54
+  },
+  {
+   "reason": "no-interface: no stored IDL for program ERfhoTm5C4cQ1U7M2K5R83nnCzWMqZr9Df21Nzx4sm5e in test/fixtures/ecosystem-store-2026-1",
+   "count": 54
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 2b644913e",
+   "count": 44
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator b817ee616",
+   "count": 40
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0400000",
+   "count": 36
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0400010",
+   "count": 36
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0800000",
+   "count": 36
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0800010",
+   "count": 36
+  },
+  {
+   "reason": "no-interface: no stored IDL for program 2DNbzPochEcyCcWMbL4d9S3u9QqQEj5bbe6cSZFvKsbh in test/fixtures/ecosystem-store-2026-1",
+   "count": 34
+  },
+  {
+   "reason": "no-interface: no stored IDL for program 6RCmQ8XMQCJnPbNDQa8U9ucAS9hk4tXQeps96V7p6aRY in test/fixtures/ecosystem-store-2026-1",
+   "count": 33
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 5df6823ce",
+   "count": 20
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown event discriminator bb77f80dafff403",
+   "count": 19
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator c2ab1c466",
+   "count": 17
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): truncated input: need 8 byte(s) for 8-byt",
+   "count": 15
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5c1ce",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5d1ce",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5b1ce",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5a1ce",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a591ce",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a581ce",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 07051dc4f",
+   "count": 5
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0b5b1ce",
+   "count": 4
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator e19a7516d",
+   "count": 3
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): BisonFiDynamicRouteV1Options: malformed str",
+   "count": 3
+  },
+  {
+   "reason": "no-interface: no stored IDL for program jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC in test/fixtures/ecosystem-store-2026-11",
+   "count": 3
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): NexusDynamicRouteV1Options: malformed struc",
+   "count": 2
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): AlphaQDynamicRouteV1Options: malformed stru",
+   "count": 2
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 055b1ce",
+   "count": 2
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0b591ce",
+   "count": 2
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa7e40",
+   "count": 1
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa3e40",
+   "count": 1
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0300001",
+   "count": 1
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa6e40",
+   "count": 1
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown event discriminator 742b4dbd117a482",
+   "count": 1
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 05591ce",
+   "count": 1
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa4e40",
+   "count": 1
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa5e40",
+   "count": 1
+  }
+ ],
+ "outcomeVsChain": {
+  "decoded_txSuccess": 12219,
+  "decoded_txFailed": 3929,
+  "refused_txSuccess": 745,
+  "refused_txFailed": 513,
+  "noInterface_txSuccess": 2031,
+  "noInterface_txFailed": 1913
+ },
+ "programs": [
+  {
+   "program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+   "name": "SPL Token",
+   "watched": true,
+   "acquirable": false,
+   "decoded": 4916,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 4338,
+   "describedExact": 0,
+   "trailing": 578,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 4916,
+   "coveredPct": 100
+  },
+  {
+   "program": "11111111111111111111111111111111",
+   "name": "System",
+   "watched": true,
+   "acquirable": false,
+   "decoded": 3317,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 3317,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 3317,
+   "coveredPct": 100
+  },
+  {
+   "program": "ComputeBudget111111111111111111111111111111",
+   "name": "ComputeBudget",
+   "watched": true,
+   "acquirable": false,
+   "decoded": 2963,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 2943,
+   "describedExact": 0,
+   "trailing": 20,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 2963,
+   "coveredPct": 100
+  },
+  {
+   "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+   "name": "Token-2022",
+   "watched": true,
+   "acquirable": false,
+   "decoded": 2170,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 2162,
+   "describedExact": 0,
+   "trailing": 8,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 2170,
+   "coveredPct": 100
+  },
+  {
+   "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 1410,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 1410,
+   "coveredPct": 0
+  },
+  {
+   "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 1214,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 1214,
+   "coveredPct": 0
+  },
+  {
+   "program": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
+   "name": "PumpSwap",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 860,
+   "refused": 121,
+   "noInterface": 0,
+   "byteExact": 454,
+   "describedExact": 860,
+   "trailing": 406,
+   "shortForm": 55,
+   "chainVerified": 55,
+   "payloads": 981,
+   "coveredPct": 87.7
+  },
+  {
+   "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+   "name": "Pump.fun bonding curve",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 400,
+   "refused": 442,
+   "noInterface": 0,
+   "byteExact": 249,
+   "describedExact": 400,
+   "trailing": 151,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 842,
+   "coveredPct": 47.5
+  },
+  {
+   "program": "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ",
+   "name": null,
+   "watched": false,
+   "acquirable": true,
+   "decoded": 5,
+   "refused": 459,
+   "noInterface": 0,
+   "byteExact": 5,
+   "describedExact": 5,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 464,
+   "coveredPct": 1.1
+  },
+  {
+   "program": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+   "name": "Meteora DLMM",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 350,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 350,
+   "describedExact": 350,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 350,
+   "coveredPct": 100
+  },
+  {
+   "program": "JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4",
+   "name": "Jupiter v6",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 346,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 346,
+   "describedExact": 346,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 346,
+   "coveredPct": 100
+  },
+  {
+   "program": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 307,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 307,
+   "coveredPct": 0
+  },
+  {
+   "program": "EtrnLzgbS7nMMy5fbD42kXiUzGg8XQzJ972Xtk1cjWih",
+   "name": null,
+   "watched": false,
+   "acquirable": true,
+   "decoded": 227,
+   "refused": 15,
+   "noInterface": 0,
+   "byteExact": 227,
+   "describedExact": 227,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 242,
+   "coveredPct": 93.8
+  },
+  {
+   "program": "cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG",
+   "name": "Meteora DAMM v2",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 236,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 236,
+   "describedExact": 236,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 236,
+   "coveredPct": 100
+  },
+  {
+   "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+   "name": null,
+   "watched": false,
+   "acquirable": true,
+   "decoded": 0,
+   "refused": 195,
+   "noInterface": 0,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 195,
+   "coveredPct": 0
+  },
+  {
+   "program": "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 134,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 134,
+   "coveredPct": 0
+  },
+  {
+   "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+   "name": "Raydium CLMM",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 127,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 127,
+   "describedExact": 127,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 127,
+   "coveredPct": 100
+  },
+  {
+   "program": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 102,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 102,
+   "coveredPct": 0
+  },
+  {
+   "program": "W1LDCARDa67SPBG7TFpQivHnEZXRtxCFP13ysEd1bWR",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 83,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 83,
+   "coveredPct": 0
+  },
+  {
+   "program": "Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 83,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 83,
+   "coveredPct": 0
+  },
+  {
+   "program": "dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN",
+   "name": "Meteora DBC",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 60,
+   "refused": 19,
+   "noInterface": 0,
+   "byteExact": 60,
+   "describedExact": 60,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 79,
+   "coveredPct": 75.9
+  },
+  {
+   "program": "ojh19ojaKduoJZuaJADhcVGp4xt1TcdAvZmpVsCorch",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 71,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 71,
+   "coveredPct": 0
+  },
+  {
+   "program": "Tri3NG4HkZ6DddYPKoX2ehgkqFtDuej9Aspw5BmvSo4",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 68,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 68,
+   "coveredPct": 0
+  },
+  {
+   "program": "Cvf5Gb7wgS3LvCDeecw5yoaAWo8SyPG3624CzRFkrfZp",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 66,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 66,
+   "coveredPct": 0
+  },
+  {
+   "program": "dijkbkCAKfFTCxQg3u1pg82gVU1jJGHBBRcteD11mBu",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 58,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 58,
+   "coveredPct": 0
+  },
+  {
+   "program": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 58,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 58,
+   "coveredPct": 0
+  },
+  {
+   "program": "BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 56,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 56,
+   "coveredPct": 0
+  },
+  {
+   "program": "MEViEnscUm6tsQRoGd9h6nLQaQspKj7DB2M5FwM3Xvz",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 56,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 56,
+   "coveredPct": 0
+  },
+  {
+   "program": "orafZ4BdfzikRRg498P23vG3EdEyMR7bYoYcD2zcwiD",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 54,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 54,
+   "coveredPct": 0
+  },
+  {
+   "program": "ERfhoTm5C4cQ1U7M2K5R83nnCzWMqZr9Df21Nzx4sm5e",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 54,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 54,
+   "coveredPct": 0
+  },
+  {
+   "program": "DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH",
+   "name": null,
+   "watched": false,
+   "acquirable": true,
+   "decoded": 39,
+   "refused": 7,
+   "noInterface": 0,
+   "byteExact": 39,
+   "describedExact": 39,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 46,
+   "coveredPct": 84.8
+  },
+  {
+   "program": "proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u",
+   "name": null,
+   "watched": false,
+   "acquirable": true,
+   "decoded": 41,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 41,
+   "describedExact": 41,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 41,
+   "coveredPct": 100
+  },
+  {
+   "program": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+   "name": "Whirlpool",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 39,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 35,
+   "describedExact": 39,
+   "trailing": 4,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 39,
+   "coveredPct": 100
+  },
+  {
+   "program": "CcmRKTuZCGJBWQwMHvDYApBRvSZNHqGJXkznqpDTSQUr",
+   "name": null,
+   "watched": false,
+   "acquirable": true,
+   "decoded": 39,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 39,
+   "describedExact": 39,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 39,
+   "coveredPct": 100
+  },
+  {
+   "program": "2DNbzPochEcyCcWMbL4d9S3u9QqQEj5bbe6cSZFvKsbh",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 34,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 34,
+   "coveredPct": 0
+  },
+  {
+   "program": "6RCmQ8XMQCJnPbNDQa8U9ucAS9hk4tXQeps96V7p6aRY",
+   "name": null,
+   "watched": false,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 33,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 33,
+   "coveredPct": 0
+  },
+  {
+   "program": "CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C",
+   "name": "Raydium CPMM",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 7,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 7,
+   "describedExact": 7,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 7,
+   "coveredPct": 100
+  },
+  {
+   "program": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+   "name": "Raydium AMM v4",
+   "watched": true,
+   "acquirable": false,
+   "decoded": 5,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 5,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 5,
+   "coveredPct": 100
+  },
+  {
+   "program": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
+   "name": "Jupiter Liquidity",
+   "watched": true,
+   "acquirable": false,
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 3,
+   "byteExact": 0,
+   "describedExact": 0,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 3,
+   "coveredPct": 0
+  },
+  {
+   "program": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+   "name": "Marinade liquid staking",
+   "watched": true,
+   "acquirable": true,
+   "decoded": 1,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 1,
+   "describedExact": 1,
+   "trailing": 0,
+   "shortForm": 0,
+   "chainVerified": 0,
+   "payloads": 1,
+   "coveredPct": 100
+  }
+ ],
+ "acquisitionQueue": [
+  {
+   "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+   "name": null,
+   "payloads": 1410,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
+   "name": null,
+   "payloads": 1214,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+   "name": null,
+   "payloads": 307,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9",
+   "name": null,
+   "payloads": 134,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
+   "name": null,
+   "payloads": 102,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "W1LDCARDa67SPBG7TFpQivHnEZXRtxCFP13ysEd1bWR",
+   "name": null,
+   "payloads": 83,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy",
+   "name": null,
+   "payloads": 83,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "ojh19ojaKduoJZuaJADhcVGp4xt1TcdAvZmpVsCorch",
+   "name": null,
+   "payloads": 71,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "Tri3NG4HkZ6DddYPKoX2ehgkqFtDuej9Aspw5BmvSo4",
+   "name": null,
+   "payloads": 68,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "Cvf5Gb7wgS3LvCDeecw5yoaAWo8SyPG3624CzRFkrfZp",
+   "name": null,
+   "payloads": 66,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "dijkbkCAKfFTCxQg3u1pg82gVU1jJGHBBRcteD11mBu",
+   "name": null,
+   "payloads": 58,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "MAyhSmzXzV1pTf7LsNkrNwkWKTo4ougAJ1PPg47MD4e",
+   "name": null,
+   "payloads": 58,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "BiSoNHVpsVZW2F7rx2eQ59yQwKxzU5NvBcmKshCSUypi",
+   "name": null,
+   "payloads": 56,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "MEViEnscUm6tsQRoGd9h6nLQaQspKj7DB2M5FwM3Xvz",
+   "name": null,
+   "payloads": 56,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "orafZ4BdfzikRRg498P23vG3EdEyMR7bYoYcD2zcwiD",
+   "name": null,
+   "payloads": 54,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "ERfhoTm5C4cQ1U7M2K5R83nnCzWMqZr9Df21Nzx4sm5e",
+   "name": null,
+   "payloads": 54,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "2DNbzPochEcyCcWMbL4d9S3u9QqQEj5bbe6cSZFvKsbh",
+   "name": null,
+   "payloads": 34,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "6RCmQ8XMQCJnPbNDQa8U9ucAS9hk4tXQeps96V7p6aRY",
+   "name": null,
+   "payloads": 33,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  },
+  {
+   "program": "jupeiUmn818Jg1ekPURTpr4mFo29p46vygyykFJ3wZC",
+   "name": "Jupiter Liquidity",
+   "payloads": 3,
+   "acquirable": false,
+   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
+  }
+ ]
+}
