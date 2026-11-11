@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-11T06:09:01.497Z",
+  "measuredAt": "2026-11-11T22:19:59.592Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.18",
+        "body": "### What this release delivers\n\nThe SPL Associated Token Account program (`ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL`) was the **#1 acquisition gap** in the ecosystem measurement (`research/ecosystem-coverage-2026-11-11.json`): **1,410 payloads across 6 finalized mainnet blocks, with no IDL account published at either pullable address**.\n\nThis release ships a derived wire table for the ATA program, derived directly from the vendored upstream Rust sources (`solana-program/associated-token-account@fbf5379`, Apache-2.0, LICENSE + sha256 pin on all three files).\n\n### Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.18   # tagged release; no npm account needed\n```\n\n### What changed\n\n- `src/ata-interface.mjs`: derives the wire table from upstream TEXT (instruction builder literals cross-checked against the declaration index the borsh derive uses; processor empty-input Create fallback and InvalidInstructionData refusal);\n- `src/ata.mjs`: two-check load (fresh derivation + artifact equality), exported as `sememe/ata`;\n- CLI: `sememe decode-ata <program> [<payload>] [--empty]` and `sememe ata-provenance`;\n- `sememe decode` now points at `decode-ata` instead of telling the user to pull a receipt that cannot exist;\n- Package exports `./ata`, description updated.\n\n### Evidence\n\n- **1,410/1,410 ATA payloads decode** from the committed 6-block sample (`research/ecosystem-coverage-2026-11-11.json`), 1,406 byte-exact; 4 empty payloads are named Create via the processor's own fallback and honestly carry `roundTripByteExact: false`;\n- Ecosystem coverage moves from **75.6% -> 82.2%** (watchlist 96.4% unchanged, outside-watchlist **7.1% -> 35.4%**); `no-interface` **3,944 -> 2,534**;\n- The 1,000-transaction foreign-archive wire sweep decodes **5,032** payloads (was 4,646) with zero disagreements;\n- `test/ata-interface.test.mjs` (8 tests): tampered artifact, tampered vendored source, missing vendor all refuse the load; guards prove ATA stays out of the token table and SPL Token is undisturbed;\n- Suite 825 -> 833 (829 pass / 4 named network skips / 0 fail).\n\n### Limits\n\nNo external users yet (0 non-owner stars/forks/issues/PRs); not an audit; own-host measurement on committed finalized blocks. No account list or PDA derivation is claimed — only instruction data. Tags are immutable; older tags retain the acquisition gap.",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-11T22:19:49Z",
+        "createdAt": "2026-11-11T22:19:37Z"
+      },
       {
         "tag": "v0.4.17",
         "body": "### What this release delivers\n\n`sememe conform <tx.json> --store <dir>` resolves each instruction's accounts by index into the canonical key list (`keys[index]`). In v0.4.16 an index that did not resolve (past the end, negative, or a non-integer entry such as the `jsonParsed` object shape) became `{address: null, signer: null, writable: null}`, and `checkAccountList` files a null signer under `unknownSigner`: a note, never a violation.\n\n**The worst face, measured on the order-engine fixture** (committed fixture, no network): the fill instruction carries the transaction's ONE real disagreement — a signing account the interface does not declare, at position 11. Replacing exactly that index with an out-of-range value:\n\n```\nintact transaction:          verdict undeclared-signing-account, EXIT 1\nbroken extra account index:  verdict remaining-accounts,        EXIT 0\nwhole transaction in jsonParsed object shape:      remaining-accounts, EXIT 0\n```\n\nThe disagreement was not just unchecked — it was **hidden**, behind a green CI gate.\n\n### Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.17   # tagged release; no npm account needed\n```\n\n### What changed\n\nOne refusal, `instruction-account-index-unresolvable`, raised **before** the store is read and **before** the filter selection:\n\n- any instruction whose accounts list carries an index the key list cannot resolve is refused, naming each offending instruction (top-level `#n`, or `CPI of top-level #n at position p`), the account POSITION, and the RAW value it carried, plus the repair;\n- CPI instructions are covered;\n- `jsonParsed` object entries are refused by name instead of folding into null rows;\n- guards: an unresolvable PROGRAM index keeps `instruction-program-id-unresolvable` even beside broken accounts, an EMPTY accounts list stays legal, and loaded-range (ALT) indices stay resolvable.\n\n### Evidence\n\n- `research/conform-unresolvable-accounts-2026-11-11.json` — same probe in the pre-fix tree (`git archive 7b30c68` = published v0.4.16) and this tree: pre-fix 3 of 4 defect shapes exit 0 and the disagreement is hidden (`hiddenDisagreement: true`); this tree refuses all 4 with the named reason; both controls unchanged in both trees.\n- `research/conform-unresolvable-accounts-tag-2026-11-11.json` — installed tags in empty directories: v0.4.16 carries the defect (exit 0 on 3 shapes, real finding hidden); v0.4.17 refuses all 4; controls unchanged.\n- Ladder `test/conform-unresolvable-accounts.test.mjs`: 6 red on pre-fix tree -> 10 green here; measurement pin (7); mutation ladder 6/6.\n- Suite 796 -> 813 (809 pass / 4 named network skips / 0 fail).\n\n### Limits\n\nThis is NOT an audit and there is no external user yet (0 stars, no third-party issues); the release is user-zero measured only, on one machine and one account, from committed fixtures — no live RPC shape was sampled for this pulse. The refusal is about a shape no reader can interpret — it does not decide what the right account is. The check covers indices at the `transactionInstructions` seam; a transaction that resolves every index still passes through `checkAccountList` unchanged. Older tags keep the defect (tags are immutable).",
@@ -165,6 +173,7 @@
       "v0.4.15",
       "v0.4.16",
       "v0.4.17",
+      "v0.4.18",
       "v0.4.2",
       "v0.4.3",
       "v0.4.4",
@@ -176,7 +185,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.17"
+        "v0.4.18"
       ],
       "documentedCommands": [
         "pull",
@@ -191,6 +200,7 @@
         "native",
         "token",
         "raydium",
+        "ata",
         "store",
         "pull",
         "codec",
@@ -209,6 +219,109 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.18": {
+        "manifest": {
+          "version": "0.4.18",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.18"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.17": {
         "manifest": {
           "version": "0.4.17",
@@ -1949,13 +2062,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.17",
-    "latestTag": "v0.4.17",
+    "newestTag": "v0.4.18",
+    "latestTag": "v0.4.18",
     "pinnedTags": [
-      "v0.4.17"
+      "v0.4.18"
     ]
   },
   "perRelease": {
+    "v0.4.18": {
+      "defects": []
+    },
     "v0.4.17": {
       "defects": []
     },
