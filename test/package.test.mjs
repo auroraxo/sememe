@@ -140,7 +140,7 @@ test('the package does not ship the qualification harness', async () => {
 });
 
 test('the documented subpaths resolve through the exports map', async () => {
-  for (const sub of ['./native', './token', './raydium', './store', './pull', './codec', './canonical', './discriminators', './native-corpus', './native-audit', './package.json']) {
+  for (const sub of ['./native', './token', './raydium', './store', './pull', './codec', './canonical', './discriminators', './native-corpus', './native-audit', './lighthouse', './package.json']) {
     assert.ok(pkg.exports[sub], `exports must declare "${sub}"`);
     // The map must point at a file that exists, otherwise the install succeeds
     // and the first import fails.
