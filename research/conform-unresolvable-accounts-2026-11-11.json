@@ -1,0 +1,361 @@
+{
+  "ok": true,
+  "tool": "tools/measure-conform-unresolvable-accounts.mjs",
+  "measuredAt": "2026-11-11",
+  "prefix": {
+    "commit": "7b30c68",
+    "greenOverDropped": [
+      "droppedExtraSigner",
+      "droppedFillAll",
+      "parsedObjectAccounts"
+    ]
+  },
+  "worktree": {
+    "greenOverDropped": [],
+    "refusals": {
+      "droppedExtraSigner": {
+        "refused": true,
+        "reason": "instruction-account-index-unresolvable",
+        "cliReason": "instruction-account-index-unresolvable"
+      },
+      "droppedFillAll": {
+        "refused": true,
+        "reason": "instruction-account-index-unresolvable",
+        "cliReason": "instruction-account-index-unresolvable"
+      },
+      "droppedCpi": {
+        "refused": true,
+        "reason": "instruction-account-index-unresolvable",
+        "cliReason": "instruction-account-index-unresolvable"
+      },
+      "parsedObjectAccounts": {
+        "refused": true,
+        "reason": "instruction-account-index-unresolvable",
+        "cliReason": "instruction-account-index-unresolvable"
+      }
+    }
+  },
+  "hiddenDisagreement": {
+    "prefixHidDisagreement": true,
+    "description": "pre-fix: breaking the fill's signing-extra account index downgraded undeclared-signing-account (exit 1) to remaining-accounts (exit 0)"
+  },
+  "controls": {
+    "intactControl": {
+      "prefix": {
+        "refused": false,
+        "exit": 1,
+        "fillVerdict": "undeclared-signing-account"
+      },
+      "worktree": {
+        "refused": false,
+        "exit": 1,
+        "fillVerdict": "undeclared-signing-account"
+      }
+    },
+    "emptyAccountsControl": {
+      "prefix": {
+        "refused": false,
+        "exit": 1,
+        "fillVerdict": "missing-declared-accounts"
+      },
+      "worktree": {
+        "refused": false,
+        "exit": 1,
+        "fillVerdict": "missing-declared-accounts"
+      }
+    }
+  },
+  "cases": {
+    "prefix": {
+      "cases": {
+        "droppedExtraSigner": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "fillVerdict": "remaining-accounts",
+            "unknownSignerPositions": 0,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "remaining-accounts": 1
+            }
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "remaining-accounts": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "droppedFillAll": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "fillVerdict": "remaining-accounts",
+            "unknownSignerPositions": 11,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "remaining-accounts": 1
+            }
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "remaining-accounts": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "droppedCpi": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "fillVerdict": "undeclared-signing-account",
+            "unknownSignerPositions": 0,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            }
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "parsedObjectAccounts": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "fillVerdict": "remaining-accounts",
+            "unknownSignerPositions": 11,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "remaining-accounts": 1
+            }
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "remaining-accounts": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "intactControl": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "fillVerdict": "undeclared-signing-account",
+            "unknownSignerPositions": 0,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            }
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "emptyAccountsControl": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 5,
+            "instructions": 5,
+            "fillVerdict": "missing-declared-accounts",
+            "unknownSignerPositions": 0,
+            "byVerdict": {
+              "no-stored-interface": 4,
+              "missing-declared-accounts": 1
+            }
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 5,
+            "rows": 5,
+            "byVerdict": {
+              "no-stored-interface": 4,
+              "missing-declared-accounts": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 5
+        }
+      }
+    },
+    "worktree": {
+      "cases": {
+        "droppedExtraSigner": {
+          "library": {
+            "refused": true,
+            "reason": "instruction-account-index-unresolvable",
+            "rows": null,
+            "instructions": null,
+            "fillVerdict": null,
+            "unknownSignerPositions": null,
+            "byVerdict": null
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "instruction-account-index-unresolvable"
+          },
+          "transactionInstructionCount": 12
+        },
+        "droppedFillAll": {
+          "library": {
+            "refused": true,
+            "reason": "instruction-account-index-unresolvable",
+            "rows": null,
+            "instructions": null,
+            "fillVerdict": null,
+            "unknownSignerPositions": null,
+            "byVerdict": null
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "instruction-account-index-unresolvable"
+          },
+          "transactionInstructionCount": 12
+        },
+        "droppedCpi": {
+          "library": {
+            "refused": true,
+            "reason": "instruction-account-index-unresolvable",
+            "rows": null,
+            "instructions": null,
+            "fillVerdict": null,
+            "unknownSignerPositions": null,
+            "byVerdict": null
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "instruction-account-index-unresolvable"
+          },
+          "transactionInstructionCount": 12
+        },
+        "parsedObjectAccounts": {
+          "library": {
+            "refused": true,
+            "reason": "instruction-account-index-unresolvable",
+            "rows": null,
+            "instructions": null,
+            "fillVerdict": null,
+            "unknownSignerPositions": null,
+            "byVerdict": null
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "instruction-account-index-unresolvable"
+          },
+          "transactionInstructionCount": 12
+        },
+        "intactControl": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "fillVerdict": "undeclared-signing-account",
+            "unknownSignerPositions": 0,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            }
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "emptyAccountsControl": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 5,
+            "instructions": 5,
+            "fillVerdict": "missing-declared-accounts",
+            "unknownSignerPositions": 0,
+            "byVerdict": {
+              "no-stored-interface": 4,
+              "missing-declared-accounts": 1
+            }
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 5,
+            "rows": 5,
+            "byVerdict": {
+              "no-stored-interface": 4,
+              "missing-declared-accounts": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 5
+        }
+      }
+    }
+  },
+  "falsifications": {
+    "worktreeGreenOverDroppedCount": 0,
+    "worktreeGreenOverDropped": [],
+    "worktreeRefusesHealthyShape": [],
+    "refusalReasonDrift": [],
+    "prefixShowsNoDefect": false
+  }
+}

@@ -20,7 +20,12 @@
 //     understands.
 //   - an instruction's `accounts` are INDICES into that key list, not
 //     addresses. Resolving them wrongly turns a signer question into a
-//     no-op.
+//     no-op. An index that does NOT resolve (past the end, negative, a
+//     non-integer, or an object from the `jsonParsed` shape this file does
+//     not model) is a shape this gate cannot check — it must REFUSE, never
+//     fold the position into a null row (measured 2026-11-11, v0.4.16:
+//     null rows downgraded the fixture's real `undeclared-signing-account`
+//     disagreement to `remaining-accounts`, exit 0).
 //
 // When the shape cannot be understood (no header, no account keys, an
 // encoding this file does not model), the transaction is REFUSED with a
@@ -107,11 +112,20 @@ export function transactionInstructions(transaction) {
 
   const push = (instruction, depth, position, parentIndex) => {
     const accounts = Array.isArray(instruction?.accounts) ? instruction.accounts : [];
-    const resolved = accounts.map((index) => {
+    // Account references this key list CANNOT resolve: out of range,
+    // negative, non-integer (a jsonParsed object entry lands here too), or
+    // absent from the loaded range. They are collected per instruction so
+    // `checkTransaction` can refuse the shape by name — a null row would
+    // let `checkAccountList` file them under "signer unknown" (a note) and
+    // the gate would exit 0 over an account list it never checked.
+    const unresolvedAccounts = [];
+    const resolved = accounts.map((index, positionInInstruction) => {
+      if (!Number.isSafeInteger(index) || index < 0 || index >= keys.length) {
+        unresolvedAccounts.push({ position: positionInInstruction, value: index });
+        return { address: null, signer: null, writable: null };
+      }
       const key = keys[index];
-      return key
-        ? { address: key.address, signer: key.signer, writable: key.writable }
-        : { address: null, signer: null, writable: null };
+      return { address: key.address, signer: key.signer, writable: key.writable };
     });
     out.push({
       depth,
@@ -124,6 +138,7 @@ export function transactionInstructions(transaction) {
       programIdRef: instruction?.programId ?? instruction?.programIdIndex ?? null,
       accounts: resolved,
       accountIndices: accounts.slice(),
+      unresolvedAccounts,
       dataBase58: instruction?.data ?? '',
     });
   };
@@ -254,6 +269,46 @@ export async function checkTransaction(transaction, storeDir, options = {}) {
       `${unresolvable.length} of ${instructions.length} instruction(s) have no program id that resolves inside `
         + `message.accountKeys (${described}) — the gate cannot report a transaction it can only check in part; `
         + 'repair: fix programIdIndex (or set programId) on the named instruction(s)',
+    );
+  }
+
+  // An ACCOUNT reference the key list cannot resolve is the same defect one
+  // level over (the program-id sibling was refused 2026-11-11, v0.4.16).
+  //
+  // MEASURED 2026-11-11 (this host, pre-fix tree 7b30c68 = the published
+  // v0.4.16, order-engine fixture): resolving `keys[index]` past the end
+  // returned `{address: null, signer: null, writable: null}`, and
+  // `checkAccountList` files a null signer under `unknownSigner` — a NOTE,
+  // never a violation. Breaking the ONE signing extra account's index
+  // downgraded the fill from `undeclared-signing-account` (exit 1) to
+  // `remaining-accounts` (EXIT 0): the transaction's only real disagreement
+  // hidden behind a report that looked complete. An object entry (the
+  // `jsonParsed` shape this file's header says it does not model) did the
+  // same for the WHOLE transaction.
+  //
+  // The refusal runs BEFORE the store is read and BEFORE the filter
+  // selection: it is about the transaction's shape, not about which
+  // interface the store happens to hold, and a broken shape must never be
+  // reported as "this filter matched nothing".
+  const unresolvableAccounts = instructions
+    .map((instruction, index) => ({ instruction, index }))
+    .filter(({ instruction }) => instruction.unresolvedAccounts.length > 0);
+  if (unresolvableAccounts.length) {
+    const described = unresolvableAccounts.map(({ instruction, index }) => {
+      const where = instruction.depth
+        ? `CPI of top-level #${instruction.parentIndex} at position ${instruction.position}`
+        : `#${instruction.position ?? index}`;
+      const values = instruction.unresolvedAccounts
+        .map((entry) => `account position ${entry.position} (value ${JSON.stringify(entry.value)})`)
+        .join(', ');
+      return `${where} — ${values}`;
+    }).join('; ');
+    throw new ConformanceRefusal(
+      'instruction-account-index-unresolvable',
+      `${unresolvableAccounts.length} of ${instructions.length} instruction(s) carry account indices that do not `
+        + `resolve inside message.accountKeys + meta.loadedAddresses (${described}) — the gate cannot report a `
+        + 'transaction whose account list it can only check in part; repair: fix the named account index '
+        + '(indices are integers into the canonical key list, loaded addresses included)',
     );
   }
 

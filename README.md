@@ -2221,6 +2221,87 @@ with `instruction-program-id-unresolvable`, with both controls unchanged.
 `test/conform-unresolvable-tag-measurement.test.mjs` fails if those roles ever
 blur.
 
+## An account index the gate cannot resolve is the same defect one level over (2026-11-11)
+
+One pulse ago the program reference was fixed; the ACCOUNT reference still
+had the identical shape. `sememe conform` resolves each instruction's
+accounts by index into the canonical key list, and in the published v0.4.16
+an index that did not resolve — past the end, negative, or a non-integer
+entry such as the `jsonParsed` OBJECT shape this file's own header says it
+does not model — silently became `{address: null, signer: null,
+writable: null}`. `checkAccountList` files a null signer under
+`unknownSigner`: a note, never a violation. The report looked complete.
+
+**The worst face, measured on the order-engine fixture** (committed fixture,
+no network): the fill instruction carries the transaction's ONE real
+disagreement — a signing account the interface does not declare, at position
+11. Replacing exactly that index with an out-of-range value:
+
+```
+intact transaction:          verdict undeclared-signing-account, EXIT 1
+broken extra account index:  verdict remaining-accounts,        EXIT 0
+whole transaction in jsonParsed object shape:      remaining-accounts, EXIT 0
+```
+
+The disagreement was not just unchecked — it was **hidden**, behind a green
+gate. This is the class this repository keeps finding one level down: not
+the program reference, the account reference.
+
+**What changed.** One refusal, `instruction-account-index-unresolvable`,
+raised **before** the store is read and **before** the filter selection —
+the same ordering discipline as the program-id sibling:
+
+- any instruction whose accounts list carries an index the key list cannot
+  resolve is refused, naming each offending instruction (top-level `#n`, or
+  `CPI of top-level #n at position p`), the account POSITION, and the RAW
+  value it carried, plus the repair;
+- CPI instructions are covered — an inner instruction is part of the
+  transaction;
+- the `jsonParsed` object entries are refused by name instead of folding
+  into null rows — the header's own "this file handles the `json` shape"
+  is now enforced, not just stated;
+- the older refusals did not move: an unresolvable PROGRAM index keeps
+  `instruction-program-id-unresolvable` even beside broken accounts (guard
+  G4), an EMPTY accounts list stays legal (guard G2 — emptiness is not
+  unresolvability), and indices into the loaded (ALT) range stay resolvable
+  (guard G3).
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-unresolvable-accounts.mjs` derives
+[research/conform-unresolvable-accounts-2026-11-11.json](research/conform-unresolvable-accounts-2026-11-11.json)
+by running the SAME probe in the pre-fix tree (`git archive 7b30c68` = the
+published v0.4.16) and in this tree: on the pre-fix tree **three of the four
+drop shapes exit 0** (`droppedExtraSigner`, `droppedFillAll`,
+`parsedObjectAccounts`) AND the fill's real disagreement is gone from the
+report (`hiddenDisagreement: true`); in this tree all four refuse with the
+named reason, and both controls — the intact disagreement (exit 1 in BOTH
+trees) and the legal empty-accounts shape — are unchanged. The tool exits
+non-zero if the baseline ever shows no defect, and
+`test/conform-unresolvable-accounts-measurement.test.mjs` re-derives the
+artifact and fails if the committed numbers stop being reproducible. The
+ladder `test/conform-unresolvable-accounts.test.mjs` is **6 red on the
+pre-fix tree and 10 green here** (A1–A6 defect, G1–G4 guards that pass on
+both trees); `tools/mutation-ladder-conform-unresolvable-accounts.sh` catches
+**6/6** mutations (the refusal itself, the reason name, the detail's
+positions and raw values, CPI coverage, the non-integer check, the
+unfiltered path).
+
+One ladder error, own-fault, caught by the ladder's own gates: the first
+M3/M5/M6 were VACUOUS — M3's replacement string matched the program-id
+refusal first (wrong block mutated, suite stayed green), M5's
+`typeof index !== 'number'` still refused objects (the mutation did not
+remove the behaviour under test), and M6's `[] && x` is truthy in bash-side
+JS. All three were rewritten to bite, and the vacuous first run is why the
+ladder requires an ANCHORED mutation, not just a plausible one.
+
+**Limits.** The refusal is about a shape no reader can interpret — it does
+not decide what the *right* account is. The check covers indices at the
+`transactionInstructions` seam; a transaction that resolves every index
+still passes through `checkAccountList` unchanged, so honest
+`unknownSigner` notes (a genuinely mangled encoding downstream of this
+seam) keep their existing meaning. One transaction fixture, committed — no
+live RPC shape was sampled for this pulse.
+
 ## The largest publish-nothing gap decodes in its own dialect: shank (2026-11-04)
 
 The acquisition-gap classification left one program standing at the top of the
