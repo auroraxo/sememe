@@ -118,6 +118,10 @@ export function transactionInstructions(transaction) {
       position,
       parentIndex,
       programId: programIdOf(instruction, keys),
+      // The RAW program id reference the message carried, kept so a refusal
+      // can name the offending value instead of only its resolved shape
+      // (src/conformance.mjs `instruction-program-id-unresolvable`).
+      programIdRef: instruction?.programId ?? instruction?.programIdIndex ?? null,
       accounts: resolved,
       accountIndices: accounts.slice(),
       dataBase58: instruction?.data ?? '',
@@ -198,6 +202,61 @@ export async function checkTransaction(transaction, storeDir, options = {}) {
     }
   }
   const invoked = [...new Set(instructions.map((i) => i.programId).filter(Boolean))];
+  const unresolvable = instructions
+    .map((instruction, index) => ({ instruction, index }))
+    .filter(({ instruction }) => !instruction.programId);
+
+  // An instruction whose program id CANNOT be resolved is not a hole in the
+  // report — it is a shape this gate cannot check, and a partial check must
+  // never be reported as a check of the transaction it was handed.
+  //
+  // MEASURED 2026-11-11 (this host, pre-fix tree 94aa00b = the published
+  // v0.4.15, order-engine fixture): the loop below used to `continue` over an
+  // instruction with an unresolvable programId — no row, no count, no
+  // refusal. With the fill instruction's programIdIndex pushed past the end
+  // of accountKeys, the gate reported 11 of 12 instructions,
+  // `byVerdict {no-stored-interface: 11}`, exit 0 — while the SAME
+  // transaction with an intact index exits 1 with
+  // `undeclared-signing-account`. The transaction's REAL disagreement was not
+  // just unchecked, it was HIDDEN behind a report that looked complete.
+  //
+  // The order of the refusals matters:
+  //   * ALL instructions unresolvable keeps its EXISTING reason
+  //     (`transaction-has-no-resolvable-program-id`) — that refusal already
+  //     existed and must not be rewritten;
+  //   * SOME unresolvable is the middle case that was silent, and it is
+  //     refused here — BEFORE the filter selection, because a filter that
+  //     selects nothing (`filter-matched-no-instruction`) must not mask a
+  //     transaction whose shape is broken, and a broken shape must not be
+  //     reported as "this filter matched nothing";
+  //   * a filter that is not a program id is still refused first (above) —
+  //     that is about the CALLER's argument, not about the transaction.
+  if (unresolvable.length && unresolvable.length === instructions.length) {
+    throw new ConformanceRefusal(
+      'transaction-has-no-resolvable-program-id',
+      `all ${instructions.length} instruction(s) lack a program id that resolves inside message.accountKeys — `
+        + 'this shape cannot be checked',
+    );
+  }
+  if (unresolvable.length) {
+    const described = unresolvable
+      .map(({ instruction, index }) => {
+        const raw = instruction.programIdRef;
+        const shown = raw === undefined || raw === null ? '(none)' : JSON.stringify(raw);
+        const where = instruction.depth
+          ? `CPI of top-level #${instruction.parentIndex} at position ${instruction.position}`
+          : `#${instruction.position ?? index}`;
+        return `${where} (programIdIndex ${shown})`;
+      })
+      .join(', ');
+    throw new ConformanceRefusal(
+      'instruction-program-id-unresolvable',
+      `${unresolvable.length} of ${instructions.length} instruction(s) have no program id that resolves inside `
+        + `message.accountKeys (${described}) — the gate cannot report a transaction it can only check in part; `
+        + 'repair: fix programIdIndex (or set programId) on the named instruction(s)',
+    );
+  }
+
   const eligible = instructions.filter((i) => i.programId && (!only || only.includes(i.programId)));
   if (eligible.length === 0) {
     if (!instructions.length) {
@@ -225,7 +284,6 @@ export async function checkTransaction(transaction, storeDir, options = {}) {
   const rows = [];
   const idlCache = new Map();
   for (const instruction of instructions) {
-    if (!instruction.programId) continue;
     if (only && !only.includes(instruction.programId)) continue;
     let idl = idlCache.get(instruction.programId);
     if (idl === undefined) {

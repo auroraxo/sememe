@@ -2127,6 +2127,88 @@ it" is this repository's most-repeated defect:
 `tools/measure-conform-store-damage-tag.mjs` installs PUBLISHED TAGS into an
 empty directory and runs the same cases against the bytes a stranger receives.
 
+## An instruction the gate cannot resolve must refuse, not vanish (2026-11-11)
+
+`sememe conform <tx.json> --store <dir>` resolves each instruction's program
+one of two ways: `instruction.programId` directly, or `instruction.programIdIndex`
+by INDEX into the canonical key list. An index past the end of the list
+resolves to nothing — and the gate's row loop simply stepped over it:
+
+```js
+for (const instruction of instructions) {
+  if (!instruction.programId) continue;   // no row, no count, no refusal
+```
+
+The instruction disappeared from `rows`, from `summary.instructions`, and from
+every verdict count. The report it produced was over a **subset of the
+transaction it was handed** — while describing itself as a check of that
+transaction. The file's own header already states the rule ("an unknown shape
+must never be reported as a clean bill of health") and the code already
+refuses when **NO** instruction resolves
+(`transaction-has-no-resolvable-program-id`); only the middle case — some
+resolve, some do not — was silent.
+
+**The worst face, measured on the order-engine fixture** (committed fixture,
+no network): the fill instruction is the ONE instruction with a real
+disagreement (an undeclared signing account). Pushing its `programIdIndex`
+past the end of `accountKeys`:
+
+```
+intact transaction:  rows 12, byVerdict {no-stored-interface: 11, undeclared-signing-account: 1}, exit 1
+broken fill index:   rows 11, byVerdict {no-stored-interface: 11},                 exit 0
+```
+
+The disagreement was not just unchecked — it was **hidden**, behind a report
+that looked complete over 11 of 12 instructions. Same class as the store the
+reader refuses (2026-11-10), one level over: not the store, the transaction.
+
+**What changed.** One refusal, `instruction-program-id-unresolvable`, raised
+**before** the store is read and **before** the filter selection:
+
+- some resolve, some do not -> refused, naming each offending instruction by
+  position (top-level or `CPI of top-level #n`) and by the raw
+  `programIdIndex` value it carried, plus the repair;
+- ALL unresolvable keeps its **existing** reason
+  (`transaction-has-no-resolvable-program-id`) — that refusal predates this
+  fix and must not be rewritten (it is pinned as guard G2);
+- a filter that selects nothing still fires its own reason first for callers
+  whose argument is the problem — the filter check stays ahead of both;
+- CPI instructions (`meta.innerInstructions`) are covered too: an unresolved
+  inner instruction is part of the transaction and cannot silently shrink the
+  report.
+
+The unfiltered and `--only` paths now agree: a transaction with a broken
+shape refuses on both, and the CLI exits 1 with the reason on stderr and no
+decision-carrying report (the decision is the refusal).
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-unresolvable.mjs` derives
+[research/conform-unresolvable-2026-11-11.json](research/conform-unresolvable-2026-11-11.json)
+by running the SAME probe in the pre-fix tree (`git archive 94aa00b` = the
+published v0.4.15) and in this tree: on the pre-fix tree the defect case exits
+0 over the dropped instruction AND the transaction's real disagreement is
+absent from the report (`hiddenDisagreement: true`); in this tree all three
+defect cases refuse with the named reason, the intact control still exits 1
+with its disagreement, and the all-dropped control keeps its original reason
+in **both** trees. The tool exits non-zero if the baseline ever shows no
+defect, and
+`test/conform-unresolvable-measurement.test.mjs` fails if the committed
+artifact stops being what the tool derives. The ladder
+`test/conform-unresolvable-program-id.test.mjs` is **6 red on the pre-fix
+tree and 16 green here** (6 defect cases U1–U6, 4 guards G1–G4 that pass on
+both trees); `tools/mutation-ladder-conform-unresolvable.sh` catches **6/6**
+mutations (the refusal itself, the reason name, the refusal order vs the
+filter, the detail naming positions, the all-dropped reason staying put, and
+CPI coverage).
+
+**Limits.** The refusal is about a shape no reader can interpret — it does
+not decide what the *right* program id is, only that the gate must not guess.
+A transaction whose `programIdIndex` legitimately points at a lookup-table
+loaded address is resolved through `meta.loadedAddresses` first (unchanged);
+an instruction that omits both `programId` and `programIdIndex` lands in the
+same refusal (`(none)` in the detail). One transaction fixture, committed —
+no live RPC shape was sampled for this pulse.
+
 ## The largest publish-nothing gap decodes in its own dialect: shank (2026-11-04)
 
 The acquisition-gap classification left one program standing at the top of the

@@ -1,0 +1,235 @@
+{
+  "tool": "tools/measure-conform-unresolvable.mjs",
+  "measuredAt": "2026-11-10T23:58:29.443Z",
+  "prefix": {
+    "commit": "94aa00b",
+    "greenOverDropped": [
+      "droppedFill"
+    ]
+  },
+  "worktree": {
+    "greenOverDropped": [],
+    "refusals": {
+      "droppedFill": {
+        "refused": true,
+        "reason": "instruction-program-id-unresolvable",
+        "cliReason": "instruction-program-id-unresolvable"
+      },
+      "droppedCpi": {
+        "refused": true,
+        "reason": "instruction-program-id-unresolvable",
+        "cliReason": "instruction-program-id-unresolvable"
+      },
+      "droppedAppended": {
+        "refused": true,
+        "reason": "instruction-program-id-unresolvable",
+        "cliReason": "instruction-program-id-unresolvable"
+      }
+    }
+  },
+  "hiddenDisagreement": {
+    "prefixHidDisagreement": true
+  },
+  "cases": {
+    "prefix": {
+      "cases": {
+        "droppedFill": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 11,
+            "instructions": 11,
+            "droppedVisible": false
+          },
+          "cli": {
+            "exit": 0,
+            "instructions": 11,
+            "rows": 11,
+            "byVerdict": {
+              "no-stored-interface": 11
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "droppedAppended": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "droppedVisible": false
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 13
+        },
+        "droppedCpi": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 11,
+            "instructions": 11,
+            "droppedVisible": false
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 11,
+            "rows": 11,
+            "byVerdict": {
+              "no-stored-interface": 10,
+              "undeclared-signing-account": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "intactControl": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "droppedVisible": true
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "allDroppedControl": {
+          "library": {
+            "refused": true,
+            "reason": "transaction-has-no-resolvable-program-id",
+            "rows": null,
+            "instructions": null,
+            "droppedVisible": true
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "transaction-has-no-resolvable-program-id"
+          },
+          "transactionInstructionCount": 5
+        }
+      }
+    },
+    "worktree": {
+      "cases": {
+        "droppedFill": {
+          "library": {
+            "refused": true,
+            "reason": "instruction-program-id-unresolvable",
+            "rows": null,
+            "instructions": null,
+            "droppedVisible": true
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "instruction-program-id-unresolvable"
+          },
+          "transactionInstructionCount": 12
+        },
+        "droppedAppended": {
+          "library": {
+            "refused": true,
+            "reason": "instruction-program-id-unresolvable",
+            "rows": null,
+            "instructions": null,
+            "droppedVisible": true
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "instruction-program-id-unresolvable"
+          },
+          "transactionInstructionCount": 13
+        },
+        "droppedCpi": {
+          "library": {
+            "refused": true,
+            "reason": "instruction-program-id-unresolvable",
+            "rows": null,
+            "instructions": null,
+            "droppedVisible": true
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "instruction-program-id-unresolvable"
+          },
+          "transactionInstructionCount": 12
+        },
+        "intactControl": {
+          "library": {
+            "refused": false,
+            "reason": null,
+            "rows": 12,
+            "instructions": 12,
+            "droppedVisible": true
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": 12,
+            "rows": 12,
+            "byVerdict": {
+              "no-stored-interface": 11,
+              "undeclared-signing-account": 1
+            },
+            "refusalReason": null
+          },
+          "transactionInstructionCount": 12
+        },
+        "allDroppedControl": {
+          "library": {
+            "refused": true,
+            "reason": "transaction-has-no-resolvable-program-id",
+            "rows": null,
+            "instructions": null,
+            "droppedVisible": true
+          },
+          "cli": {
+            "exit": 1,
+            "instructions": null,
+            "rows": null,
+            "byVerdict": null,
+            "refusalReason": "transaction-has-no-resolvable-program-id"
+          },
+          "transactionInstructionCount": 5
+        }
+      }
+    }
+  },
+  "falsifications": {
+    "worktreeGreenOverDroppedCount": 0,
+    "worktreeGreenOverDropped": [],
+    "worktreeRefusesHealthyStore": [],
+    "refusalReasonDrift": [],
+    "prefixShowsNoDefect": false
+  },
+  "ok": true
+}
