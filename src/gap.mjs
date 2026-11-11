@@ -44,6 +44,7 @@
 // like `pull`, so the decode-only install path stays dependency-free.
 
 import { addresses, inspect, rpcAccounts } from './acquire.mjs';
+import { LIGHTHOUSE_PROGRAM } from './lighthouse.mjs';
 import { isNativeProgram } from './native.mjs';
 import { isTokenProgram } from './token.mjs';
 import { isRaydiumProgram } from './raydium.mjs';
@@ -184,6 +185,14 @@ export function nextStep(row, program) {
     case 'pullable':
       return `sememe pull ${program}`;
     case 'no-interface-published':
+      // Lighthouse is the one measured case where sememe SHIPS the verified
+      // first-party copy (vendor/lighthouse, hash-pinned): the general advice
+      // would send the user off to find a file the package already carries.
+      if (program === LIGHTHOUSE_PROGRAM) {
+        return 'this program publishes no on-chain interface at either address — pulling it can never succeed. '
+          + 'sememe ships its first-party published copy (Jac0xb/lighthouse, MIT, hash-pinned): '
+          + 'use sememe adopt-lighthouse --store <dir>, then sememe decode --union.';
+      }
       return 'this program publishes no on-chain interface at either address — pulling it can never succeed. '
         + 'Use sememe adopt <program> <file> with a first-party published copy, or a pinned upstream derivation.';
     case 'present-undecodable':

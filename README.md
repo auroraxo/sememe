@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic) **and the same arbitration for account bytes (`sememe account --union`, 2026-11-08: measured on 12 real mainnet accounts, byte-exact on 6 of 12 where the single-receipt path managed 0 of 12)**, plus six programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget), Raydium AMM v4 and the SPL Associated Token Account, all six with wire tables DERIVED from pinned upstream Rust — and the ecosystem-wide measured coverage is now 82.2% (17,558/21,350 payloads across 6 finalized blocks, 2026-11-11; 96.4% on the curated watchlist, 35.4% outside it; byte-exact re-encode on 93.3% of decoded), with all 1,410 ATA payloads decoded byte-for-byte — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. The fingerprint lockfile ships (`sememe lock` + `sememe verify`, 2026-11-05); catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic) **and the same arbitration for account bytes (`sememe account --union`, 2026-11-08: measured on 12 real mainnet accounts, byte-exact on 6 of 12 where the single-receipt path managed 0 of 12)**, plus six programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget), Raydium AMM v4 and the SPL Associated Token Account, all six with wire tables DERIVED from pinned upstream Rust — and the ecosystem-wide measured coverage is now 87.9% (18,772/21,350 payloads across 6 finalized blocks, 2026-11-11; 96.4% on the curated watchlist, 59.9% outside it; byte-exact re-encode on 93.8% of decoded), with all 1,410 ATA payloads and all 1,214 Lighthouse payloads decoded byte-for-byte (the Lighthouse copy adopted from the program's own published IDL, hash-pinned, and labelled `adopted` apart from the 17,558 `pulled` decodes) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. The fingerprint lockfile ships (`sememe lock` + `sememe verify`, 2026-11-05); catalog import and daemon are still proposals.
 
 ## Quickstart: the copy-paste 1,000-transaction check (2026-11-04)
 
@@ -50,12 +50,16 @@ Result (`research/ecosystem-coverage-2026-11-11.json`, pinned by `test/ecosystem
 | denominator | payloads | decoded | coverage |
 |---|---|---|---|
 | curated watchlist (the claim's own) | 16,382 | 15,797 | **96.4%** |
-| outside the watchlist (never measured) | 4,968 | 351 | **7.1%** |
-| all measured traffic | 21,350 | 16,148 | **75.6%** |
+| outside the watchlist (never measured) | 4,968 | 2,975 | **59.9%** |
+| all measured traffic | 21,350 | 18,772 | **87.9%** |
 
-The gap is dominated by **acquisition, not decoding**: 3,941 of the 4,617 uncovered outside-payloads have no interface at either pullable address (SPL Associated Token Account `ATokenGPvbd…` 1,410; `L2TExMFK…` 1,214 — the same program the 2026-11-04 acquisition-gap sweep already found publish-nothing at 42 payloads, now the #2 traffic gap; `MNFSTqtC9…` 307). The rest is **source lag on interfaces that ARE acquirable**: pfeeU… refuses 459 of 464 payloads against its freshly pulled anchor IDL; HADRo… refuses 195 of 195. Inside the watchlist the same lag now shows up: pump.fun — the program the union path decoded 915/996 for — decodes 400 of 842 payloads (47.5%) from the single on-chain source in this window; the union's second source is what carried the old number, and this measurement pulls only on-chain copies. 915 payloads from 152 tail programs were counted, not measured; the report names every one of them so the denominator cannot quietly shrink.
+**Two acquisition faces were closed since that gap was first measured, and the report names the evidence class of every decode.** The SPL Associated Token Account (`ATokenGPvbd…`, 1,410 payloads, v0.4.18) got a wire table derived from pinned upstream Rust. Lighthouse (`L2TExMFK…`, 1,214 payloads — the same program the 2026-11-04 acquisition-gap sweep already found publish-nothing at 42 payloads) turned out to be the case where the program's OWN repository publishes an IDL: `sememe adopt-lighthouse` adopts that first-party copy (`Jac0xb/lighthouse@4c579479`, MIT) through the product's own write path, hash-checked against a vendored pin BEFORE anything is written (12 tests in `test/lighthouse-acquisition.test.mjs`, 6 red on the tree without the copy; measurement artifact `research/lighthouse-acquisition-2026-11-11.json`). 2,624 payloads moved from *no interface at all* to *decoded*, and coverage of measured traffic moved 75.6% → 82.2% → **87.9%** (outside the watchlist 7.1% → 35.4% → **59.9%**).
 
-What this changes about the thesis, stated plainly: sememe's decode path is strong on interfaces it holds (92.8% byte-exact of decoded across all 46 programs), and the honest ecosystem number a consumer would meet today is ~75%, not 100%. The product's remaining value step is acquisition breadth — programs with no IDL at either address — not decoder polish. "no-interface" is now the named, counted, ranked queue (`acquisitionQueue` in the artifact), which is where the next cards come from.
+An adoption and an on-chain pull are **different evidence classes**, and the headline keeps them apart: `decodedVia` reads `pulled: 17,558, adopted: 1,214`. The pulled number is slot-bound by the chain; the adopted number is hash-bound to a reviewed copy whose origin stays **declared** — nothing checks that the commit is signed or that the bytes describe the deployed program; the evidence for THAT is the byte-exact re-encode on 1,214/1,214 live payloads. The watchlist view carries **zero** adopted decodes: the curated 96.4% still rests entirely on on-chain receipts.
+
+The remaining gap stays **acquisition-led**: 1,320 of the 2,578 uncovered measured payloads have no interface at either pullable address (`MNFSTqtC9…` 307, `FLASH…` 134, `Diab…` 102, …) and 1,258 are **source lag on interfaces that ARE acquirable**: pfeeU… refuses 459 of 464 payloads against its freshly pulled anchor IDL; HADRo… refuses 195 of 195. Inside the watchlist the same lag shows up: pump.fun — the program the union path decoded 915/996 for — decodes 400 of 842 payloads (47.5%) from the single on-chain source in this window; the union's second source is what carried the old number, and this measurement pulls only on-chain copies. 915 payloads from 152 tail programs were counted, not measured; the report names every one of them so the denominator cannot quietly shrink.
+
+What this changes about the thesis, stated plainly: sememe's decode path is strong on interfaces it holds (93.8% byte-exact of decoded across all 46 programs), and the honest ecosystem number moved from ~75% to 87.9% — because two named acquisition gaps were CLOSED with pinned, byte-exact artifacts, not because the denominator was softened: the watchlist number stayed 96.4% and the outside denominator stayed 4,968 payloads. The product's remaining value step is still acquisition breadth — the queue's head is now `MNFSTqtC9…` (307) — not decoder polish. "no-interface" remains the named, counted, ranked queue (`acquisitionQueue`), which is where the next cards come from.
 
 The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — and that is now **measured, not asserted** (`tools/measure-foreign-run.mjs` -> `research/foreign-run-2026-11-05.json`): verdict `not-distributed-not-consumed`, i.e. zero non-owner signals on every channel that was read — 0 non-owner stars/forks/issues/PRs on this repo, 0 non-owner comments on the two outbound threads (`step-finance-oss/step-ingestooor#1` and `jup-ag/rfq-webhook-toolkit#96`, both open), 0 foreign-authored threads containing this project's slug. The first external run therefore remains the open gate. The measurement has limits and names them: the broad mention sweep covers 92 of 93 results (GitHub's search index hides one result in every ordering — measured, not assumed), a registry `404` for the bare name `sememe` on npm/crates.io/PyPI means **no install channel is published yet**, never "nobody used it", and the code-index absence is only claimed for the indexed part of GitHub (the sweep's self-reference control passes). Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic). The funnel a stranger walks before that first run is measured separately (2026-11-05, `tools/measure-stranger-funnel.mjs` -> `research/stranger-funnel-2026-11-05.json`): a fresh GitHub clone ran both quickstart commands verbatim (1,089 and 6,337 payloads, all decoded byte-exactly, exit 0), the published tag `v0.3.0` installed into an empty app with no npm account, and its entry decoded 1,119/1,119 real payloads byte-exactly from `node_modules/sememe` — the harness (tools/test/research) does not travel into the install. The quickstart block itself is pinned by `test/quickstart-funnel.test.mjs`, which caught and fixed one defect on 2026-11-05: the documented output line was the pre-2026-11-04 schema (missing `rpcEncoding`, `chainParsedInstructions`, `missingBytes`) — a stranger comparing her terminal to the README saw two different products. The README now documents the line the tool actually prints, and a hand-edited documented line goes red.
 
@@ -381,7 +385,7 @@ Pointed at a program that publishes nothing at either address (for example `L2TE
 {
   "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
   "verdict": "no-interface-published",
-  "next": "this program publishes no on-chain interface at either address — pulling it can never succeed. Use sememe adopt <program> <file> with a first-party published copy, or a pinned upstream derivation."
+  "next": "this program publishes no on-chain interface at either address — pulling it can never succeed. sememe ships its first-party published copy (Jac0xb/lighthouse, MIT, hash-pinned): use sememe adopt-lighthouse --store <dir>, then sememe decode --union."
 }
 ```
 
@@ -1690,6 +1694,52 @@ as `sememe/ata` with `sememe decode-ata` / `sememe ata-provenance` (the empty
 payload is real input here: `sememe decode-ata ATokenGPvbd… --empty`), and
 `sememe decode` on this program points at it instead of telling the user to
 pull a receipt that can never exist.
+
+## The #1 remaining acquisition gap decodes: Lighthouse adopted from first-party (2026-11-11)
+
+Closing the SPL Associated Token Account left `L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95`
+standing at the top of the acquisition queue: **1,214 payloads across the 6
+committed blocks**, no on-chain IDL account at either address. But unlike ATA
+(which publishes no IDL anywhere and needed a Rust wire table), Lighthouse is
+the program whose **own repository publishes an IDL** (`Jac0xb/lighthouse`,
+commit `4c579479c98635e419b1b167f08be02a71604a71`, MIT; `programs/lighthouse/lighthouse.json`,
+18 instructions in the [shank](https://github.com/metaplex-foundation/shank) dialect).
+
+`sememe adopt-lighthouse` ships that verified first-party copy and adopts it
+through the product's one write path (`src/adopt.mjs`), with the vendored bytes
+hash-checked against their pin BEFORE anything is written:
+
+```bash
+sememe adopt-lighthouse --store my-store
+sememe decode L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95 0500000c6a0a0f0000000004 --store my-store --union
+# -> AssertAccountInfo (Lamports >= 252340748), byte-exact re-encode, origin declared:
+#    github.com/Jac0xb/lighthouse@4c579479:programs/lighthouse/lighthouse.json
+```
+
+**Measured on the committed 6-block sample (1,214 payloads):**
+- **1,214 / 1,214 decoded (100%)**
+- **1,214 / 1,214 byte-exact re-encode (100%)**
+- 0 disagreements, 0 refusals
+- 4 instruction faces active: `AssertAccountInfo` (342), `AssertTokenAccount` (386), `AssertSysvarClock` (337), `AssertAccountData` (149)
+- `no-interface` on this program: **1,214 → 0**
+- Ecosystem coverage of measured traffic moves **82.2% → 87.9%** (outside the watchlist: **35.4% → 59.9%**; total outside-watchlist decoded: **2,975 / 4,968**)
+- `acquisitionQueue`'s new head is `MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms` (307 payloads)
+
+**The evidence class stays honest.** The headline split in `research/ecosystem-coverage-2026-11-11.json`
+names every decode: `pulled: 17,558, adopted: 1,214`. The 1,214 Lighthouse decodes
+are hash-bound to a reviewed copy whose origin stays **declared** (the commit is
+not checked for a signature, and nothing proves the bytes describe the deployed
+program; the byte evidence for that is the 100% byte-exact re-encode on live
+traffic). The curated watchlist carries zero adopted decodes: its 96.4% still
+rests entirely on slot-bound on-chain receipts.
+
+Falsification (`test/lighthouse-acquisition.test.mjs`, 8 tests):
+- **L1..L5:** a tampered vendor file, a missing file, a file declaring another address, and a tampered shank discriminant table all refuse the load by name before any write is attempted;
+- **L6:** adopting the verified copy into an empty store makes all 1,214 payloads decode byte-exactly, while the store before the adoption refuses every one as `no stored IDL`;
+- **G1/G2:** the 1,214 denominator is pinned, and adopt's product refusal for a foreign address is guarded.
+
+`sememe gap` on this program points directly at `sememe adopt-lighthouse` instead
+of telling the stranger to search for a file the package already carries.
 
 Falsification (`test/ata-interface.test.mjs`, 8 tests): a tampered artifact, a
 tampered vendored source and a missing `vendor/` all refuse the load; the wire

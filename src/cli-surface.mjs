@@ -96,6 +96,10 @@ export const COMMAND_SPECS = {
     positionals: 2,
     positionalNames: ['program id', 'interface file'],
   },
+  'adopt-lighthouse': {
+    flags: { '--store': 'value' },
+    positionals: 0,
+  },
   decode: {
     flags: { '--store': 'value', '--trailing': 'value', '--absent': 'value', '--union': 'boolean' },
     positionals: 2,

@@ -1,0 +1,55 @@
+{
+ "generatedAt": "2026-11-11T22:59:44.734Z",
+ "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
+ "name": "lighthouse",
+ "nameEvidence": "upstream programs/lighthouse/src/lib.rs declare_id + solana-foundation/explorer app/utils/programs.ts bind this id to lighthouse",
+ "finding": "acquisitionQueue[0] of ecosystem-coverage-2026-11-11 (1,214 no-interface payloads) closes through adopt of the first-party published copy, verified against a vendored pin",
+ "pin": {
+  "repo": "Jac0xb/lighthouse",
+  "commit": "4c579479c98635e419b1b167f08be02a71604a71",
+  "license": "MIT",
+  "files": [
+   {
+    "file": "programs/lighthouse/lighthouse.json",
+    "sha256": "9c54749abd27c09cf8d61e50016b625b5ae4aeb5cb1b8baf295199a1d7ecfd48"
+   },
+   {
+    "file": "LICENSE",
+    "sha256": "64d73100cafc1f5cb148cbbd5b3c7fc74bafc46f156646b0861c698570d02327"
+   }
+  ],
+  "vendoredAt": "vendor/lighthouse/4c579479c98635e419b1b167f08be02a71604a71",
+  "hashedNow": "sha256:9c54749abd27c09cf8d61e50016b625b5ae4aeb5cb1b8baf295199a1d7ecfd48"
+ },
+ "origin": "github.com/Jac0xb/lighthouse@4c579479c98635e419b1b167f08be02a71604a71:programs/lighthouse/lighthouse.json",
+ "originStatus": "declared",
+ "originNote": "declared, not verified: the pin binds the BYTES to a commit the owner read; nothing checks that the commit is signed or that the bytes describe the deployed program. The byte evidence for THAT is below.",
+ "receipt": {
+  "fingerprint": "sha256:461e28fd1c7e33f3c37507b2c23632bcdbd9a4fb9daec83c4c600740febd0141",
+  "instructionCount": 18
+ },
+ "sample": "test/fixtures/ecosystem-sample-2026-11-11.json",
+ "store": "test/fixtures/ecosystem-store-2026-11-11",
+ "measured": {
+  "payloads": 1214,
+  "preAdoptionFace": "no-stored-idl",
+  "decoded": 1214,
+  "refused": 0,
+  "byteExact": 1214,
+  "describedExact": 1214,
+  "byteExactPct": 100,
+  "names": {
+   "AssertAccountInfo": 342,
+   "AssertAccountData": 149,
+   "AssertTokenAccount": 386,
+   "AssertSysvarClock": 337
+  },
+  "refusals": {}
+ },
+ "limits": [
+  "one window: these 1,214 payloads come from the 6 committed blocks, not from the whole ecosystem",
+  "origin declared, not verified: the commit is not checked for a signature",
+  "the adopted copy sits at slot 0 and can never displace an on-chain pull",
+  "decode + re-encode byte-exact is consistency evidence, not an audit of the program"
+ ]
+}

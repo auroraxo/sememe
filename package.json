@@ -23,6 +23,7 @@
     "./token-metadata": "./src/token-metadata.mjs",
     "./raydium": "./src/raydium.mjs",
     "./ata": "./src/ata.mjs",
+    "./lighthouse": "./src/lighthouse.mjs",
     "./gap": "./src/gap.mjs"
   },
   "files": [

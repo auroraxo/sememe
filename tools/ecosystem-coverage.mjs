@@ -409,6 +409,14 @@ async function classify(storeDir, program, hex, absentPolicy, dehost = (v) => v)
       trailing: result.trailing?.count ?? 0,
       absentFields: result.absent?.length ?? 0,
       chainVerified: result.shortForm?.verified === true,
+      // The EVIDENCE CLASS of the interface that answered. An on-chain pull
+      // (`slot` set) is the chain's own published copy; an adopted file
+      // (`slot: null`) is a published copy whose bytes are hash-bound but
+      // whose origin is only DECLARED (src/adopt.mjs). Coverage built on
+      // adopted copies is real coverage, but a DIFFERENT evidence class — the
+      // report keeps it a separate column, so an adoption can never silently
+      // inflate the on-chain-pull number.
+      sourceClass: result.idl?.slot === null || result.idl?.slot === undefined ? 'adopted' : 'pulled',
     };
   } catch (error) {
     const reason = dehost(String(error?.message ?? error)).slice(0, 110);
@@ -474,11 +482,16 @@ async function report() {
           acquirable: sample.acquirable?.[row.program]?.acquirable ?? null,
           decoded: 0, refused: 0, noInterface: 0, byteExact: 0, describedExact: 0,
           trailing: 0, shortForm: 0, chainVerified: 0,
+          // Decoded through an ADOPTED published copy (declared origin),
+          // counted inside `decoded` AND separately, so the headline can be
+          // read against both evidence classes at once.
+          decodedAdopted: 0,
         };
         perProgram.set(row.program, entry);
       }
       if (verdict.outcome === 'decoded') {
         entry.decoded += 1;
+        if (verdict.sourceClass === 'adopted') entry.decodedAdopted += 1;
         if (verdict.byteExact === true) entry.byteExact += 1;
         if (verdict.describedExact === true) entry.describedExact += 1;
         if (verdict.trailing > 0) entry.trailing += 1;
@@ -512,16 +525,26 @@ async function report() {
   const refused = sum('refused');
   const noInterface = sum('noInterface');
   const byteExact = sum('byteExact');
+  // Evidence-class split of `decoded`: through an on-chain PULL vs through an
+  // ADOPTED published copy (slot null, origin declared). Headline coverage
+  // counts both, and names them apart, so a reader never mistakes an adoption
+  // for chain-verified acquisition.
+  const decodedAdopted = sum('decodedAdopted');
+  const decodedPulled = decoded - decodedAdopted;
 
   // The falsification views: the committed claim lives on the watchlist
   // denominator; the ecosystem claim must live on the outside-watchlist one.
   const view = (predicate) => {
     const payloads = count(predicate);
     const viewDecoded = rows.filter(predicate).reduce((acc, row) => acc + row.decoded, 0);
+    const viewAdopted = rows.filter(predicate).reduce((acc, row) => acc + row.decodedAdopted, 0);
     const viewRefused = rows.filter(predicate).reduce((acc, row) => acc + row.refused, 0);
     const viewNoInterface = rows.filter(predicate).reduce((acc, row) => acc + row.noInterface, 0);
     return {
       payloads, decoded: viewDecoded, refused: viewRefused, noInterface: viewNoInterface,
+      // The adopted-copy share travels with the view: a rise in coverage that
+      // came from an adoption is visible here, not hidden in `decoded`.
+      decodedAdopted: viewAdopted,
       coveredPct: payloads ? Number((100 * viewDecoded / payloads).toFixed(1)) : null,
     };
   };
@@ -555,6 +578,11 @@ async function report() {
       measuredPayloads: total,
       notMeasuredPayloads,
       decoded, refused, noInterface,
+      decodedVia: {
+        pulled: decodedPulled,
+        adopted: decodedAdopted,
+        note: 'pulled = an on-chain IDL account answered (sememe pull, slot-bound); adopted = a published copy adopted through sememe adopt (hash-bound bytes, DECLARED origin). Both decode offline and re-encode byte-checked; the classes are never merged silently.',
+      },
       coveredPctOfMeasured: Number((100 * decoded / total).toFixed(1)),
       coveredPctOfAllSeen: Number((100 * decoded / seenTotal).toFixed(1)),
       byteExact,

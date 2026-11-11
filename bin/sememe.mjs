@@ -47,6 +47,11 @@ const usage = `usage:
       store a first-party PUBLISHED interface copy next to the on-chain pull, so
       union decode has a second verified source. The receipt says "published":
       it is provenance of bytes, not proof the bytes describe the deployed program.
+  sememe adopt-lighthouse [--store <directory>]
+      the measured #1-remaining-gap case, wired end to end: adopt Lighthouse
+      (L2TExMFK…, 1,214 payloads in the committed 6-block window) from the
+      vendored first-party copy (Jac0xb/lighthouse, MIT), hash-checked against
+      its pin BEFORE any write; the receipt's origin stays declared.
   sememe lock [--store <directory>] [--out <file>]
       snapshot the WHOLE store into a sememe.lock document: for every program,
       the exact fingerprint its newest verified receipt answered with, plus
@@ -257,6 +262,22 @@ try {
       originStatus: adopted.originStatus ?? 'declared',
       originNote: adopted.originNote
         ?? 'declared origin, not verified: sememe did not check that this repository, commit or file exists — provenance of bytes, not proof they describe the deployed program',
+    }, null, 2));
+  } else if (command === 'adopt-lighthouse') {
+    const store = option('--store', path.join(os.homedir(), '.sememe'));
+    const { adoptLighthouse } = await import('../src/lighthouse.mjs');
+    const { adopt: adoptFn } = await import('../src/adopt.mjs');
+    const result = await adoptLighthouse(store, { adopt: adoptFn });
+    console.log(JSON.stringify({
+      program: result.receipt.program,
+      source: result.receipt.source,
+      origin: result.receipt.origin,
+      originStatus: result.receipt.originStatus,
+      originNote: result.receipt.originNote,
+      fingerprint: result.receipt.fingerprint,
+      instructionCount: result.receipt.instructionCount,
+      path: result.receipt.path,
+      receiptPath: result.receipt.receiptPath,
     }, null, 2));
   } else if (command === 'decode') {
     if (!program) throw Error('decode needs a program id');

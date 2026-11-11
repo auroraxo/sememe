@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-11T22:05:45.554Z",
+ "generatedAt": "2026-11-11T23:11:32.228Z",
  "sample": {
   "file": "test/fixtures/ecosystem-sample-2026-11-11.json",
   "store": "test/fixtures/ecosystem-store-2026-11-11",
@@ -25,13 +25,18 @@
   "allPayloadsSeen": 22265,
   "measuredPayloads": 21350,
   "notMeasuredPayloads": 915,
-  "decoded": 17558,
+  "decoded": 18772,
   "refused": 1258,
-  "noInterface": 2534,
-  "coveredPctOfMeasured": 82.2,
-  "coveredPctOfAllSeen": 78.9,
-  "byteExact": 16387,
-  "byteExactPctOfDecoded": 93.3,
+  "noInterface": 1320,
+  "decodedVia": {
+   "pulled": 17558,
+   "adopted": 1214,
+   "note": "pulled = an on-chain IDL account answered (sememe pull, slot-bound); adopted = a published copy adopted through sememe adopt (hash-bound bytes, DECLARED origin). Both decode offline and re-encode byte-checked; the classes are never merged silently."
+  },
+  "coveredPctOfMeasured": 87.9,
+  "coveredPctOfAllSeen": 84.3,
+  "byteExact": 17601,
+  "byteExactPctOfDecoded": 93.8,
   "shortForm": 55,
   "chainVerified": 55,
   "absentPolicy": "verified",
@@ -40,14 +45,16 @@
    "decoded": 15797,
    "refused": 582,
    "noInterface": 3,
+   "decodedAdopted": 0,
    "coveredPct": 96.4
   },
   "outsideWatchlist": {
    "payloads": 4968,
-   "decoded": 1761,
+   "decoded": 2975,
    "refused": 676,
-   "noInterface": 2531,
-   "coveredPct": 35.4
+   "noInterface": 1317,
+   "decodedAdopted": 1214,
+   "coveredPct": 59.9
   },
   "note": "coverage = payloads an available interface could NAME. \"refused\" (interface present, bytes refused) and \"no-interface\" (no interface acquirable at all) are counted separately because they need different fixes. watchlist vs outsideWatchlist split exists because the committed 100% claim was measured on the first and never on the second."
  },
@@ -843,10 +850,6 @@
  },
  "refusalReasons": [
   {
-   "reason": "no-interface: no stored IDL for program L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95 in test/fixtures/ecosystem-store-2026-11",
-   "count": 1214
-  },
-  {
    "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 9aed8a5ca",
    "count": 459
   },
@@ -1060,12 +1063,12 @@
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 13149,
-  "decoded_txFailed": 4409,
+  "decoded_txSuccess": 13163,
+  "decoded_txFailed": 5609,
   "refused_txSuccess": 745,
   "refused_txFailed": 513,
-  "noInterface_txSuccess": 1101,
-  "noInterface_txFailed": 1433
+  "noInterface_txSuccess": 1087,
+  "noInterface_txFailed": 233
  },
  "programs": [
   {
@@ -1081,6 +1084,7 @@
    "trailing": 578,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 4916,
    "coveredPct": 100
   },
@@ -1097,6 +1101,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 3317,
    "coveredPct": 100
   },
@@ -1113,6 +1118,7 @@
    "trailing": 20,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 2963,
    "coveredPct": 100
   },
@@ -1129,6 +1135,7 @@
    "trailing": 8,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 2170,
    "coveredPct": 100
   },
@@ -1145,6 +1152,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 1410,
    "coveredPct": 100
   },
@@ -1153,16 +1161,17 @@
    "name": null,
    "watched": false,
    "acquirable": false,
-   "decoded": 0,
+   "decoded": 1214,
    "refused": 0,
-   "noInterface": 1214,
-   "byteExact": 0,
-   "describedExact": 0,
+   "noInterface": 0,
+   "byteExact": 1214,
+   "describedExact": 1214,
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 1214,
    "payloads": 1214,
-   "coveredPct": 0
+   "coveredPct": 100
   },
   {
    "program": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA",
@@ -1177,6 +1186,7 @@
    "trailing": 406,
    "shortForm": 55,
    "chainVerified": 55,
+   "decodedAdopted": 0,
    "payloads": 981,
    "coveredPct": 87.7
   },
@@ -1193,6 +1203,7 @@
    "trailing": 151,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 842,
    "coveredPct": 47.5
   },
@@ -1209,6 +1220,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 464,
    "coveredPct": 1.1
   },
@@ -1225,6 +1237,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 350,
    "coveredPct": 100
   },
@@ -1241,6 +1254,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 346,
    "coveredPct": 100
   },
@@ -1257,6 +1271,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 307,
    "coveredPct": 0
   },
@@ -1273,6 +1288,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 242,
    "coveredPct": 93.8
   },
@@ -1289,6 +1305,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 236,
    "coveredPct": 100
   },
@@ -1305,6 +1322,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 195,
    "coveredPct": 0
   },
@@ -1321,6 +1339,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 134,
    "coveredPct": 0
   },
@@ -1337,6 +1356,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 127,
    "coveredPct": 100
   },
@@ -1353,6 +1373,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 102,
    "coveredPct": 0
   },
@@ -1369,6 +1390,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 83,
    "coveredPct": 0
   },
@@ -1385,6 +1407,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 83,
    "coveredPct": 0
   },
@@ -1401,6 +1424,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 79,
    "coveredPct": 75.9
   },
@@ -1417,6 +1441,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 71,
    "coveredPct": 0
   },
@@ -1433,6 +1458,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 68,
    "coveredPct": 0
   },
@@ -1449,6 +1475,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 66,
    "coveredPct": 0
   },
@@ -1465,6 +1492,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 58,
    "coveredPct": 0
   },
@@ -1481,6 +1509,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 58,
    "coveredPct": 0
   },
@@ -1497,6 +1526,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 56,
    "coveredPct": 0
   },
@@ -1513,6 +1543,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 56,
    "coveredPct": 0
   },
@@ -1529,6 +1560,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 54,
    "coveredPct": 0
   },
@@ -1545,6 +1577,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 54,
    "coveredPct": 0
   },
@@ -1561,6 +1594,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 46,
    "coveredPct": 84.8
   },
@@ -1577,6 +1611,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 41,
    "coveredPct": 100
   },
@@ -1593,6 +1628,7 @@
    "trailing": 4,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 39,
    "coveredPct": 100
   },
@@ -1609,6 +1645,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 39,
    "coveredPct": 100
   },
@@ -1625,6 +1662,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 34,
    "coveredPct": 0
   },
@@ -1641,6 +1679,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 33,
    "coveredPct": 0
   },
@@ -1657,6 +1696,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 7,
    "coveredPct": 100
   },
@@ -1673,6 +1713,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 5,
    "coveredPct": 100
   },
@@ -1689,6 +1730,7 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 3,
    "coveredPct": 0
   },
@@ -1705,18 +1747,12 @@
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
+   "decodedAdopted": 0,
    "payloads": 1,
    "coveredPct": 100
   }
  ],
  "acquisitionQueue": [
-  {
-   "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
-   "name": null,
-   "payloads": 1214,
-   "acquirable": false,
-   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
-  },
   {
    "program": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
    "name": null,

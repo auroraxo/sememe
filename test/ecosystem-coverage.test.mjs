@@ -42,6 +42,16 @@
 //   lag: pfeeU… 459 unknown-discriminator refusals on its pulled anchor IDL,
 //   HADRo… 195 on every payload).
 //
+// 2026-11-11 (LATER PULSE, this file updated): the L2TE… face was CLOSED by
+// adopting the program's own first-party published IDL (Lighthouse,
+// Jac0xb/lighthouse@4c579479, MIT) through the product's own write path, with
+// the vendored bytes hash-pinned first. The queue's head moved on, and the
+// headline moved with it: 82.2% -> 87.9% of measured traffic, outside the
+// watchlist 35.4% -> 59.9%. The ADOPTED copies are counted in `decoded` AND
+// named apart (`decodedVia.adopted` = 1,214), because an adoption and an
+// on-chain pull are different evidence classes and must never be merged
+// silently.
+//
 //   The watchlist itself regressed against its own 11-04 window: pump.fun
 //   decoded 400/842 (47.5%) after decoding ~100% there — a source-lag signal
 //   on the freshest single-source pull, not a decoder bug (the union carries
@@ -107,17 +117,33 @@ test('the artifact carries no host path', () => {
 test('the headline holds and the three outcomes stay split', () => {
   const h = artifact.headline;
   assert.equal(h.measuredPayloads, 21_350);
-  assert.equal(h.decoded, 17_558);
+  assert.equal(h.decoded, 18_772);
   assert.equal(h.refused, 1_258);
-  assert.equal(h.noInterface, 2_534);
-  assert.equal(h.coveredPctOfMeasured, 82.2);
-  assert.equal(h.byteExact, 16_387);
+  assert.equal(h.noInterface, 1_320);
+  assert.equal(h.coveredPctOfMeasured, 87.9);
+  assert.equal(h.byteExact, 17_601);
   assert.equal(h.allPayloadsSeen, 22_265);
   assert.equal(h.notMeasuredPayloads, 915);
   // The honest number is the measured one; the all-seen number exists so the
   // un-measured tail can never inflate coverage.
   assert.ok(h.coveredPctOfAllSeen < h.coveredPctOfMeasured);
   assert.ok(h.byteExactPctOfDecoded > 90);
+});
+
+test('the evidence class of every decode is named, never merged', () => {
+  const h = artifact.headline;
+  // The Lighthouse copy was ADOPTED (published file, declared origin); every
+  // other interface came from an on-chain PULL. Both count as decoded, and
+  // the split is published so a reader can subtract the adopted share.
+  assert.equal(h.decodedVia.adopted, 1_214);
+  assert.equal(h.decodedVia.pulled, 17_558);
+  assert.equal(h.decodedVia.adopted + h.decodedVia.pulled, h.decoded,
+    'the two classes must add up to the decoded headline');
+  // The watchlist carries NO adopted copy: every watchlist decode rests on a
+  // slot-bound on-chain receipt. An adoption inside the watchlist would be an
+  // event worth naming.
+  assert.equal(h.watchlist.decodedAdopted, 0);
+  assert.equal(h.outsideWatchlist.decodedAdopted, 1_214);
 });
 
 test('the falsification view: outside the watchlist the claim does not hold', () => {
@@ -129,28 +155,58 @@ test('the falsification view: outside the watchlist the claim does not hold', ()
     'the outside view must carry a real sample');
   assert.ok(h.outsideWatchlist.coveredPct < 60,
     `outside-watchlist coverage must stay honestly below the watchlist, got ${h.outsideWatchlist.coveredPct}`);
-  assert.ok(h.outsideWatchlist.coveredPct < h.watchlist.coveredPct - 50,
+  // The split NARROWED (96.4% vs 59.9% = 36.5 points, was 89 points) because
+  // the Lighthouse face — 1,214 of the outside view's 4,968 payloads — was
+  // CLOSED, not because the denominator moved: the watchlist number is
+  // unchanged at 96.4% and the outside payload count is unchanged at 4,968.
+  // The invariant that must survive is the ORDER and the margin to
+  // convergence: the outside view may never reach the curated claim.
+  assert.ok(h.outsideWatchlist.coveredPct < h.watchlist.coveredPct,
+    'the outside view must stay below the watchlist');
+  assert.ok(h.watchlist.coveredPct - h.outsideWatchlist.coveredPct > 30,
     'the split must stay decisive — a quiet convergence would mean the outside traffic silently joined the watchlist denominator');
+  assert.equal(h.outsideWatchlist.payloads, 4_968,
+    'the outside DENOMINATOR must not move when coverage moves');
 });
 
 test('the gap is dominated by acquisition, not decoding', () => {
   const h = artifact.headline;
-  assert.ok(h.noInterface > h.refused * 2,
-    `no-interface (${h.noInterface}) must dominate refused (${h.refused}) — the fix is acquisition, not decoder polish`);
+  // The margin NARROWED because two acquisition faces were closed (ATA 1,410,
+  // Lighthouse 1,214): 2,534 no-interface against 1,258 refused is now 1,320
+  // against 1,258. Acquisition still LEADS, so the fix is still acquisition
+  // and not decoder polish — but the 2x margin no longer holds, and this file
+  // says so instead of pretending it does.
+  assert.ok(h.noInterface > h.refused,
+    `no-interface (${h.noInterface}) must still lead refused (${h.refused}) — the fix is acquisition, not decoder polish`);
+  assert.ok(h.noInterface < h.refused * 2,
+    'the acquisition margin has narrowed below 2x (two faces closed) — if it grows again, the story changed and must be argued');
   const outside = h.outsideWatchlist;
   assert.ok(outside.noInterface > outside.refused,
     'outside the watchlist the acquisition gap must lead');
   // The named faces of the acquisition gap, pinned so a change is an event.
   // 2026-11-11: the ATA table (ATokenGPvbd…) closed the #1 face — 1,410
   // payloads, no-interface 1,410 -> 0, decoded 0 -> 1,410. The queue's new
-  // head is L2TExMFK… (pump L2, 1,214).
+  // head was L2TExMFK… (1,214) — which turned out to be Lighthouse, whose
+  // own repository publishes an IDL; adopting that copy closed it too
+  // (no-interface 1,214 -> 0, decoded 0 -> 1,214, all byte-exact, all
+  // decodedAdopted). The queue's head is now MNFST… (307).
   const byId = Object.fromEntries(artifact.programs.map((p) => [p.program, p]));
   assert.equal(byId['ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'].noInterface, 0);
   assert.equal(byId['ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'].decoded, 1_410);
   assert.equal(byId['ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'].byteExact, 1_406,
     'the 1,406 one-byte payloads re-encode byte-exactly; the 4 empty ones are named via the processor fallback and are not byte-exact');
-  assert.equal(byId['L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95'].noInterface, 1_214);
+  const lighthouse = byId['L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95'];
+  assert.equal(lighthouse.noInterface, 0);
+  assert.equal(lighthouse.decoded, 1_214);
+  assert.equal(lighthouse.byteExact, 1_214,
+    'every adopted Lighthouse payload re-encodes byte-exactly');
+  assert.equal(lighthouse.decodedAdopted, 1_214,
+    'all 1,214 came from the adopted published copy — named, not hidden');
   assert.equal(byId['MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms'].noInterface, 307);
+  // The queue head must be the NEXT face, not one that was already closed.
+  const queueHead = artifact.acquisitionQueue[0];
+  assert.equal(queueHead.program, 'MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms');
+  assert.equal(queueHead.payloads, 307);
 });
 
 test('the source-lag faces are pinned: acquirable interfaces that refuse bytes', () => {
