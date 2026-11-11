@@ -1,0 +1,132 @@
+{
+  "tool": "tools/measure-conform-unresolvable-accounts-tag.mjs",
+  "measuredAt": "2026-11-11T06:06:48.513Z",
+  "tags": [
+    {
+      "tag": "v0.4.16",
+      "installedVersion": "0.4.16",
+      "cases": {
+        "droppedExtraSigner": {
+          "exit": 0,
+          "fillVerdict": "remaining-accounts",
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "remaining-accounts": 1
+          },
+          "refusalReason": null
+        },
+        "droppedFillAll": {
+          "exit": 0,
+          "fillVerdict": "remaining-accounts",
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "remaining-accounts": 1
+          },
+          "refusalReason": null
+        },
+        "droppedCpi": {
+          "exit": 1,
+          "fillVerdict": "undeclared-signing-account",
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "undeclared-signing-account": 1
+          },
+          "refusalReason": null
+        },
+        "parsedObjectAccounts": {
+          "exit": 0,
+          "fillVerdict": "remaining-accounts",
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "remaining-accounts": 1
+          },
+          "refusalReason": null
+        },
+        "intactControl": {
+          "exit": 1,
+          "fillVerdict": "undeclared-signing-account",
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "undeclared-signing-account": 1
+          },
+          "refusalReason": null
+        },
+        "emptyAccountsControl": {
+          "exit": 1,
+          "fillVerdict": "missing-declared-accounts",
+          "byVerdict": {
+            "no-stored-interface": 4,
+            "missing-declared-accounts": 1
+          },
+          "refusalReason": null
+        }
+      },
+      "greenOverDropped": [
+        "droppedExtraSigner",
+        "droppedFillAll",
+        "parsedObjectAccounts"
+      ],
+      "refusedWithNamedReason": [],
+      "controlsBroken": [],
+      "verdict": "carries-the-defect"
+    },
+    {
+      "tag": "v0.4.17",
+      "installedVersion": "0.4.17",
+      "cases": {
+        "droppedExtraSigner": {
+          "exit": 1,
+          "fillVerdict": null,
+          "byVerdict": null,
+          "refusalReason": "instruction-account-index-unresolvable"
+        },
+        "droppedFillAll": {
+          "exit": 1,
+          "fillVerdict": null,
+          "byVerdict": null,
+          "refusalReason": "instruction-account-index-unresolvable"
+        },
+        "droppedCpi": {
+          "exit": 1,
+          "fillVerdict": null,
+          "byVerdict": null,
+          "refusalReason": "instruction-account-index-unresolvable"
+        },
+        "parsedObjectAccounts": {
+          "exit": 1,
+          "fillVerdict": null,
+          "byVerdict": null,
+          "refusalReason": "instruction-account-index-unresolvable"
+        },
+        "intactControl": {
+          "exit": 1,
+          "fillVerdict": "undeclared-signing-account",
+          "byVerdict": {
+            "no-stored-interface": 11,
+            "undeclared-signing-account": 1
+          },
+          "refusalReason": null
+        },
+        "emptyAccountsControl": {
+          "exit": 1,
+          "fillVerdict": "missing-declared-accounts",
+          "byVerdict": {
+            "no-stored-interface": 4,
+            "missing-declared-accounts": 1
+          },
+          "refusalReason": null
+        }
+      },
+      "greenOverDropped": [],
+      "refusedWithNamedReason": [
+        "droppedExtraSigner",
+        "droppedFillAll",
+        "droppedCpi",
+        "parsedObjectAccounts"
+      ],
+      "controlsBroken": [],
+      "verdict": "refuses"
+    }
+  ],
+  "ok": true
+}
