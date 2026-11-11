@@ -22,10 +22,10 @@
 //   own entry points:
 //
 //     measured payloads        21,350
-//     decoded                 16,148   coveredPctOfMeasured  75.6%
+//     decoded                 17,558   coveredPctOfMeasured  82.2%
 //     refused                  1,258   (interface present, bytes refused)
-//     no-interface             3,944   (nothing acquirable at either address)
-//     byte-exact re-encode    14,981/16,148 = 92.8% of decoded
+//     no-interface             2,534   (nothing acquirable at either address)
+//     byte-exact re-encode    16,387/17,558 = 93.3% of decoded
 //     ALL traffic seen        22,265   coveredPctOfAllSeen   72.5%
 //     counted-not-measured       915   (152 programs below the bounds)
 //
@@ -35,9 +35,9 @@
 //     watchlist  (the committed claim's denominator): 16,382 payloads, 96.4%
 //     outside    (never measured before):             4,968 payloads,  7.1%
 //
-//   The ecosystem-wide number is 75.6%, not 100%. The gap is dominated by
-//   acquisition, not decoding: 3,944 of the 5,202 uncovered payloads are
-//   no-interface (ATokenGP 1,410; L2TE… pump L2 1,214; MNFST… 307; FLASH…
+//   The ecosystem-wide number is 82.2%, not 100%. The gap is dominated by
+//   acquisition, not decoding: 2,534 of the 3,792 uncovered payloads are
+//   no-interface (L2TE… pump L2 1,214; MNFST… 307; FLASH…
 //   134; …), and 817 are refusals on interfaces that ARE acquirable (source
 //   lag: pfeeU… 459 unknown-discriminator refusals on its pulled anchor IDL,
 //   HADRo… 195 on every payload).
@@ -107,11 +107,11 @@ test('the artifact carries no host path', () => {
 test('the headline holds and the three outcomes stay split', () => {
   const h = artifact.headline;
   assert.equal(h.measuredPayloads, 21_350);
-  assert.equal(h.decoded, 16_148);
+  assert.equal(h.decoded, 17_558);
   assert.equal(h.refused, 1_258);
-  assert.equal(h.noInterface, 3_944);
-  assert.equal(h.coveredPctOfMeasured, 75.6);
-  assert.equal(h.byteExact, 14_981);
+  assert.equal(h.noInterface, 2_534);
+  assert.equal(h.coveredPctOfMeasured, 82.2);
+  assert.equal(h.byteExact, 16_387);
   assert.equal(h.allPayloadsSeen, 22_265);
   assert.equal(h.notMeasuredPayloads, 915);
   // The honest number is the measured one; the all-seen number exists so the
@@ -127,8 +127,8 @@ test('the falsification view: outside the watchlist the claim does not hold', ()
     'the curated claim reproduces on its own denominator');
   assert.ok(h.outsideWatchlist.payloads > 3_000,
     'the outside view must carry a real sample');
-  assert.ok(h.outsideWatchlist.coveredPct < 20,
-    `outside-watchlist coverage must stay honestly low, got ${h.outsideWatchlist.coveredPct}`);
+  assert.ok(h.outsideWatchlist.coveredPct < 60,
+    `outside-watchlist coverage must stay honestly below the watchlist, got ${h.outsideWatchlist.coveredPct}`);
   assert.ok(h.outsideWatchlist.coveredPct < h.watchlist.coveredPct - 50,
     'the split must stay decisive — a quiet convergence would mean the outside traffic silently joined the watchlist denominator');
 });
@@ -141,8 +141,14 @@ test('the gap is dominated by acquisition, not decoding', () => {
   assert.ok(outside.noInterface > outside.refused,
     'outside the watchlist the acquisition gap must lead');
   // The named faces of the acquisition gap, pinned so a change is an event.
+  // 2026-11-11: the ATA table (ATokenGPvbd…) closed the #1 face — 1,410
+  // payloads, no-interface 1,410 -> 0, decoded 0 -> 1,410. The queue's new
+  // head is L2TExMFK… (pump L2, 1,214).
   const byId = Object.fromEntries(artifact.programs.map((p) => [p.program, p]));
-  assert.equal(byId['ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'].noInterface, 1_410);
+  assert.equal(byId['ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'].noInterface, 0);
+  assert.equal(byId['ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'].decoded, 1_410);
+  assert.equal(byId['ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'].byteExact, 1_406,
+    'the 1,406 one-byte payloads re-encode byte-exactly; the 4 empty ones are named via the processor fallback and are not byte-exact');
   assert.equal(byId['L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95'].noInterface, 1_214);
   assert.equal(byId['MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms'].noInterface, 307);
 });

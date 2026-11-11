@@ -46,6 +46,7 @@ import { decodePayload, decodeUnionPayload } from '../src/decode.mjs';
 import { decodeNativeInstruction, isNativeProgram } from '../src/native.mjs';
 import { decodeTokenInstruction, isTokenProgram } from '../src/token.mjs';
 import { decodeRaydiumInstruction, isRaydiumProgram } from '../src/raydium.mjs';
+import { decodeAtaInstruction, isAtaProgram } from '../src/ata.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
@@ -121,6 +122,21 @@ async function classify(program, hex) {
       };
     } catch (error) {
       return { outcome: 'refused', via: 'raydium-upstream', reason: String(error?.message ?? error).slice(0, 110) };
+    }
+  }
+
+  if (isAtaProgram(program)) {
+    try {
+      const decoded = decodeAtaInstruction(program, Buffer.from(hex, 'hex'), { trailing: 'report' });
+      return {
+        outcome: 'decoded',
+        via: 'ata-upstream',
+        name: decoded.name,
+        byteExact: decoded.roundTripByteExact === true,
+        trailing: decoded.trailing?.count ?? 0,
+      };
+    } catch (error) {
+      return { outcome: 'refused', via: 'ata-upstream', reason: String(error?.message ?? error).slice(0, 110) };
     }
   }
 

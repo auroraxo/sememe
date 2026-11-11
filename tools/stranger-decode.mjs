@@ -62,6 +62,7 @@ import { decodePayload, decodeUnionPayload } from '../src/decode.mjs';
 import { decodeNativeInstruction, isNativeProgram } from '../src/native.mjs';
 import { decodeTokenInstruction, isTokenProgram, encodeTokenInstruction } from '../src/token.mjs';
 import { decodeRaydiumInstruction, isRaydiumProgram, encodeRaydiumInstruction } from '../src/raydium.mjs';
+import { decodeAtaInstruction, isAtaProgram } from '../src/ata.mjs';
 import { encodeNativeInstruction } from '../src/native.mjs';
 import { extractPayloads, accountKeyList } from './lib/payloads.mjs';
 
@@ -390,6 +391,14 @@ async function decodeOne(program, hex) {
       return { outcome: 'decoded', name: decoded.name, fullExact: decoded.roundTripByteExact === true, describedExact, trailing: decoded.trailing?.count ?? 0 };
     } catch (error) {
       return { outcome: 'refused', via: 'raydium-upstream', reason: String(error?.message ?? error).slice(0, 160) };
+    }
+  }
+  if (isAtaProgram(program)) {
+    try {
+      const decoded = decodeAtaInstruction(program, bytes, { trailing: 'report' });
+      return { outcome: 'decoded', name: decoded.name, fullExact: decoded.roundTripByteExact === true, describedExact: decoded.roundTripByteExact === true, trailing: decoded.trailing?.count ?? 0 };
+    } catch (error) {
+      return { outcome: 'refused', via: 'ata-upstream', reason: String(error?.message ?? error).slice(0, 160) };
     }
   }
   try {

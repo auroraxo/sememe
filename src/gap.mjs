@@ -47,6 +47,7 @@ import { addresses, inspect, rpcAccounts } from './acquire.mjs';
 import { isNativeProgram } from './native.mjs';
 import { isTokenProgram } from './token.mjs';
 import { isRaydiumProgram } from './raydium.mjs';
+import { isAtaProgram } from './ata.mjs';
 
 const VENDORED = 'vendored';
 
@@ -55,6 +56,7 @@ export function vendoredProgram(program) {
   if (isNativeProgram(program)) return 'native';
   if (isTokenProgram(program)) return 'token';
   if (isRaydiumProgram(program)) return 'raydium';
+  if (isAtaProgram(program)) return 'ata';
   return null;
 }
 

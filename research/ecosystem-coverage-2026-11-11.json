@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-11T20:55:33.905Z",
+ "generatedAt": "2026-11-11T22:05:45.554Z",
  "sample": {
   "file": "test/fixtures/ecosystem-sample-2026-11-11.json",
   "store": "test/fixtures/ecosystem-store-2026-11-11",
@@ -19,19 +19,19 @@
   "measuredPrograms": 46,
   "method": "getBlock finalized full encoding:json maxSupportedTransactionVersion:1 rewards:false; contiguous newest finalized slots minus 2",
   "selection": "curated watchlist + top-volume traffic programs outside it; ranked by observed instruction count, bounded by count and byte budget; the store was never consulted during selection",
-  "measurementPath": "the product entry points (decodeUnionPayload / native decoder / token decoder / raydium decoder) against the captured store; interfaces installed through the product write path (installIdl)"
+  "measurementPath": "the product entry points (decodeUnionPayload / native decoder / token decoder / raydium decoder / ata decoder) against the captured store; interfaces installed through the product write path (installIdl)"
  },
  "headline": {
   "allPayloadsSeen": 22265,
   "measuredPayloads": 21350,
   "notMeasuredPayloads": 915,
-  "decoded": 16148,
+  "decoded": 17558,
   "refused": 1258,
-  "noInterface": 3944,
-  "coveredPctOfMeasured": 75.6,
-  "coveredPctOfAllSeen": 72.5,
-  "byteExact": 14981,
-  "byteExactPctOfDecoded": 92.8,
+  "noInterface": 2534,
+  "coveredPctOfMeasured": 82.2,
+  "coveredPctOfAllSeen": 78.9,
+  "byteExact": 16387,
+  "byteExactPctOfDecoded": 93.3,
   "shortForm": 55,
   "chainVerified": 55,
   "absentPolicy": "verified",
@@ -44,10 +44,10 @@
   },
   "outsideWatchlist": {
    "payloads": 4968,
-   "decoded": 351,
+   "decoded": 1761,
    "refused": 676,
-   "noInterface": 3941,
-   "coveredPct": 7.1
+   "noInterface": 2531,
+   "coveredPct": 35.4
   },
   "note": "coverage = payloads an available interface could NAME. \"refused\" (interface present, bytes refused) and \"no-interface\" (no interface acquirable at all) are counted separately because they need different fixes. watchlist vs outsideWatchlist split exists because the committed 100% claim was measured on the first and never on the second."
  },
@@ -843,10 +843,6 @@
  },
  "refusalReasons": [
   {
-   "reason": "no-interface: no stored IDL for program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL in test/fixtures/ecosystem-store-2026-1",
-   "count": 1410
-  },
-  {
    "reason": "no-interface: no stored IDL for program L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95 in test/fixtures/ecosystem-store-2026-11",
    "count": 1214
   },
@@ -1064,12 +1060,12 @@
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 12219,
-  "decoded_txFailed": 3929,
+  "decoded_txSuccess": 13149,
+  "decoded_txFailed": 4409,
   "refused_txSuccess": 745,
   "refused_txFailed": 513,
-  "noInterface_txSuccess": 2031,
-  "noInterface_txFailed": 1913
+  "noInterface_txSuccess": 1101,
+  "noInterface_txFailed": 1433
  },
  "programs": [
   {
@@ -1141,16 +1137,16 @@
    "name": null,
    "watched": false,
    "acquirable": false,
-   "decoded": 0,
+   "decoded": 1410,
    "refused": 0,
-   "noInterface": 1410,
-   "byteExact": 0,
+   "noInterface": 0,
+   "byteExact": 1406,
    "describedExact": 0,
    "trailing": 0,
    "shortForm": 0,
    "chainVerified": 0,
    "payloads": 1410,
-   "coveredPct": 0
+   "coveredPct": 100
   },
   {
    "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
@@ -1714,13 +1710,6 @@
   }
  ],
  "acquisitionQueue": [
-  {
-   "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-   "name": null,
-   "payloads": 1410,
-   "acquirable": false,
-   "reason": "no on-chain IDL at either address; needs a first-party published copy or a vendored upstream source"
-  },
   {
    "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
    "name": null,

@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic) **and the same arbitration for account bytes (`sememe account --union`, 2026-11-08: measured on 12 real mainnet accounts, byte-exact on 6 of 12 where the single-receipt path managed 0 of 12)**, plus five programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget) and Raydium AMM v4, all five with wire tables DERIVED from pinned upstream Rust — and all 12,572 unbiased real-mainnet payloads now have an interface to decode against, lifting coverage from 55.5% to 98.6% strict / 100% verified (the last strict refusal, Token-2022's token-metadata fallback, decodes since 2026-11-03) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. The fingerprint lockfile ships (`sememe lock` + `sememe verify`, 2026-11-05); catalog import and daemon are still proposals.
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic) **and the same arbitration for account bytes (`sememe account --union`, 2026-11-08: measured on 12 real mainnet accounts, byte-exact on 6 of 12 where the single-receipt path managed 0 of 12)**, plus six programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget), Raydium AMM v4 and the SPL Associated Token Account, all six with wire tables DERIVED from pinned upstream Rust — and the ecosystem-wide measured coverage is now 82.2% (17,558/21,350 payloads across 6 finalized blocks, 2026-11-11; 96.4% on the curated watchlist, 35.4% outside it; byte-exact re-encode on 93.3% of decoded), with all 1,410 ATA payloads decoded byte-for-byte — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. The fingerprint lockfile ships (`sememe lock` + `sememe verify`, 2026-11-05); catalog import and daemon are still proposals.
 
 ## Quickstart: the copy-paste 1,000-transaction check (2026-11-04)
 
@@ -130,7 +130,7 @@ const result = await decodePayload('./store', 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYz
 // result.name, result.args, result.roundTripByteExact, result.idl.fingerprint
 ```
 
-The decode path installs **zero runtime dependencies**: `sememe` itself has none on its entry, and every file it reaches imports only `node:` builtins. Beyond the entry, the package exports `sememe/native` (System + ComputeBudget, derived at import from the pinned upstream sources), `sememe/token` (SPL Token + Token-2022, derived the same way from the pinned interface crates), `sememe/raydium` (Raydium AMM v4, derived from its pinned program source), `sememe/store` (read/verify receipts), `sememe/pull` (acquisition) and the low-level surfaces a consumer may need directly: `sememe/codec`, `sememe/canonical`, `sememe/discriminators`. Two audit surfaces let a consumer falsify the table it was handed instead of trusting it: `sememe/native-corpus` (the real mainnet System/ComputeBudget harvests the decoder was qualified against, re-hashed on every read) and `sememe/native-audit` (re-derive the native tables from the pinned vendored Rust and byte-compare the shipped artifacts — the same audit the suite runs).
+The decode path installs **zero runtime dependencies**: `sememe` itself has none on its entry, and every file it reaches imports only `node:` builtins. Beyond the entry, the package exports `sememe/native` (System + ComputeBudget, derived at import from the pinned upstream sources), `sememe/token` (SPL Token + Token-2022, derived the same way from the pinned interface crates), `sememe/raydium` (Raydium AMM v4, derived from its pinned program source), `sememe/ata` (SPL Associated Token Account, derived from its pinned interface + processor), `sememe/store` (read/verify receipts), `sememe/pull` (acquisition) and the low-level surfaces a consumer may need directly: `sememe/codec`, `sememe/canonical`, `sememe/discriminators`. Two audit surfaces let a consumer falsify the table it was handed instead of trusting it: `sememe/native-corpus` (the real mainnet System/ComputeBudget harvests the decoder was qualified against, re-hashed on every read) and `sememe/native-audit` (re-derive the native tables from the pinned vendored Rust and byte-compare the shipped artifacts — the same audit the suite runs).
 
 The pull is the one path that needs a package too, because deriving the Program Metadata PDA needs ed25519: install `@solana/web3.js` next to sememe before it. `@solana/web3.js` is declared as an *optional peer* precisely so a decoder-only consumer is never asked to install it. The CLI refuses `sememe pull` and `sememe gap` without it, with that instruction, and still runs every other subcommand. (Measured 2026-11-05: `sememe gap` probes the same on-chain IDL addresses as `sememe pull`, so it needs the peer too — the sentence here used to name only `sememe pull`; `tools/measure-release-surface.mjs` now derives the peer-needing commands from the import graph and fails this README if the claim drifts again.)
 
@@ -144,7 +144,7 @@ npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
 
-`./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
+`./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
 
 Publishing to the npm registry itself is deliberately not done: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), and no registry name squatting is part of the plan. The git tag is the release artifact; `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep it honest.
 
@@ -172,7 +172,7 @@ npx sememe verify --store ./store --lock ./sememe.lock
 
 **Measured 2026-11-07 (`verify` must not call clean a store the reader refuses):** a store holding Whirlpool (locked) and Jupiter pulled *afterwards*, so Jupiter is an extra, with Jupiter's object rewritten so it no longer re-hashed to its receipt — the store reader refuses that program, and `sememe decode` on it exits 1 with "object and receipt disagree, refusing to decode". On the published `v0.4.10` install: `sememe lock` exited **1** (no lock written) while `sememe verify` exited **0** with **violations 0** — a green CI gate over a program the reader refuses. The cause was structural, not a typo: `writeLock` re-checked **every** receipt, `checkLock` re-checked only the **pinned** ones, so the shared helper was shared but only ever called on one side. Both paths now re-check the extras through the same helper, and only their FAILURES are reported. See [Working now: `verify` agrees with `lock`](README.md#working-now-verify-agrees-with-lock-about-a-store-whose-extra-program-is-damaged-2026-11-07) and [research/extra-damage-2026-11-07-before.json](research/extra-damage-2026-11-07-before.json) (the published install: 3 contract violations) / [research/extra-damage-2026-11-07.json](research/extra-damage-2026-11-07.json) (this tree: 0).
 
-What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4 have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
+What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4/SPL Associated Token Account have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
 
 ## Working now: `verify` agrees with `lock` about a store whose EXTRA program is damaged (2026-11-07)
 
@@ -389,7 +389,7 @@ The five possible verdicts, all mutually exclusive:
 - `pullable`: an on-chain interface exists that your local store does not have yet -> `sememe pull` is the fix.
 - `no-interface-published`: neither address answers -> pulling it forever will never help. Use `sememe adopt` with a first-party published copy, or a pinned upstream derivation.
 - `present-undecodable`: an account exists at one of the addresses, but its schema cannot be decoded (malformed, or declares another program).
-- `vendored`: one of the programs sememe answers via pinned upstream wire tables (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4) — there is no on-chain IDL to store.
+- `vendored`: one of the programs sememe answers via pinned upstream wire tables (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) — there is no on-chain IDL to store.
 - `unknown`: the RPC failed. **An RPC failure is never recorded as an absence** (the crates.io 403 lesson: a client-side failure that reads as missing data). The CLI exits 3 (`no-verdict`) in this case so scripted callers know the chain's state is unmeasured.
 
 Measured 2026-11-04 over all 70 gap programs of the foreign 156-fixture set (`research/acquisition-gap-2026-11-04.json`): **34 programs publish an on-chain IDL (177 payloads)** — never-pulled gaps, not derivation work — and **36 publish nothing (129 payloads)**.
@@ -1659,6 +1659,53 @@ Refusals are pinned by reason — unknown tag, each refused variant, truncated
 u64/pubkey/fees, unmatched discriminator, wildcard rejection — and the optional
 group round-trips in both directions with half a group refused as
 `partial-optional` rather than guessed.
+
+**The largest gap closed by derivation: SPL Associated Token Account
+(2026-11-11).** The ecosystem measurement (`tools/ecosystem-coverage.mjs`, the
+next section) put ATokenGPvbd… first in its acquisition queue: **1,410 payloads
+in 6 finalized mainnet blocks, no IDL account at either pullable address** —
+the single biggest acquisition gap the unbiased denominator exposed. Its
+interface is upstream Rust again, and this time the wire rule is borsh's own:
+`solana-program/associated-token-account@fbf5379` (Apache-2.0, LICENSE + sha256
+pin on all three vendored files) declares `AssociatedTokenAccountInstruction`
+as a borsh UNIT enum — Create, CreateIdempotent, RecoverNested — so the payload
+is exactly the one-byte variant index and no argument bytes follow. The wire
+bytes come from upstream's own builders (`data: vec![2], // …::RecoverNested`
+and the `instruction` argument of `build_associated_token_account_instruction`),
+cross-checked against the declaration index the borsh derive would use — both
+must agree or the derivation refuses. The RUNTIME verdicts are read from the
+pin's processor, not assumed: `input.is_empty()` is EXECUTED as `Create` (so
+the 4 empty payloads the measurement saw are a named Create via the processor's
+own fallback — honest about not being byte-exact, since the canonical encoding
+is `[0]`), everything else is judged by `try_from_slice`, and an unjudged input
+is `InvalidInstructionData` — this decoder refuses it under the same name.
+
+Measured on the committed 6-block sample, product entry points only:
+**1,410/1,410 decode (1,406 byte-exact), `no-interface` 1,410 → 0**, ecosystem
+coverage **75.6% → 82.2%** (watchlist 96.4% unchanged, outside-watchlist
+**7.1% → 35.4%**), and `acquisitionQueue`'s head moved from ATA to pump L2
+(L2TExMFK…, 1,214). A re-run of the 1,000-transaction foreign-archive wire
+sweep decodes **5,032** (was 4,646) with zero disagreements. The decoder ships
+as `sememe/ata` with `sememe decode-ata` / `sememe ata-provenance` (the empty
+payload is real input here: `sememe decode-ata ATokenGPvbd… --empty`), and
+`sememe decode` on this program points at it instead of telling the user to
+pull a receipt that can never exist.
+
+Falsification (`test/ata-interface.test.mjs`, 8 tests): a tampered artifact, a
+tampered vendored source and a missing `vendor/` all refuse the load; the wire
+and runtime shape is pinned against upstream's own text (tags, unit enum, empty
+fallback, `InvalidInstructionData`); every measured payload must decode, and
+the 4 empty ones must come out as Create — named, not refused. Guards: ATA
+stays OUT of the token table, and a real SPL Token payload keeps decoding
+through its own table.
+
+**Limits.** One 6-block window, one RPC, one pin. The table describes the
+program AT THE PIN: a tagged upstream release that changes the enum or the
+processor refuses the load loudly instead of decoding stale. No account list
+and no PDA derivation is claimed — the table covers instruction data only. The
+empty-input verdicts carry `roundTripByteExact: false` BY DESIGN: upstream
+never writes a zero-length payload, the canonical encoding is `[0]`, and the
+4 empty wire forms are named through the processor's own empty-input branch.
 
 **Limits.** One four-block window (~20 seconds of mainnet), one RPC. The
 acquisability check ran at capture time and reflects that moment. The token

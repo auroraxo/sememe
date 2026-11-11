@@ -136,6 +136,16 @@ export const COMMAND_SPECS = {
     positionals: 2,
     positionalNames: ['program id', 'payload'],
   },
+  'decode-ata': {
+    flags: { '--trailing': 'value', '--empty': 'boolean' },
+    positionals: [1, 2],
+    positionalNames: ['program id', 'payload'],
+  },
+  'ata-provenance': {
+    flags: {},
+    positionals: [0, 1],
+    positionalNames: ['program id'],
+  },
   account: {
     flags: { '--store': 'value', '--name': 'value', '--trailing': 'value', '--union': 'boolean' },
     positionals: 2,

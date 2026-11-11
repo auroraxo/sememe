@@ -17,6 +17,9 @@ import {
 import {
   decodeRaydiumInstruction, raydiumProvenance, raydiumPrograms, isRaydiumProgram,
 } from '../src/raydium.mjs';
+import {
+  decodeAtaInstruction, ataProvenance, ataPrograms, isAtaProgram,
+} from '../src/ata.mjs';
 import { toJsonSafe } from '../src/codec.mjs';
 import { VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE } from '../src/short-forms.mjs';
 // The DECLARED surface of every command (which flags it takes, how many
@@ -116,6 +119,15 @@ const usage = `usage:
   sememe raydium-provenance [program-id]
       print the pinned upstream commit, encoding rule and variant counts for a
       Raydium program (or for all of them).
+  sememe decode-ata <program-id> [<payload>] [--empty] [--trailing report|error]
+      payload: base58 or hex instruction data, or --empty for the processor's
+      own empty-input Create fallback. For the SPL ASSOCIATED TOKEN ACCOUNT
+      program there is no IDL account to pull at either address: its interface
+      is pinned from the upstream program source (borsh unit enum, empty-input
+      processor fallback), and this decodes against that pin.
+  sememe ata-provenance [program-id]
+      print the pinned upstream commit, encoding rule and variant counts for
+      the SPL Associated Token Account program.
 
 Every command declares the flags it accepts and how many positional arguments
 it consumes. A flag the command does not know, a flag given twice, a flag
@@ -268,7 +280,8 @@ try {
     // first-time user reads "run sememe pull" as the fix and pulls forever.
     const vendored = (programId) => (isTokenProgram(programId) ? 'decode-token'
       : isNativeProgram(programId) ? 'decode-native'
-        : isRaydiumProgram(programId) ? 'decode-raydium' : null);
+        : isRaydiumProgram(programId) ? 'decode-raydium'
+          : isAtaProgram(programId) ? 'decode-ata' : null);
     let decoded;
     try {
       decoded = union
@@ -432,6 +445,48 @@ try {
       roundTripByteExact: decoded.roundTripByteExact,
       interface: raydiumProvenance(program),
     }, null, 2));
+  } else if (command === 'decode-ata') {
+    if (!program) throw Error('decode-ata needs a program id');
+    const trailing = option('--trailing', 'report');
+    if (trailing !== 'report' && trailing !== 'error') {
+      throw Error('--trailing must be "report" or "error"');
+    }
+    // The empty payload is a REAL instruction for this program: the pin's
+    // processor executes empty input as Create. It therefore needs a way to
+    // be said out loud, and `--empty` is that way — the base58/hex parsers
+    // have no empty string, by design.
+    const empty = flags['--empty'] === true;
+    const payloadArg = args.shift();
+    if (!payloadArg && !empty) {
+      throw Error('decode-ata needs an instruction payload (use --empty for the empty-input Create fallback)');
+    }
+    if (payloadArg && empty) {
+      throw Error('decode-ata: give a payload or --empty, not both');
+    }
+    const decoded = decodeAtaInstruction(program, empty ? Buffer.alloc(0) : parsePayload(payloadArg), { trailing });
+    if (decoded.refused === 'not-ata') {
+      throw Error(`${program} is not a program sememe pins with the ATA table — try decode-native, decode-token, decode-raydium or decode`);
+    }
+    console.log(JSON.stringify({
+      program,
+      kind: 'ata-instruction',
+      name: decoded.name,
+      tag: decoded.tag,
+      selectorWidth: decoded.selectorWidth,
+      args: {},
+      bytes: decoded.bytes,
+      consumed: decoded.consumed,
+      trailing: decoded.trailing,
+      roundTripByteExact: decoded.roundTripByteExact,
+      note: decoded.note,
+      interface: ataProvenance(program),
+    }, null, 2));
+  } else if (command === 'ata-provenance') {
+    const provenance = program ? ataProvenance(program) : null;
+    if (program && !provenance) {
+      throw Error(`${program} is not a program sememe pins with the ATA table — try decode-native, decode-token, decode-raydium or decode`);
+    }
+    console.log(JSON.stringify(provenance ?? ataPrograms().map((id) => ataProvenance(id)), null, 2));
   } else if (command === 'account') {
     if (!program) throw Error('account needs a program id');
     const data = args.shift();

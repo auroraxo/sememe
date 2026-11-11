@@ -157,11 +157,13 @@ test('1,000+ foreign-archive wire transactions decode diff-free (foreign-user th
     assert.equal(report.summary.transactionsChecked, 1000);
     assert.equal(report.summary.transactionsUnreadable, 0);
     // Measured 2026-11-04 on contiguous slots 464588080..464588083 (1,947
-    // transactions in document, checked the first 1,000): 6,355 payloads,
-    // 4,646 decoded, 1,709 no-interface across 115 programs, zero
-    // disagreements.
+    // transactions in document, checked the first 1,000): 6,355 payloads.
+    // First measured at 4,646 decoded / 1,709 no-interface across 115
+    // programs; 2026-11-11 the ATA table (ATokenGPvbd… 386 payloads here)
+    // landed and the same archive reads 5,032 decoded / 1,323 no-interface —
+    // zero disagreements, every decoded claim reproducible, byte-exact 100.
     assert.equal(report.summary.payloadsChecked, 6355);
-    assert.equal(report.summary.decoded, 4646);
+    assert.equal(report.summary.decoded, 5032);
     assert.equal(report.summary.decodeErrors, 0);
     assert.equal(report.summary.disagreements, 0);
     assert.equal(report.summary.byteExactRate, 100);

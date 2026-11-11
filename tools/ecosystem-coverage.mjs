@@ -51,7 +51,7 @@
 //            consulted during selection.
 //
 //   report   measures the captured bytes through the product's own entry
-//            points (decodeUnionPayload / native / token / raydium) against
+//            points (decodeUnionPayload / native / token / raydium / ata) against
 //            the captured store. It never touches the network, so the number
 //            is reproducible offline and a change in it means the CODE or the
 //            FIXTURE changed, not the chain. The report splits the headline
@@ -79,6 +79,7 @@ import { decodeUnionPayload } from '../src/decode.mjs';
 import { decodeNativeInstruction, isNativeProgram } from '../src/native.mjs';
 import { decodeTokenInstruction, isTokenProgram } from '../src/token.mjs';
 import { decodeRaydiumInstruction, isRaydiumProgram } from '../src/raydium.mjs';
+import { decodeAtaInstruction, isAtaProgram } from '../src/ata.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -386,6 +387,15 @@ async function classify(storeDir, program, hex, absentPolicy, dehost = (v) => v)
       return { outcome: 'refused', via: 'raydium-upstream', reason: String(error?.message ?? error).slice(0, 110) };
     }
   }
+  if (isAtaProgram(program)) {
+    try {
+      const decoded = decodeAtaInstruction(program, Buffer.from(hex, 'hex'), { trailing: 'report' });
+      return { outcome: 'decoded', via: 'ata-upstream', name: decoded.name,
+        byteExact: decoded.roundTripByteExact === true, trailing: decoded.trailing?.count ?? 0 };
+    } catch (error) {
+      return { outcome: 'refused', via: 'ata-upstream', reason: String(error?.message ?? error).slice(0, 110) };
+    }
+  }
   try {
     const result = await decodeUnionPayload(storeDir, program, hex, {
       trailing: 'report', absent: absentPolicy,
@@ -538,7 +548,7 @@ async function report() {
       measuredPrograms: sample.meta.measuredPrograms,
       method: sample.meta.method,
       selection: sample.meta.selection,
-      measurementPath: 'the product entry points (decodeUnionPayload / native decoder / token decoder / raydium decoder) against the captured store; interfaces installed through the product write path (installIdl)',
+      measurementPath: 'the product entry points (decodeUnionPayload / native decoder / token decoder / raydium decoder / ata decoder) against the captured store; interfaces installed through the product write path (installIdl)',
     },
     headline: {
       allPayloadsSeen: seenTotal,

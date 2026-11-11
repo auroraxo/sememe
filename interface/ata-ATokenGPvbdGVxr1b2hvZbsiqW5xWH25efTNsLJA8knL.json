@@ -1,0 +1,62 @@
+{
+  "program": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  "label": "SPL Associated Token Account",
+  "scheme": "native-ata",
+  "source": {
+    "repo": "solana-program/associated-token-account",
+    "pin": "fbf5379e7398ac8b231c73ee8a9ff677b43dd0ec",
+    "license": "Apache-2.0 (LICENSE vendored beside the sources)",
+    "enum": "AssociatedTokenAccountInstruction (borsh unit enum: the variant index is the one-byte payload)",
+    "programSource": "vendored interface/src/lib.rs declare_id",
+    "files": [
+      {
+        "file": "interface/src/instruction.rs",
+        "role": "AssociatedTokenAccountInstruction: borsh unit enum, serialise arms carry the wire byte",
+        "sha256": "sha256:033191cb1316fe2370fb9f694b0a0f9f140f647ca44661f07cb661ed4aa8c56d"
+      },
+      {
+        "file": "program/src/processor.rs",
+        "role": "runtime verdict: empty input falls back to Create, borsh try_from_slice judges the rest, InvalidInstructionData refuses",
+        "sha256": "sha256:e8bf0dd2d9ac87ebc488faf73dee2530df6d6dc83bc19907def973c5209953ca"
+      },
+      {
+        "file": "interface/src/lib.rs",
+        "role": "the program id (declare_id), read from upstream, not re-typed",
+        "sha256": "sha256:a1bf5de71e01902c9a5b42604ba4eb696c7ef4c100bc6c72a0b59a926f4efad0"
+      }
+    ],
+    "vendoredAt": "vendor/spl-associated-token-account/fbf5379e7398ac8b231c73ee8a9ff677b43dd0ec",
+    "derivation": "src/ata-interface.mjs: tag = the declaration index upstream's borsh serialise arm pushes; args = none (unit enum); runtime verdicts read from the processor (empty input falls back to Create, borsh try_from_slice judges, InvalidInstructionData refuses)"
+  },
+  "runtime": {
+    "judge": "borsh AssociatedTokenAccountInstruction::try_from_slice(input)",
+    "emptyInputFallback": "Create",
+    "unknownInputRefusal": "ProgramError::InvalidInstructionData",
+    "source": "program/src/processor.rs at the pin"
+  },
+  "selector": {
+    "width": 1,
+    "encoding": "borsh enum index, u8; empty input is the processor's own Create fallback, not an unknown selector"
+  },
+  "argEncoding": "unit enum: payload is exactly the one index byte; no argument bytes",
+  "instructions": [
+    {
+      "tag": 0,
+      "name": "Create",
+      "wire": "borsh-unit-enum",
+      "args": []
+    },
+    {
+      "tag": 1,
+      "name": "CreateIdempotent",
+      "wire": "borsh-unit-enum",
+      "args": []
+    },
+    {
+      "tag": 2,
+      "name": "RecoverNested",
+      "wire": "borsh-unit-enum",
+      "args": []
+    }
+  ]
+}
