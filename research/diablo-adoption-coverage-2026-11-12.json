@@ -1,0 +1,144 @@
+{
+  "generatedAt": "2026-11-12T18:58:58.089Z",
+  "question": "does the PULS Z wiring move the ecosystem coverage number, and by how much?",
+  "verdict": "headline-unchanged-at-shipped-store; adoption-adds-102",
+  "premiseCheck": {
+    "claimed": "DiabLokxis 102 jetzt zaehlbar (card next-step 3)",
+    "shippedStore": "FALSE — 0 decoded / 102 no-interface remains: the wiring changed the codec, not the store; the diabloarb bytes carry no license at the pin and are not vendored",
+    "adoptPath": "TRUE — 102/102 decoded, 0 refused, 102 byte-exact, all in the adopted evidence class, for a user who adopts the pinned first-party copy"
+  },
+  "pin": {
+    "repo": "cryptodiablo/diabloarb",
+    "commit": "f5005ac4c401cbb88dcb7c8e249b6dfe119f13dc",
+    "file": "sdk/diabloarb-executor.idl.json",
+    "license": null,
+    "canonicalFingerprint": "d6d4e8aac4eb4199fb7b5ff818fcf04d4bd43793b9fc72d0652163b1d0711ec9",
+    "fingerprintVerified": "d6d4e8aac4eb4199fb7b5ff818fcf04d4bd43793b9fc72d0652163b1d0711ec9"
+  },
+  "source": {
+    "fetchedBy": "caller at the pinned commit",
+    "vendored": false,
+    "bytesSha256": "ce582b4fbb67c9fc72b8189ad9873a183cb1aa49c920ddb6b0614820ee6165ce"
+  },
+  "sample": "test/fixtures/ecosystem-sample-2026-11-11.json",
+  "committedArtifact": "research/ecosystem-coverage-2026-11-11.json",
+  "baseline": {
+    "measuredPayloads": 21350,
+    "decoded": 18895,
+    "refused": 1135,
+    "noInterface": 1320,
+    "byteExact": 17652,
+    "coveredPctOfMeasured": 88.5,
+    "coveredPctOfAllSeen": 84.9,
+    "decodedVia": {
+      "pulled": 17681,
+      "adopted": 1214,
+      "note": "pulled = an on-chain IDL account answered (sememe pull, slot-bound); adopted = a published copy adopted through sememe adopt (hash-bound bytes, DECLARED origin). Both decode offline and re-encode byte-checked; the classes are never merged silently."
+    },
+    "outsideWatchlist": {
+      "payloads": 4968,
+      "decoded": 3098,
+      "refused": 553,
+      "noInterface": 1317,
+      "decodedAdopted": 1214,
+      "coveredPct": 62.4
+    },
+    "watchlist": {
+      "payloads": 16382,
+      "decoded": 15797,
+      "refused": 582,
+      "noInterface": 3,
+      "decodedAdopted": 0,
+      "coveredPct": 96.4
+    },
+    "diabRow": {
+      "program": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
+      "name": null,
+      "watched": false,
+      "acquirable": false,
+      "decoded": 0,
+      "refused": 0,
+      "noInterface": 102,
+      "byteExact": 0,
+      "describedExact": 0,
+      "trailing": 0,
+      "shortForm": 0,
+      "chainVerified": 0,
+      "decodedAdopted": 0,
+      "payloads": 102,
+      "coveredPct": 0
+    }
+  },
+  "union": {
+    "measuredPayloads": 21350,
+    "decoded": 18997,
+    "refused": 1135,
+    "noInterface": 1218,
+    "byteExact": 17754,
+    "coveredPctOfMeasured": 89,
+    "coveredPctOfAllSeen": 85.3,
+    "decodedVia": {
+      "pulled": 17681,
+      "adopted": 1316,
+      "note": "pulled = an on-chain IDL account answered (sememe pull, slot-bound); adopted = a published copy adopted through sememe adopt (hash-bound bytes, DECLARED origin). Both decode offline and re-encode byte-checked; the classes are never merged silently."
+    },
+    "outsideWatchlist": {
+      "payloads": 4968,
+      "decoded": 3200,
+      "refused": 553,
+      "noInterface": 1215,
+      "decodedAdopted": 1316,
+      "coveredPct": 64.4
+    },
+    "watchlist": {
+      "payloads": 16382,
+      "decoded": 15797,
+      "refused": 582,
+      "noInterface": 3,
+      "decodedAdopted": 0,
+      "coveredPct": 96.4
+    },
+    "diabRow": {
+      "program": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
+      "name": null,
+      "watched": false,
+      "acquirable": false,
+      "decoded": 102,
+      "refused": 0,
+      "noInterface": 0,
+      "byteExact": 102,
+      "describedExact": 102,
+      "trailing": 0,
+      "shortForm": 0,
+      "chainVerified": 0,
+      "decodedAdopted": 102,
+      "payloads": 102,
+      "coveredPct": 100
+    }
+  },
+  "delta": {
+    "decoded": 102,
+    "noInterface": -102,
+    "coveredPctOfMeasured": [
+      88.5,
+      89
+    ],
+    "outsideWatchlistPct": [
+      62.4,
+      64.4
+    ],
+    "byteExact": 102
+  },
+  "receipt": {
+    "program": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
+    "fingerprint": "sha256:d6d4e8aac4eb4199fb7b5ff818fcf04d4bd43793b9fc72d0652163b1d0711ec9",
+    "slot": null
+  },
+  "committedStoreModified": false,
+  "honestLimits": [
+    "one window (the committed 2026-11-11 fixture), not fresh traffic",
+    "the +102 belongs to a user who adopts; the shipped store and the pinned tag do not carry the copy (no license at the pin)",
+    "adopted evidence class: hash-bound bytes, DECLARED origin",
+    "0 external users, npm ENEEDAUTH, no audit"
+  ]
+}
