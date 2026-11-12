@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2026-11-12T16:05:19.016Z",
+  "program": "DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z",
+  "finding": "naming a dialect is not speaking it: a raw-LE engine decodes the declared field lists over the real wire — 102/102 decoded, 102/102 byte-exact round-trips, 8 named grammar refusals; the product boundary is NOT wired this run",
+  "pin": {
+    "repo": "cryptodiablo/diabloarb",
+    "commit": "f5005ac4c401cbb88dcb7c8e249b6dfe119f13dc",
+    "license": null,
+    "file": "sdk/diabloarb-executor.idl.json",
+    "canonicalFingerprint": "d6d4e8aac4eb4199fb7b5ff818fcf04d4bd43793b9fc72d0652163b1d0711ec9",
+    "rawSha256": "ce582b4fbb67c9fc72b8189ad9873a183cb1aa49c920ddb6b0614820ee6165ce",
+    "programIdField": "program_id",
+    "instructions": 4,
+    "encoding": "little-endian",
+    "grammar": {
+      "primitives": [
+        "u8",
+        "u16",
+        "u32",
+        "u64",
+        "i64"
+      ],
+      "namedTypes": [
+        "Hop",
+        "Base",
+        "Route"
+      ],
+      "counterArrays": [
+        "Base[n_bases]",
+        "Hop[n_windows]",
+        "Route[n_routes]",
+        "u8[n_hops]"
+      ]
+    }
+  },
+  "face": [
+    {
+      "tag": "01",
+      "length": 104,
+      "count": 14
+    },
+    {
+      "tag": "01",
+      "length": 118,
+      "count": 34
+    },
+    {
+      "tag": "01",
+      "length": 138,
+      "count": 27
+    },
+    {
+      "tag": "01",
+      "length": 165,
+      "count": 3
+    },
+    {
+      "tag": "01",
+      "length": 171,
+      "count": 5
+    },
+    {
+      "tag": "01",
+      "length": 182,
+      "count": 19
+    }
+  ],
+  "prefix": {
+    "commit": "aa6901bdc5e3b4cc5f8fad0831e5ff79557fdd3d",
+    "enginePresent": false,
+    "productVoice": "crash"
+  },
+  "faces": {
+    "prefix": {
+      "engine": {
+        "present": false,
+        "dialectReason": null,
+        "decoded": 0,
+        "byteExact": 0,
+        "refusalFaces": []
+      },
+      "product": {
+        "voice": "crash",
+        "message": "object is not iterable (cannot read property Symbol(Symbol.iterator))"
+      },
+      "guards": {
+        "whirlpool": "decoded-or-reported",
+        "whirlpoolMessage": null
+      },
+      "wireFace": {
+        "01:118": 34,
+        "01:138": 27,
+        "01:104": 14,
+        "01:182": 19,
+        "01:171": 5,
+        "01:165": 3
+      }
+    },
+    "current": {
+      "engine": {
+        "present": true,
+        "dialectReason": null,
+        "decoded": 102,
+        "byteExact": 102,
+        "refusalFaces": [],
+        "grammar": {
+          "mutatedFixedSize": "not a raw-LE dialect this engine speaks: types.Base: declared size 32 does not equal the field sum 24",
+          "duplicateTag": "named: duplicate instruction tag 1 (search / quote)",
+          "counterNotAPrecedingField": "named: instruction search.bases: counter \"n_morphs\" is not a preceding field of the same list",
+          "unknownDispatchTag": "unknown instruction tag 0x07 (4 known: 1, 2, 0, 3)",
+          "truncatedPayload": "trailing bytes after search: consumed 114 of 115 (search)",
+          "trailingByte": "trailing bytes after search: consumed 114 of 119 (search)",
+          "noEncodingDeclaration": "named: no little-endian encoding declaration — this engine speaks only the dialect the file itself declares",
+          "layoutlessStubTag": "instruction \"route\" declares no field list — the interface publishes no layout for this tag (route)"
+        }
+      },
+      "product": {
+        "voice": "named",
+        "message": "unsupported IDL dialect: types must be an array, got object (mapping dialects like diabloarb tag-dispatch are not decodable)"
+      },
+      "guards": {
+        "whirlpool": "decoded-or-reported",
+        "whirlpoolMessage": null
+      },
+      "wireFace": {
+        "01:118": 34,
+        "01:138": 27,
+        "01:104": 14,
+        "01:182": 19,
+        "01:171": 5,
+        "01:165": 3
+      }
+    }
+  },
+  "falsifications": {
+    "prefixHasEngine": 0,
+    "prefixProductCrash": 0,
+    "engineMissing": 0,
+    "engineGateRefused": 0,
+    "decodedNotAll": 0,
+    "byteExactNotAll": 0,
+    "engineRefusalFaces": 0,
+    "grammar_mutatedFixedSize_escaped": 0,
+    "grammar_duplicateTag_escaped": 0,
+    "grammar_counterNotAPrecedingField_escaped": 0,
+    "grammar_unknownDispatchTag_escaped": 0,
+    "grammar_truncatedPayload_escaped": 0,
+    "grammar_trailingByte_escaped": 0,
+    "grammar_noEncodingDeclaration_escaped": 0,
+    "grammar_layoutlessStubTag_escaped": 0,
+    "currentProductNotNamed": 0,
+    "currentProductCrash": 0,
+    "currentProductOther": 0,
+    "guardWhirlpoolNotDecoded": 0,
+    "wireFaceDisagrees": 0
+  },
+  "delta": {
+    "engine": "absent -> present (src/rawle.mjs)",
+    "decode": "0/102 -> 102/102 decoded, 102/102 byte-exact round-trips",
+    "productVoice": "crash (TypeError crash) -> named (unchanged named refusal — wiring is future work)"
+  },
+  "committedStoreState": "24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi-468262003-anchor-945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94.json|6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-468262003-anchor-5a00cdb86fcd0e8efac99ffb2f8a51a9b0e9093008466f4666a1e5058513ec52.json|CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK-468262003-metadata-4346a82dfc04e65f84c754b4b905e8bb33bd2904a280b730ae7bc6bda4d8d2ba.json|CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C-468262003-metadata-5762f79ae9d1019cd0247185ccd41b069368acafa539b07e1b06373beb1c5b09.json|CcmRKTuZCGJBWQwMHvDYApBRvSZNHqGJXkznqpDTSQUr-468262003-anchor-8d4772dfa77139c4b7e944ea712c7e57691a9944074b9b4f3e05d9302a36486b.json|DF1ow4tspfHX9JwWJsAb9epbkA8hmpSEAtxXy1V27QBH-468262003-anchor-e90d71cbb8c16e5f9ab28fb18adee2d1d8158f8803d6f06fe309d4d42c1daed8.json|Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB-468262003-anchor-dd60d3d367986a1d2ad574df3ea5855c5a9801fdaa6fdea57b898deafb95fdba.json|EtrnLzgbS7nMMy5fbD42kXiUzGg8XQzJ972Xtk1cjWih-468262003-metadata-218a4c993363b5a0fb9a3e205d00c45fe7f17695f39e0095cf9959e9a09f63eb.json|HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8-468262003-metadata-96252a7a1a84263bdd6185b2a6e51d292db5ce9be8442ff9eceb78cd6680b6ad.json|JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4-468262003-anchor-55893f8d023ef2613a873b6a85d5a0c693403c2fb25c82c6c7318c3d7a1a774d.json|KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD-468262003-anchor-8a9a5d124ac3a2b50ef096f1fff56557367ee9cb8d08a17bde8a61dd373da4b5.json|L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95-0-published-461e28fd1c7e33f3c37507b2c23632bcdbd9a4fb9daec83c4c600740febd0141.json|LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo-468262003-anchor-cecc3030cfb32a13d497375b08d168bf376ffa0935a87e7191b23b750377330b.json|MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD-468262003-anchor-61ccc0c1a5995dd4aaaa0ec0108e88343642f8da4f74603c67472c8ae42ea14e.json|cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG-468262003-anchor-e80f49b1da381661c34bcc7ae01225937f9f86eb84fb851937b1f6e26eb13f3d.json|dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH-468262003-metadata-ac0a0c3488bccc8b1bf9da2aa83f4c316e1a1388df72a8091e3838fd2a9ec21e.json|dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN-468262003-anchor-977f458bebceccd25dc0e4fd1fef8a4240e049db4abcf4fc04c4c73f4072561c.json|opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb-468262003-anchor-d12a2e16314b418a173cc6da755746396e2b15caf9e28ccb4913aa335050913f.json|pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA-468262003-anchor-2de95c333ae62476376f60c01f56c6e03967eb04a5bb7e63ec55eff523205bfe.json|pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ-468262003-anchor-9c1ef6ed66df5d72f4491d12e9781436f8037a6e20499d1681485591b8644a26.json|proVF4pMXVaYqmy4NjniPh4pqKNfMmsihgd4wdkCX3u-468262003-anchor-1b012a7fc74710c98d6384092729f016e7cb397ada393ff59396c07151c1a41d.json|whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc-468262003-metadata-0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f.json::0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f.json|1b012a7fc74710c98d6384092729f016e7cb397ada393ff59396c07151c1a41d.json|218a4c993363b5a0fb9a3e205d00c45fe7f17695f39e0095cf9959e9a09f63eb.json|2de95c333ae62476376f60c01f56c6e03967eb04a5bb7e63ec55eff523205bfe.json|4346a82dfc04e65f84c754b4b905e8bb33bd2904a280b730ae7bc6bda4d8d2ba.json|461e28fd1c7e33f3c37507b2c23632bcdbd9a4fb9daec83c4c600740febd0141.json|55893f8d023ef2613a873b6a85d5a0c693403c2fb25c82c6c7318c3d7a1a774d.json|5762f79ae9d1019cd0247185ccd41b069368acafa539b07e1b06373beb1c5b09.json|5a00cdb86fcd0e8efac99ffb2f8a51a9b0e9093008466f4666a1e5058513ec52.json|61ccc0c1a5995dd4aaaa0ec0108e88343642f8da4f74603c67472c8ae42ea14e.json|8a9a5d124ac3a2b50ef096f1fff56557367ee9cb8d08a17bde8a61dd373da4b5.json|8d4772dfa77139c4b7e944ea712c7e57691a9944074b9b4f3e05d9302a36486b.json|945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94.json|96252a7a1a84263bdd6185b2a6e51d292db5ce9be8442ff9eceb78cd6680b6ad.json|977f458bebceccd25dc0e4fd1fef8a4240e049db4abcf4fc04c4c73f4072561c.json|9c1ef6ed66df5d72f4491d12e9781436f8037a6e20499d1681485591b8644a26.json|ac0a0c3488bccc8b1bf9da2aa83f4c316e1a1388df72a8091e3838fd2a9ec21e.json|cecc3030cfb32a13d497375b08d168bf376ffa0935a87e7191b23b750377330b.json|d12a2e16314b418a173cc6da755746396e2b15caf9e28ccb4913aa335050913f.json|dd60d3d367986a1d2ad574df3ea5855c5a9801fdaa6fdea57b898deafb95fdba.json|e80f49b1da381661c34bcc7ae01225937f9f86eb84fb851937b1f6e26eb13f3d.json|e90d71cbb8c16e5f9ab28fb18adee2d1d8158f8803d6f06fe309d4d42c1daed8.json",
+  "ok": true,
+  "verdict": "measured"
+}
