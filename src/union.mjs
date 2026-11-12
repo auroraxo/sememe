@@ -85,10 +85,13 @@ function prepare(source) {
   const { idl: filledIdl, filled, conflicts } = withDerivedDiscriminators(source.idl);
   // The STORED discriminators, kept per instruction name: a rename is
   // recognized by the bytes, not by a name similarity — see the rename check
-  // in unionDecode.
+  // in unionDecode. Stored means any non-empty byte array the source
+  // published (HADRo stores 1-byte discriminators) — the same "stored is
+  // stored at any length" rule as src/discriminators.mjs; the old length===8
+  // gate silently dropped every short stored byte from this evidence map.
   const stored = new Map();
   for (const ix of source.idl?.instructions ?? []) {
-    if (ix && typeof ix.name === 'string' && Array.isArray(ix.discriminator) && ix.discriminator.length === 8) {
+    if (ix && typeof ix.name === 'string' && Array.isArray(ix.discriminator) && ix.discriminator.length > 0) {
       stored.set(ix.name, Buffer.from(ix.discriminator).toString('hex'));
     }
   }

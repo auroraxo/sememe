@@ -56,6 +56,18 @@ const isDiscriminator = (value) => Array.isArray(value)
   && value.every((byte) => Number.isInteger(byte) && byte >= 0 && byte <= 255);
 
 /**
+ * Any stored discriminator bytes, whatever length the source published. A
+ * non-8-byte array is NOT a gap: it is a stored value under a different
+ * dispatch scheme (measured: HADRo… publishes 38 one-byte instruction
+ * discriminators — a real, chain-accepted wire table that Anchor's sighash
+ * derivation cannot describe). The codec matches and re-encodes on the stored
+ * prefix length, so preservation here is what makes those bytes decodable.
+ */
+const isStoredDiscriminator = (value) => Array.isArray(value)
+  && value.length > 0
+  && value.every((byte) => Number.isInteger(byte) && byte >= 0 && byte <= 255);
+
+/**
  * Compare derived discriminators against the ones an IDL already stores.
  *
  * @returns {{ checked: number, agree: number, conflicts: object[] }}
@@ -95,8 +107,13 @@ export function verifyDerivedDiscriminators(idl) {
 
 /**
  * Return a copy of the IDL with discriminators filled in where they are
- * missing. Stored discriminators are never changed; a stored value that
- * disagrees with the derivation is reported as a conflict.
+ * missing. Stored discriminators are never changed — at ANY length, not just
+ * Anchor's 8 (pre-fix, a stored 1-byte array fell through to the sighash fill
+ * and HADRo's whole wire table was silently replaced by bytes no payload
+ * carries; measured 0/195 decoded pre-fix, 123/195 post-fix). Only an 8-byte
+ * stored value makes a claim under Anchor's rule, so only those are checked
+ * for a conflict; a stored value that disagrees with the derivation is
+ * reported as a conflict.
  *
  * @returns {{ idl: object, filled: { instructions: number, events: number }, conflicts: object[] }}
  */
@@ -117,10 +134,16 @@ export function withDerivedDiscriminators(idl) {
       instruction.discriminator = [instruction.discriminant.value];
       continue;
     }
-    if (isDiscriminator(instruction.discriminator)) {
-      const derived = globalDiscriminator(instruction.name);
-      if (!derived.every((byte, index) => byte === instruction.discriminator[index])) {
-        conflicts.push({ kind: 'instruction', name: instruction.name, stored: instruction.discriminator.slice(), derived });
+    if (isStoredDiscriminator(instruction.discriminator)) {
+      // STORED bytes under any scheme: copied verbatim, never filled. Only
+      // Anchor's own 8-byte form is checked against his sighash rule — a
+      // 1-byte stored value is a different dispatch scheme and makes no
+      // sighash claim, so there is nothing to conflict.
+      if (isDiscriminator(instruction.discriminator)) {
+        const derived = globalDiscriminator(instruction.name);
+        if (!derived.every((byte, index) => byte === instruction.discriminator[index])) {
+          conflicts.push({ kind: 'instruction', name: instruction.name, stored: instruction.discriminator.slice(), derived });
+        }
       }
       continue;
     }
@@ -128,10 +151,14 @@ export function withDerivedDiscriminators(idl) {
     instructions++;
   }
   for (const event of copy.events ?? []) {
-    if (isDiscriminator(event.discriminator)) {
-      const derived = eventDiscriminator(event.name);
-      if (!derived.every((byte, index) => byte === event.discriminator[index])) {
-        conflicts.push({ kind: 'event', name: event.name, stored: event.discriminator.slice(), derived });
+    if (isStoredDiscriminator(event.discriminator)) {
+      // Same rule as instructions: stored bytes at any length are kept
+      // verbatim; only the 8-byte Anchor form is conflict-checked.
+      if (isDiscriminator(event.discriminator)) {
+        const derived = eventDiscriminator(event.name);
+        if (!derived.every((byte, index) => byte === event.discriminator[index])) {
+          conflicts.push({ kind: 'event', name: event.name, stored: event.discriminator.slice(), derived });
+        }
       }
       continue;
     }

@@ -1,0 +1,304 @@
+{
+  "tool": "tools/measure-hadro-short-discriminator.mjs",
+  "measuredAt": "2026-11-12T05:37:41.622Z",
+  "rule": "a stored discriminator is stored at ANY length: withDerivedDiscriminators keeps it verbatim, fills only true gaps, and conflict-checks only Anchor's 8-byte form",
+  "prefix": {
+    "commit": "c304e80"
+  },
+  "faces": {
+    "prefix": {
+      "unit": {
+        "preservesShortInstruction": false,
+        "preservesShortEvent": false,
+        "instructionsFilled": 2,
+        "eventsFilled": 2,
+        "eightByteConflictReported": true,
+        "keepsEightByteStored": true
+      },
+      "hadroStore": {
+        "totalInstructions": 38,
+        "storedShortInstructions": 38,
+        "storedShortEvents": 0,
+        "shortDiscriminatorsPreserved": 0,
+        "instructionsFilled": 38,
+        "eventsFilled": 0,
+        "conflicts": 0
+      },
+      "etrnStore": {
+        "totalInstructions": 125,
+        "storedShortInstructions": 0,
+        "storedShortEvents": 76,
+        "shortDiscriminatorsPreserved": 0,
+        "instructionsFilled": 0,
+        "eventsFilled": 76,
+        "conflicts": 2
+      },
+      "wire": {
+        "hadro": {
+          "totalPayloads": 195,
+          "decoded": 0,
+          "refused": 195,
+          "fullExact": 0,
+          "describedExact": 0,
+          "decodedByInstruction": {},
+          "refusalReasons": {
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-040000000": 36,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-040001000": 36,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-080000000": 36,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-080001000": 28,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0a5c1ce91": 6,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-080001001": 8,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0aa7e4000": 1,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0a5d1ce91": 6,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0aa3e4000": 1,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0a5b1ce91": 6,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0300001bb": 1,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0aa6e4000": 1,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-055b1ce91": 2,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0b5b1ce91": 4,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0a5a1ce91": 6,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-05591ce91": 1,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0b591ce91": 2,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0a591ce91": 6,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0aa4e4000": 1,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0aa5e4000": 1,
+            "decode refused by the only stored source (metadata @slot 468262003): unknown-discriminator-0a581ce91": 6
+          }
+        },
+        "etrn": {
+          "totalPayloads": 242,
+          "decoded": 227,
+          "refused": 15,
+          "fullExact": 227,
+          "describedExact": 0,
+          "decodedByInstruction": {
+            "UpdateSplineParameters": 6,
+            "LogEventLengths": 53,
+            "Log": 53,
+            "SyncParentToChild": 1,
+            "PlaceMarketOrder": 3,
+            "TransferCollateralChildToParent": 1,
+            "UpdateSplinePriceWithMetadata": 66,
+            "UpdateOraclePricesWithOrdering": 15,
+            "UpdateSplinePrice": 24,
+            "UncrossCrank": 2,
+            "CancelAll": 1,
+            "PlaceMultiLimitOrder": 1,
+            "ClearExpiredOrders": 1
+          },
+          "refusalReasons": {
+            "decode refused by the only stored source (metadata @slot 468262003): truncated input: need 8 byte(s)": 15
+          }
+        },
+        "pump": {
+          "totalPayloads": 842,
+          "decoded": 400,
+          "refused": 442,
+          "fullExact": 249,
+          "describedExact": 151,
+          "decodedByInstruction": {
+            "collect_creator_fee": 85,
+            "sell_v2": 14,
+            "TradeEvent": 128,
+            "sell": 73,
+            "collect_creator_fee_v2": 14,
+            "buy_exact_sol_in": 15,
+            "close_user_volume_accumulator": 8,
+            "buy": 18,
+            "create_v2": 5,
+            "CreateEvent": 5,
+            "extend_account": 1,
+            "migrate_bonding_curve_creator": 1,
+            "MigrateBondingCurveCreatorEvent": 1,
+            "distribute_creator_fees": 1,
+            "DistributeCreatorFeesEvent": 1,
+            "init_user_volume_accumulator": 5,
+            "InitUserVolumeAccumulatorEvent": 5,
+            "CloseUserVolumeAccumulatorEvent": 6,
+            "buy_exact_quote_in_v2": 5,
+            "buy_v2": 3,
+            "CollectCreatorFeeEvent": 2,
+            "claim_cashback": 2,
+            "ClaimCashbackEvent": 2
+          },
+          "refusalReasons": {
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-e1f7501ed5b": 251,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-20f6bf3408c": 98,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-1c92de7726c": 84,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-e19a7516d75": 3,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-07051dc4f51": 5,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-event-discriminator-742b4": 1
+          }
+        },
+        "pfee": {
+          "totalPayloads": 464,
+          "decoded": 5,
+          "refused": 459,
+          "fullExact": 5,
+          "describedExact": 0,
+          "decodedByInstruction": {
+            "create_fee_sharing_config": 1,
+            "update_fee_shares": 1,
+            "CreateFeeSharingConfigEvent": 1,
+            "UpdateFeeSharesEvent": 1,
+            "get_fees": 1
+          },
+          "refusalReasons": {
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-9aed8a5ca20": 459
+          }
+        }
+      }
+    },
+    "worktree": {
+      "unit": {
+        "preservesShortInstruction": true,
+        "preservesShortEvent": true,
+        "instructionsFilled": 1,
+        "eventsFilled": 1,
+        "eightByteConflictReported": true,
+        "keepsEightByteStored": true
+      },
+      "hadroStore": {
+        "totalInstructions": 38,
+        "storedShortInstructions": 38,
+        "storedShortEvents": 0,
+        "shortDiscriminatorsPreserved": 38,
+        "instructionsFilled": 0,
+        "eventsFilled": 0,
+        "conflicts": 0
+      },
+      "etrnStore": {
+        "totalInstructions": 125,
+        "storedShortInstructions": 0,
+        "storedShortEvents": 76,
+        "shortDiscriminatorsPreserved": 76,
+        "instructionsFilled": 0,
+        "eventsFilled": 0,
+        "conflicts": 2
+      },
+      "wire": {
+        "hadro": {
+          "totalPayloads": 195,
+          "decoded": 123,
+          "refused": 72,
+          "fullExact": 51,
+          "describedExact": 72,
+          "decodedByInstruction": {
+            "setCurve": 72,
+            "updateMidpriceAndSpreadFactor": 41,
+            "swapExactIn": 1,
+            "updateMidprice": 3,
+            "switchPriceCurve": 6
+          },
+          "refusalReasons": {
+            "decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector len": 72
+          }
+        },
+        "etrn": {
+          "totalPayloads": 242,
+          "decoded": 227,
+          "refused": 15,
+          "fullExact": 227,
+          "describedExact": 0,
+          "decodedByInstruction": {
+            "UpdateSplineParameters": 6,
+            "LogEventLengths": 53,
+            "Log": 53,
+            "SyncParentToChild": 1,
+            "PlaceMarketOrder": 3,
+            "TransferCollateralChildToParent": 1,
+            "UpdateSplinePriceWithMetadata": 66,
+            "UpdateOraclePricesWithOrdering": 15,
+            "UpdateSplinePrice": 24,
+            "UncrossCrank": 2,
+            "CancelAll": 1,
+            "PlaceMultiLimitOrder": 1,
+            "ClearExpiredOrders": 1
+          },
+          "refusalReasons": {
+            "decode refused by the only stored source (metadata @slot 468262003): truncated input: need 8 byte(s)": 15
+          }
+        },
+        "pump": {
+          "totalPayloads": 842,
+          "decoded": 400,
+          "refused": 442,
+          "fullExact": 249,
+          "describedExact": 151,
+          "decodedByInstruction": {
+            "collect_creator_fee": 85,
+            "sell_v2": 14,
+            "TradeEvent": 128,
+            "sell": 73,
+            "collect_creator_fee_v2": 14,
+            "buy_exact_sol_in": 15,
+            "close_user_volume_accumulator": 8,
+            "buy": 18,
+            "create_v2": 5,
+            "CreateEvent": 5,
+            "extend_account": 1,
+            "migrate_bonding_curve_creator": 1,
+            "MigrateBondingCurveCreatorEvent": 1,
+            "distribute_creator_fees": 1,
+            "DistributeCreatorFeesEvent": 1,
+            "init_user_volume_accumulator": 5,
+            "InitUserVolumeAccumulatorEvent": 5,
+            "CloseUserVolumeAccumulatorEvent": 6,
+            "buy_exact_quote_in_v2": 5,
+            "buy_v2": 3,
+            "CollectCreatorFeeEvent": 2,
+            "claim_cashback": 2,
+            "ClaimCashbackEvent": 2
+          },
+          "refusalReasons": {
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-e1f7501ed5b": 251,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-20f6bf3408c": 98,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-1c92de7726c": 84,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-e19a7516d75": 3,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-07051dc4f51": 5,
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-event-discriminator-742b4": 1
+          }
+        },
+        "pfee": {
+          "totalPayloads": 464,
+          "decoded": 5,
+          "refused": 459,
+          "fullExact": 5,
+          "describedExact": 0,
+          "decodedByInstruction": {
+            "create_fee_sharing_config": 1,
+            "update_fee_shares": 1,
+            "CreateFeeSharingConfigEvent": 1,
+            "UpdateFeeSharesEvent": 1,
+            "get_fees": 1
+          },
+          "refusalReasons": {
+            "decode refused by the only stored source (anchor @slot 468262003): unknown-discriminator-9aed8a5ca20": 459
+          }
+        }
+      }
+    }
+  },
+  "delta": {
+    "hadroWireDecoded": 123,
+    "hadroShortDiscriminatorsPreserved": 38,
+    "unitPreservesShortInstruction": "false -> true",
+    "unitPreservesShortEvent": "false -> true"
+  },
+  "honestLimits": {
+    "setRiskCurve": "72 payloads stay refused: the stored IDL declares points as a vector whose length does not match the wire bytes; refused and NAMED, never counted as coverage",
+    "setCurve": "72 payloads decode the described prefix byte-exactly but carry trailing bytes the IDL does not explain — describedRoundTripByteExact, not full byte-exact",
+    "etrnEvents": "Eternal stores 76 1-byte event discriminators; the event wire path dispatches on 8-byte heads, so preservation changes no decode in this window (227/242 byte-exact before and after) — kept is right, measurable effect none"
+  },
+  "falsifications": {
+    "prefixShowsNoDefect": false,
+    "landedOnPinnedNumbers": true,
+    "landed": [],
+    "refusalsNotNamed": 0,
+    "guardMoves": [],
+    "pinMoves": [],
+    "etrnPreservedPostFix": true,
+    "etrnConflictsStable": true
+  },
+  "ok": true
+}
