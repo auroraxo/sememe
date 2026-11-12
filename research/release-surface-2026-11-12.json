@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-12T05:58:34.895Z",
+  "measuredAt": "2026-11-12T11:55:54.452Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.21",
+        "body": "A dialect sememe does not speak is now a NAMED refusal at every boundary — never a codec crash. Measured on `DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z` (102 sampled payloads, first-party interface `cryptodiablo/diabloarb` sdk/diabloarb-executor.idl.json @ f5005ac4, raw little-endian \"NOT Anchor/Borsh\"): before this release all 102 payloads died with the unnamed `TypeError: object is not iterable` (the IDL's `types` is a dict), `withDerivedDiscriminators` filled all 4 tag-dispatch instructions with Anchor sighashes that match no wire byte, and `adopt` re-labelled the file under a foreign program id because it only read `idl.address` while the file declares `program_id`. Now `src/dialect.mjs` defines the refusal once (`unsupported IDL dialect: …`) and the codec, the derivation, `adopt` and the store reader all refuse with that identical reason; the declared-program check reads `address`, `metadata.address` and `program_id` and names the field. The honest product answer for an unadoptable interface is `no stored interface` (102, countable), never a TypeError. Two-tree measurement against the pre-fix commit aa6901b: 24 falsification counts, all zero (`research/dialect-named-refusal-2026-11-12.json`); surgical on anchor, shank and legacy name-only anchor IDLs (Kamino's conform account lists pass unchanged), 22/22 committed store objects still readable.\n\nInstall (no npm account needed):\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.21            # decode path: zero dependencies\nnpm install github:auroraxo/sememe#v0.4.21 @solana/web3.js   # adds the on-chain pull\nnpx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store\n```\n\nReproduce the measurement: `node tools/measure-dialect-named-refusal.mjs --source <sdk/diabloarb-executor.idl.json at pin f5005ac4>` -> `research/dialect-named-refusal-2026-11-12.json` (the upstream file carries no license, so it is fetched at the pin, never vendored; the tool verifies the pinned fingerprint first). Ladder: `test/dialect-named-refusal.test.mjs` 9 tests, `test/dialect-named-refusal-measurement.test.mjs` 10 tests (1 network re-derivation skipped by name); suite 912: 908 pass / 4 named skips / 0 fail.\n\nLimits, stated plainly: naming a refusal is not support — none of the 102 DiabLokxis payloads decode yet (decoding the raw little-endian dialect is follow-up work, pinned per program the way shank was); tags <= v0.4.20 carry the three defect faces and cannot be changed; one owner account, zero external users measured so far (`not-distributed-not-consumed`); fixture bytes, no audit; npm publish still blocked on a missing token (ENEEDAUTH).\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-12T11:55:46Z",
+        "createdAt": "2026-11-12T11:55:09Z"
+      },
       {
         "tag": "v0.4.20",
         "body": "A stored discriminator is stored at ANY length. `withDerivedDiscriminators` treated only 8-byte arrays as \"stored\", so a program publishing 1-byte instruction discriminators had its whole wire table silently overwritten with Anchor's 8-byte sighash — against the module's own header rule. Measured on the committed 6-block mainnet sample: `HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8` decodes 0/195 -> 123/195 through the product path (51 full byte-exact, 72 described-exact with reported trailing bytes); the remaining 72 `setRiskCurve` payloads stay refused and NAMED — that IDL declares a vector length the wire bytes do not carry. Ecosystem coverage of measured traffic moves 87.9% -> 88.5% (18,772 -> 18,895 of 21,350). The fix is surgical: pump.fun 400/842, pfeeU 5/464 and Eternal 227/242 verdicts are byte-identical between the pre-fix tree (c304e80) and this one — proven by a two-tree measurement, not asserted.\n\nInstall (no npm account needed):\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.20            # decode path: zero dependencies\nnpm install github:auroraxo/sememe#v0.4.20 @solana/web3.js   # adds the on-chain pull\nnpx sememe decode HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8 040000000... --store ./store\n```\n\nReproduce the measurement: `node tools/measure-hadro-short-discriminator.mjs` -> `research/hadro-short-discriminator-2026-11-12.json`; the ladder pins it (`test/hadro-short-discriminator.test.mjs` 7 tests, D1–D4 red on v0.4.19's tree; `test/hadro-short-discriminator-measurement.test.mjs` 5 tests; mutation ladder 6/6).\n\nLimits, stated plainly: tags <= v0.4.19 carry the defect and cannot be changed; one owner account, zero external users measured so far (`not-distributed-not-consumed`); fixture bytes, no audit; npm publish still blocked on a missing token (ENEEDAUTH); the 88.5% is one 6-block window, not an ecosystem proof.\n",
@@ -193,6 +201,7 @@
       "v0.4.19",
       "v0.4.2",
       "v0.4.20",
+      "v0.4.21",
       "v0.4.3",
       "v0.4.4",
       "v0.4.5",
@@ -203,7 +212,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.20"
+        "v0.4.21"
       ],
       "documentedCommands": [
         "pull",
@@ -239,6 +248,113 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.21": {
+        "manifest": {
+          "version": "0.4.21",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.21"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt",
+            "adopt-lighthouse"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.20": {
         "manifest": {
           "version": "0.4.20",
@@ -2296,13 +2412,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.20",
-    "latestTag": "v0.4.20",
+    "newestTag": "v0.4.21",
+    "latestTag": "v0.4.21",
     "pinnedTags": [
-      "v0.4.20"
+      "v0.4.21"
     ]
   },
   "perRelease": {
+    "v0.4.21": {
+      "defects": []
+    },
     "v0.4.20": {
       "defects": []
     },
