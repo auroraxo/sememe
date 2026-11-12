@@ -365,8 +365,14 @@ function decodeAt(type, cur, ctx, path, depth) {
       throw new CodecError(`vector length ${length} needs ${length * minimum} byte(s) but ${cur.remaining} remain`, path);
     }
     const out = [];
-    for (let index = 0; index < length; index++) {
-      out.push(decodeAt(type.vec, cur, ctx, `${path}[${index}]`, depth + 1));
+    const insideCollection = ctx.__insideCollection;
+    ctx.__insideCollection = true;
+    try {
+      for (let index = 0; index < length; index++) {
+        out.push(decodeAt(type.vec, cur, ctx, `${path}[${index}]`, depth + 1));
+      }
+    } finally {
+      ctx.__insideCollection = insideCollection;
     }
     return out;
   }
@@ -428,8 +434,40 @@ function decodeAt(type, cur, ctx, path, depth) {
       throw new CodecError('malformed struct field', path);
     }
     const out = {};
-    for (const field of fields) {
-      assign(out, field.name, decodeAt(field.type, cur, ctx, `${path}.${field.name}`, depth + 1), path);
+    for (const [index, field] of fields.entries()) {
+      // The payload ends exactly where this struct's next field would begin.
+      // Under the caller-risk 'report' policy (reached only through
+      // ctx.__absentPolicy — decodeInstructionData sets it, and nothing else
+      // in the codec opts in), the rest of THIS struct is ABSENT, not
+      // truncated: a field boundary is the only place a payload can end and
+      // still carry a complete value for what came before. The marker names
+      // the missing fields by their path RELATIVE TO THE ARGUMENT (e.g.
+      // builderFeePpm inside swapParams), so decodeInstructionData can report
+      // `swapParams.builderFeePpm` and tell a struct-internal absence from a
+      // missing top-level argument. Under the strict default this branch
+      // never engages and the field decode refuses as truncated.
+      if (ctx.__absentPolicy === 'report' && cur.remaining === 0) {
+        if (ctx.__insideCollection) {
+          // A struct inside a vec/array: the wire stopped inside a repeated
+          // element, and the element INDEX is not recoverable from the
+          // bytes. Naming an absence there would be a guess, so it refuses
+          // like a mid-field cut until a witness says what to call it.
+          throw new CodecError(
+            `truncated input: the payload ends inside a repeated struct field (${path})`,
+            path);
+        }
+        const missing = fields.slice(index).map((rest) => rest.name);
+        ctx.__absentCollected?.push(...missing.map((name) => [...(ctx.__absentTrail ?? []), name].join('.')));
+        out.__absentFields = missing;
+        return out;
+      }
+      const trail = ctx.__absentTrail;
+      trail?.push(field.name);
+      try {
+        assign(out, field.name, decodeAt(field.type, cur, ctx, `${path}.${field.name}`, depth + 1), path);
+      } finally {
+        trail?.pop();
+      }
     }
     return out;
   }
@@ -445,6 +483,10 @@ function decodeAt(type, cur, ctx, path, depth) {
     if (!shape) throw new CodecError(`malformed variant ${JSON.stringify(variant.name)}`, path);
     const out = { __kind: variant.name };
     if (shape.kind === 'unit') return out;
+    // Note: a payload cut inside an enum variant's fields refuses even under
+    // the absent:'report' policy — the struct-boundary absence rule covers
+    // struct arguments (the shape every measured witness used), not variant
+    // bodies. Widening it needs its own chain witness first.
     if (shape.kind === 'tuple') {
       out.fields = shape.fields.map((fieldType, position) =>
         decodeAt(fieldType, cur, ctx, `${path}.fields[${position}]`, depth + 1));
@@ -461,13 +503,45 @@ function decodeAt(type, cur, ctx, path, depth) {
 
 function decodeArray(inner, length, cur, ctx, path, depth) {
   const out = [];
-  for (let index = 0; index < length; index++) {
-    out.push(decodeAt(inner, cur, ctx, `${path}[${index}]`, depth + 1));
+  const insideCollection = ctx.__insideCollection;
+  ctx.__insideCollection = true;
+  try {
+    for (let index = 0; index < length; index++) {
+      out.push(decodeAt(inner, cur, ctx, `${path}[${index}]`, depth + 1));
+    }
+  } finally {
+    ctx.__insideCollection = insideCollection;
   }
   return out;
 }
 
 // --- encoder ----------------------------------------------------------------
+
+/**
+ * Struct fields of a type that an absent PATH may descend through. Only
+ * named structs qualify: a dotted absent name like swapParams.builderFeePpm
+ * describes where the wire stopped, and only a named struct's fields can
+ * name that place. Anything else (tuple struct, enum, array, primitive) is a
+ * refusal — inventing an absence inside a shape that cannot name its fields
+ * would be exactly the guesswork the policy exists to avoid.
+ */
+function structFieldsForAbsentPath(type, ctx, path) {
+  let current = type;
+  if (current && typeof current === 'object' && 'defined' in current) {
+    const name = typeof current.defined === 'string' ? current.defined : current.defined?.name;
+    const typedef = ctx.types.get(name);
+    if (!typedef) throw new CodecError(`absent path crosses unknown type ${JSON.stringify(name)}`, path);
+    current = typedef.type;
+  }
+  if (current && typeof current === 'object' && current.kind === 'type' && 'type' in current) {
+    current = current.type;
+  }
+  const fields = structShape(current);
+  if (!fields || !isNamedStructFields(fields)) {
+    throw new CodecError(`absent path crosses a type that is not a named struct`, path);
+  }
+  return fields;
+}
 
 function encodeAt(type, value, ctx, path, depth) {
   if (depth > MAX_DEPTH) throw new CodecError('type nesting too deep (recursive type?)', path);
@@ -562,8 +636,31 @@ function encodeAt(type, value, ctx, path, depth) {
     const expected = new Set(fields.map((field) => field.name));
     const unknown = Object.keys(value).filter((key) => !expected.has(key));
     if (unknown.length) throw new CodecError(`unexpected field(s): ${unknown.join(', ')}`, path);
+    // Struct-internal absent fields: encodeInstructionData resolves dotted
+    // absent names (swapParams.builderFeePpm) to the VALUE object that owns
+    // the field and records the omission on ctx. Same rule as the top level:
+    // within this struct only a trailing run may be omitted, every omitted
+    // name must be declared, and what remains must still carry a value —
+    // byte-exactness is the only evidence this encoder offers.
+    const skip = ctx.__absentFields?.get(value);
+    if (skip) {
+      const unknownSkip = [...skip].filter((name) => !expected.has(name));
+      if (unknownSkip.length) {
+        throw new CodecError(`unexpected absent field(s): ${unknownSkip.join(', ')}`, path);
+      }
+      let seenSkip = false;
+      for (const field of fields) {
+        if (skip.has(field.name)) { seenSkip = true; continue; }
+        if (seenSkip) {
+          throw new CodecError(
+            `field ${JSON.stringify(field.name)} follows an absent field — only a trailing run may be omitted`,
+            path);
+        }
+      }
+    }
     const parts = [];
     for (const field of fields) {
+      if (skip?.has(field.name)) continue;
       if (!(field.name in value)) throw new CodecError(`missing field ${JSON.stringify(field.name)}`, path);
       parts.push(encodeAt(field.type, value[field.name], ctx, `${path}.${field.name}`, depth + 1));
     }
@@ -986,6 +1083,14 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
   const args = {};
   const absentArgs = [];
   const declaredArgs = instruction.args ?? [];
+  // Struct-internal absences (the payload ends INSIDE a declared struct
+  // argument, on that struct's own field boundary) surface as a marker the
+  // struct decoder leaves on the decoded value. The struct decoder only
+  // produces that marker under ctx.__absentPolicy === 'report' — every other
+  // entry into the codec leaves these inert.
+  ctx.__absentPolicy = absentPolicy;
+  ctx.__absentCollected = absentArgs;
+  ctx.__absentTrail = [];
   for (const [position, argument] of declaredArgs.entries()) {
     if (!argument || typeof argument.name !== 'string' || !('type' in argument)) {
       throw new CodecError(`instruction ${instruction.name} has a malformed argument`, null);
@@ -1000,8 +1105,23 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
     }
     // With absent:'error' (default) this falls through to decodeAt, which
     // reports `truncated input` — the behaviour every existing caller pins.
-    assign(args, argument.name, decodeAt(argument.type, cursor, ctx, `${instruction.name}.${argument.name}`, 0), instruction.name);
+    ctx.__absentTrail.push(argument.name);
+    let value;
+    try {
+      value = decodeAt(argument.type, cursor, ctx, `${instruction.name}.${argument.name}`, 0);
+    } finally {
+      ctx.__absentTrail.pop();
+    }
+    // A struct the wire stopped inside carries the `__absentFields` marker;
+    // peel it off so the decoded args never show codec-internal keys. The
+    // dotted names were already collected into absentArgs. The strip is
+    // recursive: a struct nested in a struct carries its own marker.
+    stripAbsentMarkers(value);
+    assign(args, argument.name, value, instruction.name);
   }
+  delete ctx.__absentPolicy;
+  delete ctx.__absentCollected;
+  delete ctx.__absentTrail;
   const trailingCount = cursor.remaining;
   const trailingHex = trailingCount > 0
     ? Buffer.from(data.subarray(cursor.offset)).toString('hex')
@@ -1025,6 +1145,26 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
     // completeness assertion and `count > 0` is an IDL-drift signal.
     trailing: { count: trailingCount, hex: trailingHex },
   };
+}
+
+/**
+ * Remove the codec-internal `__absentFields` markers from a decoded value.
+ *
+ * The marker is how a struct tells the instruction level "the wire ended on
+ * my field boundary, and THESE fields are the ones it did not carry". It is
+ * bookkeeping, not data: a consumer must never see it inside the decoded
+ * args. Recursive, because a struct nested in a struct carries its own
+ * marker.
+ */
+function stripAbsentMarkers(value) {
+  if (!value || typeof value !== 'object') return value;
+  if (Array.isArray(value)) {
+    for (const item of value) stripAbsentMarkers(item);
+    return value;
+  }
+  delete value.__absentFields;
+  for (const key of Object.keys(value)) stripAbsentMarkers(value[key]);
+  return value;
 }
 
 /**
@@ -1058,6 +1198,10 @@ export function encodeInstructionData(idl, name, args, { absent } = {}) {
   const known = new Set(declared.map((argument) => argument.name));
   const absentSet = new Set(Array.isArray(absent) ? absent : []);
   for (const fieldName of absentSet) {
+    // A dotted name names a field INSIDE a declared struct argument; it is
+    // validated against that struct further down, where the struct's own
+    // field list is known.
+    if (fieldName.includes('.')) continue;
     if (!known.has(fieldName)) {
       throw new CodecError(`unexpected argument(s) for ${instruction.name}: ${fieldName}`, instruction.name);
     }
@@ -1079,13 +1223,68 @@ export function encodeInstructionData(idl, name, args, { absent } = {}) {
   if (unknown.length) {
     throw new CodecError(`unexpected argument(s) for ${instruction.name}: ${unknown.join(', ')}`, null);
   }
-  const parts = [bytes];
-  for (const argument of declared) {
-    if (absentSet.has(argument.name)) continue;
-    if (!(argument.name in args)) throw new CodecError(`missing argument ${JSON.stringify(argument.name)}`, instruction.name);
-    parts.push(encodeAt(argument.type, args[argument.name], ctx, `${instruction.name}.${argument.name}`, 0));
+  // Struct-internal absent fields: an absent name with a dot names a field
+  // INSIDE a declared struct argument (swapParams.builderFeePpm). Resolve
+  // each dotted path to the value object that owns the field, and record the
+  // omission on the encode context so encodeAt's struct branch skips it —
+  // with the same rules the top level enforces: only a trailing run of that
+  // struct's fields may be omitted, and the value must not carry the field.
+  // The encoder is the inverse of the decoder's struct-boundary marker: the
+  // dotted absent list is exactly what the decode reported.
+  const nestedAbsent = new Map(); // value object -> Set(struct-relative field names)
+  for (const fieldName of absentSet) {
+    if (!fieldName.includes('.')) continue;
+    const parts = fieldName.split('.');
+    if (!known.has(parts[0])) {
+      throw new CodecError(`unexpected argument(s) for ${instruction.name}: ${parts[0]}`, instruction.name);
+    }
+    const ownerName = parts[0];
+    const ownerType = declared.find((argument) => argument.name === ownerName)?.type;
+    // Walk the INTERMEDIATE segments through named structs; the LAST segment
+    // is the omitted field itself, validated against the struct it lives in.
+    let containerType = ownerType;
+    let containerValue = args[ownerName];
+    for (const part of parts.slice(1, -1)) {
+      const fields = structFieldsForAbsentPath(containerType, ctx, fieldName);
+      const nextField = fields.find((field) => field.name === part);
+      if (!nextField) {
+        throw new CodecError(`unexpected absent field(s) for ${instruction.name}: ${fieldName}`, instruction.name);
+      }
+      containerType = nextField.type;
+      if (!containerValue || typeof containerValue !== 'object' || !(part in containerValue)) {
+        throw new CodecError(
+          `absent path ${JSON.stringify(fieldName)} crosses a field the value does not carry`, instruction.name);
+      }
+      containerValue = containerValue[part];
+    }
+    const fields = structFieldsForAbsentPath(containerType, ctx, fieldName);
+    const leaf = parts[parts.length - 1];
+    if (!fields.some((field) => field.name === leaf)) {
+      throw new CodecError(`unexpected absent field(s) for ${instruction.name}: ${fieldName}`, instruction.name);
+    }
+    if (!containerValue || typeof containerValue !== 'object' || Array.isArray(containerValue)) {
+      throw new CodecError(`expected a struct object for ${JSON.stringify(fieldName)}, got ${describe(containerValue)}`, instruction.name);
+    }
+    if (leaf in containerValue) {
+      throw new CodecError(`argument ${JSON.stringify(fieldName)} is both absent and present`, instruction.name);
+    }
+    if (!nestedAbsent.has(containerValue)) nestedAbsent.set(containerValue, new Set());
+    nestedAbsent.get(containerValue).add(leaf);
   }
-  return Buffer.concat(parts);
+  if (nestedAbsent.size) {
+    ctx.__absentFields = nestedAbsent;
+  }
+  try {
+    const parts = [bytes];
+    for (const argument of declared) {
+      if (absentSet.has(argument.name)) continue;
+      if (!(argument.name in args)) throw new CodecError(`missing argument ${JSON.stringify(argument.name)}`, instruction.name);
+      parts.push(encodeAt(argument.type, args[argument.name], ctx, `${instruction.name}.${argument.name}`, 0));
+    }
+    return Buffer.concat(parts);
+  } finally {
+    delete ctx.__absentFields;
+  }
 }
 
 /**

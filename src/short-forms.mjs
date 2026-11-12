@@ -114,23 +114,51 @@ const VERIFIED_SHORT_FORMS = [
     absent: ['is_cashback_enabled', 'creator_fee_bps', 'is_holder_reward'],
     witnesses: 1,
   },
+  // --- 2026-11-12: the first short form whose missing field sits INSIDE a
+  // struct argument (research/archer-legacy-swap-witness-2026-11-12.json).
+  // Every form above ends at a TOP-LEVEL argument boundary; this one ends on
+  // the boundary of the LAST field inside `swapParams`, so the absent name
+  // is dotted (`swapParams.builderFeePpm`) and the codec's struct-boundary
+  // rule is what makes it decodable. Evidence: a Swap executed at slot
+  // 468261978 with err:null whose instruction bytes are byte-identical to
+  // the 19-byte payload (checked against the RPC witness twice: `json`
+  // encoding base58 -> 0f430000000000000000000000000000000100), the Archer
+  // CPI's own `success` line, and the pinned IDL's SwapParams docs which
+  // describe the shorter legacy payload as a supported form read as a 0 fee.
+  {
+    program: 'Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy',
+    discriminator: '0f',
+    bytes: 19,
+    instruction: 'Swap',
+    absent: ['swapParams.builderFeePpm'],
+    witnesses: 1,
+    missingFieldInsideStruct: true,
+  },
 ];
 
 export const SHORT_FORM_SOURCE =
   'research/short-form-wire-forms-2026-11-03.json + research/short-form-wire-forms-2026-11-04.json '
-  + '(chain witnesses: err:null, byte-identical payload, matching program log line)';
+  + '(chain witnesses: err:null, byte-identical payload, matching program log line) '
+  + 'research/archer-legacy-swap-witness-2026-11-12.json (chain witness: err:null, byte-identical payload)';
 
 export const VERIFIED = VERIFIED_SHORT_FORMS;
 export { VERIFIED_SHORT_FORMS };
 
 /** Look up a payload in the chain-verified short-form table; null when absent. */
 export function verifiedShortForm(program, data) {
+  // Struct-internal short forms may carry a discriminator SHORTER than 8
+  // bytes (measured: Archer's shank tag, 1 byte). The old `data.length < 8`
+  // guard refused any lookup that could not yield such a match: a 19-byte
+  // payload with a 1-byte tag reaches the table fine once the prefix is
+  // clipped to min(8, len) — exactly the rule the codec's instruction index
+  // already uses for short stored discriminators.
   if (!program || !(data instanceof Uint8Array)) return null;
-  if (data.length < 8) return null;
-  const discriminator = Buffer.from(data.subarray(0, 8)).toString('hex');
+  if (data.length === 0) return null;
+  const prefixLength = Math.min(8, data.length);
+  const discriminator = Buffer.from(data.subarray(0, prefixLength)).toString('hex');
   return VERIFIED_SHORT_FORMS.find((entry) =>
     entry.program === program
-    && entry.discriminator === discriminator
+    && discriminator.startsWith(entry.discriminator)
     && entry.bytes === data.length) ?? null;
 }
 

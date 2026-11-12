@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-11-12T22:45:00.000Z",
+  "program": "Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy",
+  "name": "archer",
+  "witness": {
+    "signature": "5Kpdai4oRG1JbEgypjc1GBU3HPcdXq62sVCXJP9MXLbJnpq4o9i2M1vkVFg4Yipp4JmXp9Adzj8iUFB3ycAwseZ6",
+    "slot": 468261978,
+    "err": null,
+    "chainAccepted": true,
+    "instructionIndex": 8,
+    "discriminator": "0f",
+    "wireBytes": 19,
+    "payloadHex": "0f430000000000000000000000000000000100",
+    "instruction": "Swap",
+    "decodedArgs": {
+      "swapParams": {
+        "amount": "67",
+        "threshold": "0",
+        "side": 1,
+        "mode": 0
+      }
+    },
+    "absent": [
+      "swapParams.builderFeePpm"
+    ],
+    "missingFieldInsideStruct": true,
+    "logMessagesWindow": [
+      "Program Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy invoke [2]",
+      "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb invoke [3]",
+      "Program log: Instruction: TransferChecked",
+      "Program TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb success",
+      "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+      "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+      "Program Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy consumed 22005 of 71019 compute units",
+      "Program Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy success"
+    ]
+  },
+  "pin": {
+    "repo": "ballista-tech/archer-sdk",
+    "commit": "5d07c895207ebd02f1ce70078b2d0c1ec3f186b5",
+    "license": "Apache-2.0",
+    "dialect": "shank",
+    "file": "idl/archer_v1.json",
+    "canonicalFingerprint": "4354dc49ea9a9294960aca0f595e3ed4523046506572a028550c2318ded1a805"
+  },
+  "docsCorroboration": "ballista-tech/archer-sdk idl/archer_v1.json SwapParams docs: 'Borsh args for Swap and SwapFromArcherAccount, 22 bytes. The program also accepts an 18-byte payload that stops after `mode`, for callers built before builderFeePpm existed; it is read as a 0 fee. New clients should always send 22.'",
+  "verification": "Byte identity re-verified 2026-11-13 against the live RPC (getTransaction, encoding jsonParsed, maxSupportedTransactionVersion 1): inner CPI instruction data \"3o3wdtLShpzR4xndHcYqJY7Raf\" base58-decodes to 0f430000000000000000000000000000000100 (19 bytes) — byte-identical to payloadHex. meta.err = null, slot 468261978. Program logs carry the Archer CPI 'success' line and 'Program log: Arb OK! Final=26.15881 USDC, ...'. Note on encodings: with encoding json the RPC renders instruction data as BASE58 (not base64); an earlier byte-mismatch reading had decoded the same string as base64 and was wrong.",
+  "decoderRule": "Decodable since the struct-boundary absent-field rule (src/codec.mjs): decodeInstructionData(idl, bytes, {absent:'report'}) returns instruction 'Swap', absent ['swapParams.builderFeePpm'], trailing {count:0}; re-encode with the dotted absent name reproduces the wire byte-exactly. Product path: --absent verified (src/short-forms.mjs VERIFIED_SHORT_FORMS entry)."
+}
