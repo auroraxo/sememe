@@ -202,9 +202,13 @@ async function main() {
   const prefixCommit = prefixCommitOf();
   const prefixTree = mkdtempSync(path.join(tmpdir(), 'dialect-prefix-'));
   try {
-    const extract = spawnSync('git', ['archive', prefixCommit], { cwd: ROOT, encoding: 'buffer', maxBuffer: 64 << 20 });
-    if (extract.status !== 0) throw Error(`git archive ${prefixCommit} failed`);
-    spawnSync('tar', ['-x', '-C', prefixTree], { input: extract.stdout });
+    // The tree is ~68 MB — far over any pipe buffer, so the archive goes
+    // to a file (`git archive -o`) instead of through a spawnSync buffer.
+    const archivePath = path.join(prefixTree, '..', `dialect-prefix-${path.basename(prefixTree)}.tar`);
+    const extract = spawnSync('git', ['archive', '-o', archivePath, prefixCommit], { cwd: ROOT, encoding: 'utf8' });
+    if (extract.status !== 0) throw Error(`git archive ${prefixCommit} failed: ${(extract.stderr || '').slice(0, 120)}`);
+    const untar = spawnSync('tar', ['-xf', archivePath, '-C', prefixTree], { cwd: ROOT, encoding: 'utf8' });
+    if (untar.status !== 0) throw Error(`untar failed: ${(untar.stderr || '').slice(0, 120)}`);
     if (!existsSync(path.join(prefixTree, 'src', 'codec.mjs'))) throw Error('prefix tree has no src/codec.mjs');
     copyFileSync(path.join(ROOT, 'tools', 'dialect-named-refusal-probe.mjs'),
       path.join(prefixTree, 'tools', 'dialect-named-refusal-probe.mjs'));
@@ -297,6 +301,7 @@ async function main() {
     if (!ok) process.exit(3);
   } finally {
     rmSync(prefixTree, { recursive: true, force: true, retryDelay: 200, maxRetries: 3 });
+    try { rmSync(`${prefixTree}.tar` ?? '', { force: true }); } catch { /* the archive sits beside the temp dir */ }
   }
 }
 

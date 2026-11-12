@@ -62,8 +62,12 @@ const STORE_PATH = path.join(ROOT, 'test', 'fixtures', 'ecosystem-store-2026-11-
 const WHIRLPOOL_FIXTURE = path.join(ROOT, 'test', 'fixtures', 'whirlpool-idl.json');
 const KAMINO_FIXTURE = path.join(ROOT, 'test', 'fixtures', 'kamino-lend-idl.json');
 
+// Faces must be comparable across trees AND across machines: any host or
+// scratch path a refusal embeds is stripped before it becomes a face.
 const messageFace = (error) => String(error?.message ?? error)
   .replace(/unknown instruction discriminator ([0-9a-f]+).*/, 'unknown-discriminator-$1')
+  .replace(/ in [^ ]*\/(objects|receipts|dialect-probe[^ "\n]*)/g, ' in <store>')
+  .replace(/\/(tmp|home)\/[^ :\n]*/g, '<path>')
   .slice(0, 140);
 
 const voiceOf = (error) => {
