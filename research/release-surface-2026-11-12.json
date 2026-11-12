@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-11T23:35:32.314Z",
+  "measuredAt": "2026-11-12T05:58:34.895Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.20",
+        "body": "A stored discriminator is stored at ANY length. `withDerivedDiscriminators` treated only 8-byte arrays as \"stored\", so a program publishing 1-byte instruction discriminators had its whole wire table silently overwritten with Anchor's 8-byte sighash — against the module's own header rule. Measured on the committed 6-block mainnet sample: `HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8` decodes 0/195 -> 123/195 through the product path (51 full byte-exact, 72 described-exact with reported trailing bytes); the remaining 72 `setRiskCurve` payloads stay refused and NAMED — that IDL declares a vector length the wire bytes do not carry. Ecosystem coverage of measured traffic moves 87.9% -> 88.5% (18,772 -> 18,895 of 21,350). The fix is surgical: pump.fun 400/842, pfeeU 5/464 and Eternal 227/242 verdicts are byte-identical between the pre-fix tree (c304e80) and this one — proven by a two-tree measurement, not asserted.\n\nInstall (no npm account needed):\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.20            # decode path: zero dependencies\nnpm install github:auroraxo/sememe#v0.4.20 @solana/web3.js   # adds the on-chain pull\nnpx sememe decode HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8 040000000... --store ./store\n```\n\nReproduce the measurement: `node tools/measure-hadro-short-discriminator.mjs` -> `research/hadro-short-discriminator-2026-11-12.json`; the ladder pins it (`test/hadro-short-discriminator.test.mjs` 7 tests, D1–D4 red on v0.4.19's tree; `test/hadro-short-discriminator-measurement.test.mjs` 5 tests; mutation ladder 6/6).\n\nLimits, stated plainly: tags <= v0.4.19 carry the defect and cannot be changed; one owner account, zero external users measured so far (`not-distributed-not-consumed`); fixture bytes, no audit; npm publish still blocked on a missing token (ENEEDAUTH); the 88.5% is one 6-block window, not an ecosystem proof.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-12T05:55:48Z",
+        "createdAt": "2026-11-12T05:53:51Z"
+      },
       {
         "tag": "v0.4.19",
         "body": "### What this release delivers\n\nThe Lighthouse program (`L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95`) was the **#1 remaining acquisition gap** in the ecosystem measurement (`research/ecosystem-coverage-2026-11-11.json`): **1,214 payloads across 6 finalized mainnet blocks, with no on-chain IDL account published at either pullable address**.\n\nUnlike the SPL Associated Token Account (which publishes no IDL anywhere and needed a Rust wire table), Lighthouse is the program whose **own repository publishes an IDL** (`Jac0xb/lighthouse`, commit `4c579479c98635e419b1b167f08be02a71604a71`, MIT; `programs/lighthouse/lighthouse.json`, 18 instructions in the shank dialect). This release ships that first-party copy, hash-pinned and vendored, and adopts it through the product's own write path.\n\n### Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.19   # tagged release; no npm account needed\n```\n\n### What changed\n\n- `src/lighthouse.mjs`: loads the vendored copy only when its sha256 matches the pin, its declared address matches the program, and the shank discriminant table is intact — a tampered, missing or foreign file refuses **by name** before anything is written;\n- CLI: `sememe adopt-lighthouse [--store <dir>]`, adopting through `src/adopt.mjs` (the same path `sememe adopt` uses);\n- `sememe gap` for this program now points at `sememe adopt-lighthouse` instead of telling a stranger to search for a file the package already carries;\n- Package exports `./lighthouse` (`sememe/lighthouse`); `vendor/lighthouse/` ships with the tarball, MIT LICENSE included.\n\n### Evidence\n\n- **1,214 / 1,214 Lighthouse payloads decode byte-exactly (100%)**, 0 refusals, from the committed 6-block sample (`research/lighthouse-acquisition-2026-11-11.json`);\n- 4 instruction faces active: `AssertAccountInfo` (342), `AssertTokenAccount` (386), `AssertSysvarClock` (337), `AssertAccountData` (149);\n- Ecosystem coverage of measured traffic moves **82.2% -> 87.9%** (18,772/21,350); outside the watchlist **35.4% -> 59.9%** (2,975/4,968); the curated watchlist stays **96.4%** (unchanged);\n- The headline names the evidence class of every decode: `pulled: 17,558, adopted: 1,214` — an adoption never claims on-chain slot provenance, its origin stays `declared`;\n- `test/lighthouse-acquisition.test.mjs` (9 tests): 7 red on the tree without the copy, 9 green here; suite 833 -> 843 tests (839 pass / 4 named network skips / 0 fail).\n\n### Limits\n\nNo external users yet (0 non-owner stars/forks/issues/PRs); not an audit; own-host measurement on committed finalized blocks. The adopted copy's origin is `declared`: the commit is not checked for a signature, and nothing proves the bytes describe the deployed program — the byte evidence for that is the 100% byte-exact re-encode on live traffic. Only instruction data is decoded, no account list or PDA derivation. Tags are immutable; older tags retain the acquisition gap.\n",
@@ -184,6 +192,7 @@
       "v0.4.18",
       "v0.4.19",
       "v0.4.2",
+      "v0.4.20",
       "v0.4.3",
       "v0.4.4",
       "v0.4.5",
@@ -194,7 +203,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.19"
+        "v0.4.20"
       ],
       "documentedCommands": [
         "pull",
@@ -230,6 +239,113 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.20": {
+        "manifest": {
+          "version": "0.4.20",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.20"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt",
+            "adopt-lighthouse"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.19": {
         "manifest": {
           "version": "0.4.19",
@@ -2180,13 +2296,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.19",
-    "latestTag": "v0.4.19",
+    "newestTag": "v0.4.20",
+    "latestTag": "v0.4.20",
     "pinnedTags": [
-      "v0.4.19"
+      "v0.4.20"
     ]
   },
   "perRelease": {
+    "v0.4.20": {
+      "defects": []
+    },
     "v0.4.19": {
       "defects": []
     },
