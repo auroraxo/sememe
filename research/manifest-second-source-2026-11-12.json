@@ -1,0 +1,124 @@
+{
+ "generatedAt": "2026-11-12T07:41:34.047Z",
+ "program": "MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms",
+ "name": "manifest",
+ "finding": "the acquisition queue's largest no-interface face is not a decode gap: the program's own generated wire table (Bonasa-Tech/manifest fuzz/crucible idl, GPL-3.0, same commit as the client copy) decodes all 307 committed payloads byte-exactly via one adopt through the product write path; the same repo's client/idl/manifest.json at the SAME commit lists Swap and SwapV2 on discriminator 04 and the product refuses every payload by name — adopt-and-measure includes the defect face, not just the sunny path",
+ "pin": {
+  "repo": "Bonasa-Tech/manifest",
+  "commit": "d4e908b34f7a050d63cad38cb7175b2e88008465",
+  "license": "GPL-3.0",
+  "licenseNote": "GPL-3.0 at the pin — the bytes stay OUT of this repository and the npm package; both copies were adopted into throwaway store copies and deleted after the measurement",
+  "wireTable": {
+   "file": "fuzz/crucible/idls/manifest.json",
+   "canonicalFingerprint": "sha256:d13f0aed26ffd07112c4b2740549d8e58706aeb259024d755cd3ba7e35f0fc3e",
+   "origin": "Bonasa-Tech/manifest@d4e908b34f7a050d63cad38cb7175b2e88008465:fuzz/crucible/idls/manifest.json",
+   "instructionCount": 15,
+   "sourceReadFrom": "read outside the repository at the pinned commit (GitHub contents API; path not recorded)"
+  },
+  "clientCopy": {
+   "file": "client/idl/manifest.json",
+   "canonicalFingerprint": "sha256:9cc6490d7519f1917a14b3dfbe347320a4051d52e4d8b50a1c98b0670e60a028",
+   "origin": "Bonasa-Tech/manifest@d4e908b34f7a050d63cad38cb7175b2e88008465:client/idl/manifest.json",
+   "instructionCount": 16,
+   "duplicatedDiscriminator": "04",
+   "duplicatedNames": [
+    "Swap",
+    "SwapV2"
+   ],
+   "sourceReadFrom": "read outside the repository at the pinned commit (GitHub contents API; path not recorded)"
+  }
+ },
+ "sample": "test/fixtures/ecosystem-sample-2026-11-11.json",
+ "store": "test/fixtures/ecosystem-store-2026-11-11",
+ "committedStoreModified": false,
+ "measured": {
+  "payloads": 307,
+  "failedTransactions": 7,
+  "baseline": {
+   "decoded": 0,
+   "refused": 0,
+   "noInterface": 307,
+   "coveredPct": 0,
+   "refusalShape": {
+    "no stored IDL for program MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms in test/fixtures/ecosystem-store-2026-11": 307
+   }
+  },
+  "union": {
+   "decoded": 307,
+   "refused": 0,
+   "noInterface": 0,
+   "byteExact": 307,
+   "describedExact": 307,
+   "coveredPct": 100,
+   "adoptedAnswered": 307,
+   "pulledAnswered": 0,
+   "names": {
+    "SwapV2": 10,
+    "BatchUpdate": 201,
+    "Withdraw": 46,
+    "Deposit": 46,
+    "Swap": 3,
+    "GlobalWithdraw": 1
+   }
+  },
+  "defect": {
+   "decoded": 0,
+   "refused": 307,
+   "noInterface": 0,
+   "duplicateRefusals": 307,
+   "refusalNamed": "duplicate instruction discriminator 04 (Swap / SwapV2)"
+  },
+  "delta": {
+   "decoded": 307,
+   "refusalsClosed": 307
+  }
+ },
+ "face": [
+  {
+   "discriminator": "02",
+   "name": "Deposit",
+   "count": 46
+  },
+  {
+   "discriminator": "03",
+   "name": "Withdraw",
+   "count": 46
+  },
+  {
+   "discriminator": "04",
+   "name": "Swap",
+   "count": 3
+  },
+  {
+   "discriminator": "06",
+   "name": "BatchUpdate",
+   "count": 201
+  },
+  {
+   "discriminator": "0a",
+   "name": "GlobalWithdraw",
+   "count": 1
+  },
+  {
+   "discriminator": "0d",
+   "name": "SwapV2",
+   "count": 10
+  }
+ ],
+ "receipt": {
+  "slot": null,
+  "instructionCount": 15,
+  "fingerprint": "sha256:d13f0aed26ffd07112c4b2740549d8e58706aeb259024d755cd3ba7e35f0fc3e",
+  "origin": "Bonasa-Tech-manifest-d4e908b34f7a050d63cad38cb7175b2e88008465:fu",
+  "originStatus": "declared"
+ },
+ "gates": {
+  "baselineReproducesArtifact": true,
+  "faceMatchesPinnedWire": true,
+  "unionFullyCloses": true,
+  "namesMatchFace": true,
+  "defectRefusesByName": true,
+  "receiptSlotNull": true,
+  "committedStoreUntouched": true
+ }
+}
