@@ -132,7 +132,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.21   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.22   # tagged release; no npm account needed
 ```
 
 ```js
@@ -151,7 +151,7 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.21 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.22 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -2631,6 +2631,48 @@ tests) plus the bent faces in `test/dialect-named-refusal.test.mjs` (D1b),
 `test/dialect-named-refusal-measurement.test.mjs`. Suite 912 → **933: 929
 pass / 4 named network skips / 0 fail**. Product code changed; the pin is
 the next release.
+
+## The wiring SHIPS in v0.4.22 — and the ecosystem number it moves is +102 for the user who adopts, not the shipped store (2026-11-12)
+
+This release carries the raw-LE wiring above to the install channel: the
+pinned tag now contains `src/rawle.mjs` and every wired boundary, so
+`npm install github:auroraxo/sememe#v0.4.22` degrades nobody (Whirlpool,
+shank, name-only anchor controls pin unchanged) and answers the diabloarb
+dialect where v0.4.21 refused it by name.
+
+The wiring also prompted the card's declared coverage re-measurement, and
+the honest answer is TWO-HALVED (`tools/measure-diablo-adoption-coverage.mjs`
+→ `research/diablo-adoption-coverage-2026-11-12.json`, pinned by
+`test/diablo-adoption-coverage.test.mjs`, 9 tests, gh-gated re-derivation
+included):
+
+- **At the shipped store the headline does NOT move.** Re-running the
+  committed 2026-11-11 fixture through the coverage tool on this tree
+  reproduces the committed artifact exactly: **88.5%, DiabLokxis 0 decoded
+  / 102 no-interface.** The wiring changed the codec, not the store, and
+  the diabloarb copy cannot ship inside the store: `cryptodiablo/diabloarb`
+  carries **no license** at the pin `f5005ac4` — live re-checked inside the
+  pin test (GitHub license API 404 at the pin AND at HEAD, repo field
+  null), not narrated. The bytes stay out of the repository and the
+  package; `committedStoreModified: false` (readdir + per-file hash digest
+  before/after).
+- **For the user who adopts, the 102 are real.** ONE `adopt` of the
+  hash-gated first-party copy (canonical fingerprint
+  `d6d4e8aa…` verified before anything runs) through the product's own
+  write path, into a throwaway copy of the committed store, and the SAME
+  report tool answers **102/102 decoded, 0 refused, 102 byte-exact**:
+  headline **88.5% → 89.0%** of measured traffic, outside the watchlist
+  **62.4% → 64.4%**. Every one of the 102 rides the **adopted** evidence
+  column (`decodedVia.adopted +102`; `pulled` moves by exactly zero) — the
+  same class split the pfeeU, manifest and archer measurements keep, so an
+  adoption can never silently inflate the on-chain-pull number.
+
+So "102 jetzt zählbar" was half true: countable **yes** — as adoption-path
+coverage, with a name and a byte-exact check — and **not** as a shipped
+headline. The acquisition gap at that program is a LICENSE gap, not a
+decoder gap: the one thing between the user and those 102 payloads is a
+licensed first-party copy, which is exactly what `sememe adopt` exists to
+carry while origin stays declared.
 
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
