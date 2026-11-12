@@ -1,0 +1,131 @@
+{
+  "measuredAt": "2026-11-12T19:49:11.024Z",
+  "repo": "auroraxo/sememe",
+  "checks": {
+    "repoMetadata": {
+      "public": true,
+      "license": "MIT",
+      "createdAt": "2026-10-26T09:24:02Z",
+      "ok": true
+    },
+    "starForkCensus": {
+      "starsTotal": 0,
+      "forksTotal": 0,
+      "nonOwnerStars": [],
+      "nonOwnerForks": [],
+      "ok": true
+    },
+    "ownIssueCensus": {
+      "total": 0,
+      "external": [],
+      "ok": true
+    },
+    "traffic": {
+      "window": "last 14 days, GitHub-fixed buckets",
+      "views": {
+        "count": 6,
+        "uniques": 2
+      },
+      "clones": {
+        "count": 2466,
+        "uniques": 509
+      },
+      "caveat": "clone count includes every CI checkout of this repo (own CI pulls it per push); never a consumption signal",
+      "externalReferrers": [],
+      "ok": true
+    }
+  },
+  "outbound": [
+    {
+      "ref": "step-finance-oss/step-ingestooor#1",
+      "state": "open",
+      "mergedOrClosed": false,
+      "commentsTotal": 0,
+      "nonOwnerComments": []
+    },
+    {
+      "ref": "jup-ag/rfq-webhook-toolkit#96",
+      "state": "open",
+      "mergedOrClosed": false,
+      "commentsTotal": 0,
+      "nonOwnerComments": []
+    }
+  ],
+  "mentionSweep": {
+    "query": "sememe in:body",
+    "total": 93,
+    "fetched": 92,
+    "remainder": {
+      "total": 93,
+      "unionFetched": 92,
+      "hidden": 1,
+      "perOrderFetched": [
+        92,
+        92
+      ],
+      "stable": true
+    },
+    "buckets": {
+      "selfAuthoredSlug": 3,
+      "foreignSlugPost": 0,
+      "foreignSlugPre": 0,
+      "termCollision": 89,
+      "samples": {
+        "selfAuthoredSlug": [
+          "step-finance-oss/step-ingestooor#1 by auroraxo (2026-11-04)",
+          "jup-ag/rfq-webhook-toolkit#96 by auroraxo (2026-11-02)",
+          "auroraxo/reeflog#1 by auroraxo (2026-10-31)"
+        ],
+        "foreignSlugPost": [],
+        "foreignSlugPre": []
+      }
+    }
+  },
+  "codeIndex": {
+    "selfControlHits": 1,
+    "total": 1,
+    "fetched": 1,
+    "foreign": [],
+    "ok": true
+  },
+  "registries": {
+    "npm": "found",
+    "cratesIo": "not-found",
+    "pypi": "not-found",
+    "controls": {
+      "npm": "ok",
+      "cratesIo": "ok"
+    }
+  },
+  "traffic": {
+    "window": "last 14 days, GitHub-fixed buckets",
+    "views": {
+      "count": 6,
+      "uniques": 2
+    },
+    "clones": {
+      "count": 2466,
+      "uniques": 509
+    },
+    "caveat": "clone count includes every CI checkout of this repo (own CI pulls it per push); never a consumption signal",
+    "externalReferrers": [],
+    "ok": true
+  },
+  "verdict": {
+    "class": "not-distributed-not-consumed",
+    "signals": [
+      "step-finance-oss/step-ingestooor#1 open with 0 non-owner comment(s)",
+      "jup-ag/rfq-webhook-toolkit#96 open with 0 non-owner comment(s)",
+      "zero non-owner stars, forks, issues, PRs"
+    ],
+    "meaning": "channels open, nothing consumed — no non-owner signal found on any measured channel",
+    "limits": [
+      "1 of 93 broad-sweep results are index-hidden (measured stable across orderings) and were not classified"
+    ]
+  },
+  "warnings": [
+    "index remainder: 1 of 93 results hidden by GitHub search in every measured ordering — sweep covers 92/93; the hidden item(s) are NOT classified"
+  ],
+  "dataSourcesFailed": 0,
+  "complete": true
+}
