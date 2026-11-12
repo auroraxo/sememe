@@ -27,9 +27,10 @@
 //      stating the interface carries no field list for that tag.
 //   D7 an unknown tag, a truncated payload and a payload with trailing
 //      bytes are all refused by name with RawLeError.
-//   G1 the PRODUCT boundary is unchanged: decodeInstructionData still
-//      refuses the diabloarb interface with the named CodecError from
-//      src/dialect.mjs — the engine is capability, not a wired path.
+//   G1 the PRODUCT boundary is WIRED (12.11. PULS Z): decodeInstructionData
+//      decodes and byte-exactly re-encodes every payload through the
+//      engine, and a grammar-defeating payload comes back as the codec's
+//      own CodecError — one refusal family at the product boundary.
 //   G2 the committed store objects (22/22) pass their own gates untouched.
 //   G3 every one of the 8 grammar falsifications is caught and named.
 
@@ -214,15 +215,30 @@ test('D8: encoding declaration is required by the gate; tag agreement and array 
   );
 });
 
-test('G1: the PRODUCT boundary is unchanged — codec context still refuses by name', async (t) => {
+test('G1: the PRODUCT boundary is WIRED — codec answers through the engine', async (t) => {
+  // Was: 'the product boundary is unchanged'. Since PULS Z the engine
+  // IS the product answer for this dialect: decodeInstructionData decodes
+  // and byte-exactly re-encodes every payload of the committed sample.
   const idl = await getIdl();
   if (!idl) { t.skip('diabloarb IDL not available'); return; }
-  const { decodeInstructionData, CodecError } = await import('../src/codec.mjs');
+  const { decodeInstructionData, encodeInstructionData, CodecError } = await import('../src/codec.mjs');
   const rows = samplePayloads();
+  let byteExact = 0;
+  for (const row of rows) {
+    const decoded = decodeInstructionData(idl, row, { trailing: 'error' });
+    const reencoded = encodeInstructionData(idl, decoded.instruction, decoded.args);
+    if (Buffer.from(reencoded).equals(row)) byteExact += 1;
+  }
+  assert.equal(byteExact, rows.length, 'the product entry reproduces every payload byte-identically');
+  // One refusal family: a mutation the grammar cannot explain comes back
+  // as the codec's own CodecError, never a RawLeError past the boundary.
+  const unknown = Buffer.from(rows[0]);
+  unknown[0] = 7;
   assert.throws(
-    () => decodeInstructionData(idl, rows[0], { trailing: 'report' }),
-    (error) => error instanceof CodecError && /^unsupported IDL dialect:/.test(error.message),
-    'the product boundary must continue stating the named refusal — the engine is capability only',
+    () => decodeInstructionData(idl, unknown),
+    (error) => error instanceof CodecError && !(error.constructor.name === 'RawLeError')
+      && /unknown instruction tag 0x07/.test(error.message),
+    'a wired refusal stays in the codec error family',
   );
 });
 

@@ -105,17 +105,28 @@ test('D1: the measured crash face is a NAMED CodecError, never a TypeError', asy
   );
 });
 
-test('D1b: the real interface at the pin refuses by name in the product codec', async (t) => {
+test('D1b: the real interface at the pin now DECODES at the product boundary', async (t) => {
+  // Was: the named refusal (PULS X). Since the PULS-Z wiring the product
+  // entry speaks the dialect: a real committed payload decodes as `search`
+  // and byte-exactly re-encodes; the shape note survives for the file's
+  // dict `types` (which is WHY this dialect needs its own engine).
   if (!await ghAuthed()) { t.skip('gh CLI not authenticated; skipping pin fetch'); return; }
   const raw = await fetchAt(PIN.file);
   const idl = JSON.parse(raw);
   assert.equal(idl.program_id, DIABLO, 'the pinned file declares this program');
-  const { decodeInstructionData, CodecError } = await import('../src/codec.mjs');
-  assert.throws(
-    () => decodeInstructionData(idl, Buffer.from('010680ca15000000000000010b0500000000010000009201f74d00000000', 'hex'), { trailing: 'report' }),
-    (error) => error instanceof CodecError && /^unsupported IDL dialect:/.test(error.message),
-  );
-  // And the reason names the mapping shape, not a shrug.
+  const sample = JSON.parse(await readFile(path.join(ROOT, 'test/fixtures/ecosystem-sample-2026-11-11.json'), 'utf8'));
+  const row = (sample.transactions ?? []).flatMap((tx) => tx.payloads ?? [])
+    .find((p) => p.program === DIABLO);
+  assert.ok(row, 'the committed sample carries diabloarb payloads');
+  const bytes = Buffer.from(row.dataHex, 'hex');
+  const { decodeInstructionData, encodeInstructionData } = await import('../src/codec.mjs');
+  const decoded = decodeInstructionData(idl, bytes, { trailing: 'error' });
+  assert.equal(decoded.instruction, 'search');
+  assert.equal(decoded.tag, 1);
+  const reencoded = encodeInstructionData(idl, decoded.instruction, decoded.args);
+  assert.equal(Buffer.from(reencoded).toString('hex'), row.dataHex, 'the product entry round-trips byte-identically');
+  // And the shape note stays named: the Anchor codec still cannot READ
+  // this file — the engine does.
   assert.match(unsupportedIdlReason(idl), /types must be an array, got object/);
 });
 

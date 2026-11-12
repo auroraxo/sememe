@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 // measure-rawle-decoder.mjs — NAMING A DIALECT IS NOT SPEAKING IT.
 //
+// HISTORICAL INSTRUMENT (PULS Y, 2026-11-12): its falsifications pin the
+// product boundary as NOT wired (currentProductNotNamed). Since PULS Z the
+// boundary IS wired, so running this tool in a wired tree exits 3 NO
+// VERDICT by design — it measures the trees it was built for. The wired
+// product boundary is measured by tools/measure-rawle-product.mjs
+// (research/rawle-product-2026-11-12.json).
+//
 // THE PREMISE (PULS X, research/dialect-named-refusal-2026-11-12.json):
 //   sememe refused the diabloarb interface BY NAME at every boundary — the
 //   honest answer while the dialect was foreign. The card's own next step

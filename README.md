@@ -2570,6 +2570,68 @@ way shank was. What this fix guarantees is that until that happens, the
 interface is refused by name at every boundary and never crashes the codec
 or pretends to be decodable.
 
+## The product SPEAKS the dialect it named: the raw-LE engine is wired (2026-11-12)
+
+PULS X named the refusal ("naming a dialect is not speaking it") and PULS Y
+built the speaker — an engine for exactly the grammar the diabloarb file
+DECLARES (`encoding: "little-endian; u8/u16/u32/u64 unsigned, i64 signed; no
+padding; no length prefixes except the u8 counters named in each header"`):
+u8-tag dispatch, dict `types` with declared fixed sizes, counter-prefixed
+vectors (`Base[n_bases]`, `u8[n_hops]`), one byte-decided optional trailing
+field. 102/102 committed payloads decoded byte-exactly, and the product
+boundary stayed untouched — deliberately: capability first, the wiring with
+the pins it rewrites.
+
+**This pulse is the wiring** (the card's own declared next step):
+
+- `src/codec.mjs` routes every decode/encode of a file OUTSIDE the Anchor
+  shape but INSIDE the engine grammar through `src/rawle.mjs`, before the
+  shape gate. The result carries the codec's own fields (`discriminator` is
+  the dispatch prefix in hex; `dialect: 'raw-le'`), and every engine refusal
+  is translated into `CodecError` — one refusal family at the product
+  boundary, never a `RawLeError` leak, never a crash.
+- `src/dialect.mjs` splits the question "can anything read this file?" from
+  "can the Anchor codec read it?": `unreadableDialectReason`/`assertReadableDialect`
+  pass an engine-readable file and keep the exact named refusal (code
+  `unsupported-idl-dialect`) for everything else; `idlDialect` reports
+  `'raw-le'` for a wired dialect.
+- The store gates (`src/adopt.mjs` write path, `src/store-read.mjs` read
+  path) use the readable-dialect guard: a raw-LE object adopts under its
+  own program id, reads back, and the CLI loop `sememe adopt` → `sememe
+  decode` works end-to-end offline (measured 2/2). Mislabelling under a
+  foreign program id stays refused via `program_id` — the wiring opens the
+  dialect gate, not the re-labelling gate.
+- The derivation (`src/discriminators.mjs`) passes the file WITHOUT filling
+  any Anchor sighash table (the PULS X fill defect stays dead — measured
+  filled {instructions: 0, events: 0}); the union (`src/union.mjs`)
+  decodes through the engine like through any source.
+
+Measured two-tree, byte-identical probe
+([`research/rawle-product-2026-11-12.json`](research/rawle-product-2026-11-12.json),
+pinned in `test/rawle-product-measurement.test.mjs` with a full
+gh-gated re-derivation): prefix tree = the PULS Y engine commit `05e6643`
+(engine present, product refuses — 0/102, store loop closed), this tree =
+102/102 decoded AND 102/102 byte-exact re-encoded at `decodeInstructionData`,
+5/5 product-level refusals as named `CodecError` faces (unknown tag,
+truncated payload, trailing bytes, unknown instruction on encode, missing
+argument on encode), derivation passes with NO table, adopt/read/union open,
+CLI store loop 2/2, Whirlpool control unchanged, a file that defeats BOTH
+engines keeps the exact PULS X named refusal at codec AND union. 24
+falsification counts, all zero. The PULS X measurement
+([`research/dialect-named-refusal-2026-11-12.json`](research/dialect-named-refusal-2026-11-12.json))
+was re-derived in its invariant form: its delta now reads crash → decodes
+through the engine, fill {4,0} → {0,0} — the no-crash, no-fill, no-mislabel
+invariants pinned on every payload. The PULS Y artifact stays the frozen
+pre-wiring baseline; its tool now exits 3 NO VERDICT in a wired tree BY
+DESIGN (stated in the tool header).
+
+**Tests: 1 new pin file** (`test/rawle-product-measurement.test.mjs`, 12
+tests) plus the bent faces in `test/dialect-named-refusal.test.mjs` (D1b),
+`test/rawle-decoder.test.mjs` (G1) and
+`test/dialect-named-refusal-measurement.test.mjs`. Suite 912 → **933: 929
+pass / 4 named network skips / 0 fail**. Product code changed; the pin is
+the next release.
+
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
 With Lighthouse decoded under shank, exactly **35 programs (87 payloads)** remained

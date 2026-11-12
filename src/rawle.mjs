@@ -42,15 +42,19 @@
 //     A remainder that is neither exactly the option size nor zero is a
 //     named refusal (trailing bytes the layout does not explain).
 //
-// NOT WIRED INTO THE PRODUCT. No call site in codec/union/adopt/store-read
-// or the CLI routes through this engine yet — PULS X's named refusal stays
-// the product's answer at every boundary, byte for byte, and the dialect
-// gate is untouched. That is deliberate: making support the product answer
-// changes 19 pinned faces of the PULS X measurement (its artifacts and
-// tools assert the refusal of THIS interface), and the release it belongs
-// to must state the change. The engine + measurement first, the wiring
-// with the pins it rewrites — this is the same order every pulse in this
-// repo has worked in.
+// WIRED INTO THE PRODUCT SINCE PULS Z (2026-11-12): src/codec.mjs routes
+// every decode/encode of a file OUTSIDE the Anchor shape but INSIDE this
+// grammar through this engine — instruction decode/encode, the union
+// probe, store adopt/read, and the discriminator derivation gate (an
+// engine-readable file passes it; no Anchor table is derived for it).
+// RawLeError is translated into CodecError at the boundary, so the
+// product keeps ONE refusal family. Everything else — every anchor/shank/
+// name-only file — takes the exact same codec paths as before, byte for
+// byte, and files no engine can read keep PULS X's named refusal.
+// The face this wiring turns: diabloarb's 102 sample payloads, refused
+// by name until now, decode byte-exactly through the product entry. The
+// pins it bends are the PULS X refusal faces for THIS interface, and the
+// measurement that proves them is tools/measure-rawle-product.mjs.
 //
 // Byte-exactness note: decoded integers come back as Number (<= 4 bytes)
 // or BigInt (8 bytes), exactly like src/codec.mjs's own convention, and

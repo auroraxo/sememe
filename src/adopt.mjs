@@ -39,7 +39,7 @@ import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { writeOnce } from './store-write.mjs';
 import { originDigestOf, receiptDigestOf } from './receipt-digest.mjs';
-import { assertIdlShape, declaredProgram } from './dialect.mjs';
+import { assertIdlShape, assertReadableDialect, declaredProgram } from './dialect.mjs';
 
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
 
@@ -117,12 +117,13 @@ export async function adopt(programInput, filePath, storeDir, { source = 'publis
     }
     throw Error(`${filePath} declares program ${declared}, not ${program} — refusing to re-label a foreign interface`);
   }
-  // Gate 2 — the dialect gate runs at the store's WRITE path too: an
-  // interface the codec cannot read (measured 2026-11-12: diabloarb's
-  // tag/data dispatch with dict `types`) is refused HERE, not after
-  // adoption when every decode crashes unnamed. Same reason text as the
-  // codec's guard (src/dialect.mjs).
-  assertIdlShape(idl, (reason) => Error(`${filePath}: ${reason}`));
+  // Gate 2 — the dialect gate at the store's WRITE path: a dialect NO
+  // engine of the product can read is refused HERE by name, before
+  // adoption can store an undecodable interface. SINCE THE PULS-Z WIRING
+  // a raw-LE file passes (the codec serves it from src/rawle.mjs),
+  // everything else keeps the named refusal (measured 2026-11-12:
+  // diabloarb's dict `types` was the face of that refusal).
+  assertReadableDialect(idl, (reason) => Error(`${filePath}: ${reason}`));
 
   const json = Buffer.from(canonicalJson(idl) + '\n');
   const fingerprint = sha256(json);

@@ -43,6 +43,7 @@
 // shank take the same paths as before, byte for byte.
 
 import { isShankDiscriminant } from './shank.mjs';
+import { rawLeDialectReason } from './rawle.mjs';
 
 const isPlainObject = (value) => !!value && typeof value === 'object' && !Array.isArray(value);
 
@@ -107,7 +108,12 @@ export function unsupportedIdlReason(idl) {
  * lists.
  */
 export function idlDialect(idl) {
-  if (unsupportedIdlReason(idl)) return 'unsupported';
+  // A raw-LE file is SUPPORTED now (PULS Z wiring) but is not one of the
+  // three Anchor-family dialects this classifier enumerates; it reports
+  // its own name so callers can tell a wired dialect from a refused one.
+  if (unsupportedIdlReason(idl)) {
+    return rawLeDialectReason(idl) === null ? 'raw-le' : 'unsupported';
+  }
   const instructions = idl.instructions;
   if (instructions.length === 0) return 'anchor';
   for (const instruction of instructions) {
@@ -136,6 +142,35 @@ export function declaredProgram(idl) {
  */
 export function assertIdlShape(idl, makeError) {
   const reason = unsupportedIdlReason(idl);
+  if (!reason) return;
+  const error = makeError(reason);
+  if (error && typeof error === 'object') {
+    error.code = UNSUPPORTED_DIALECT_CODE;
+  }
+  throw error;
+}
+
+/**
+ * The refusal reason ONLY when no engine in the product can read the file.
+ * Since 12.11. PULS Z the raw little-endian engine (src/rawle.mjs) is wired
+ * into the codec: an IDL the Anchor codec refuses by SHAPE but the engine
+ * claims grammar for is decodable, so the store write gate, the store read
+ * gate and the discriminator derivation must not refuse it. Every other
+ * unsupported shape keeps the exact named refusal of `unsupportedIdlReason`.
+ * The codec's own dispatch (src/codec.mjs) asks the same two questions in
+ * the same order: is it outside the Anchor shape, and is it inside the
+ * engine grammar?
+ */
+export function unreadableDialectReason(idl) {
+  const reason = unsupportedIdlReason(idl);
+  if (!reason) return null;
+  return rawLeDialectReason(idl) === null ? null : reason;
+}
+
+/** Like assertIdlShape, but raw-LE-readable files pass — the engine speaks
+ * them now (PULS Z). Same named refusal and same error code otherwise. */
+export function assertReadableDialect(idl, makeError) {
+  const reason = unreadableDialectReason(idl);
   if (!reason) return;
   const error = makeError(reason);
   if (error && typeof error === 'object') {

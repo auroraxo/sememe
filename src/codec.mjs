@@ -20,7 +20,8 @@
 
 import { encodeBase58, decodeBase58 } from './base58.mjs';
 import { isShankIdl, isShankDiscriminant, shankDiscriminatorBytes, SHANK_LEB128_TYPES } from './shank.mjs';
-import { assertIdlShape } from './dialect.mjs';
+import { assertIdlShape, unsupportedIdlReason } from './dialect.mjs';
+import { rawLeDialectReason, decodeRawLe, encodeRawLe, RawLeError } from './rawle.mjs';
 
 const MAX_DEPTH = 32;
 // Instruction data is bounded by transaction size; a hostile length prefix
@@ -925,6 +926,43 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
     throw new CodecError(`unknown absent policy ${JSON.stringify(absent)}`, null);
   }
   if (!(data instanceof Uint8Array)) throw new CodecError('instruction data must be a Uint8Array/Buffer', null);
+  // The raw little-endian dialect is WIRED at the product boundary (12.11.
+  // PULS Z). Until PULS X the diabloarb interface crashed the codec unnamed
+  // (TypeError over the dict `types`, 102/102 payloads); until this wiring
+  // the same interface was refused by name — honest, but naming a dialect is
+  // not speaking it (PULS Y: the engine decoded 102/102 byte-exactly, and
+  // the card's own next step was this adapter). The branch runs BEFORE the
+  // shape gate: a raw-LE IDL is exactly the shape the dialect gate names as
+  // unsupported, so the engine must answer first. When the bytes defeat the
+  // declared grammar the RawLeError is translated into the codec's error
+  // family — one refusal family at the product boundary, never a RawLeError
+  // leaking past it. The message text stays the engine's own words.
+  if (unsupportedIdlReason(idl) && rawLeDialectReason(idl) === null) {
+    try {
+      const raw = decodeRawLe(idl, data);
+      const { kind, instruction, tag, args, absent, consumed, total, trailing: rawTrailing } = raw;
+      const bytes = data instanceof Uint8Array ? data : Buffer.from(data);
+      return {
+        kind: kind ?? 'instruction',
+        instruction,
+        tag,
+        // The dispatch prefix in hex, like the codec's own `discriminator`
+        // field — here the prefix is the u8 tag the engine dispatched on,
+        // not an Anchor sighash. Consumers that render the prefix (CLI,
+        // src/decode.mjs) therefore see the real wire bytes.
+        discriminator: Buffer.from(data.subarray(0, 1)).toString('hex'),
+        args,
+        absent: absent ?? [],
+        consumed,
+        total,
+        trailing: rawTrailing ?? { count: Math.max(0, bytes.length - consumed), hex: '' },
+        dialect: 'raw-le',
+      };
+    } catch (error) {
+      if (!(error instanceof RawLeError)) throw error;
+      throw new CodecError(error.message, error.path);
+    }
+  }
   const ctx = context(idl);
   const index = instructionIndex(idl);
   const prefixLength = Math.min(8, data.length);
@@ -998,6 +1036,17 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
  * layout, and byte-exactness is the only evidence this function offers.
  */
 export function encodeInstructionData(idl, name, args, { absent } = {}) {
+  // Same dialect branch as decodeInstructionData: a raw-LE interface is
+  // served by its engine, byte for byte, and every refusal comes back in
+  // the codec's own error family.
+  if (unsupportedIdlReason(idl) && rawLeDialectReason(idl) === null) {
+    try {
+      return encodeRawLe(idl, name, args, { absent });
+    } catch (error) {
+      if (!(error instanceof RawLeError)) throw error;
+      throw new CodecError(error.message, error.path);
+    }
+  }
   const ctx = context(idl);
   const instruction = instructionByName(idl, name);
   const bytes = discriminatorBytes(instruction) ?? (() => {

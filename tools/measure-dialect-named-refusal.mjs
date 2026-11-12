@@ -238,22 +238,24 @@ async function main() {
       prefixFillsSighash: (prefix.direct.derivationFilled?.instructions ?? -1) === PIN.instructions ? 0 : 1,
       prefixAdoptsUnderForeignId: prefix.adopt.mislabelAdopted === true ? 0 : 1,
       prefixReadBoundaryOpen: prefix.readBoundary.voice === 'readable' ? 0 : 1,
-      // This tree must refuse with names at every face.
+      // This tree must never land back on a defect face. SINCE PULS Z
+      // (the raw-LE wiring) the diabloarb interface is SPOKEN at the
+      // product entry — decode 102/102 through the codec and the union —
+      // so the PULS X 'named refusal everywhere' faces became wired
+      // faces. The INVARIANTS this measurement pins never moved: no crash
+      // voice anywhere, no Anchor sighash fill, no mislabelling, one
+      // countable refusal family, and every OTHER dialect still gated.
       currentCrashVoice: current.direct.codecCrashVoice !== null ? 1 : 0,
-      currentNotNamed: current.direct.codecNamedVoice === null ? 1 : 0,
-      currentNamedNotCodecError: current.direct.codecNamedIsCodecError === true ? 0 : 1,
-      currentDerivationNotRefused: current.direct.derivationRefused === null ? 1 : 0,
+      currentCrashOnAnyPayload: current.adopt.voices.crash !== 0 ? 1 : 0,
+      currentOtherVoice: current.adopt.voices.other !== 0 ? 1 : 0,
       currentDerivationCrashed: current.direct.derivationCrashed !== null ? 1 : 0,
-      currentAdoptStillAcceptedOwnId: current.adopt.voiceAdopted === false ? 0 : 1,
-      currentAdoptVoiceNotNamed: current.adopt.voiceAdoptRefusal === null
-        || !current.adopt.voiceAdoptRefusal.includes('unsupported IDL dialect') ? 1 : 0,
-      currentStoreVoicesNotClean: (current.adopt.voices.crash === 0 && current.adopt.voices.other === 0
-        && current.adopt.voices.decoded === 0
-        && current.adopt.voices['no-interface'] === rows) ? 0 : 1,
+      currentDerivationStillFillsSighashes: (current.direct.derivationFilled?.instructions ?? 0) !== 0
+        || (current.direct.derivationFilled?.events ?? 0) !== 0 ? 1 : 0,
+      currentProductNotSpoken: current.adopt.voices.decoded !== rows ? 1 : 0,
+      currentUnionNotDecoded: current.direct.codecOtherVoice === null ? 1 : 0,
       currentMislabelStillAdopted: current.adopt.mislabelAdopted === false ? 0 : 1,
       currentMislabelUnnamed: current.adopt.mislabelAdoptRefusal === null
         || !current.adopt.mislabelAdoptRefusal.includes('via program_id') ? 1 : 0,
-      currentReadBoundaryNotNamed: current.readBoundary.voice === 'named' ? 0 : 1,
       // The fix must be surgical: supported-dialect controls and every
       // committed store object pass unchanged.
       controlWhirlpoolRefused: current.guards.controls.whirlpoolAnchor.refused !== false ? 1 : 0,
@@ -277,16 +279,16 @@ async function main() {
     const output = {
       generatedAt: new Date().toISOString(),
       program: DIABLO,
-      finding: 'a non-Anchor IDL crashed the codec with an unnamed TypeError, had its tag-dispatch instructions silently filled with Anchor sighashes, and could be adopted under a foreign program id: the dialect gate now names the refusal at every boundary (codec context, derivation, adopt, store-read) and a declared program_id must agree with the receipt',
+      finding: 'a non-Anchor IDL crashed the codec with an unnamed TypeError, had its tag-dispatch instructions silently filled with Anchor sighashes, and could be adopted under a foreign program id: the dialect gate named the refusal at every boundary (PULS X) and the raw-LE engine is wired since PULS Z, so this interface now DECODES through the product — the pinned invariants (no crash voice, no sighash fill, no mislabelling, countable refusal family) still hold on every payload',
       pin: PIN,
       face: FACE_COUNTS,
       prefix: { commit: prefixCommit },
       faces: { prefix, current },
       falsifications,
       delta: {
-        directCodecVoice: `${prefix.direct.codecCrashVoice ? 'crash (TypeError)' : 'unknown'} -> ${current.direct.codecNamedVoice ? 'named (unsupported IDL dialect, CodecError)' : 'unknown'}`,
-        storeVoices: `crash ${prefix.adopt.voices.crash} -> crash ${current.adopt.voices.crash}, no-interface ${current.adopt.voices['no-interface']}`,
-        derivationFill: `${JSON.stringify(prefix.direct.derivationFilled)} -> ${current.direct.derivationRefused ? 'refused' : 'filled'}`,
+        directCodecVoice: `${prefix.direct.codecCrashVoice ? 'crash (TypeError)' : 'unknown'} -> ${current.direct.codecCrashVoice ? 'crash' : (current.direct.codecOtherVoice ? 'decodes through the engine (raw-le wired)' : 'unknown')}`,
+        storeVoices: `crash ${prefix.adopt.voices.crash} -> crash ${current.adopt.voices.crash}, decoded ${current.adopt.voices.decoded}`,
+        derivationFill: `${JSON.stringify(prefix.direct.derivationFilled)} -> ${current.direct.derivationRefused ? 'refused' : JSON.stringify(current.direct.derivationFilled)}`,
         adoptUnderOwnId: `${prefix.adopt.voiceAdopted} -> ${current.adopt.voiceAdopted}`,
         mislabelAdopted: `${prefix.adopt.mislabelAdopted} -> ${current.adopt.mislabelAdopted}`,
         readBoundary: `${prefix.readBoundary.voice} -> ${current.readBoundary.voice}`,

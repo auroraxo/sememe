@@ -56,26 +56,27 @@ test('the prefix tree SHOWED the defect on every face, and this tree landed on t
     'pre-fix the codec CRASHED with the unnamed TypeError');
   assert.equal(prefix.adopt.voices.crash, 102, 'pre-fix all 102 payloads refused with the crash voice');
   assert.equal(current.direct.codecCrashVoice, null, 'post-fix the crash voice is gone');
-  assert.match(String(current.direct.codecNamedVoice), /^unsupported IDL dialect:/);
-  assert.equal(current.direct.codecNamedIsCodecError, true, 'the named refusal is a CodecError, not a bare Error');
-  assert.equal(current.adopt.voices.crash, 0);
-  assert.equal(current.adopt.voices['no-interface'], 102,
-    'the honest product answer with a refused interface is a COUNTABLE no-interface state');
+  // Since the PULS-Z raw-LE wiring this interface is SPOKEN, not refused:
+  // the product entry decodes all 102 payloads through the engine. The
+  // refusal faces became wired faces — the INVARIANT is what stays pinned.
+  assert.equal(current.adopt.voices.crash, 0, 'no payload may crash');
+  assert.equal(current.adopt.voices.decoded, 102,
+    'the wired product decodes every payload of the committed sample');
+  assert.equal(current.adopt.voices.other, 0, 'no payload may land in an uncountable voice');
   // Face 2: the derivation.
   assert.deepEqual(prefix.direct.derivationFilled, { instructions: 4, events: 0 },
     'pre-fix the derivation filled all four tag-dispatch instructions with sighashes');
-  assert.match(String(current.direct.derivationRefused), /^unsupported IDL dialect:/);
-  assert.equal(current.direct.derivationFilled, null);
+  assert.deepEqual(current.direct.derivationFilled, { instructions: 0, events: 0 },
+    'the wired dialect derives NO Anchor table — its dispatch is its own u8 tags');
+  assert.equal(current.direct.derivationCrashed, null, 'the derivation must not crash');
   // Face 3: both mislabelling paths.
   assert.equal(prefix.adopt.voiceAdopted, true, 'pre-fix adopt under the OWN id succeeded');
   assert.equal(prefix.adopt.mislabelAdopted, true, 'pre-fix adopt under WSOL succeeded — the re-labelling defect');
   assert.equal(prefix.readBoundary.voice, 'readable',
     'pre-fix the store reader admitted a dialect the codec could not read');
-  assert.equal(current.adopt.voiceAdopted, false);
-  assert.match(String(current.adopt.voiceAdoptRefusal), /unsupported IDL dialect/);
-  assert.equal(current.adopt.mislabelAdopted, false);
+  assert.equal(current.adopt.mislabelAdopted, false,
+    'the re-labelling gate stays closed even with the dialect gate opened');
   assert.match(String(current.adopt.mislabelAdoptRefusal), /via program_id/, 'the refusal names the field that carried the declaration');
-  assert.equal(current.readBoundary.voice, 'named');
 });
 
 test('every falsification count is zero — the surgical guards hold', () => {
@@ -87,12 +88,12 @@ test('every falsification count is zero — the surgical guards hold', () => {
 });
 
 test('the delta is the measured one', () => {
-  assert.match(artifact.delta.directCodecVoice, /crash \(TypeError\) -> named/);
-  assert.match(artifact.delta.storeVoices, /crash 102 -> crash 0, no-interface 102/);
-  assert.equal(artifact.delta.derivationFill, '{"instructions":4,"events":0} -> refused');
-  assert.equal(artifact.delta.adoptUnderOwnId, 'true -> false');
+  assert.match(artifact.delta.directCodecVoice, /crash \(TypeError\) -> decodes through the engine/);
+  assert.match(artifact.delta.storeVoices, /crash 102 -> crash 0, decoded 102/);
+  assert.equal(artifact.delta.derivationFill, '{"instructions":4,"events":0} -> {"instructions":0,"events":0}');
+  assert.equal(artifact.delta.adoptUnderOwnId, 'true -> true');
   assert.equal(artifact.delta.mislabelAdopted, 'true -> false');
-  assert.equal(artifact.delta.readBoundary, 'readable -> named');
+  assert.equal(artifact.delta.readBoundary, 'readable -> readable');
 });
 
 test('the artifact\'s baselines match the committed fixtures (no hand-edited numbers)', () => {

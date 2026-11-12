@@ -13,9 +13,12 @@
 //   * this tree decodes 102/102 and re-encodes 102/102 byte-identically;
 //   * every one of the 8 grammar falsifications refused BY NAME (never the
 //     sentinel ESCAPED);
-//   * the PRODUCT boundary is UNCHANGED: the named refusal from
-//     src/dialect.mjs is still the product's answer — the engine is
-//     capability, the wiring is future work;
+//   * the PRODUCT boundary is UNCHANGED **in the tree this artifact
+//     measured** (PULS Y): the named refusal from src/dialect.mjs was the
+//     product's answer — the engine was capability, the wiring future
+//     work. Since PULS Z the boundary IS wired; this artifact stays the
+//     frozen pre-wiring baseline, and the wired faces are measured by
+//     research/rawle-product-2026-11-12.json (test/rawle-product-measurement.test.mjs);
 //   * every falsification count is zero and the verdict is 'measured'.
 //
 // The tool-side falsification half lives in the tool itself: it exits 3
@@ -84,6 +87,11 @@ test('every grammar falsification refused BY NAME (no ESCAPED sentinel)', () => 
 });
 
 test('the PRODUCT boundary is unchanged — the engine did not wire itself in', () => {
+  // HISTORICAL RECORD of the PULS Y run: in THAT tree the product still
+  // refused by name. Since PULS Z the boundary is wired and the product
+  // face of a fresh run is 'decoded' — that state is measured by
+  // research/rawle-product-2026-11-12.json (test/rawle-product-measurement).
+  // This artifact stays the pre-wiring baseline and is pinned as measured.
   assert.equal(artifact.faces.current.product.voice, 'named');
   assert.match(artifact.faces.current.product.message, /^unsupported IDL dialect:/);
   assert.equal(artifact.faces.prefix.product.voice, 'crash');

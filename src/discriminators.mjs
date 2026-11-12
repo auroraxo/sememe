@@ -28,7 +28,7 @@
 
 import { createHash } from 'node:crypto';
 import { isShankDiscriminant } from './shank.mjs';
-import { unsupportedIdlReason } from './dialect.mjs';
+import { unreadableDialectReason, idlDialect } from './dialect.mjs';
 
 const sha256 = (text) => createHash('sha256').update(text).digest();
 
@@ -119,14 +119,29 @@ export function verifyDerivedDiscriminators(idl) {
  * @returns {{ idl: object, filled: { instructions: number, events: number }, conflicts: object[] }}
  */
 export function withDerivedDiscriminators(idl) {
-  // A dialect the codec cannot read gets NO derived table at all. Measured
-  // 2026-11-12 on the diabloarb interface: the derivation filled all four
-  // tag-dispatch instructions with Anchor sighashes that match no wire — a
-  // table that looks authoritative and decodes nothing. The refusal is named
-  // (see src/dialect.mjs) and identical to the codec's own.
-  const refusal = unsupportedIdlReason(idl);
+  // A dialect NO engine in the product can read gets NO derived table at
+  // all. Measured 2026-11-12 on the diabloarb interface: the derivation
+  // filled all four tag-dispatch instructions with Anchor sighashes that
+  // match no wire — a table that looks authoritative and decodes nothing.
+  // The refusal is named (see src/dialect.mjs) and identical to the
+  // codec's own. SINCE THE PULS-Z WIRING the raw little-endian engine is
+  // a product engine: a raw-LE interface carries its own tag dispatch (a
+  // u8 `tag`, not a sighash) and passes this gate to the codec, which
+  // serves it from src/rawle.mjs — no Anchor table is derived for it and
+  // none is needed.
+  const refusal = unreadableDialectReason(idl);
   if (refusal) throw new Error(refusal);
   const copy = structuredClone(idl);
+  // A raw-LE file (PULS Z wiring) dispatches on the u8 tag its own file
+  // declares — Anchor sighash derivation for it is the measured PULS X
+  // defect one gate change later: filled {instructions: 4, events: 0}, a
+  // table that looks authoritative and matches no wire byte. The honest
+  // table for this dialect is NO derived table, and the codec serves the
+  // file from src/rawle.mjs. The file still passes the gate (an engine
+  // reads it); only the Anchor filling is withheld.
+  if (idlDialect(idl) === 'raw-le') {
+    return { idl: copy, filled: { instructions: 0, events: 0 }, conflicts: [] };
+  }
   let instructions = 0;
   let events = 0;
   const conflicts = [];

@@ -33,7 +33,7 @@ import { canonicalJson } from './canonical.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
 import { receiptIntegrity } from './receipt-digest.mjs';
-import { assertIdlShape, declaredProgram } from './dialect.mjs';
+import { assertIdlShape, assertReadableDialect, declaredProgram } from './dialect.mjs';
 
 export { canonicalJson } from './canonical.mjs';
 
@@ -80,11 +80,14 @@ export async function readVerified(storeDir, program, receiptName) {
   }
   if (!Array.isArray(idl.instructions)) throw Error(`stored object for ${program} has no instructions`);
   // Same two checks as the write path (src/adopt.mjs), applied on every
-  // read: a dialect the codec cannot read is refused by NAME before any
-  // decode can crash unnamed, and a declared program that differs from the
-  // receipt's program is a re-labelling no matter which field carries the
-  // declaration (`address`, `metadata.address` or `program_id`).
-  assertIdlShape(idl, (reason) => {
+  // read: a dialect NO engine of the product can read is refused by NAME
+  // before any decode can crash unnamed, and a declared program that
+  // differs from the receipt's program is a re-labelling no matter which
+  // field carries the declaration (`address`, `metadata.address` or
+  // `program_id`). Since the PULS-Z wiring a stored raw-LE object reads
+  // through the engine (src/rawle.mjs) — a store that refused it by name
+  // now decodes instead, which is the point of the wiring.
+  assertReadableDialect(idl, (reason) => {
     const error = Error(`stored object ${fingerprint} for ${program}: ${reason}`);
     error.code = 'unsupported-idl-dialect';
     return error;
