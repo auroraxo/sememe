@@ -1,0 +1,90 @@
+{
+ "generatedAt": "2026-11-12T06:52:24.904Z",
+ "program": "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ",
+ "name": "pump.fun fees (pump_fees)",
+ "finding": "pfeeU's 459 refusals are one instruction (get_fees_with_quote_mint, discriminator 9aed8a5ca202a2bb) that the on-chain IDL account does not list even at slot 468428470; the MIT candidate the card named is byte-identical to the stored pull and closes nothing; the FIRST-PARTY published copy closes all 459 on the same committed bytes",
+ "cardPremiseFalsified": {
+  "candidate": "needsmorergb/charlie-protocol-v1:_idl_pfeeUxB6.json@eb85241573842170151f59a4cb7e377294cdd3f8 (MIT)",
+  "evidence": "canonical fingerprint 9c1ef6ed66df5d72f4491d12e9781436f8037a6e20499d1681485591b8644a26 equals the stored on-chain pull's fingerprint — same bytes, 29 instructions, zero new discriminators"
+ },
+ "chainLag": {
+  "storedSlot": 468262003,
+  "livePull": {
+   "slot": 468428470,
+   "fingerprint": "sha256:9c1ef6ed66df5d72f4491d12e9781436f8037a6e20499d1681485591b8644a26",
+   "unchanged": true
+  },
+  "note": "a fresh pull at a newer slot returned the same bytes — the lag is live on chain, not stale in the store"
+ },
+ "nameBinding": {
+  "instruction": "get_fees_with_quote_mint",
+  "faceDiscriminator": "9aed8a5ca202a2bb",
+  "rule": "sha256(\"global:\" + name)[0..8] (anchor-lang), computed independently here",
+  "fileAgrees": true,
+  "ruleAgrees": true,
+  "sanityOnStoredPair": "get_fees -> e7257e55cf5b3f34 agrees with both copies"
+ },
+ "pin": {
+  "repo": "pump-fun/pump-public-docs",
+  "commit": "639b87fb45c3adeffa6f7c4a1bf0cb85e392bf22",
+  "file": "idl/pump_fees.json",
+  "canonicalFingerprint": "sha256:d85238f1557e8951dcfc3e06341c248ee7e642c11017fbbee80702718c2f88ca",
+  "license": null,
+  "licenseNote": "no LICENSE file in the repo at the pinned commit — the bytes stay OUT of this repository and the npm package; they were adopted into a throwaway store copy that the tool deletes",
+  "origin": "pump-fun/pump-public-docs@639b87fb45c3adeffa6f7c4a1bf0cb85e392bf22:idl/pump_fees.json"
+ },
+ "sample": "test/fixtures/ecosystem-sample-2026-11-11.json",
+ "store": "test/fixtures/ecosystem-store-2026-11-11",
+ "committedStoreModified": false,
+ "measured": {
+  "payloads": 464,
+  "failedTransactions": 60,
+  "baseline": {
+   "decoded": 5,
+   "refused": 459,
+   "byteExact": 5,
+   "describedExact": 5,
+   "coveredPct": 1.1,
+   "refusalReasons": {
+    "decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 9aed8a5ca": 459
+   }
+  },
+  "union": {
+   "decoded": 464,
+   "refused": 0,
+   "byteExact": 464,
+   "describedExact": 464,
+   "coveredPct": 100,
+   "adoptedAnswered": 459,
+   "pulledAnswered": 5
+  },
+  "delta": {
+   "decoded": 459,
+   "refusalsClosed": 459,
+   "reAssignedToAdopted": 0
+  },
+  "baselineNamesKept": true,
+  "renames": [],
+  "receipt": {
+   "fingerprint": "sha256:d85238f1557e8951dcfc3e06341c248ee7e642c11017fbbee80702718c2f88ca",
+   "instructionCount": 31,
+   "slot": null
+  },
+  "unionNames": {
+   "get_fees_with_quote_mint": 459,
+   "create_fee_sharing_config": 1,
+   "update_fee_shares": 1,
+   "CreateFeeSharingConfigEvent": 1,
+   "UpdateFeeSharesEvent": 1,
+   "get_fees": 1
+  },
+  "unionRefusals": {}
+ },
+ "limits": [
+  "one committed window: the 464 pfeeU payloads of the 11-11 ecosystem capture, not the whole ecosystem",
+  "origin declared, not verified: the pin binds the canonical bytes to a commit nobody signed; the byte evidence is the re-encode",
+  "the adopted copy sits at slot null and never displaces the on-chain pull (src/adopt.mjs ordering rule)",
+  "licensing: pump-public-docs ships no LICENSE file, so it is not vendored — the measurement reproduces it from the pin at run time",
+  "the on-chain account still lags (same bytes at slot 468428470): until the deployer publishes, only the first-party copy explains this instruction"
+ ]
+}
