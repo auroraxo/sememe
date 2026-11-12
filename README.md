@@ -132,7 +132,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.20   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.21   # tagged release; no npm account needed
 ```
 
 ```js
@@ -151,7 +151,7 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.20 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.21 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
@@ -2498,6 +2498,77 @@ the ed25519 verification path still does not apply to this payload family.
 Lighthouse publishes no on-chain interface: the store copy is only as honest
 as its upstream source (first-party, fingerprinted, origin-labelled) — if
 upstream changes the wire, sememe will refuse by name, not decode wrongly.
+
+## A dialect it does not speak is a NAMED refusal, never a crash (2026-11-12)
+
+The acquisition queue's fourth face looked like a data problem and turned out
+to be a product defect. `DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z` — 102
+payloads in the committed ecosystem sample — has a first-party interface
+([cryptodiablo/diabloarb](https://github.com/cryptodiablo/diabloarb),
+`sdk/diabloarb-executor.idl.json` @ `f5005ac4`), and that file says in its own
+description what it is: *"Raw little-endian byte layout (NOT Anchor/Borsh:
+list lengths are u8 counters in the header)"*. It dispatches on a 1-byte
+`tag` with fields under `data`, its `types` is a dict keyed by name
+(`{Hop, Base, Route}`), and it declares its program under `program_id`.
+
+Feeding it to sememe before this section's fix produced three measured defect
+faces, none of them a refusal:
+
+1. **The codec CRASHED.** `context()` iterated `idl.types ?? []` — a dict is
+   not iterable — so all 102 payloads died with the unnamed
+   `TypeError: object is not iterable (cannot read property
+   Symbol(Symbol.iterator))`. A crash voice cannot be counted, grouped or
+   gated on: the coverage artifact recorded 102 `noInterface` and never saw
+   that the codec was broken one layer under.
+2. **The derivation LIED.** `withDerivedDiscriminators` filled all four
+tag-dispatch instructions with Anchor sighashes (`filled {instructions: 4,
+   events: 0}`, zero conflicts) — an authoritative-looking table matching no
+   wire byte, the stored-discriminator defect one dialect up.
+3. **adopt RE-LABELLED.** The file declares its program under `program_id`;
+   adopt and the store reader checked `idl.address` only, so adopting the
+   diabloarb interface under WSOL's program id **succeeded** without a word.
+
+**What landed.** `src/dialect.mjs` defines the named refusal ONCE
+(`unsupported IDL dialect: …`) and every boundary the defect entered through
+checks it: the codec's `context()` (before any iteration), the derivation
+(no table over a dialect it does not speak), `sememe adopt` (write path) and
+`store-read` (read path, so a store that already contains such an object
+refuses on every read). The declared-program check now reads `address`,
+`metadata.address` **and** `program_id`, and the refusal names the field that
+carried the declaration. Post-fix, the honest product answer for an
+unadoptable interface is `no stored interface` — 102 payloads in a state you
+can COUNT, group and gate on, never a TypeError.
+
+**The gate is surgical, and measured as such**
+([`research/dialect-named-refusal-2026-11-12.json`](research/dialect-named-refusal-2026-11-12.json),
+two-tree falsification against the pre-fix commit `aa6901b`): 24
+falsification counts, all zero. The prefix tree SHOWS every face — crash
+102/102, fill 4/0, adopt true under both ids, read boundary open; this tree
+lands on the named voices. The supported-dialect controls pass unchanged: a
+full anchor IDL, a shank IDL, and — deliberately — a legacy **name-only**
+anchor IDL (Kamino's, no selectors): such IDLs have no wire claims, the
+conform gate reads their account lists for layout checking, and the decode
+path already refused their payloads by name (`unknown instruction
+discriminator`) before this gate existed. Calling that shape "unsupported"
+would have changed attested behavior without a single measured wire failure.
+All 22 committed store objects stay readable. The upstream bytes carry no
+license at the pin, so they are **not vendored**: the measurement takes
+`--source` (the file fetched at the pin) and verifies the pinned canonical
+fingerprint `sha256:d6d4e8aa…` before anything runs.
+
+**Tests: 19 new** (9 in `test/dialect-named-refusal.test.mjs`, 10 in
+`test/dialect-named-refusal-measurement.test.mjs` — the artifact-vs-tool pin
+re-derives the whole two-tree measurement and is network-skipped by name).
+Suite 893 → **912: 908 pass / 4 named network skips / 0 fail**. Released as
+v0.4.21: product code changed, so the pin moved.
+
+**Known limits, kept explicit.** Naming the refusal is not support: none of
+the 102 DiabLokxis payloads decode yet. A raw little-endian dialect with
+header-counted vectors is a real second dialect family and the follow-up
+work is to decode it — pinned per program from its first-party source, the
+way shank was. What this fix guarantees is that until that happens, the
+interface is refused by name at every boundary and never crashes the codec
+or pretends to be decodable.
 
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
