@@ -2674,6 +2674,12 @@ decoder gap: the one thing between the user and those 102 payloads is a
 licensed first-party copy, which is exactly what `sememe adopt` exists to
 carry while origin stays declared.
 
+Suite after this release: **954 tests / 950 pass / 4 named network skips /
+0 fail** (945 → 954: the 9 new pin tests). CI green on `main`
+(43287274405) and on the published tag v0.4.22 (43287274209); the release
+surface re-measured against that tag is clean (newest = latest = pinned,
+0 defects — `research/release-surface-2026-11-12b.json`).
+
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
 With Lighthouse decoded under shank, exactly **35 programs (87 payloads)** remained
