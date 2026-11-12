@@ -1,0 +1,108 @@
+{
+  "generatedAt": "2026-11-12T09:12:17.204Z",
+  "program": "Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy",
+  "name": "archer",
+  "finding": "the acquisition queue's third no-interface face closes through the program's OWN SDK interface: ballista-tech/archer-sdk (Apache-2.0, the crate that declares this exact program id) ships idl/archer_v1.json in the shank dialect; ONE adopt through the product write path decodes 82 of 83 committed payloads byte-exactly (UpdateMidPrice 78, UpdateBook 3, ClearBook 1), and the remaining one — the 19-byte legacy Swap form the upstream interface documents as '22 bytes, but an 18-byte payload that stops after mode is also accepted' — stays a NAMED refusal, because the missing field sits inside a defined struct where sememe's absent-field policy does not reach",
+  "pin": {
+    "repo": "ballista-tech/archer-sdk",
+    "commit": "5d07c895207ebd02f1ce70078b2d0c1ec3f186b5",
+    "license": "Apache-2.0",
+    "dialect": "shank",
+    "file": "idl/archer_v1.json",
+    "canonicalFingerprint": "4354dc49ea9a9294960aca0f595e3ed4523046506572a028550c2318ded1a805",
+    "origin": "ballista-tech/archer-sdk@5d07c895207ebd02f1ce70078b2d0c1ec3f186b5:idl/archer_v1.json",
+    "instructionCount": 27,
+    "typeCount": 19
+  },
+  "face": [
+    {
+      "tag": "07",
+      "name": "UpdateBook",
+      "length": 536,
+      "count": 3
+    },
+    {
+      "tag": "08",
+      "name": "UpdateMidPrice",
+      "length": 17,
+      "count": 78
+    },
+    {
+      "tag": "09",
+      "name": "ClearBook",
+      "length": 9,
+      "count": 1
+    },
+    {
+      "tag": "0f",
+      "name": "Swap",
+      "length": 19,
+      "count": 1
+    }
+  ],
+  "measured": {
+    "payloads": 83,
+    "baseline": {
+      "decoded": 0,
+      "refused": 0,
+      "noInterface": 83,
+      "byteExact": 0,
+      "describedExact": 0,
+      "adoptedAnswered": 0,
+      "pulledAnswered": 0,
+      "truncatedRefusals": 0,
+      "truncatedRefusalClause": null,
+      "refusals": {
+        "no stored IDL for program Archer8kgiavM61GyusMzaaS2ft5sALtNsD1HxkUPMhy in test/fixtures/ecosystem-store-2026-11-11": 83
+      },
+      "names": {}
+    },
+    "union": {
+      "decoded": 82,
+      "refused": 1,
+      "noInterface": 0,
+      "byteExact": 82,
+      "describedExact": 82,
+      "adoptedAnswered": 82,
+      "pulledAnswered": 0,
+      "truncatedRefusals": 1,
+      "truncatedRefusalClause": "truncated input: need 4 byte(s",
+      "refusals": {
+        "decode refused by the only stored source (published (adopted, declared origin: ballista-tech-archer-sdk-5d07c895207ebd02f1ce70078b2d0c1ec3f1": 1
+      },
+      "names": {
+        "UpdateMidPrice": 78,
+        "UpdateBook": 3,
+        "ClearBook": 1
+      }
+    },
+    "receipt": {
+      "slot": null,
+      "source": "published",
+      "origin": "ballista-tech-archer-sdk-5d07c895207ebd02f1ce70078b2d0c1ec3f186b",
+      "originStatus": "declared",
+      "fingerprint": "sha256:4354dc49ea9a9294960aca0f595e3ed4523046506572a028550c2318ded1a805",
+      "instructionCount": 27
+    },
+    "committedStoreModified": false,
+    "legacySwapRefusal": "truncated input: need 4 byte(s",
+    "legacySwapRefusalCount": 1
+  },
+  "delta": {
+    "decoded": 82,
+    "refusalsClosed": 82,
+    "coveredPct": 98.8
+  },
+  "gates": {
+    "baselineReproducesArtifact": true,
+    "faceMatchesPinnedWire": true,
+    "unionClosesAllButLegacySwap": true,
+    "unionByteExactOnWhatItDecodes": true,
+    "namesMatchFace": true,
+    "legacySwapStaysRefused": true,
+    "receiptSlotNull": true,
+    "receiptOriginDeclared": true,
+    "committedStoreUntouched": true
+  },
+  "verdict": "measured"
+}
