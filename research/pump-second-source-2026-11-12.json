@@ -1,0 +1,64 @@
+{
+ "generatedAt": "2026-11-12T03:00:11.817Z",
+ "program": "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P",
+ "name": "pump.fun bonding curve",
+ "finding": "the 442 pump.fun refusals of research/ecosystem-coverage-2026-11-11 are source lag, not a decode gap: adopting the first-party published copy next to the on-chain pull closes every one of them on the same committed bytes",
+ "pin": {
+  "repo": "pump-fun/pump-public-docs",
+  "commit": "639b87fb45c3adeffa6f7c4a1bf0cb85e392bf22",
+  "file": "idl/pump.json",
+  "canonicalFingerprint": "sha256:a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818",
+  "license": null,
+  "licenseNote": "no LICENSE file at the pinned commit — the bytes stay OUT of this repository and the npm package; they were adopted into a throwaway store copy and deleted after the measurement",
+  "origin": "pump-fun/pump-public-docs@639b87fb45c3adeffa6f7c4a1bf0cb85e392bf22:idl/pump.json",
+  "sourceReadFrom": "test/fixtures/traffic-sample-store-2026-11-04-pulled/objects/a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818.json"
+ },
+ "sample": "test/fixtures/ecosystem-sample-2026-11-11.json",
+ "store": "test/fixtures/ecosystem-store-2026-11-11",
+ "committedStoreModified": false,
+ "measured": {
+  "payloads": 842,
+  "failedTransactions": 543,
+  "baseline": {
+   "decoded": 400,
+   "refused": 442,
+   "byteExact": 249,
+   "describedExact": 400,
+   "coveredPct": 47.5
+  },
+  "union": {
+   "decoded": 842,
+   "refused": 0,
+   "byteExact": 714,
+   "describedExact": 842,
+   "coveredPct": 100,
+   "adoptedAnswered": 593,
+   "pulledAnswered": 249
+  },
+  "delta": {
+   "decoded": 442,
+   "refusalsClosed": 442,
+   "reAssignedToAdopted": 151
+  },
+  "receipt": {
+   "fingerprint": "sha256:a35349f371114b52701a3aeae83627f6b4667251efb3ac9d37a882baa723e818",
+   "instructionCount": 56,
+   "slot": null
+  },
+  "closedDiscriminators": {
+   "e1f7501ed": 251,
+   "20f6bf340": 98,
+   "1c92de772": 84,
+   "e19a7516d": 3,
+   "07051dc4f": 5,
+   "742b4dbd117a482": 1
+  },
+  "unionRefusals": {}
+ },
+ "limits": [
+  "one committed window: the 842 payloads of the 11-11 ecosystem capture, not the whole ecosystem",
+  "origin declared, not verified: the pin binds the canonical bytes to a commit nobody signed; the byte evidence is the re-encode",
+  "the adopted copy sits at slot null and never displaces the on-chain pull (src/adopt.mjs ordering rule)",
+  "licensing: the published copy ships no LICENSE file, so it is not vendored — the measurement reproduces it from the pin at run time"
+ ]
+}
