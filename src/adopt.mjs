@@ -39,6 +39,7 @@ import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { writeOnce } from './store-write.mjs';
 import { originDigestOf, receiptDigestOf } from './receipt-digest.mjs';
+import { assertIdlShape, declaredProgram } from './dialect.mjs';
 
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
 
@@ -90,12 +91,38 @@ export async function adopt(programInput, filePath, storeDir, { source = 'publis
   }
   if (!idl || typeof idl !== 'object' || Array.isArray(idl)) throw Error(`${filePath} is not an IDL object`);
   if (!Array.isArray(idl.instructions)) throw Error(`${filePath} has no instructions array — not an interface copy`);
-  if (idl.address !== undefined) {
-    if (typeof idl.address !== 'string') throw Error(`${filePath} declares a malformed address field`);
-    if (idl.address !== program) {
-      throw Error(`${filePath} declares program ${idl.address}, not ${program} — refusing to re-label a foreign interface`);
-    }
+  // Two INDEPENDENT gates, each with its own named voice, checked in the
+  // order the faces were measured — an integrity question first (does this
+  // file claim to be about THIS program?), a capability question second
+  // (can the codec read this dialect at all?). Collapsing them would hide
+  // one face behind the other.
+  //
+  // Gate 1 — declared-program agreement. A file may declare its program
+  // under `address` (Anchor), `metadata.address` (shank) or `program_id`
+  // (raw dialects). Whatever the field is called, a DECLARED program that
+  // differs from the receipt's program is a re-labelling: measured
+  // 2026-11-12, the diabloarb file declares `program_id` only, and the old
+  // address-only check adopted it under WSOL's program id unchanged.
+  if (idl.address !== undefined && typeof idl.address !== 'string') {
+    throw Error(`${filePath} declares a malformed address field`);
   }
+  const declared = declaredProgram(idl);
+  if (declared && declared !== program) {
+    if (idl.address === undefined) {
+      // The declaration rides a field the old check never read — name the
+      // field so the repair is obvious (this is the measured diabloarb face).
+      const field = idl.program_id !== undefined ? 'program_id'
+        : idl?.metadata?.address !== undefined ? 'metadata.address' : 'declared program';
+      throw Error(`${filePath} declares program ${declared} via ${field}, not ${program} — refusing to re-label a foreign interface`);
+    }
+    throw Error(`${filePath} declares program ${declared}, not ${program} — refusing to re-label a foreign interface`);
+  }
+  // Gate 2 — the dialect gate runs at the store's WRITE path too: an
+  // interface the codec cannot read (measured 2026-11-12: diabloarb's
+  // tag/data dispatch with dict `types`) is refused HERE, not after
+  // adoption when every decode crashes unnamed. Same reason text as the
+  // codec's guard (src/dialect.mjs).
+  assertIdlShape(idl, (reason) => Error(`${filePath}: ${reason}`));
 
   const json = Buffer.from(canonicalJson(idl) + '\n');
   const fingerprint = sha256(json);

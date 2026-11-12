@@ -33,6 +33,7 @@ import { canonicalJson } from './canonical.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
 import { receiptIntegrity } from './receipt-digest.mjs';
+import { assertIdlShape, declaredProgram } from './dialect.mjs';
 
 export { canonicalJson } from './canonical.mjs';
 
@@ -78,6 +79,20 @@ export async function readVerified(storeDir, program, receiptName) {
     throw Error(`store object ${fingerprint}.json is not JSON: ${String(error?.message ?? error).slice(0, 140)}`);
   }
   if (!Array.isArray(idl.instructions)) throw Error(`stored object for ${program} has no instructions`);
+  // Same two checks as the write path (src/adopt.mjs), applied on every
+  // read: a dialect the codec cannot read is refused by NAME before any
+  // decode can crash unnamed, and a declared program that differs from the
+  // receipt's program is a re-labelling no matter which field carries the
+  // declaration (`address`, `metadata.address` or `program_id`).
+  assertIdlShape(idl, (reason) => {
+    const error = Error(`stored object ${fingerprint} for ${program}: ${reason}`);
+    error.code = 'unsupported-idl-dialect';
+    return error;
+  });
+  const declared = declaredProgram(idl);
+  if (declared && declared !== program) {
+    throw Error(`stored object ${fingerprint} declares program ${declared}, not the receipt's ${program}`);
+  }
   if (idl.address && idl.address !== program) {
     throw Error(`stored object ${fingerprint} declares program ${idl.address}, not the receipt's ${program}`);
   }

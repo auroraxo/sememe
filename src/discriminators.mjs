@@ -28,6 +28,7 @@
 
 import { createHash } from 'node:crypto';
 import { isShankDiscriminant } from './shank.mjs';
+import { unsupportedIdlReason } from './dialect.mjs';
 
 const sha256 = (text) => createHash('sha256').update(text).digest();
 
@@ -118,6 +119,13 @@ export function verifyDerivedDiscriminators(idl) {
  * @returns {{ idl: object, filled: { instructions: number, events: number }, conflicts: object[] }}
  */
 export function withDerivedDiscriminators(idl) {
+  // A dialect the codec cannot read gets NO derived table at all. Measured
+  // 2026-11-12 on the diabloarb interface: the derivation filled all four
+  // tag-dispatch instructions with Anchor sighashes that match no wire — a
+  // table that looks authoritative and decodes nothing. The refusal is named
+  // (see src/dialect.mjs) and identical to the codec's own.
+  const refusal = unsupportedIdlReason(idl);
+  if (refusal) throw new Error(refusal);
   const copy = structuredClone(idl);
   let instructions = 0;
   let events = 0;

@@ -20,6 +20,7 @@
 
 import { encodeBase58, decodeBase58 } from './base58.mjs';
 import { isShankIdl, isShankDiscriminant, shankDiscriminatorBytes, SHANK_LEB128_TYPES } from './shank.mjs';
+import { assertIdlShape } from './dialect.mjs';
 
 const MAX_DEPTH = 32;
 // Instruction data is bounded by transaction size; a hostile length prefix
@@ -690,7 +691,12 @@ function minSize(type, ctx) {
 // --- instruction level ------------------------------------------------------
 
 function context(idl) {
-  if (!idl || !Array.isArray(idl.instructions)) throw new CodecError('IDL has no instructions array', null);
+  // The dialect guard runs FIRST, before any iteration: a mapping-dialect
+  // IDL (measured: diabloarb's dict `types`) used to crash every payload of
+  // the program with the unnamed `TypeError: object is not iterable` — a
+  // crash, not a refusal (found 2026-11-12, 102/102 payloads).
+  assertIdlShape(idl, (reason) => new CodecError(reason, null));
+  if (!Array.isArray(idl.instructions)) throw new CodecError('IDL has no instructions array', null);
   const types = new Map();
   for (const typedef of idl.types ?? []) {
     if (typedef && typeof typedef.name === 'string') types.set(typedef.name, typedef);
