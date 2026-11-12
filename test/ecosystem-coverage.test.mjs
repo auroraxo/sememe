@@ -42,6 +42,20 @@
 //   lag: pfeeU… 459 unknown-discriminator refusals on its pulled anchor IDL,
 //   HADRo… 195 on every payload).
 //
+// 2026-11-12 (THIS PULSE): the HADRo… face was NOT source lag. It was a
+// DECODER BUG — `withDerivedDiscriminators` treated only 8-byte arrays as
+// "stored", so the program's 38 published ONE-BYTE instruction discriminators
+// were overwritten with Anchor's 8-byte sighash (against that module's own
+// header rule), and the product path decoded 0/195. With the stored bytes
+// kept, 123/195 decode (51 full byte-exact, 72 described-exact) and the 72
+// setRiskCurve payloads stay honestly refused — that IDL's vector length does
+// not match the wire. The headline moves 87.9% -> 88.5% of measured traffic,
+// outside the watchlist 59.9% -> 62.4% (HADRo sits outside the watchlist),
+// and the 72 refusals are NAMED, never counted as coverage. The measurement
+// that proves it in both trees: tools/measure-hadro-short-discriminator.mjs
+// -> research/hadro-short-discriminator-2026-11-12.json (the pin for the
+// surgical guards lives in test/hadro-short-discriminator-measurement.test.mjs).
+//
 // 2026-11-11 (LATER PULSE, this file updated): the L2TE… face was CLOSED by
 // adopting the program's own first-party published IDL (Lighthouse,
 // Jac0xb/lighthouse@4c579479, MIT) through the product's own write path, with
@@ -117,11 +131,11 @@ test('the artifact carries no host path', () => {
 test('the headline holds and the three outcomes stay split', () => {
   const h = artifact.headline;
   assert.equal(h.measuredPayloads, 21_350);
-  assert.equal(h.decoded, 18_772);
-  assert.equal(h.refused, 1_258);
+  assert.equal(h.decoded, 18_895);
+  assert.equal(h.refused, 1_135);
   assert.equal(h.noInterface, 1_320);
-  assert.equal(h.coveredPctOfMeasured, 87.9);
-  assert.equal(h.byteExact, 17_601);
+  assert.equal(h.coveredPctOfMeasured, 88.5);
+  assert.equal(h.byteExact, 17_652);
   assert.equal(h.allPayloadsSeen, 22_265);
   assert.equal(h.notMeasuredPayloads, 915);
   // The honest number is the measured one; the all-seen number exists so the
@@ -136,7 +150,7 @@ test('the evidence class of every decode is named, never merged', () => {
   // other interface came from an on-chain PULL. Both count as decoded, and
   // the split is published so a reader can subtract the adopted share.
   assert.equal(h.decodedVia.adopted, 1_214);
-  assert.equal(h.decodedVia.pulled, 17_558);
+  assert.equal(h.decodedVia.pulled, 17_681);
   assert.equal(h.decodedVia.adopted + h.decodedVia.pulled, h.decoded,
     'the two classes must add up to the decoded headline');
   // The watchlist carries NO adopted copy: every watchlist decode rests on a
@@ -153,12 +167,13 @@ test('the falsification view: outside the watchlist the claim does not hold', ()
     'the curated claim reproduces on its own denominator');
   assert.ok(h.outsideWatchlist.payloads > 3_000,
     'the outside view must carry a real sample');
-  assert.ok(h.outsideWatchlist.coveredPct < 60,
+  assert.ok(h.outsideWatchlist.coveredPct < 70,
     `outside-watchlist coverage must stay honestly below the watchlist, got ${h.outsideWatchlist.coveredPct}`);
-  // The split NARROWED (96.4% vs 59.9% = 36.5 points, was 89 points) because
-  // the Lighthouse face — 1,214 of the outside view's 4,968 payloads — was
-  // CLOSED, not because the denominator moved: the watchlist number is
-  // unchanged at 96.4% and the outside payload count is unchanged at 4,968.
+  // The split NARROWED again (96.4% vs 59.9%, then 62.4% after the 2026-11-12
+  // stored-short-discriminator fix, which moved 123 HADRo payloads outside the
+  // watchlist from refused to decoded) because faces were CLOSED, not because
+  // the denominator moved: the watchlist number is unchanged at 96.4% and the
+  // outside payload count is unchanged at 4,968.
   // The invariant that must survive is the ORDER and the margin to
   // convergence: the outside view may never reach the curated claim.
   assert.ok(h.outsideWatchlist.coveredPct < h.watchlist.coveredPct,
@@ -215,10 +230,23 @@ test('the source-lag faces are pinned: acquirable interfaces that refuse bytes',
   assert.equal(pfee.acquirable, true);
   assert.ok(pfee.refused >= 400,
     `pfeeU… source lag must stay visible (${pfee.refused} refused)`);
+  // 2026-11-12: HADRo… is NO LONGER a source-lag face. Its 38 published
+  // one-byte discriminators were being overwritten with Anchor sighashes —
+  // a decoder bug, not a missing source. With the stored bytes kept, 123 of
+  // 195 decode and the 72 setRiskCurve payloads stay refused (that IDL's
+  // vector length does not match the wire). This pin now asserts the FIXED
+  // face and its honest remainder; the pre-fix 0/195 is falsified in
+  // test/hadro-short-discriminator-measurement.test.mjs.
   const hadr = byId['HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8'];
   assert.equal(hadr.acquirable, true);
-  assert.equal(hadr.decoded, 0,
-    'HADRo… must stay a total source-lag face — any decode there is an event, not noise');
+  assert.equal(hadr.decoded, 123,
+    'the stored 1-byte discriminators must decode: 123 of 195 (was 0 — that was a bug, not source lag)');
+  assert.equal(hadr.refused, 72,
+    'the setRiskCurve payloads must stay refused — the IDL disagrees with the wire there');
+  assert.equal(hadr.byteExact, 51, '51 of the 123 re-encode byte-for-byte');
+  assert.equal(hadr.describedExact, 123,
+    'every HADRo decode explains its prefix byte-exactly (51 full + 72 with trailing bytes)');
+  assert.equal(hadr.trailing, 72, 'the 72 setCurve payloads carry trailing bytes the IDL does not explain');
   // pump.fun regression against its own 11-04 window (union coverage was
   // ~100% there; the single-source pull now refuses 442 payloads).
   const pump = byId['6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P'];

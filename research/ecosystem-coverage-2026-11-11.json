@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-11T23:11:32.228Z",
+ "generatedAt": "2026-11-12T05:42:10.881Z",
  "sample": {
   "file": "test/fixtures/ecosystem-sample-2026-11-11.json",
   "store": "test/fixtures/ecosystem-store-2026-11-11",
@@ -25,18 +25,18 @@
   "allPayloadsSeen": 22265,
   "measuredPayloads": 21350,
   "notMeasuredPayloads": 915,
-  "decoded": 18772,
-  "refused": 1258,
+  "decoded": 18895,
+  "refused": 1135,
   "noInterface": 1320,
   "decodedVia": {
-   "pulled": 17558,
+   "pulled": 17681,
    "adopted": 1214,
    "note": "pulled = an on-chain IDL account answered (sememe pull, slot-bound); adopted = a published copy adopted through sememe adopt (hash-bound bytes, DECLARED origin). Both decode offline and re-encode byte-checked; the classes are never merged silently."
   },
-  "coveredPctOfMeasured": 87.9,
-  "coveredPctOfAllSeen": 84.3,
-  "byteExact": 17601,
-  "byteExactPctOfDecoded": 93.8,
+  "coveredPctOfMeasured": 88.5,
+  "coveredPctOfAllSeen": 84.9,
+  "byteExact": 17652,
+  "byteExactPctOfDecoded": 93.4,
   "shortForm": 55,
   "chainVerified": 55,
   "absentPolicy": "verified",
@@ -50,11 +50,11 @@
   },
   "outsideWatchlist": {
    "payloads": 4968,
-   "decoded": 2975,
-   "refused": 676,
+   "decoded": 3098,
+   "refused": 553,
    "noInterface": 1317,
    "decodedAdopted": 1214,
-   "coveredPct": 59.9
+   "coveredPct": 62.4
   },
   "note": "coverage = payloads an available interface could NAME. \"refused\" (interface present, bytes refused) and \"no-interface\" (no interface acquirable at all) are counted separately because they need different fixes. watchlist vs outsideWatchlist split exists because the committed 100% claim was measured on the first and never on the second."
  },
@@ -930,22 +930,6 @@
    "count": 40
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0400000",
-   "count": 36
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0400010",
-   "count": 36
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0800000",
-   "count": 36
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0800010",
-   "count": 36
-  },
-  {
    "reason": "no-interface: no stored IDL for program 2DNbzPochEcyCcWMbL4d9S3u9QqQEj5bbe6cSZFvKsbh in test/fixtures/ecosystem-store-2026-1",
    "count": 34
   },
@@ -970,36 +954,56 @@
    "count": 15
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5c1ce",
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 181475",
    "count": 6
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5d1ce",
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 272191",
    "count": 6
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5b1ce",
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 358674",
    "count": 6
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a5a1ce",
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 244858",
    "count": 6
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a591ce",
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 349229",
    "count": 6
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0a581ce",
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 921449",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 620158",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 149124",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 101581",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 168573",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 141169",
+   "count": 6
+  },
+  {
+   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 190260",
    "count": 6
   },
   {
    "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator 07051dc4f",
    "count": 5
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0b5b1ce",
-   "count": 4
   },
   {
    "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown instruction discriminator e19a7516d",
@@ -1022,51 +1026,15 @@
    "count": 2
   },
   {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 055b1ce",
-   "count": 2
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0b591ce",
-   "count": 2
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa7e40",
-   "count": 1
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa3e40",
-   "count": 1
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0300001",
-   "count": 1
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa6e40",
-   "count": 1
-  },
-  {
    "reason": "idl: decode refused by the only stored source (anchor @slot 468262003): unknown event discriminator 742b4dbd117a482",
-   "count": 1
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 05591ce",
-   "count": 1
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa4e40",
-   "count": 1
-  },
-  {
-   "reason": "idl: decode refused by the only stored source (metadata @slot 468262003): unknown instruction discriminator 0aa5e40",
    "count": 1
   }
  ],
  "outcomeVsChain": {
-  "decoded_txSuccess": 13163,
-  "decoded_txFailed": 5609,
-  "refused_txSuccess": 745,
-  "refused_txFailed": 513,
+  "decoded_txSuccess": 13285,
+  "decoded_txFailed": 5610,
+  "refused_txSuccess": 623,
+  "refused_txFailed": 512,
   "noInterface_txSuccess": 1087,
   "noInterface_txFailed": 233
  },
@@ -1314,17 +1282,17 @@
    "name": null,
    "watched": false,
    "acquirable": true,
-   "decoded": 0,
-   "refused": 195,
+   "decoded": 123,
+   "refused": 72,
    "noInterface": 0,
-   "byteExact": 0,
-   "describedExact": 0,
-   "trailing": 0,
+   "byteExact": 51,
+   "describedExact": 123,
+   "trailing": 72,
    "shortForm": 0,
    "chainVerified": 0,
    "decodedAdopted": 0,
    "payloads": 195,
-   "coveredPct": 0
+   "coveredPct": 63.1
   },
   {
    "program": "FLASHX8DrLbgeR8FcfNV1F5krxYcYMUdBkrP1EPBtxB9",
