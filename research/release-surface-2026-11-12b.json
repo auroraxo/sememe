@@ -1,0 +1,2610 @@
+{
+  "measuredAt": "2026-11-12T19:10:06.433Z",
+  "repo": "auroraxo/sememe",
+  "surfaces": {
+    "releases": [
+      {
+        "tag": "v0.4.22",
+        "body": "The raw-LE dialect engine now ships at the pinned tag: `npm install github:auroraxo/sememe#v0.4.22` answers the diabloarb dialect instead of refusing it by name — 102/102 sampled `DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z` payloads decoded AND re-encoded byte-exactly at the product entry (`decodeInstructionData`, `decodeData`, the union path), the `sememe adopt` -> `sememe decode` store loop works end-to-end offline (2/2 measured), and every engine refusal comes back as the product's own `CodecError` — one refusal family, no `RawLeError` leak, no crash. v0.4.21 only NAMED that refusal (`unsupported IDL dialect: …`); this release SPEAKS it.\n\nWhat changed: `src/rawle.mjs` (the engine for the grammar the first-party file DECLARES — u8-tag dispatch, dict `types` with declared fixed sizes, counter-prefixed vectors, one byte-decided optional trailing field) is wired into `src/codec.mjs` before the Anchor shape gate, `src/dialect.mjs` splits \"can anything read this file?\" from \"can the Anchor codec read it?\", and the store gates (`src/adopt.mjs`, `src/store-read.mjs`) use the readable-dialect guard so a raw-LE object adopts under its own program id and reads back. The derivation passes the file WITHOUT filling any Anchor sighash table (filled {instructions: 0, events: 0}), and mislabelling under a foreign program id stays refused via `program_id`.\n\nMeasured two-tree, byte-identical probe (`research/rawle-product-2026-11-12.json`, pinned by `test/rawle-product-measurement.test.mjs`): prefix tree = the PULS Y engine commit `05e6643` (engine present, product refuses — 0/102, store loop closed), this tree = 102/102 decoded and 102/102 byte-exact, 5/5 product-level refusals as named `CodecError` faces, derivation with NO table, adopt/read/union open, CLI store loop 2/2, Whirlpool control unchanged, and a file that defeats BOTH engines keeps the exact v0.4.21 named refusal at codec AND union. 24 falsification counts, all zero.\n\nThe ecosystem number, measured two ways and split honestly (`research/diablo-adoption-coverage-2026-11-12.json`, pinned by `test/diablo-adoption-coverage.test.mjs`, 9 tests): at the SHIPPED store the headline does NOT move (18,895/21,350 = 88.5%, DiabLokxis 0/102 no-interface) — the wiring changed the codec, not the store, and the diabloarb copy carries NO license at the pin (`cryptodiablo/diabloarb` license API 404 at `f5005ac4` AND at HEAD, live-re-checked inside the pin test), so it cannot ship inside the store. For the user who adopts the hash-gated first-party copy (canonical fingerprint `d6d4e8aa…`, one `adopt` through the product's own write path), the SAME 102 payloads move to decoded: 102/102, 0 refused, 102 byte-exact, headline 88.5% -> 89.0%, outside-watchlist 62.4% -> 64.4% — all of it in the ADOPTED evidence column, with the on-chain-pull column untouched.\n\nInstall (no npm account needed):\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.22            # decode path: zero dependencies\nnpm install github:auroraxo/sememe#v0.4.22 @solana/web3.js   # adds the on-chain pull\nnpx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store\n```\n\nReproduce the measurements: `node tools/measure-rawle-product.mjs --source <sdk/diabloarb-executor.idl.json at pin f5005ac4>` -> `research/rawle-product-2026-11-12.json`, and `node tools/measure-diablo-adoption-coverage.mjs --source <same file>` -> `research/diablo-adoption-coverage-2026-11-12.json` (the upstream file carries no license, so it is fetched at the pin and never vendored; both tools verify the pinned fingerprint before anything runs).\n\nLimits, stated plainly: the shipped store and the pinned tag do NOT carry the diabloarb interface (no license at the pin) — only a user who adopts it decodes those 102; adopted copies are hash-bound but their origin stays DECLARED, not verified; tags <= v0.4.21 refuse that dialect by name and cannot be changed; one owner account, zero external users measured so far (`not-distributed-not-consumed`); fixture bytes, no audit; npm publish still blocked on a missing token (ENEEDAUTH).\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-12T19:09:54Z",
+        "createdAt": "2026-11-12T19:09:34Z"
+      },
+      {
+        "tag": "v0.4.21",
+        "body": "A dialect sememe does not speak is now a NAMED refusal at every boundary — never a codec crash. Measured on `DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z` (102 sampled payloads, first-party interface `cryptodiablo/diabloarb` sdk/diabloarb-executor.idl.json @ f5005ac4, raw little-endian \"NOT Anchor/Borsh\"): before this release all 102 payloads died with the unnamed `TypeError: object is not iterable` (the IDL's `types` is a dict), `withDerivedDiscriminators` filled all 4 tag-dispatch instructions with Anchor sighashes that match no wire byte, and `adopt` re-labelled the file under a foreign program id because it only read `idl.address` while the file declares `program_id`. Now `src/dialect.mjs` defines the refusal once (`unsupported IDL dialect: …`) and the codec, the derivation, `adopt` and the store reader all refuse with that identical reason; the declared-program check reads `address`, `metadata.address` and `program_id` and names the field. The honest product answer for an unadoptable interface is `no stored interface` (102, countable), never a TypeError. Two-tree measurement against the pre-fix commit aa6901b: 24 falsification counts, all zero (`research/dialect-named-refusal-2026-11-12.json`); surgical on anchor, shank and legacy name-only anchor IDLs (Kamino's conform account lists pass unchanged), 22/22 committed store objects still readable.\n\nInstall (no npm account needed):\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.21            # decode path: zero dependencies\nnpm install github:auroraxo/sememe#v0.4.21 @solana/web3.js   # adds the on-chain pull\nnpx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store\n```\n\nReproduce the measurement: `node tools/measure-dialect-named-refusal.mjs --source <sdk/diabloarb-executor.idl.json at pin f5005ac4>` -> `research/dialect-named-refusal-2026-11-12.json` (the upstream file carries no license, so it is fetched at the pin, never vendored; the tool verifies the pinned fingerprint first). Ladder: `test/dialect-named-refusal.test.mjs` 9 tests, `test/dialect-named-refusal-measurement.test.mjs` 10 tests (1 network re-derivation skipped by name); suite 912: 908 pass / 4 named skips / 0 fail.\n\nLimits, stated plainly: naming a refusal is not support — none of the 102 DiabLokxis payloads decode yet (decoding the raw little-endian dialect is follow-up work, pinned per program the way shank was); tags <= v0.4.20 carry the three defect faces and cannot be changed; one owner account, zero external users measured so far (`not-distributed-not-consumed`); fixture bytes, no audit; npm publish still blocked on a missing token (ENEEDAUTH).\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-12T11:55:46Z",
+        "createdAt": "2026-11-12T11:55:09Z"
+      },
+      {
+        "tag": "v0.4.20",
+        "body": "A stored discriminator is stored at ANY length. `withDerivedDiscriminators` treated only 8-byte arrays as \"stored\", so a program publishing 1-byte instruction discriminators had its whole wire table silently overwritten with Anchor's 8-byte sighash — against the module's own header rule. Measured on the committed 6-block mainnet sample: `HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8` decodes 0/195 -> 123/195 through the product path (51 full byte-exact, 72 described-exact with reported trailing bytes); the remaining 72 `setRiskCurve` payloads stay refused and NAMED — that IDL declares a vector length the wire bytes do not carry. Ecosystem coverage of measured traffic moves 87.9% -> 88.5% (18,772 -> 18,895 of 21,350). The fix is surgical: pump.fun 400/842, pfeeU 5/464 and Eternal 227/242 verdicts are byte-identical between the pre-fix tree (c304e80) and this one — proven by a two-tree measurement, not asserted.\n\nInstall (no npm account needed):\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.20            # decode path: zero dependencies\nnpm install github:auroraxo/sememe#v0.4.20 @solana/web3.js   # adds the on-chain pull\nnpx sememe decode HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8 040000000... --store ./store\n```\n\nReproduce the measurement: `node tools/measure-hadro-short-discriminator.mjs` -> `research/hadro-short-discriminator-2026-11-12.json`; the ladder pins it (`test/hadro-short-discriminator.test.mjs` 7 tests, D1–D4 red on v0.4.19's tree; `test/hadro-short-discriminator-measurement.test.mjs` 5 tests; mutation ladder 6/6).\n\nLimits, stated plainly: tags <= v0.4.19 carry the defect and cannot be changed; one owner account, zero external users measured so far (`not-distributed-not-consumed`); fixture bytes, no audit; npm publish still blocked on a missing token (ENEEDAUTH); the 88.5% is one 6-block window, not an ecosystem proof.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-12T05:55:48Z",
+        "createdAt": "2026-11-12T05:53:51Z"
+      },
+      {
+        "tag": "v0.4.19",
+        "body": "### What this release delivers\n\nThe Lighthouse program (`L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95`) was the **#1 remaining acquisition gap** in the ecosystem measurement (`research/ecosystem-coverage-2026-11-11.json`): **1,214 payloads across 6 finalized mainnet blocks, with no on-chain IDL account published at either pullable address**.\n\nUnlike the SPL Associated Token Account (which publishes no IDL anywhere and needed a Rust wire table), Lighthouse is the program whose **own repository publishes an IDL** (`Jac0xb/lighthouse`, commit `4c579479c98635e419b1b167f08be02a71604a71`, MIT; `programs/lighthouse/lighthouse.json`, 18 instructions in the shank dialect). This release ships that first-party copy, hash-pinned and vendored, and adopts it through the product's own write path.\n\n### Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.19   # tagged release; no npm account needed\n```\n\n### What changed\n\n- `src/lighthouse.mjs`: loads the vendored copy only when its sha256 matches the pin, its declared address matches the program, and the shank discriminant table is intact — a tampered, missing or foreign file refuses **by name** before anything is written;\n- CLI: `sememe adopt-lighthouse [--store <dir>]`, adopting through `src/adopt.mjs` (the same path `sememe adopt` uses);\n- `sememe gap` for this program now points at `sememe adopt-lighthouse` instead of telling a stranger to search for a file the package already carries;\n- Package exports `./lighthouse` (`sememe/lighthouse`); `vendor/lighthouse/` ships with the tarball, MIT LICENSE included.\n\n### Evidence\n\n- **1,214 / 1,214 Lighthouse payloads decode byte-exactly (100%)**, 0 refusals, from the committed 6-block sample (`research/lighthouse-acquisition-2026-11-11.json`);\n- 4 instruction faces active: `AssertAccountInfo` (342), `AssertTokenAccount` (386), `AssertSysvarClock` (337), `AssertAccountData` (149);\n- Ecosystem coverage of measured traffic moves **82.2% -> 87.9%** (18,772/21,350); outside the watchlist **35.4% -> 59.9%** (2,975/4,968); the curated watchlist stays **96.4%** (unchanged);\n- The headline names the evidence class of every decode: `pulled: 17,558, adopted: 1,214` — an adoption never claims on-chain slot provenance, its origin stays `declared`;\n- `test/lighthouse-acquisition.test.mjs` (9 tests): 7 red on the tree without the copy, 9 green here; suite 833 -> 843 tests (839 pass / 4 named network skips / 0 fail).\n\n### Limits\n\nNo external users yet (0 non-owner stars/forks/issues/PRs); not an audit; own-host measurement on committed finalized blocks. The adopted copy's origin is `declared`: the commit is not checked for a signature, and nothing proves the bytes describe the deployed program — the byte evidence for that is the 100% byte-exact re-encode on live traffic. Only instruction data is decoded, no account list or PDA derivation. Tags are immutable; older tags retain the acquisition gap.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-11T23:35:25Z",
+        "createdAt": "2026-11-11T23:35:10Z"
+      },
+      {
+        "tag": "v0.4.18",
+        "body": "### What this release delivers\n\nThe SPL Associated Token Account program (`ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL`) was the **#1 acquisition gap** in the ecosystem measurement (`research/ecosystem-coverage-2026-11-11.json`): **1,410 payloads across 6 finalized mainnet blocks, with no IDL account published at either pullable address**.\n\nThis release ships a derived wire table for the ATA program, derived directly from the vendored upstream Rust sources (`solana-program/associated-token-account@fbf5379`, Apache-2.0, LICENSE + sha256 pin on all three files).\n\n### Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.18   # tagged release; no npm account needed\n```\n\n### What changed\n\n- `src/ata-interface.mjs`: derives the wire table from upstream TEXT (instruction builder literals cross-checked against the declaration index the borsh derive uses; processor empty-input Create fallback and InvalidInstructionData refusal);\n- `src/ata.mjs`: two-check load (fresh derivation + artifact equality), exported as `sememe/ata`;\n- CLI: `sememe decode-ata <program> [<payload>] [--empty]` and `sememe ata-provenance`;\n- `sememe decode` now points at `decode-ata` instead of telling the user to pull a receipt that cannot exist;\n- Package exports `./ata`, description updated.\n\n### Evidence\n\n- **1,410/1,410 ATA payloads decode** from the committed 6-block sample (`research/ecosystem-coverage-2026-11-11.json`), 1,406 byte-exact; 4 empty payloads are named Create via the processor's own fallback and honestly carry `roundTripByteExact: false`;\n- Ecosystem coverage moves from **75.6% -> 82.2%** (watchlist 96.4% unchanged, outside-watchlist **7.1% -> 35.4%**); `no-interface` **3,944 -> 2,534**;\n- The 1,000-transaction foreign-archive wire sweep decodes **5,032** payloads (was 4,646) with zero disagreements;\n- `test/ata-interface.test.mjs` (8 tests): tampered artifact, tampered vendored source, missing vendor all refuse the load; guards prove ATA stays out of the token table and SPL Token is undisturbed;\n- Suite 825 -> 833 (829 pass / 4 named network skips / 0 fail).\n\n### Limits\n\nNo external users yet (0 non-owner stars/forks/issues/PRs); not an audit; own-host measurement on committed finalized blocks. No account list or PDA derivation is claimed — only instruction data. Tags are immutable; older tags retain the acquisition gap.",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-11T22:19:49Z",
+        "createdAt": "2026-11-11T22:19:37Z"
+      },
+      {
+        "tag": "v0.4.17",
+        "body": "### What this release delivers\n\n`sememe conform <tx.json> --store <dir>` resolves each instruction's accounts by index into the canonical key list (`keys[index]`). In v0.4.16 an index that did not resolve (past the end, negative, or a non-integer entry such as the `jsonParsed` object shape) became `{address: null, signer: null, writable: null}`, and `checkAccountList` files a null signer under `unknownSigner`: a note, never a violation.\n\n**The worst face, measured on the order-engine fixture** (committed fixture, no network): the fill instruction carries the transaction's ONE real disagreement — a signing account the interface does not declare, at position 11. Replacing exactly that index with an out-of-range value:\n\n```\nintact transaction:          verdict undeclared-signing-account, EXIT 1\nbroken extra account index:  verdict remaining-accounts,        EXIT 0\nwhole transaction in jsonParsed object shape:      remaining-accounts, EXIT 0\n```\n\nThe disagreement was not just unchecked — it was **hidden**, behind a green CI gate.\n\n### Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.17   # tagged release; no npm account needed\n```\n\n### What changed\n\nOne refusal, `instruction-account-index-unresolvable`, raised **before** the store is read and **before** the filter selection:\n\n- any instruction whose accounts list carries an index the key list cannot resolve is refused, naming each offending instruction (top-level `#n`, or `CPI of top-level #n at position p`), the account POSITION, and the RAW value it carried, plus the repair;\n- CPI instructions are covered;\n- `jsonParsed` object entries are refused by name instead of folding into null rows;\n- guards: an unresolvable PROGRAM index keeps `instruction-program-id-unresolvable` even beside broken accounts, an EMPTY accounts list stays legal, and loaded-range (ALT) indices stay resolvable.\n\n### Evidence\n\n- `research/conform-unresolvable-accounts-2026-11-11.json` — same probe in the pre-fix tree (`git archive 7b30c68` = published v0.4.16) and this tree: pre-fix 3 of 4 defect shapes exit 0 and the disagreement is hidden (`hiddenDisagreement: true`); this tree refuses all 4 with the named reason; both controls unchanged in both trees.\n- `research/conform-unresolvable-accounts-tag-2026-11-11.json` — installed tags in empty directories: v0.4.16 carries the defect (exit 0 on 3 shapes, real finding hidden); v0.4.17 refuses all 4; controls unchanged.\n- Ladder `test/conform-unresolvable-accounts.test.mjs`: 6 red on pre-fix tree -> 10 green here; measurement pin (7); mutation ladder 6/6.\n- Suite 796 -> 813 (809 pass / 4 named network skips / 0 fail).\n\n### Limits\n\nThis is NOT an audit and there is no external user yet (0 stars, no third-party issues); the release is user-zero measured only, on one machine and one account, from committed fixtures — no live RPC shape was sampled for this pulse. The refusal is about a shape no reader can interpret — it does not decide what the right account is. The check covers indices at the `transactionInstructions` seam; a transaction that resolves every index still passes through `checkAccountList` unchanged. Older tags keep the defect (tags are immutable).",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-11T06:07:09Z",
+        "createdAt": "2026-11-11T06:06:02Z"
+      },
+      {
+        "tag": "v0.4.16",
+        "body": "## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.16\n```\n\n## The defect this release refuses (measured, not asserted)\n\n`sememe conform <tx> --store <dir>` resolves each instruction's program from `instruction.programId` or by `programIdIndex` into the canonical key list. An index past the end of the list resolves to nothing — and the row loop **stepped over it**:\n\n```js\nfor (const instruction of instructions) {\n  if (!instruction.programId) continue;   // no row, no count, no refusal\n```\n\nThe instruction vanished from `rows`, from `summary.instructions`, and from every verdict count. The report covered a **subset of the transaction it was handed** while describing itself as a check of that transaction.\n\nWorst face, on the committed order-engine fixture (the fill instruction is the ONE instruction with a real disagreement — an undeclared signing account):\n\n| case | v0.4.15 (published) | v0.4.16 |\n|---|---|---|\n| intact transaction | rows 12, `undeclared-signing-account: 1`, exit 1 | unchanged |\n| fill index pushed past `accountKeys` | rows 11, `{no-stored-interface: 11}`, **exit 0** — the disagreement is HIDDEN | exit 1, `instruction-program-id-unresolvable` |\n| extra appended instruction with a bad index | exit 0, rows 12 of 13 | exit 1, same reason |\n| CPI (inner) instruction with a bad index | exit 0, rows 11 of 12 | exit 1, same reason |\n\n## What changed\n\nOne refusal, `instruction-program-id-unresolvable`, raised **before** the store is read and **before** the filter selection. It names each offending instruction by position (top-level or `CPI of top-level #n`) and by the raw `programIdIndex` value it carried, plus the repair. The **all**-unresolvable case keeps its existing reason (`transaction-has-no-resolvable-program-id`) — pinned as a guard so the refusal does not drift. A filter that selects nothing still fires its own reason for callers whose argument is the problem.\n\n## Evidence\n\n- `research/conform-unresolvable-2026-11-11.json` — the SAME probe run in the pre-fix tree (`git archive 94aa00b`) and this tree: pre-fix exits 0 over the dropped instruction and the report **hides** the real finding; this tree refuses all three defect cases with the named reason; the intact control still exits 1 with its disagreement and the all-dropped control keeps its reason in **both** trees.\n- Ladder `test/conform-unresolvable-program-id.test.mjs`: 6 red on the pre-fix tree → 16 green here (6 defect cases, 4 guards green on both trees).\n- `test/conform-unresolvable-measurement.test.mjs` fails if the committed artifact stops being what the tool derives.\n- Delivery measured on PUBLISHED TAGS (`tools/measure-conform-unresolvable-tag.mjs`, `research/conform-unresolvable-tag-2026-11-11.json`): v0.4.15 `carries-the-defect` — a subset report on all three dropped shapes, exit 0 with the real disagreement hidden on the worst face; v0.4.16 `refuses` — all three named refusals, no subset report, both controls unchanged.\n- Tag pin `test/conform-unresolvable-tag-measurement.test.mjs`: 5 checks, including a falsification that the two tags' roles are not interchangeable.\n- `tools/mutation-ladder-conform-unresolvable.sh`: 6/6 mutations caught (the refusal itself, the reason name, the refusal order vs the filter, the detail naming positions, the all-dropped reason staying put, CPI coverage).\n- Full suite: 791 tests, 787 pass, 0 fail, 4 named network skips.\n\n## Limits\n\nOne committed transaction fixture — no live RPC shape was sampled for this pulse. The refusal does not decide which program id is *right*, only that the gate must not guess about a shape it cannot read. Lookup-table addresses are still resolved through `meta.loadedAddresses` first (unchanged). No external users yet (user zero only), 0 stars, no audit — an own-host measurement on one machine with one account, not a statement that any third-party transaction shape behaves the same. v0.4.15 and older keep the defect (tags are immutable). npm registry publish is still credentials-blocked; the git tag is the release artifact.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-11T00:05:09Z",
+        "createdAt": "2026-11-11T00:04:51Z"
+      },
+      {
+        "tag": "v0.4.15",
+        "body": "## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.15\n```\n\n## The defect this release refuses (measured, not asserted)\n\n`sememe conform <tx> --store <dir>` is a CI gate: exit 1 on any disagreement, exit 0 when the checked instructions agree. It read the store through **one line that swallowed every failure** — `} catch { idl = null; }` — while `findStoredIdls` is the one store reader that refuses damage *by name* (a receipt whose object no longer re-hashes to its fingerprint, a receipt bound to another program, a missing object, a malformed receipt, a rewritten origin). `sememe decode` on such a store exits 1 with the reader's message; `sememe conform` on the **same store** turned that refusal into a verdict and exited 0.\n\nThree faces of one defect, on the committed order-engine fixture:\n\n| case | v0.4.14 (published) | v0.4.15 |\n|---|---|---|\n| tampered receipt fingerprint | exit 0, all `no-stored-interface` | exit 1, `store-reader-refused` |\n| `--store` directory does not exist | exit 0 | exit 1, `no-sememe-store` |\n| `objects/` but no `receipts/` | exit 0 | exit 1, `no-sememe-store` |\n\nThe tampered-receipt face is worse than a false green: the transaction's real disagreement (`undeclared-signing-account`) **disappeared** behind 12 green rows. Damage was indistinguishable from an acquisition gap — so the honest gap verdict was carrying a lie.\n\n## What changed\n\nThe reader's two *absence* errors now carry machine-readable codes (`no-sememe-store`, `no-stored-idl`) with byte-identical messages. `checkTransaction` distinguishes exactly three cases: no receipt for this program → honest `no-stored-interface` row (the acquisition gap the coverage numbers depend on, unchanged); missing store → refused `no-sememe-store`; any other reader refusal → refused `store-reader-refused`. Both refusals exit 1, lead with the program id, and carry the reader's message plus the repair. The gate fails **closed** on stores it cannot read — a refusal is not a statement that the transaction disagrees.\n\n## Evidence\n\n- `research/conform-store-damage-2026-11-10.json` — same probe in the pre-fix tree and this tree: 3/3 faces green over an unreadable store before → 0/3 after, controls byte-identical, `hiddenDisagreement` measured.\n- Ladder `test/conform-store-damage.test.mjs`: 7 red on the pre-fix tree → 11 green here; measurement test pins the committed artifact.\n- `tools/mutation-ladder-conform-store-damage.sh`: 5/5 mutations caught.\n- Full suite: 770 tests, 766 pass, 0 fail, 4 named network skips.\n\n## Limits\n\nNo external users yet (user zero only), 0 stars, no audit — this is an own-host measurement on one machine with one account, not an audit and not a statement that any third-party store behaves the same. A refusal means the gate could not answer — it decides nothing about the transaction in that case. `--only` filtering still applies before the store is read. A program the store genuinely does not hold still produces `no-stored-interface`. Older tags keep their defects (tags are immutable). No npm registry publish; the git tag is the release artifact.",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-10T06:45:01Z",
+        "createdAt": "2026-11-10T06:44:38Z"
+      },
+      {
+        "tag": "v0.4.14",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.14\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.14\n\n**A lock that pins nothing must not certify a store.**\n\n`sememe lock` + `sememe verify --mode error` is the CI gate this project runs after checkout. Measured on the published `v0.4.13` install, two faces of one defect made that gate able to pass without checking anything:\n\n```bash\nnpx sememe lock --store ./store --out ./sememe.lock   # store: receipts/ exists, no receipt in it\n# -> { \"lockVersion\": 1, \"programs\": {} }, exit 0\n\nnpx sememe verify --store ./store --lock ./empty.lock --mode error\n# -> { \"pinned\": 0, \"violations\": 0, \"extra\": [ ...18 real programs... ] }, exit 0\n```\n\nThe first command wrote a lock pinning **zero** answers — no fingerprint, no receipt, no origin: nothing a drifted store could ever contradict. The second then certified a **real 18-program store** as clean against it. Every program appeared as an `extra`, and extras are never violations for being there (that rule is correct and stayed), so the report even *looked* informative while pinning nothing. `--mode warn` did the same.\n\nTwo refusals now happen, both named `lock-pins-nothing`:\n\n- `sememe lock` over a store with no receipt **refuses and writes no file** — the refusal names the repair (`sememe pull` first). A store whose `receipts/` directory does not exist is still refused as `no sememe store`: the two refusals have different repairs.\n- `sememe verify` against a lock whose `programs` map is empty **refuses in both modes** — the defect is a property of the *document*, not of the store, so `--mode warn` does not certify it either. The check runs after the `lockVersion` check, so an unsupported version is still reported as a version problem.\n\nThe ordinary journey is untouched: locking a real store writes a lock pinning every program, and verifying it against an intact store still exits 0.\n\n**Measured** (`research/lock-nothing-pinned-2026-11-09.json`, the same probe file run in the pre-fix tree `git archive f22dbf5` and in this one): 3 defect faces green-over-nothing before, 0 after; the ordinary lock-then-verify journey exits 0 with 18 programs pinned in **both** trees. The published-tag side is measured separately (`research/lock-nothing-pinned-tag-2026-11-09.json`): v0.4.13 carries the defect on all three faces. Ladder `test/lock-nothing-pinned.test.mjs`: 5 red on the pre-fix tree, 12 green here, 6 guards green on both; 5/5 mutations caught by `tools/mutation-ladder-lock-nothing-pinned.sh`.\n\n## Limits\n\n- **No external users and no audit**: this release is verified only on the maintainer's own host, from fixtures. Zero stars, zero forks, zero outsiders so far.\n- Fixture bytes, not a live RPC pull: the measurement runs from committed fixtures.\n- `v0.4.13` and older keep the old behaviour — tags are immutable, and v0.4.13 carries this defect.\n- npm registry publish is still blocked (no credentials); the git tag is the only install channel.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-09T22:21:01Z",
+        "createdAt": "2026-11-09T22:20:17Z"
+      },
+      {
+        "tag": "v0.4.13",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.13\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.13\n\n**A CI gate that never ran must not exit 0.**\n\n`sememe conform` is a gate: exit 1 on any disagreement, exit 0 when the checked instructions conform. `--only <program-id>` narrows the check to one program. Measured on the published `v0.4.12` install, a filter that selected **zero** instructions still exited **0**:\n\n```bash\nnpx sememe conform <tx.json> --store ./store --only 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\n# -> { \"rows\": [], \"summary\": { \"instructions\": 0, ... } }, exit 0\n```\n\nThe program id above is real — it just is not invoked by that transaction. A caller who mistyped the id they meant to gate on was told the transaction conformed. The second face of the same defect: `--only not-a-program-id` produced the identical empty green, and the value was never validated as a program id at all.\n\nTwo refusals now happen **before the store is read**:\n\n- `filter-is-not-a-program-id` — the value is not a canonical 32-byte base58 program id; it can never match an instruction.\n- `filter-matched-no-instruction` — the filter selects none of this transaction's instructions, and the refusal **names the programs the transaction actually invokes**, so a typo is visible instead of green.\n\nThe unfiltered check and a filter that does match are untouched.\n\n**Measured** (`research/conform-filter-domain-2026-11-09.json`, same probe run in the pre-fix tree and in this one): 2 defect cases green-over-0-instructions before, 0 after; guards unchanged. 16 tests on the fix, 6 red on the pre-fix tree, 5/5 mutations caught.\n\n## Limits\n\n- **No external users and no audit**: this release is verified only on the maintainer's own host, from fixtures. Zero stars, zero forks, zero outsiders so far.\n- Fixture bytes, not a live RPC pull: the measurement runs from committed fixtures.\n- `v0.4.12` and older keep the old behaviour — tags are immutable.\n- npm registry publish is still blocked (no credentials); the git tag is the only install channel.\n- The filter refusal covers `conform --only`; it does not make a conform report meaningful for a program with no stored interface.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-09T18:58:14Z",
+        "createdAt": "2026-11-09T18:57:29Z"
+      },
+      {
+        "tag": "v0.4.12",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.12\n```\n\n```js\nimport { decodePayload, decodeUnionStoredAccount } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.12\n\n**Account union — two verified sources, one account, byte evidence decides.**\n\nUnion decode has covered instructions and events since v0.4.0. Accounts never got the second half: `sememe account` read exactly ONE receipt, so a store holding two verified copies of a program had two opinions about an account's layout and only one of them was ever consulted. This release closes that half.\n\n```bash\nnpx sememe account --union 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P <base64> --store ./store\n```\n\n**Measured on 12 real mainnet pump.fun accounts** (`research/account-union-2026-11-08.json`; the two committed copies genuinely disagree about `BondingCurve` — 13 fields on chain, 19 in the published copy):\n\n| | single receipt (before) | `account --union` |\n|---|---|---|\n| byte-exact | **0 / 12** | **6 / 12** |\n| bytes left unexplained | **12 / 12** | 6 / 12 |\n| verdict | one source, no verdict | `layout_drift` 6, `agree` 6 |\n\nThe 6 recovered accounts are the ones where the published copy reproduces every byte and the on-chain copy leaves 41 (and 1) unexplained — byte evidence picks the published copy and records why. The 6 `UserVolumeAccumulator` accounts read `agree`: both copies say the same thing and **both** leave 31 bytes unexplained. Agreement is reported, never papered over as coverage.\n\n**The rules, because an arbitration is only as good as its refusals:**\n\n- **A fallback needs byte evidence.** A source that names an account it cannot reproduce is refused. The honest no-evidence state is reachable and is pinned with a real codec property rather than a mock: an `f32` field holding a *signalling* NaN decodes to `null` and re-encodes to a different bit pattern — the decode succeeds, consumes the whole account, and reproduces nothing.\n- **When the evidence ties, the primary stands.** Two layouts can serialise to the same bytes and decode to different values (`u32` vs `i32` over `0xffffffff`): both are `full_roundtrip`, so the on-chain pull answers and the drift is reported — never resolved by preference.\n- **Two different account names for the same 8 bytes is a hard refusal**, not a decision to make.\n- **The plain path is untouched.** `sememe account` still reads one receipt and carries no `view`; the union is a flag, not a behaviour change.\n\n**The harvester no longer dies on a public endpoint's batch cap.** `tools/account-harvest.mjs` died on its first oversized `getMultipleAccounts` batch (one public endpoint caps it at 10) — no fixture written, and a refusal that did not name the cap as the whole story. The cap is now read from the server's own sentence and the batch shrinks **without skipping keys** (a shrink that skipped would silently under-sample and report fewer accounts as if that were all there were); the fixture records the batch size it actually got.\n\n14 new tests pin the behaviour, each asserting a VERDICT rather than just a decode, and two mutations were verified red on either side of their fix before landing.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. A byte-exact round trip proves the bytes are *reproduced*, not that the field names mean what the program intends. The published copy is adopted content whose origin stays **declared**, never verified against the deployed program — that item remains open. One program, one account window: this measures a drift that exists, not how common it is across the ecosystem. `v0.4.11` and earlier keep their behaviour (tags are immutable); their limits are named on their own pages.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-08T08:13:44Z",
+        "createdAt": "2026-11-08T08:12:42Z"
+      },
+      {
+        "tag": "v0.4.11",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.11\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.11\n\nFive measured fixes, all of them found by running the product against a store it should have handled — not by reading the code.\n\n- **A crashed write must not brick the store.** sememe installs every receipt through a temporary file `<name>.tmp-<pid>-<random>` in the SAME `receipts/` directory and removes it in a `finally`; a crash between the write and the cleanup (SIGKILL, OOM, power loss) leaves that file behind forever — and every reader treated EVERY file in `receipts/` as a receipt. Measured on the published `v0.4.10` install, one leftover `.tmp-4711-9f2c1a` file broke every surface at once: `sememe decode` exited 1 (\"store receipt … is unreadable\"), `sememe decode --union` exited 1, `sememe lock` exited 1 (\"Cannot destructure property 'idl'\"), and `sememe verify --mode error` went **red over a perfectly intact program** while naming no repair. One classifier (`src/receipt-name.mjs`) now separates four kinds: a well-formed `receipt` (read as before), a `malformed` receipt-shaped name (DAMAGE — still refused by name, because ignoring it would be a new green lie), sememe's own `debris` (safe to ignore: the install hard-links the temporary to its final name, so the temp never holds information the committed receipt does not), and `foreign` (never a program). Debris and foreign files are ignored but never silently — `verify`'s report gains a `stray` field naming each file and its kind.\n- **A CI gate must not be green over a store the reader refuses.** `writeLock` re-checked every receipt, `checkLock` only the pinned ones: `sememe lock` exited 1 while `sememe verify` exited 0 with violations 0 — a green CI gate over a program whose decode exits 1. Extras now run through the same helper; damage in an unpinned program is a violation marked `scope: \"extra\"`, so pin drift is not misread as the cause.\n- **A lock that pins no origin must not certify a declared origin.** A legacy lock (written before origin pinning) left the comparison unrun, so a rewritten `receipt.origin` passed the gate as verified. The store now reports `unbound` — exit 1, repair named.\n- **A declared origin is declared, not verified.** Origins are qualified as `declared` on every reader surface and bound to the receipt by digest; rewriting one is reported as `relabelled`.\n- **The test harness no longer races itself.** Six test files packed into the shared repo root and renamed each other's tarball away (ENOENT under a parallel suite); each now packs into its own directory.\n\nThe measurement ships as an instrument, not a claim: `tools/measure-receipt-hygiene.mjs` derives both committed artifacts — `research/receipt-hygiene-2026-11-07-before.json` (the published v0.4.10 install: 6 contract violations) and `research/receipt-hygiene-2026-11-07.json` (this tag: 0) — and `test/receipt-hygiene-measurement.test.mjs` fails if a committed report stops being what the tool derives. Seventeen new tests pin the behaviour (three green guards that must stay green on the pre-fix tree, six that were red there, four mutations that must each turn a test red, four pinning the artifacts).\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The before/after artifacts were both measured on this host; the tag journeys measure the exact bytes an install receives, but it is still one machine and my own account. The classifier was checked against 256 real receipt names (0 unmatched), but no store outside this host has been observed. An adopted receipt's `origin` remains a declared label, not a verified origin — honest labelling of provenance is still open. `v0.4.10` and earlier keep their behaviour (tags are immutable); their defects are named on this page, and the v0.4.10 release page carries a SUPERSEDED banner pointing here.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-07T20:13:51Z",
+        "createdAt": "2026-11-07T20:13:34Z"
+      },
+      {
+        "tag": "v0.4.10",
+        "body": "> **SUPERSEDED — use [v0.4.11](https://github.com/auroraxo/sememe/releases/tag/v0.4.11).**\n>\n> Measured 2026-11-07 against the PUBLISHED v0.4.10 install: one leftover\n> crash file in `receipts/` (`<receipt>.tmp-<pid>-<hex>`, sememe's own\n> temporary — a crash between the write and the cleanup leaves it forever)\n> broke every surface at once: `sememe decode` exited 1 (\"store receipt … is\n> unreadable\"), `sememe decode --union` exited 1, `sememe lock` exited 1\n> (\"Cannot destructure property 'idl'\"), and `sememe verify --mode error`\n> went **red over a perfectly intact program** while naming no repair. A\n> foreign file (`.DS_Store`) also became a phantom program in the report.\n> One classifier now separates receipt / malformed (still refused by name) /\n> debris / foreign, and `verify` reports ignored files by name in `stray`.\n> The tag keeps its behaviour (tags are immutable).\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.10\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.10\n\n- **One store answers with ONE receipt, whichever command reads it.** Measured on the published v0.4.9 install (`github:auroraxo/sememe#v0.4.9` in an empty app, no clone) with a store whose two ON-CHAIN receipts of one program carry slot strings of different digit length: `sememe decode` read the OLDER slot `99999999` and refused `sell_v3` (`unknown instruction discriminator 1c92de7726c469d5`, exit 1), while `sememe decode --union` read the newer slot `123456789` and decoded it, and `sememe lock` pinned `99999999` — a third surface, a second receipt. Two sorts, two winners: the union path has always sorted on-chain receipts by NUMERIC slot, while the plain reader and `src/lock.mjs` sorted by receipt FILENAME — and a decimal string sorts by its digits, not by its value. One comparator (`src/receipt-order.mjs`) now rules the plain reader, the union path and both lock paths: slot numerically first, filename byte-wise as tiebreak.\n- **The measurement ships as an instrument, not a claim.** `tools/measure-slot-order.mjs` derives both committed artifacts — `research/slot-order-2026-11-07-before.json` (the published v0.4.9 install: 5 contract violations) and `research/slot-order-2026-11-07.json` (this tree: 0) — and `test/slot-order-measurement.test.mjs` fails if a committed report stops being what the tool derives. Nine new store tests pin the ordering (three of them RED on the pre-fix tree, plus two mutations that must each turn a test red), and the multi-copy ladder gains O6: a SECOND program with only adopted copies — plain, union and lock name the same receipt, and a damaged second copy refuses the lock and is named at verify time.\n- **Reachability stated honestly.** All 44,661 live slot values across `research/` and fixtures are 9 digits (`462039125..465713413`), so two receipts written by `pull` today have equal-length slots and both orderings agree — the defect is LATENT for a fresh pull and becomes LIVE for stores whose slot strings differ in length (another era or cluster, a hand-assembled store, or mainnet crossing 1,000,000,000). The equal-length control case is green on both sides of the fix: this release changes the defective case only.\n\nEighth release-page note of the class this repo keeps measuring — main fixed, the pin pointing at a tag behind it: v0.4.1, v0.4.3, v0.4.4, v0.4.5, v0.4.6, v0.4.7, v0.4.8 (two verdicts from one store), now v0.4.9 (one store, two receipts, a lock pinning a third surface's pick). The instrument that measures the PUBLISHED tag itself now covers this too: the journey test installs exactly what the README pins.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The before/after artifacts were both measured on this host; the tag journey measures the exact bytes an install receives, but it is still one machine and my own account. The defect is latent for today's 9-digit fresh pulls (reachability above). `origin` on an adopted receipt remains a declared label, not a verified origin — honest labelling of provenance is still open. v0.4.9 keeps its behaviour (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-07T07:15:36Z",
+        "createdAt": "2026-11-07T07:14:08Z"
+      },
+      {
+        "tag": "v0.4.9",
+        "body": "> **SUPERSEDED — use [v0.4.10](https://github.com/auroraxo/sememe/releases/tag/v0.4.10).**\n>\n> Measured 2026-11-07 against the PUBLISHED v0.4.9 install, with a store whose\n> two ON-CHAIN receipts of one program carry slot strings of different digit\n> length: `sememe decode` read the OLDER slot `99999999` and refused\n> `sell_v3` (`unknown instruction discriminator 1c92de7726c469d5`), while\n> `sememe decode --union` read slot `123456789` and decoded it, and\n> `sememe lock` pinned `99999999` — three surfaces, two receipts, and a lock\n> pinning a receipt the decoders did not read. Two sorts, two winners: the\n> union path sorts on-chain receipts by NUMERIC slot, the plain reader and\n> `src/lock.mjs` sorted by FILENAME, and a decimal string sorts by its digits,\n> not by its value. Tags are immutable, so the pin moved to v0.4.10, whose\n> tree uses one comparator (`src/receipt-order.mjs`) for the plain reader, the\n> union path and both lock paths, measured at 0 violations with the same tool\n> that measured 5 here (`research/slot-order-2026-11-07-before.json`).\n> Reachability is stated honestly in the v0.4.10 notes: for today's 9-digit\n> fresh pulls both orderings agree, so this is latent for a fresh `pull` and\n> live for stores whose slot strings differ in length.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.9\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.9\n\n- **One store answers with ONE answer, whichever flag the caller passes.** Measured on the published v0.4.8 install (a `github:` tarball in an empty app, no clone) with a store holding two ADOPTED copies of the same pump.fun program: `sememe decode` answered `sell_v3` (fingerprint `a35349f3…`, exit 0) while `sememe decode --union` **refused the same bytes** — `unknown instruction discriminator 1c92de7726c469d5 (47 known, …)`, exit 1. Two sorts, two winners: `src/store-read.mjs` sorted adopted receipts by their LABEL (which embeds the origin the caller typed) while the plain reader and `src/lock.mjs` sorted by receipt filename (which ends in the fingerprint). One ordering rules everywhere now, copies not consulted are reported as `additionalSources`, and a three-copy store never reads as a two-source store.\n- **The lock gate no longer passes over a damaged second copy.** Same measurement: `sememe lock` exited 0 and `sememe verify` reported `violations: 0` over a store whose SECOND copy had been tampered with — the README already promised \"every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage\", but only the NEWEST receipt per program was re-checked. `writeLock` and `checkLock` now share one verification helper, so `lock` refuses the store (exit 1, no file written) and `verify --mode error` exits 1 naming the damaged receipt.\n- **The measurement ships as an instrument, not a claim.** `tools/measure-multi-copy-store.mjs` derives both artifacts — `research/multi-copy-store-2026-11-07-before.json` (the published v0.4.8 install: 7 contract violations) and `research/multi-copy-store-2026-11-07.json` (this tree: 0). Eleven new tests pin the behaviour with three mutations that must each turn a test red, and a new tag journey packs this tag and runs the same measurement against the bytes a stranger installs: red against v0.4.8 by design, green from this release on.\n\nSeventh release-page note of the class this repo keeps measuring — main fixed, the pin pointing at a tag behind it: v0.4.1 (journey dead-ends), v0.4.3 (no lock), v0.4.4 (elided payload), v0.4.5 (peer refusal), v0.4.6 (silent typos), v0.4.7 (duplicated flag list), now v0.4.8 (two verdicts from one store, green gate over damage). The difference: this defect class now has an instrument that measures the PUBLISHED tag itself, so the next repetition fails a journey test instead of being found by reading the README.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The defect and the fix were measured on this host, and the tag journey measures the exact bytes an install receives — but it is still one machine and my own account. `origin` on an adopted receipt remains a declared label, not a verified origin: this release makes the label stop deciding which copy answers (the part that silently changed decode results); it does not verify the label's truth. v0.4.8 keeps its behaviour (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-07T03:55:48Z",
+        "createdAt": "2026-11-07T03:54:31Z"
+      },
+      {
+        "tag": "v0.4.8",
+        "body": "> **SUPERSEDED — use [v0.4.9](https://github.com/auroraxo/sememe/releases/tag/v0.4.9).**\n>\n> Measured 2026-11-07 against the PUBLISHED v0.4.8 install: with a store\n> holding TWO adopted copies of the same pump.fun program, `sememe decode`\n> answered `sell_v3` while `sememe decode --union` **refused the same bytes**\n> (`unknown instruction discriminator 1c92de7726c469d5`), exit 0 vs exit 1 —\n> one store, two verdicts depending on the flag. Worse, `sememe lock` exited 0\n> and `sememe verify` reported `violations: 0` over that store after its\n> SECOND copy had been tampered with, so the CI gate was green over damage.\n> Tags are immutable, so the pin moved to v0.4.9, whose tree answers from one\n> consistent copy, refuses to lock a damaged store, and names the damaged\n> receipt at verify time. `test/multi-copy-store-tag-journey.test.mjs` measures\n> exactly that on the PINNED tag — this tag fails it by design.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.8\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.8\n\n- **The refusal message prints the supported flag list EXACTLY ONCE.** Measured on the published v0.4.7 install (a `github:` tarball in an empty app, no clone): for a flag with no close match the same list printed twice in one line — `sememe decode --rpc …` → `… this command accepts: --store, --trailing, --absent, --union supported flags: --store, --trailing, --absent, --union` — and a command that takes no flags printed `this command accepts: (none) supported flags: (none)`, an empty list twice. Both are now one message: `sememe decode: unknown flag \"--rpc\" — supported flags: --store, --trailing, --absent, --union`, and a flagless command says `this command accepts no flags`.\n- **The flag level of the PINNED install is now measured, not assumed.** New `test/flag-tag-journey.test.mjs` packs this tag the way the other five journeys do and installs it into an empty app: the list prints once in both branches (F1/F2), a flagless command says so (F3), and the silent-typo class is still refused *before* any work — exit 2, no lock file, no default `~/.sememe` created (F4), with a guard on the current tree (G1). Against the v0.4.7 pin F1 and F3 were red — the defect this release heals; a mutation restoring the duplicated message turns the guard red.\n- **`package-lock.json` announces the same version as `package.json` again.** Measured: a clean clone's `npm ci` reported root `0.4.1` while `package.json` said `0.4.7` (the lock had not moved since 0.4.1). Both say 0.4.8 now, and the README's test count for `test/flag-surface.test.mjs` was corrected from 28 to its actual 29.\n\nSixth release-page note of the class this repo keeps measuring — main fixed, the pin pointing at a tag behind it: v0.4.1 (journey dead-ends), v0.4.3 (no lock), v0.4.4 (elided payload), v0.4.5 (peer refusal), v0.4.6 (silent typos), now v0.4.7 (duplicated flag list). The difference this time: the flag level of the pin has an instrument now, so the next repetition fails a test instead of being found by running the README.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The defect and the fix were measured on this host; the pinned-tag journeys ship the bytes a stranger installs, but it is still one machine and my own account, not a stranger on another host. The message defect was cosmetic — every refusal still exited 2 and named the flag; only the text of the repair hint was noisy. v0.4.7 keeps its behaviour (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-07T01:56:42Z",
+        "createdAt": "2026-11-07T01:56:18Z"
+      },
+      {
+        "tag": "v0.4.7",
+        "body": "> **SUPERSEDED — use [v0.4.8](https://github.com/auroraxo/sememe/releases/tag/v0.4.8).**\n>\n> Measured 2026-11-07 against the PUBLISHED v0.4.7 install: the once-only\n> flag-list message had already shipped on main, but this tag was cut BEFORE\n> it — so a flag with no close match still printed the supported list TWICE in\n> one line, and a command that takes no flags still printed\n> `accepts: (none) supported flags: (none)`. Tags are immutable, so the pin\n> moved to v0.4.8, whose tree prints the list exactly once and says\n> `this command accepts no flags` for a flagless command. v0.4.8 also adds\n> `test/flag-tag-journey.test.mjs`, which measures the flag level of the\n> PINNED tag — the level no instrument covered before.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.7\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.7\n\n- **The CLI now refuses the flags a command does not declare — before any work runs.** Until now the parser looked flags up *by name anywhere in the argument list* and dropped what it did not find, so an unknown flag was not an error but an invisible edit to the request. Measured on the published v0.4.6 install:\n  - `sememe lock --store <valid> --o out.lock` → **exit 0**, lock written to `./sememe.lock`, not to `out.lock`\n  - `sememe decode <prog> <payload> --stro <dir>` → the typo was dropped and the **default** `~/.sememe` was read\n  - `sememe verify … --mod warn` → `--mod` dropped, verify ran in its default `error` mode\n  - `sememe native-provenance --store <dir>` → the flag's **value** read as the program id\n  - `sememe pull <prog> --stor <dir>` → dropped the typo and **pulled into the default store**: a write the caller never asked for\n  - `--store A --store B` → the first won, the second was silently discarded\n- **Each command's surface is declared as data** in `src/cli-surface.mjs` — which flags it accepts and how many positional arguments it consumes. `bin/sememe.mjs` parses the whole command line against that table *before* dispatch, so a refusal has no side effect: no store read, no file written, no RPC contacted. The refusal names the closest supported flag by measured edit distance plus the full supported list, and exits 2 (the usage channel) rather than 1 (work that failed).\n- **Too few positionals are still each command's own business**, so `decode needs a program id` and `pull needs a program id` are unchanged.\n- `test/flag-surface.test.mjs` (28 tests) pins it: 13 defect tests were red on the pre-fix tree with 7 guards green, and five hand mutations (unknown flag accepted, surplus positional tolerated, no suggestion, duplicate flag tolerated, missing value tolerated) each turned specific tests red before being restored byte-identical.\n\nFifth release-page note of the class this repo keeps measuring — main fixed, the pin pointing at a tag behind it: v0.4.1 (journey dead-ends), v0.4.3 (no lock), v0.4.4 (elided payload), v0.4.5 (peer refusal), now v0.4.6 (silent typos).\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The defect and the fix were measured on this host; the pinned-tag journeys ship the bytes a stranger installs, but it is still one machine and my own account, not a stranger on another host. This is a behavioural change to argument handling, and with no downstream consumers nothing has been shown to depend on the old silent acceptance. v0.4.6 keeps its behaviour (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-06T23:57:28Z",
+        "createdAt": "2026-11-06T23:57:08Z"
+      },
+      {
+        "tag": "v0.4.6",
+        "body": "> **SUPERSEDED — use [v0.4.7](https://github.com/auroraxo/sememe/releases/tag/v0.4.7).**\n>\n> Measured 2026-11-07 against the PUBLISHED v0.4.6 install: the strict flag\n> surface had already shipped on main, but this tag was cut BEFORE it — so\n> `sememe lock --store <valid> --o out.lock` from this install still exited 0\n> and wrote the lock to `./sememe.lock` instead of `out.lock`, a typo'd\n> `--stro` still read the default `~/.sememe`, and `--mod warn` on `verify`\n> was still dropped. Tags are immutable, so the pin moved to `v0.4.7`, whose\n> tree carries `src/cli-surface.mjs` and refuses every one of those by name\n> before any work runs.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.6\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.6\n\n- **The pinned install now refuses the missing peer in sememe's own voice.** The refusal shipped on main in `src/peer.mjs` (2026-11-06): importing `sememe/pull` or `sememe/gap` without `@solana/web3.js` throws `PeerDependencyMissingError` (code `peer_dependency_missing`) naming the package and the install command. The front-page pin still named `v0.4.5` — a tag cut BEFORE that fix, so the bytes a stranger installed still leaked Node's raw loader error while the README they read described the fixed behaviour. Measured against the PUBLISHED v0.4.5 install (peer absent, the state the optional-peer declaration puts a decoder-only consumer in):\n  - `import('sememe/pull')` → `code: ERR_MODULE_NOT_FOUND`, `name: Error`, `Cannot find package '@solana/web3.js' imported from …/src/pull.mjs`\n  - `import('sememe/gap')` → the same, from `…/src/acquire.mjs`\n  - the CLI on that same install already refused correctly (it wraps the failure itself) — the gap was library-only, exactly what a README sentence about the library promises.\n- **Fourth repetition of the \"fix on main, tag behind it\" class, now pinned.** v0.4.1 (journey dead-ends), v0.4.3 (no lock in the tag), v0.4.4 (elided payload) each shipped the same way. `test/acquisition-peer-surface.test.mjs` packs the working tree and could never see this.\n- **`test/peer-tag-journey.test.mjs` pins the TAG, not the tree.** It packs the pinned tag the way a `github:#<tag>` install receives it, installs it into an empty app with the peer absent, and asserts: both acquisition subpaths refuse with the package AND the install command, never `ERR_MODULE_NOT_FOUND`; the tag's CLI names the instruction exactly once; and a guard test measures the current tree's tarball the same way (the one test expected green while a defective tag is still pinned). Ladder: P1/P2 red against the published v0.4.5 pin, P3 + guard green; removing `src/peer.mjs` turns the guard red, so it is not vacuous.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The defect and the fix were measured on this host — the pinned-tag journey runs the shipped bytes, but it is still one machine and my own account, not a stranger on another host. `@solana/web3.js` remains an optional peer: the decode path installs zero packages and never reaches this refusal. v0.4.5 keeps its defect (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-06T19:51:44Z",
+        "createdAt": "2026-11-06T19:51:11Z"
+      },
+      {
+        "tag": "v0.4.5",
+        "body": "> **SUPERSEDED — use [v0.4.6](https://github.com/auroraxo/sememe/releases/tag/v0.4.6).**\n>\n> Measured 2026-11-06 against the PUBLISHED v0.4.5 install: the peer refusal\n> (`PeerDependencyMissingError` naming `@solana/web3.js` and the install\n> command) had already shipped on main, but this tag was cut BEFORE it — so\n> `import('sememe/pull')` and `import('sememe/gap')` from this install, with\n> the peer absent, leaked Node's raw `ERR_MODULE_NOT_FOUND` stack trace while\n> the README a stranger reads described the fixed behaviour. The CLI on the\n> same install refused correctly; the gap was library-only. Tags are immutable,\n> so the pin moved to `v0.4.6`, whose tree carries `src/peer.mjs`;\n> `test/peer-tag-journey.test.mjs` now packs the pinned tag and pins it, so a\n> fix that is on main but not in the tag goes red instead of shipping.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.5\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.5\n\n- **A base58 payload is a payload.** The CLI has always documented \"base58 or hex\" for every payload argument, but the base58 path decoded to a byte array that was not a `Buffer`, and three consumers need `Buffer` methods. So the SAME bytes behaved differently depending on how they were written — measured against the PUBLISHED v0.4.4 install (a pinned install of tag `v0.4.4`), not against a working tree:\n  - `sememe decode --union <program> <base58>` failed on EVERY base58 payload with `unionDecode needs the payload bytes as a Buffer`, while the same payload as hex decoded fine. The README's own union walkthrough uses a base58 payload, so it could not run.\n  - an `f64`/`f32` argument died with `slice.readDoubleLE is not a function` (measured on OpenBook v2 `stubOracleCreate`, price 1.5).\n  - a `bytes` argument came out as a comma-separated byte list (`1,2,3,255`) instead of base64 (`AQID/w==`) — silent corruption, not an error.\n- **The fix is in three layers.** Root cause: `decodeBase58` returns a `Buffer` (a `Buffer` IS a `Uint8Array`, so every existing caller keeps working). The codec's `Cursor` normalizes its bytes to a `Buffer` once, so the shape of the input cannot decide whether it decodes. The union path normalizes instead of refusing, and still refuses input that is not a byte array at all.\n- **`test/base58-payload-bytes.test.mjs` pins the equality.** For each of the three cases, the base58 form and the hex form must produce the same instruction, the same fields and the same verdict — plus the CLI end to end. Two mutations (revert `decodeBase58`; remove the `Cursor` guard) must turn the contract red, so the guards are not decorative. Suite: 515 tests, 513 pass, 2 named-skip, 0 fail.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The three defects were measured against the published v0.4.4 install on this host, and the fix is verified by the suite and by a pinned-install journey against the fixture store — not by a stranger on another machine. The fix changes the shape of one internal return value (`decodeBase58` now returns a `Buffer`); `Buffer` is a `Uint8Array`, so no existing caller breaks, but a caller that asserted the exact constructor would see a difference. v0.4.4 keeps its defect (tags are immutable); its release page carries the SUPERSEDED banner pointing here.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-06T02:16:13Z",
+        "createdAt": "2026-11-06T02:15:26Z"
+      },
+      {
+        "tag": "v0.4.4",
+        "body": "> **SUPERSEDED — use [v0.4.5](https://github.com/auroraxo/sememe/releases/tag/v0.4.5).**\n>\n> Measured 2026-11-06: the base58 payload path was broken in the PUBLISHED\n> v0.4.4 install — `sememe decode --union <program> <base58>` failed on every\n> base58 payload with \"unionDecode needs the payload bytes as a Buffer\" while\n> the same payload as hex decoded fine, f32/f64 arguments died with\n> \"slice.readDoubleLE is not a function\", and a `bytes` argument came out as a\n> comma-separated byte list instead of base64. The front-page pin still pointed\n> at v0.4.4, so a stranger following it received a package whose own README\n> walkthrough (a base58 payload) could not run. Tags are immutable, so the pin\n> moved to `v0.4.5`, whose tree fixes it; the v0.4.3 release page keeps its\n> banner.\n>\n> Measured 2026-11-05: the lock (`sememe lock` / `sememe verify`) shipped on main AFTER this tag was cut, so a stranger following the front-page pin received a package whose CLI has no lock at all — `npx sememe lock` exited 2 with the usage dump and wrote no lock file, while the README they read says the lockfile ships. Tags are immutable, so the pin moved to `v0.4.4`, whose tree carries `src/lock.mjs`; the v0.4.3 release page keeps this banner. `test/lock-journey.test.mjs` pins it: the pinned tag's documented lock journey must run verbatim from the bare install.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.4\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.4\n\n- **The pinned install now carries the lock the README documents.** The lock shipped on main (b8465bf) hours after v0.4.3 was tagged; the front page still pointed at v0.4.3, so the copy-paste install yielded a CLI without `lock`/`verify` (both exit 2, usage dump) while the README around it announced the lockfile. This tag is cut from main, so the documented journey runs from the install: `npx sememe pull ... --store ./store` → `npx sememe lock --store ./store --out ./sememe.lock` → `npx sememe verify --store ./store --lock ./sememe.lock` (measured verbatim against live mainnet before tagging: pull slot 465799518, fingerprint `sha256:0b886e37…660f`; lock → verify, 1 pinned, 1 verified, 0 violations).\n- **The lock section's fresh-machine dead end is closed.** The two documented lock commands ran against `--store /tmp/sememe-demo`, but no documented step created that store — measured verbatim: exit 1, `no sememe store at /tmp/sememe-demo`. The section now documents the store-creating `pull` BEFORE the commands that need the store, in both the clone and the install form.\n- `test/lock-journey.test.mjs` pins both: L1 runs the pinned tag's own documented lock journey from the packed tarball against the committed fixture store; L2 refuses a lock section whose store-consuming command has no pull command before it; G1 guards main.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. The journey test proves the shipped README's commands exist and run — it does not prove a stranger's success on a machine that is not this host. The lock is not a freshness check against the chain and does not cover vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4). `sememe gap` and `sememe pull` need `@solana/web3.js`; every other subcommand runs without it. v0.4.3 keeps its defect (tags are immutable); its release page carries the SUPERSEDED banner above.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-05T18:07:36Z",
+        "createdAt": "2026-11-05T18:07:07Z"
+      },
+      {
+        "tag": "v0.4.3",
+        "body": "> **SUPERSEDED — use [v0.4.4](https://github.com/auroraxo/sememe/releases/tag/v0.4.4).**\n>\n> Measured 2026-11-05: the lock (`sememe lock` / `sememe verify`) shipped on main AFTER this tag was cut, so a stranger following the front-page pin received a package whose CLI has no lock at all — `npx sememe lock` exited 2 with the usage dump and wrote no lock file, while the README they read says the lockfile ships. Tags are immutable, so the pin moved to `v0.4.4`, whose tree carries `src/lock.mjs`; `test/lock-journey.test.mjs` pins it: the pinned tag's documented lock journey must run verbatim from the bare install.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.3\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What was in v0.4.3\n\n- The shipped decode example was completed (the elided payload `2b04ed0b1ac91e62...` replaced by the full measured Whirlpool `swap_v2` payload); all three journey commands ran end-to-end from a bare install.\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. `sememe gap` and `sememe pull` need `@solana/web3.js`; every other subcommand runs without it. The lock defect named in the banner above is fixed in v0.4.4, not in this tag (tags are immutable).\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-05T12:55:26Z",
+        "createdAt": "2026-11-05T12:54:57Z"
+      },
+      {
+        "tag": "v0.4.2",
+        "body": "> **SUPERSEDED — use [v0.4.3](https://github.com/auroraxo/sememe/releases/tag/v0.4.3).**\n>\n> Measured 2026-11-05 on the packed `v0.4.2` tarball: the shipped journey's decode line carried an elided payload (`2b04ed0b1ac91e62...`), so the third verbatim command a stranger runs ends in `invalid base58 character \"0\"`. Tags are immutable, so the example was completed and re-tagged as `v0.4.3`.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.2\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.2\n\n- **The pinned tag's OWN README now runs the consumer journey.** Measured on the packed `v0.4.1` tarball (2026-11-05): the consumer section had no `pull` command, so the first decode died with `no sememe store at ./store: run \"sememe pull\" first`; and the only invocation form that works from an install (`npx sememe`) appeared 0 times — bare `sememe` is not on `PATH` after a plain `npm install`, and `node bin/sememe.mjs` resolves only inside a clone. `v0.4.1`'s README could not be fixed (tags are immutable), so the pin moved here, where the shipped README documents `npx sememe pull` / `npx sememe decode` verbatim.\n- `test/installed-tag-journey.test.mjs` measures the PACKED TARBALL of whatever tag the README pins — the bytes a `github:#<tag>` install receives — and fails if that tag's README lacks the store-creation step or a runnable CLI form. The tag is resolved locally or fetched from origin; if it is not published, the test skips with that reason instead of measuring a different tree.\n- The install pins point at `v0.4.2`, whose tree ships everything the README documents (`sememe gap`, `sememe/raydium`, `sememe/token-metadata`).\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. Instruction-data decoding is the proven path; account/event decoding is exercised by tests but not by an outside consumer. `sememe gap` and `sememe pull` need `@solana/web3.js`; every other subcommand runs without it. The journey test proves the shipped README's commands exist — it does not prove a stranger's success on a machine that is not this host.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-05T12:47:14Z",
+        "createdAt": "2026-11-05T12:46:49Z"
+      },
+      {
+        "tag": "v0.4.1",
+        "body": "> **SUPERSEDED — use [v0.4.2](https://github.com/auroraxo/sememe/releases/tag/v0.4.2).**\n>\n> Measured 2026-11-05 on the packed `v0.4.1` tarball: this tag's shipped README has no store-creation command before the decode that needs `./store`, and documents no invocation form that runs from an install (`npx sememe` appears 0 times). Tags are immutable, so the journey was repaired and re-tagged as `v0.4.2`; the README now pins `v0.4.2`.\n\n## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.1\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact.\n\n## What's in v0.4.1\n\n- **The README's peer-refusal claim is now true.** It said the CLI \"refuses `sememe pull` without [the optional peer] ... and still runs every other subcommand\" — but `sememe gap` probes the same on-chain IDL addresses, so it needs the peer too and refuses as well. Measured on the installed tree (2026-11-05): 2 of 13 subcommands need `@solana/web3.js` (`gap`, `pull`), the README named 1.\n- `tools/measure-release-surface.mjs` now derives the peer-needing commands statically from the bin's import graph and fails the README when the claim and the tree disagree.\n- The install pins point at `v0.4.1`, whose tree ships everything the README documents (`sememe gap`, `sememe/raydium`, `sememe/token-metadata`).\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement. Instruction-data decoding is the proven path; account/event decoding is exercised by tests but not by an outside consumer. `sememe gap` and `sememe pull` need `@solana/web3.js`; every other subcommand runs without it.\n\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-05T06:14:11Z",
+        "createdAt": "2026-11-05T06:14:08Z"
+      },
+      {
+        "tag": "v0.4.0",
+        "body": "## Install (no npm account needed)\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.0\n```\n\n```js\nimport { decodePayload } from 'sememe';\n```\n\nThe registry name is deliberately unpublished (no name squatting): the git tag is the release artifact. This release exists because `releases/` used to be empty while the README pinned `#v0.3.0` — a tree that shipped neither `sememe gap` nor `sememe/raydium`.\n\n## What's in v0.4.0\n\n- `sememe gap <program>` — classify one program's acquisition gap (pullable / no-interface-published / present-undecodable / vendored / unknown; RPC failure exits 3, never a fake absence).\n- `sememe/raydium` export subpath and `decode-raydium` / `raydium-provenance` commands.\n- Release-surface measurement: `tools/measure-release-surface.mjs` derives the pre-fix verdict defect-by-defect from committed inputs (`research/release-surface-2026-11-05-before.json`).\n\n## Honest limits\n\nNo external users yet (0 non-owner signals), not an audit, own-host measurement; instruction-data decoding is the proven path, account/event decoding is exercised by tests but not by an outside consumer.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-05T05:34:22Z",
+        "createdAt": "2026-11-05T05:34:11Z"
+      }
+    ],
+    "tags": [
+      "v0.1.0",
+      "v0.1.1",
+      "v0.2.0",
+      "v0.2.1",
+      "v0.2.2",
+      "v0.3.0",
+      "v0.4.0",
+      "v0.4.1",
+      "v0.4.10",
+      "v0.4.11",
+      "v0.4.12",
+      "v0.4.13",
+      "v0.4.14",
+      "v0.4.15",
+      "v0.4.16",
+      "v0.4.17",
+      "v0.4.18",
+      "v0.4.19",
+      "v0.4.2",
+      "v0.4.20",
+      "v0.4.21",
+      "v0.4.22",
+      "v0.4.3",
+      "v0.4.4",
+      "v0.4.5",
+      "v0.4.6",
+      "v0.4.7",
+      "v0.4.8",
+      "v0.4.9"
+    ],
+    "readme": {
+      "installTags": [
+        "v0.4.22"
+      ],
+      "documentedCommands": [
+        "pull",
+        "lock",
+        "verify",
+        "decode",
+        "gap",
+        "account",
+        "adopt",
+        "adopt-lighthouse"
+      ],
+      "documentedExports": [
+        "native",
+        "token",
+        "raydium",
+        "ata",
+        "lighthouse",
+        "store",
+        "pull",
+        "codec",
+        "canonical",
+        "discriminators",
+        "native-corpus",
+        "native-audit",
+        "gap"
+      ],
+      "shippedAccountEvent": true,
+      "proposalInstructionOnly": false,
+      "peerRefusalCommands": [
+        "pull",
+        "gap"
+      ],
+      "hasQuickstart": true
+    },
+    "trees": {
+      "v0.4.22": {
+        "manifest": {
+          "version": "0.4.22",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.22"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt",
+            "adopt-lighthouse"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.21": {
+        "manifest": {
+          "version": "0.4.21",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.21"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt",
+            "adopt-lighthouse"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.20": {
+        "manifest": {
+          "version": "0.4.20",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.20"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt",
+            "adopt-lighthouse"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.19": {
+        "manifest": {
+          "version": "0.4.19",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.19"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt",
+            "adopt-lighthouse"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.18": {
+        "manifest": {
+          "version": "0.4.18",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.18"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.17": {
+        "manifest": {
+          "version": "0.4.17",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.17"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.16": {
+        "manifest": {
+          "version": "0.4.16",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.16"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.15": {
+        "manifest": {
+          "version": "0.4.15",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.15"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.14": {
+        "manifest": {
+          "version": "0.4.14",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.14"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.13": {
+        "manifest": {
+          "version": "0.4.13",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.13"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.12": {
+        "manifest": {
+          "version": "0.4.12",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.12"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.11": {
+        "manifest": {
+          "version": "0.4.11",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.11"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.10": {
+        "manifest": {
+          "version": "0.4.10",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.10"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.9": {
+        "manifest": {
+          "version": "0.4.9",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.9"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.8": {
+        "manifest": {
+          "version": "0.4.8",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.8"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.7": {
+        "manifest": {
+          "version": "0.4.7",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.7"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.6": {
+        "manifest": {
+          "version": "0.4.6",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.6"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.5": {
+        "manifest": {
+          "version": "0.4.5",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.5"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.4": {
+        "manifest": {
+          "version": "0.4.4",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.4"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.3": {
+        "manifest": {
+          "version": "0.4.3",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.3"
+          ],
+          "documentedCommands": [
+            "pull",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.2": {
+        "manifest": {
+          "version": "0.4.2",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.2"
+          ],
+          "documentedCommands": [
+            "pull",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.1": {
+        "manifest": {
+          "version": "0.4.1",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.1"
+          ],
+          "documentedCommands": [
+            "pull",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
+      "v0.4.0": {
+        "manifest": {
+          "version": "0.4.0",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "conform",
+          "decode",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.0"
+          ],
+          "documentedCommands": [
+            "pull",
+            "gap",
+            "decode",
+            "account",
+            "adopt"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull"
+          ],
+          "hasQuickstart": true
+        }
+      }
+    }
+  },
+  "verdict": {
+    "verdict": "clean",
+    "defects": [],
+    "newestTag": "v0.4.22",
+    "latestTag": "v0.4.22",
+    "pinnedTags": [
+      "v0.4.22"
+    ]
+  },
+  "perRelease": {
+    "v0.4.22": {
+      "defects": []
+    },
+    "v0.4.21": {
+      "defects": []
+    },
+    "v0.4.20": {
+      "defects": []
+    },
+    "v0.4.19": {
+      "defects": []
+    },
+    "v0.4.18": {
+      "defects": []
+    },
+    "v0.4.17": {
+      "defects": []
+    },
+    "v0.4.16": {
+      "defects": []
+    },
+    "v0.4.15": {
+      "defects": []
+    },
+    "v0.4.14": {
+      "defects": []
+    },
+    "v0.4.13": {
+      "defects": []
+    },
+    "v0.4.12": {
+      "defects": []
+    },
+    "v0.4.11": {
+      "defects": []
+    },
+    "v0.4.10": {
+      "defects": []
+    },
+    "v0.4.9": {
+      "defects": []
+    },
+    "v0.4.8": {
+      "defects": []
+    },
+    "v0.4.7": {
+      "defects": []
+    },
+    "v0.4.6": {
+      "defects": []
+    },
+    "v0.4.5": {
+      "defects": []
+    },
+    "v0.4.4": {
+      "defects": []
+    },
+    "v0.4.3": {
+      "defects": []
+    },
+    "v0.4.2": {
+      "defects": []
+    },
+    "v0.4.1": {
+      "defects": []
+    },
+    "v0.4.0": {
+      "defects": []
+    }
+  },
+  "noVerdict": false,
+  "reason": null
+}
