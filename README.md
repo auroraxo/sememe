@@ -2637,7 +2637,7 @@ the next release.
 
 This release carries the raw-LE wiring above to the install channel: the
 pinned tag now contains `src/rawle.mjs` and every wired boundary, so
-`npm install github:auroraxo/sememe#v0.4.22` degrades nobody (Whirlpool,
+the v0.4.22 install degrades nobody (Whirlpool,
 shank, name-only anchor controls pin unchanged) and answers the diabloarb
 dialect where v0.4.21 refused it by name.
 
@@ -2713,11 +2713,11 @@ still `not-distributed-not-consumed`
 (`research/foreign-run-2026-11-12.json`) — publish is not consumption, and
 the first external run stays the open gate.
 
-Install — both channels ship the same product files:
+Install — the registry and the tag ship the same product files (`npm install
+sememe` resolves to 0.4.23, the one tag this README pins above):
 
 ```bash
-npm install sememe                          # registry
-npm install github:auroraxo/sememe#v0.4.23  # tagged release
+npm install sememe   # registry: 0.4.23, zero runtime dependencies
 ```
 
 Limits, stated plainly: the Archer interface still does not ship inside the
