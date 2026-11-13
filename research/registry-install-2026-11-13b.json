@@ -1,0 +1,55 @@
+{
+  "measuredAt": "2026-11-13T14:10:00Z",
+  "channel": "registry.npmjs.org",
+  "package": "sememe",
+  "version": "0.4.25",
+  "publish": {
+    "npmPublish": "+ sememe@0.4.25 (tarball ef43ee2b5148fd874ea74edf53e53f0a0cb33624, 77 files)",
+    "distTagsMeasuredAfterPropagation": "latest=0.4.25 (npm view sememe version -> 0.4.25; first check 45s after publish still read 0.4.24, named as propagation lag, not a failure)",
+    "gitTag": "v0.4.25 pushed with main (5b3852c)",
+    "releasePage": "https://github.com/auroraxo/sememe/releases/tag/v0.4.25 (draft:false, prerelease:false, published 2026-11-13T14:05:45Z)"
+  },
+  "releaseSurface": {
+    "tool": "tools/measure-release-surface.mjs",
+    "verdict": "clean",
+    "defects": [],
+    "newestTag": "v0.4.25",
+    "latestTag": "v0.4.25",
+    "pinnedTags": ["v0.4.25"],
+    "artifact": "research/release-surface-2026-11-13.json"
+  },
+  "registryInstallUserZero": {
+    "installCommand": "npm install sememe@0.4.25 --no-audit --no-fund",
+    "installedInto": "empty app (scratch, no clone)",
+    "installedVersion": "0.4.25",
+    "checks": [
+      {
+        "name": "the count-from-header fix ships through the registry",
+        "detail": "the committed byte-identical probe tools/hadro-count-header-probe.mjs run against the INSTALLED copy (only ROOT retargeted to node_modules/sememe, fixtures kept as local test data): 144 total, 144 decoded, 0 refused, 144 pointsMatchHeaderCount, 0 mismatch, 0 emptyPoints, 703 points, describedByteExact 144, trailingBytes 8-byte tail on 144 (the sequence:u64 the stored IDL does not declare — REPORTED, not invented)",
+        "pass": true
+      },
+      {
+        "name": "public export present in the installed package",
+        "detail": "import { COUNT_FROM_HEADER, countFromHeader } from the installed index.mjs resolves; decodePayload + verifiedShortForm present",
+        "pass": true
+      }
+    ]
+  },
+  "e2eFromTree": {
+    "tool": "tools/e2e-package-consumer.mjs (packed tarball of the release tree)",
+    "checks": "26/26 pass",
+    "note": "1119/1119 real mainnet Whirlpool payloads decode from the installed copy, byte-exact re-encode, tampered store refused, subpaths incl. native-corpus/native-audit work, CLI decode with zero deps"
+  },
+  "ci": {
+    "main": "43439445853 success (1m46s)",
+    "tag": "43439445840 success (2m6s)",
+    "fixCommit": "43437409283 success (2m43s)"
+  },
+  "suite": "992 tests / 988 pass / 4 named network skips / 0 fail (run on the tagged tree after publish)",
+  "honestLimits": [
+    "one machine, one owner account",
+    "no external user ran anything (verdict stays not-distributed-not-consumed; PUBLISH != CONSUMPTION)",
+    "the 8-byte sequence tail remains described-exact, not byte-exact — the stored IDL does not declare it",
+    "tags <= v0.4.24 lack the count-from-header rule (immutable)"
+  ]
+}
