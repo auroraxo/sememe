@@ -69,7 +69,7 @@ What this changes about the thesis, stated plainly: sememe's decode path is stro
 
 **HADRo's 195 refusals were NOT source lag — stored discriminators are stored at ANY length (fixed and measured 2026-11-12, `tools/measure-hadro-short-discriminator.mjs` -> `research/hadro-short-discriminator-2026-11-12.json`, pinned by `test/hadro-short-discriminator.test.mjs` 7 tests + `test/hadro-short-discriminator-measurement.test.mjs` 5 tests).** The ecosystem measurement had labelled HADRo (`HADRo…VDQ8`) a "total source-lag face" at 0/195. It was wrong, and the PULS V two-tree measurement (`git archive c304e80` for the pre-fix tree, a byte-identical probe in both) proved why: the program's published IDL stores **38 one-byte instruction discriminators** — a real, chain-accepted wire table (unique values 0x00..0x26) — and `withDerivedDiscriminators` treated only 8-byte arrays as "stored", so every stored byte was OVERWRITTEN with Anchor's 8-byte sighash, against that module's own header rule ("stored discriminators are never changed"). The replaced table matches no payload: pre-fix 0/195 decoded; post-fix **123/195 decode through the product path** (51 full byte-exact, 72 `setCurve` described-exact with reported trailing bytes), and the remaining 72 (`setRiskCurve`) stay **honestly refused and NAMED** — that IDL declares a vector length the wire bytes do not carry. The same `length === 8` assumption in `src/union.mjs`'s rename-evidence map was fixed the same way (stored means any non-empty byte array). The fix is surgical and the measurement pins that: pump.fun (400/842, 249 byte-exact), pfeeU (5/464) and Eternal (227/242 byte-exact) verdicts are BYTE-IDENTICAL between the trees; Eternal's 76 stored 1-byte EVENT discriminators are now preserved too (the event dispatch path reads 8-byte heads, so that preservation changes no decode in this window — stated, not smoothed). Honest limits ride in the artifact; the unit face flips `false -> true` on both instruction and event preservation, and the store face `0/38 -> 38/38`.
 
-The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — and that is now **measured, not asserted** (`tools/measure-foreign-run.mjs` -> `research/foreign-run-2026-11-05.json`): verdict `not-distributed-not-consumed`, i.e. zero non-owner signals on every channel that was read — 0 non-owner stars/forks/issues/PRs on this repo, 0 non-owner comments on the two outbound threads (`step-finance-oss/step-ingestooor#1` and `jup-ag/rfq-webhook-toolkit#96`, both open), 0 foreign-authored threads containing this project's slug. The first external run therefore remains the open gate. The measurement has limits and names them: the broad mention sweep covers 92 of 93 results (GitHub's search index hides one result in every ordering — measured, not assumed), a registry `404` for the bare name `sememe` on npm/crates.io/PyPI meant **no install channel was published yet** at that time, never "nobody used it" — npm published the name on 2026-11-12 (crates.io/PyPI still have no `sememe`; both are aliasing checks, not consumption evidence), and the code-index absence is only claimed for the indexed part of GitHub (the sweep's self-reference control passes). Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic). The funnel a stranger walks before that first run is measured separately (2026-11-05, `tools/measure-stranger-funnel.mjs` -> `research/stranger-funnel-2026-11-05.json`): a fresh GitHub clone ran both quickstart commands verbatim (1,089 and 6,337 payloads, all decoded byte-exactly, exit 0), the published tag `v0.3.0` installed into an empty app with no npm account, and its entry decoded 1,119/1,119 real payloads byte-exactly from `node_modules/sememe` — the harness (tools/test/research) does not travel into the install. The quickstart block itself is pinned by `test/quickstart-funnel.test.mjs`, which caught and fixed one defect on 2026-11-05: the documented output line was the pre-2026-11-04 schema (missing `rpcEncoding`, `chainParsedInstructions`, `missingBytes`) — a stranger comparing her terminal to the README saw two different products. The README now documents the line the tool actually prints, and a hand-edited documented line goes red.
+The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — and that is now **measured, not asserted** (`tools/measure-foreign-run.mjs` -> `research/foreign-run-2026-11-05.json`): verdict `not-distributed-not-consumed`, i.e. zero non-owner signals on every channel that was read — 0 non-owner stars/forks/issues/PRs on this repo, 0 non-owner comments on the two outbound threads (`step-finance-oss/step-ingestooor#1` and `jup-ag/rfq-webhook-toolkit#96`, both open), 0 foreign-authored threads containing this project's slug. The first external run therefore remains the open gate. The measurement has limits and names them: the broad mention sweep covers 92 of 93 results (GitHub's search index hides one result in every ordering — measured, not assumed), a registry `404` for the bare name `sememe` on npm/crates.io/PyPI meant **no install channel was published yet** at that time, never "nobody used it" — npm published the name on 2026-11-12 (crates.io/PyPI still have no `sememe`; both are aliasing checks, not consumption evidence), and the code-index absence is only claimed for the indexed part of GitHub (the sweep's self-reference control passes). Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic). The funnel a stranger walks before that first run is measured separately (2026-11-05, `tools/measure-stranger-funnel.mjs` -> `research/stranger-funnel-2026-11-05.json`): a fresh GitHub clone ran both quickstart commands verbatim (1,089 and 6,337 payloads, all decoded byte-exactly, exit 0), the published tag `v0.3.0` installed into an empty app with no npm account, and its entry decoded 1,119/1,119 real payloads byte-exactly from `node_modules/sememe` — the harness (tools/test/research) does not travel into the install. The quickstart block itself is pinned by `test/quickstart-funnel.test.mjs`, which caught and fixed one defect on 2026-11-05: the documented output line was the pre-2026-11-04 schema (missing `rpcEncoding`, `chainParsedInstructions`, `missingBytes`) — a stranger comparing her terminal to the README saw two different products. The README now documents the line the tool actually prints, and a hand-edited documented line goes red. Re-measured 2026-11-13 after the registry channel opened (`research/foreign-run-2026-11-12.json`): the registry check reads `npm: found` for the bare name while the verdict stays `not-distributed-not-consumed` — publish is not consumption, and the first external run remains the open gate.
 
 ## Your own transactions: raw RPC responses (the shape you already hold)
 
@@ -132,7 +132,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.22   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.23   # tagged release; no npm account needed
 ```
 
 ```js
@@ -151,14 +151,14 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.22 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.23 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
 
 `./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
 
-Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the pinned tag 0.4.22 is `latest` — measured install of `sememe@0.4.22` from the registry into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.22` deliver the same bytes: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest.
+Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.23` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest.
 
 ## Working now: pin the answers (`sememe lock` + `sememe verify`, 2026-11-05)
 
@@ -2680,6 +2680,56 @@ Suite after this release: **954 tests / 950 pass / 4 named network skips /
 (43287274405) and on the published tag v0.4.22 (43287274209); the release
 surface re-measured against that tag is clean (newest = latest = pinned,
 0 defects — `research/release-surface-2026-11-12b.json`).
+
+## v0.4.23: struct-internal absent fields decode under the evidence gate — and the registry stays truthful (2026-11-13)
+
+The absent-field policy (`absent: "report"`) only fired at TOP-LEVEL argument
+boundaries, so a payload that ends on the boundary of the LAST FIELD INSIDE a
+struct argument was refused under every policy. Measured on mainnet: Archer's
+legacy Swap form (tag `0f`, 19 bytes) omits `SwapParams.builderFeePpm`
+INSIDE `swapParams` and is chain-executed — witness `5Kpdai4oRG…`, slot
+468261978, `err: null`, instruction bytes byte-identical to the payload
+(`research/archer-legacy-swap-witness-2026-11-12.json`; the pinned IDL's own
+`SwapParams` docs describe the shorter form as supported and read as a 0 fee,
+with the program's own `success` log line). One of the 83 payloads in
+`research/archer-second-source-2026-11-12.json` hit exactly this and v0.4.22
+refused it with `truncated input: need 4 byte(s) at offset 19`.
+
+This release decodes it and re-encodes it byte-exactly: inside a named struct,
+under the same decode-only evidence gate (`ctx.__absentPolicy`), a boundary
+ending mid-struct makes the remaining fields ABSENT, named by their dotted path
+(`swapParams.builderFeePpm`), never invented; cuts INSIDE a field and boundary
+cuts inside vec/array elements still refuse; the strict default policy is
+untouched; `encodeInstructionData` accepts the dotted absent names (trailing
+run per struct). `verifiedShortForm` now matches short (sub-8-byte) shank
+discriminators by prefix — the rule the codec's instruction index already used
+— so the 1-byte Archer tag reaches the chain-verified short-form table. Pinned
+by `test/struct-absent-short-form.test.mjs` (10 tests: the falsification
+ladder is 6 red on the v0.4.22 tree, green here).
+
+The registry channel is live and carries this release with the tag: the
+foreign-run sweep measured `npm: found` for the bare name with the verdict
+still `not-distributed-not-consumed`
+(`research/foreign-run-2026-11-12.json`) — publish is not consumption, and
+the first external run stays the open gate.
+
+Install — both channels ship the same product files:
+
+```bash
+npm install sememe                          # registry
+npm install github:auroraxo/sememe#v0.4.23  # tagged release
+```
+
+Limits, stated plainly: the Archer interface still does not ship inside the
+store (no on-chain IDL; the Apache-2.0 first-party copy stays adopt-only and
+hash-gated — unchanged); enum- and vec-body boundary cuts still refuse until a
+chain witness names them (the rule stays evidence-gated; no speculative wire
+form is accepted); tags <= v0.4.22 keep the truncation refusal (a tag is
+immutable); one owner account, zero external users, no audit.
+
+Suite for this release: **964 tests / 960 pass / 4 named network skips /
+0 fail** (954 → 964: the 10 new pin tests). CI green on `main`
+(43332583023); release surface re-measured after publishing below.
 
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
