@@ -2729,7 +2729,10 @@ immutable); one owner account, zero external users, no audit.
 
 Suite for this release: **964 tests / 960 pass / 4 named network skips /
 0 fail** (954 → 964: the 10 new pin tests). CI green on `main`
-(43332583023); release surface re-measured after publishing below.
+(43332583023); the release surface re-measured after publishing is CLEAN —
+newest = latest = pinned = v0.4.23, 0 defects
+(`research/release-surface-2026-11-13.json`), and the registry carries 0.4.23
+as `latest` (measured after propagation).
 
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
