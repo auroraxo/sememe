@@ -2754,6 +2754,36 @@ published and immutable, so they keep the two-pin README; **v0.4.24 is the
 corrected release** — same product bytes as v0.4.23 (no src/ change since
 3fa9627), one pin, journey suite green (27/27), registry `latest` = 0.4.24.
 
+## v0.4.25: the count-from-header rule ships on both channels (2026-11-13)
+
+Product code changed on main since v0.4.24 (1f79e2b: `src/wire-layout.mjs` +
+the codec's decode/encode halves), so the pin and package version moved to
+v0.4.25 (`5b3852c`, tag, GitHub release page, `npm publish` -> `sememe@0.4.25`;
+first registry view 45s after publish still read 0.4.24 — propagation lag,
+named, then `latest = 0.4.25`).
+
+User-zero on the registry channel (`research/registry-install-2026-11-13b.json`):
+the committed byte-identical probe (`tools/hadro-count-header-probe.mjs`, only
+ROOT retargeted to the installed copy) run against `node_modules/sememe` from
+`npm install sememe@0.4.25` into an empty app answers **144 total, 144
+decoded, 0 refused, 144 points matching the header count, 0 empty curves, 144
+described-byte-exact** — the fix travels in the tarball, measured not asserted.
+Release surface re-measured after publishing: clean, 0 defects, newest =
+latest = pinned = v0.4.25 (`research/release-surface-2026-11-13.json`).
+e2e from the packed tarball: 26/26. Suite on the tagged tree: 992 / 988 pass /
+4 named network skips / 0 fail; CI green on the tag (43439445840) and main
+(43439445853).
+
+One ordering lesson, measured the hard way: the journey tests install the
+PINNED TAG from GitHub, so a version bump makes them red until the tag exists
+(`pathspec 'v0.4.25' did not match`); the release sequence is
+commit -> tag -> push -> publish -> suite, not bump -> suite.
+
+Limits, stated plainly: the foreign-run sweep re-measured the same day is
+identical — verdict `not-distributed-not-consumed`, zero external users; the
+8-byte `sequence: u64` tail stays described-exact, not byte-exact (the stored
+IDL does not declare it); tags <= v0.4.24 keep the old refusal (immutable).
+
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
 With Lighthouse decoded under shank, exactly **35 programs (87 payloads)** remained
