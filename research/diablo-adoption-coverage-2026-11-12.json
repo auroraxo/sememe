@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T18:58:58.089Z",
+  "generatedAt": "2026-11-13T13:06:57.126Z",
   "question": "does the PULS Z wiring move the ecosystem coverage number, and by how much?",
   "verdict": "headline-unchanged-at-shipped-store; adoption-adds-102",
   "premiseCheck": {
@@ -24,24 +24,24 @@
   "committedArtifact": "research/ecosystem-coverage-2026-11-11.json",
   "baseline": {
     "measuredPayloads": 21350,
-    "decoded": 18895,
-    "refused": 1135,
+    "decoded": 18967,
+    "refused": 1063,
     "noInterface": 1320,
     "byteExact": 17652,
-    "coveredPctOfMeasured": 88.5,
-    "coveredPctOfAllSeen": 84.9,
+    "coveredPctOfMeasured": 88.8,
+    "coveredPctOfAllSeen": 85.2,
     "decodedVia": {
-      "pulled": 17681,
+      "pulled": 17753,
       "adopted": 1214,
       "note": "pulled = an on-chain IDL account answered (sememe pull, slot-bound); adopted = a published copy adopted through sememe adopt (hash-bound bytes, DECLARED origin). Both decode offline and re-encode byte-checked; the classes are never merged silently."
     },
     "outsideWatchlist": {
       "payloads": 4968,
-      "decoded": 3098,
-      "refused": 553,
+      "decoded": 3170,
+      "refused": 481,
       "noInterface": 1317,
       "decodedAdopted": 1214,
-      "coveredPct": 62.4
+      "coveredPct": 63.8
     },
     "watchlist": {
       "payloads": 16382,
@@ -71,24 +71,24 @@
   },
   "union": {
     "measuredPayloads": 21350,
-    "decoded": 18997,
-    "refused": 1135,
+    "decoded": 19069,
+    "refused": 1063,
     "noInterface": 1218,
     "byteExact": 17754,
-    "coveredPctOfMeasured": 89,
-    "coveredPctOfAllSeen": 85.3,
+    "coveredPctOfMeasured": 89.3,
+    "coveredPctOfAllSeen": 85.6,
     "decodedVia": {
-      "pulled": 17681,
+      "pulled": 17753,
       "adopted": 1316,
       "note": "pulled = an on-chain IDL account answered (sememe pull, slot-bound); adopted = a published copy adopted through sememe adopt (hash-bound bytes, DECLARED origin). Both decode offline and re-encode byte-checked; the classes are never merged silently."
     },
     "outsideWatchlist": {
       "payloads": 4968,
-      "decoded": 3200,
-      "refused": 553,
+      "decoded": 3272,
+      "refused": 481,
       "noInterface": 1215,
       "decodedAdopted": 1316,
-      "coveredPct": 64.4
+      "coveredPct": 65.9
     },
     "watchlist": {
       "payloads": 16382,
@@ -120,12 +120,12 @@
     "decoded": 102,
     "noInterface": -102,
     "coveredPctOfMeasured": [
-      88.5,
-      89
+      88.8,
+      89.3
     ],
     "outsideWatchlistPct": [
-      62.4,
-      64.4
+      63.8,
+      65.9
     ],
     "byteExact": 102
   },

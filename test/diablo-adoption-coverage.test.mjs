@@ -17,7 +17,7 @@
 //   * the premise is TRUE on the adoption path: for a user who adopts the
 //     pinned first-party copy through src/adopt.mjs, the SAME 102 payloads
 //     move to decoded — 102/102, 0 refused, 102 byte-exact, headline
-//     88.5% -> 89.0%, outside-watchlist 62.4% -> 64.4%, and the increase
+//     88.8% -> 89.3%, outside-watchlist 63.8% -> 65.9%, and the increase
 //     rides the ADOPTED evidence column ONLY (pulled untouched).
 //   * the committed store was not touched by the run (readdir+hash
 //     digest before/after, recorded as committedStoreModified: false).
@@ -61,8 +61,9 @@ test('the shipped-store premise is FALSE and pinned so: baseline reproduces the 
     assert.equal(baseline[key], eco.headline[key], `baseline.${key} must equal the committed ecosystem artifact`);
   }
   // The measured headline at the shipped store is UNCHANGED by the wiring:
-  assert.equal(baseline.decoded, 18_895);
-  assert.equal(baseline.coveredPctOfMeasured, 88.5);
+  // 2026-11-13: the count-from-header fix moved it to 18,967/21,350 = 88.8%.
+  assert.equal(baseline.decoded, 18_967);
+  assert.equal(baseline.coveredPctOfMeasured, 88.8);
   assert.equal(baseline.diabRow.decoded, 0, 'the 102 remain no-interface at the shipped store');
   assert.equal(baseline.diabRow.noInterface, 102);
   assert.equal(artifact.premiseCheck.shippedStore.startsWith('FALSE'), true);
@@ -75,17 +76,17 @@ test('the adoption-path premise is TRUE and pinned so: 102/102 via ONE adopt thr
   assert.equal(union.diabRow.noInterface, 0);
   assert.equal(union.diabRow.byteExact, 102, 'every adopted decode re-encodes byte-exactly at the coverage layer');
   assert.equal(union.diabRow.decodedAdopted, 102, 'all 102 ride the ADOPTED evidence class, never pulled');
-  assert.equal(union.decoded, 18_997);
-  assert.equal(union.coveredPctOfMeasured, 89);
-  assert.equal(union.outsideWatchlist.coveredPct, 64.4);
+  assert.equal(union.decoded, 19_069);
+  assert.equal(union.coveredPctOfMeasured, 89.3);
+  assert.equal(union.outsideWatchlist.coveredPct, 65.9);
 });
 
 test('the split is arithmetic, not narration: delta equals the pinned +/-102 on every column', () => {
   assert.deepEqual(artifact.delta, {
     decoded: 102,
     noInterface: -102,
-    coveredPctOfMeasured: [88.5, 89],
-    outsideWatchlistPct: [62.4, 64.4],
+    coveredPctOfMeasured: [88.8, 89.3],
+    outsideWatchlistPct: [63.8, 65.9],
     byteExact: 102,
   });
   // pulled class may not move; adopted moves by exactly 102.

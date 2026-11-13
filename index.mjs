@@ -38,6 +38,12 @@ export {
 
 export { encodeBase58 } from './src/base58.mjs';
 export { canonicalJson } from './src/canonical.mjs';
+// The count-from-header table: a vector whose element count the wire states
+// in a DECLARED header argument carries NO Borsh length prefix. The table is
+// the evidence — it names the measured program address, the measured
+// instruction names and where the measurement lives. Exported so a consumer
+// can ask WHICH layouts are evidence-backed instead of guessing.
+export { COUNT_FROM_HEADER, countFromHeader } from './src/wire-layout.mjs';
 // The native programs (System, ComputeBudget) are NOT re-exported here on
 // purpose: src/native.mjs derives its wire table from the pinned upstream
 // sources AT IMPORT TIME and refuses to load when the committed artifact

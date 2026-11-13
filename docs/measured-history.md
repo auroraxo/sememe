@@ -1,8 +1,10 @@
 > **Archived measurement history.** This file preserves the full, unabridged
-> measurement and qualification history of the sememe README up to v0.4.24
-> (2026-11-13), moved here verbatim when the front page became a short
-> landing page. Every number, artifact reference and measured claim below is
-> kept as it was written. Paths like `research/…`, `test/…`, `tools/…` are
+> measurement and qualification history of the sememe README up to the
+> count-from-header fix (2026-11-13, the v0.4.25 line), moved here verbatim
+> when the front page became a short landing page. Every number, artifact
+> reference and measured claim below is kept as it was written (the one live
+> addition is the dated section at the end of the coverage narrative).
+> Paths like `research/…`, `test/…`, `tools/…` are
 > relative to the repository root, not to `docs/`. Links written as
 > `measured-history.md#…` point to sections preserved in this file. Start at
 > [README.md](../README.md) if you are new.
@@ -2840,6 +2842,73 @@ copy (artifact: `research/external-adoption-preview-2026-11-04.json`, pinned in
   `Bonasa-Tech/manifest` is `GPL-3.0`. Neither may be copied into this MIT repository or
   the published npm package. The preview therefore ran on a throwaway work-dir;
   the committed store remains untouched (`committedStoreModified: false`, 76 receipts).
+
+## The 72 HADRo refusals were a LAYOUT finding — and the fix now speaks that layout (2026-11-13)
+
+The HADRo face had two layers, and both were measured before anything was
+changed. First the decoder bug (2026-11-12): the program publishes **38
+one-byte instruction discriminators**, and `withDerivedDiscriminators`
+treated only 8-byte arrays as "stored", so every published byte was
+overwritten with Anchor's sighash — 0/195 decoded. With the stored bytes
+kept, 123/195 decoded (51 full byte-exact, 72 `setCurve` described-exact),
+and the remaining 72 (`setRiskCurve`) stayed honestly refused
+(`research/hadro-short-discriminator-2026-11-12.json`).
+
+The second layer was measured on 2026-11-13
+(`research/hadro-vec-wire-2026-11-13.json`, verdict
+`hadro-vec-wire-count-from-header-wired`, 0 falsifications — the artifact was
+re-derived after the fix; the pre-fix verdict `hadro-vec-wire-no-borsh-prefix`
+measured the same layout, 0 falsifications): the stored IDL declares
+`points: vec<CurvePointInput>`, which means "a u32 Borsh length prefix, then
+the elements" — and the wire carries **no such prefix**. The element count is
+the `numPoints` u8 the instruction already declares in its own header, and the
+points follow the header directly. Fitting that layout re-encodes 144/144
+committed payloads byte-exactly, and the 8-byte `sequence: u64` tail equals
+the containing transaction's slot (108) or slot-1 (36) in 144/144 chain-accepted
+payloads. So the strict codec read the first four bytes of the first curve
+point as a length — the refusal text said "vector length 1814753837 needs
+38109830577 byte(s)", a number that was never on the wire, and the 72 it
+"decoded" carried an EMPTY curve with 46 unexplained trailing bytes.
+
+**The fix is a rule with three gates, not a special case for one program**
+(`src/wire-layout.mjs`): a vector whose element count the wire states in a
+DECLARED header argument carries no length prefix; the count is that
+argument's decoded value; the encoder writes the elements without a prefix,
+and an encode whose elements disagree with the count is refused by name. The
+rule fires only for the measured program address, only for the measured
+instruction names, and only when the interface DECLARES the count argument
+before the vector — every other interface keeps the strict u32-prefix codec
+byte for byte. A count that does not fit the remaining bytes is refused with
+the layout named ("has no length prefix on the wire; the count comes from
+numPoints"), never with a garbage number.
+
+Measured in both trees with ONE byte-identical probe
+(`tools/measure-hadro-count-from-header.mjs`, prefix `ea074c4` extracted by
+`git archive`, artifact `research/hadro-count-from-header-2026-11-13.json`):
+the prefix tree decodes 72 of 144 (72 refused, 72 empty curves, 0 matching
+the header count), this tree decodes **144/144 with the decoded point count
+equal to the header byte in 144/144 and 0 refusals**; the guard face measures
+that the same IDL shape under another address keeps the strict codec. The
+falsification ladder (`tools/mutation-ladder-hadro-count-from-header.sh`)
+breaks one rule at a time and each mutation turns the test file red — 6/6
+caught (`test/hadro-count-from-header.test.mjs`, 11 tests).
+
+The honest remainder: the 8-byte `sequence: u64` tail the wire carries after
+the points is still REPORTED as trailing bytes — the stored IDL does not
+declare it, and this fix does not invent it. The rule covers the two
+instructions the measurement saw; a third program with the same shape would
+have to be MEASURED first and added to the table.
+
+The ecosystem number moves with it, re-derived and not narrated:
+the measured status line is now **88.8% (18,967/21,350 payloads across 6
+finalized blocks, 2026-11-13; 96.4% on the curated watchlist, 63.8% outside
+it; byte-exact re-encode on 93.1% of decoded)** — 18,895 -> **18,967**
+decoded of 21,350, outside the watchlist 62.4% -> 63.8% (the 144 curve
+payloads are described-exact — the sequence tail is why).
+`research/ecosystem-coverage-2026-11-11.json` and the DiabLokxis adoption
+measurement (`research/diablo-adoption-coverage-2026-11-12.json`, baseline
+18,967 -> union 19,069 with the same +102 on the adopted column) are
+re-derived by their tools, not edited by hand.
 
 ## Next qualification
 

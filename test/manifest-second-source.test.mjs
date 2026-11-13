@@ -27,7 +27,8 @@
 //   3. GPL-3.0 at every pin: neither copy is vendored into this MIT repo or
 //      the npm package. The committed store is byte-untouched
 //      (`committedStoreModified: false`, readdir before/after in the tool).
-//      The headline therefore stays 88.5% on the shipped store; a user who
+//      The headline therefore stays on the shipped store (88.8% after the
+//      2026-11-13 count-from-header fix); a user who
 //      adopts the pinned copy gets the closing (receipt `slot: null`,
 //      origin declared).
 //

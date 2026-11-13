@@ -161,12 +161,16 @@ const expected = {
   },
   hadroWire: {
     totalPayloads: 195,
-    decoded: 123,
-    refused: 72,
+    // 2026-11-13: the count-from-header rule (src/wire-layout.mjs) closed
+    // the 72 setRiskCurve refusals this measurement used to pin as an
+    // honest remainder — the prefix tree (c304e80) still shows 0/195.
+    decoded: 195,
+    refused: 0,
     fullExact: 51,
-    describedExact: 72,
+    describedExact: 144,
     decodedByInstruction: {
       setCurve: 72,
+      setRiskCurve: 72,
       updateMidpriceAndSpreadFactor: 41,
       switchPriceCurve: 6,
       updateMidprice: 3,
@@ -274,8 +278,8 @@ const artifact = {
     unitPreservesShortEvent: `${prefix.unit.preservesShortEvent} -> ${worktree.unit.preservesShortEvent}`,
   },
   honestLimits: {
-    setRiskCurve: '72 payloads stay refused: the stored IDL declares points as a vector whose length does not match the wire bytes; refused and NAMED, never counted as coverage',
-    setCurve: '72 payloads decode the described prefix byte-exactly but carry trailing bytes the IDL does not explain — describedRoundTripByteExact, not full byte-exact',
+    setRiskCurve: '2026-11-12 measurement: 72 payloads stay refused because the stored IDL declares points as a vector whose length does not match the wire bytes — refused and NAMED, never counted as coverage. 2026-11-13: the count-from-header rule closed them (195/195 decode; see research/hadro-count-from-header-2026-11-13.json); this artifact keeps the short-discriminator delta it measured.',
+    setCurve: 'the 144 curve payloads decode the described prefix byte-exactly but carry the 8-byte sequence tail the stored IDL does not declare — describedRoundTripByteExact, not full byte-exact',
     etrnEvents: 'Eternal stores 76 1-byte event discriminators; the event wire path dispatches on 8-byte heads, so preservation changes no decode in this window (227/242 byte-exact before and after) — kept is right, measurable effect none',
   },
   falsifications,

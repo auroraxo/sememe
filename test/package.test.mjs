@@ -86,7 +86,7 @@ test('every file the package ships imports only node: builtins or relative files
     'src/native.mjs', 'src/short-forms.mjs', 'src/store-read.mjs', 'src/store-write.mjs',
     'src/token-interface.mjs',
     'src/token.mjs', 'src/raydium-interface.mjs',
-    'src/raydium.mjs', 'src/union.mjs'];
+    'src/raydium.mjs', 'src/union.mjs', 'src/wire-layout.mjs'];
   const files = zeroDependency.map((name) => path.join(ROOT, name));
   assert.ok(files.length >= 13, `expected the shipped sources, found ${files.length}`);
   const violations = [];

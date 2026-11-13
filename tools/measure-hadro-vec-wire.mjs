@@ -1,18 +1,24 @@
 #!/usr/bin/env node
-// tools/measure-hadro-vec-wire.mjs — WHY sememe REFUSES 72 setRiskCurve
-// PAYLOADS (and calls 72 setCurve payloads "decoded" with ZERO points):
+// tools/measure-hadro-vec-wire.mjs — WHY sememe ONCE REFUSED 72 setRiskCurve
+// PAYLOADS (and called 72 setCurve payloads "decoded" with ZERO points):
 // the stored IDL says `points: vec`, the wire carries NO Borsh length prefix.
+// 2026-11-13 PULS AE WIRED THE RULE (src/wire-layout.mjs): the product face
+// below now measures the FIX (144/144 decoded, the decoded count equal to
+// the header byte in 144/144); the pre-fix face stays provable forever via
+// tools/measure-hadro-count-from-header.mjs (prefix tree ea074c4).
 //
 // THE CLAIM UNDER TEST (falsification-first; both halves are measured, never
 // asserted):
 //
-//   P  (product face, offline, committed fixtures) the product decodes the
-//      195 committed HADRo payloads as: 123 decoded (51 byte-exact, 72
-//      setCurve with points:[] and 46 trailing bytes each — the "decoded"
-//      label hides an EMPTY curve), 72 setCurve refused under a nonsense
-//      length ("vector length 1814753837 …"): the u32 Borsh prefix the IDL
-//      promises does not exist on the wire, so amountIn's low 4 bytes get
-//      read as the count.
+//   P  (product face, offline, committed fixtures) the product answers all
+//      144 committed HADRo setCurve/setRiskCurve payloads: 144 decoded, 0
+//      refused, 0 empty curves, the decoded point count equal to the header
+//      byte in 144/144, 144 described-byte-exact. THE PREFIX FACE (what
+//      this file measured before the fix): 72 decoded with points:[] and
+//      46 trailing bytes each — the "decoded" label hid an EMPTY curve —
+//      and 72 setRiskCurve refused under a nonsense length ("vector length
+//      1814753837 …"): the u32 Borsh prefix the IDL promises does not exist
+//      on the wire, so amountIn's low 4 bytes got read as the count.
 //
 //   W  (wire face) the real layout is: 1-byte discriminator + the declared
 //      u8 header (setCurve 5 bytes, setRiskCurve 6 bytes, numPoints at byte
@@ -39,10 +45,11 @@
 // question; it does not close the prefix question. What closes that is the
 // arithmetic in W — countable offline, re-encodable byte-exact, witnessed by
 // 144 chain-ACCEPTED transactions (failed:false in the committed sample).
-// The fix pulse still owes: the count-from-header rule itself, its encoder
-// half, and a refusal voice that names "no length prefix on the wire"
-// instead of a garbage number. THIS tool ships the measurement and pins the
-// current product face so the fix cannot drift either number silently.
+// THE FIX PULSE SHIPPED THE RULE: count-from-header (src/wire-layout.mjs)
+// decodes the header-counted vectors, its encoder half writes no prefix, and
+// a count that does not fit is refused BY NAME ("no length prefix on the
+// wire"). THIS tool ships the measurement and pins the product face so the
+// fix cannot drift either number silently.
 //
 // NO VERDICT (exit 3) when: a fixture is missing, the first-party source
 // cannot be fetched or its sha256 pin moved, the source's instruction set
@@ -104,35 +111,46 @@ function ghOk(args) {
 }
 
 // --- P: the product face, through the product's own union path --------------
+// 2026-11-13 (PULS AE): this face measured the DEFECT (72 decoded with an
+// empty curve, 72 refused with a garbage number). The count-from-header rule
+// closed it; the face below now measures the FIX, and the pre-fix numbers
+// live on in the two-tree measurement that proves them:
+//   tools/measure-hadro-count-from-header.mjs -> prefix tree ea074c4.
 async function productFace(payloads) {
   const { decodeUnionPayload } = await import(path.join(ROOT, 'src', 'decode.mjs'));
   const store = STORE;
   const face = {
-    total: 0, decoded: 0, refused: 0, byteExact: 0,
-    setCurveEmptyPoints: 0, setCurveTrailingHexes: {},
+    total: 0, decoded: 0, refused: 0, byteExact: 0, describedByteExact: 0,
+    emptyPoints: 0, pointsMatchHeaderCount: 0, pointsMismatchHeaderCount: 0,
+    setCurveTrailingHexes: {},
     refusalReasons: {}, refusalInstruction: {},
     examples: {},
   };
   for (const payload of payloads) {
     face.total += 1;
+    const headerCount = Buffer.from(payload.hex, 'hex')[4];
     try {
       const out = await decodeUnionPayload(store, HADRO, payload.hex, {});
       face.decoded += 1;
       if (out.roundTripByteExact) face.byteExact += 1;
+      if (out.describedRoundTripByteExact) face.describedByteExact += 1;
+      const points = Array.isArray(out.args?.points) ? out.args.points.length : -1;
+      if (points === 0) face.emptyPoints += 1;
+      if (points === headerCount) face.pointsMatchHeaderCount += 1;
+      else face.pointsMismatchHeaderCount += 1;
       const name = out.instruction ?? out.name;
       if (name === 'setCurve') {
-        const points = out.args?.points;
-        if (Array.isArray(points) && points.length === 0) face.setCurveEmptyPoints += 1;
         const trailing = out.trailing?.hex ?? '';
         face.setCurveTrailingHexes[trailing.length] = (face.setCurveTrailingHexes[trailing.length] ?? 0) + 1;
-        if (!face.examples.setCurve) {
-          face.examples.setCurve = {
-            signature: payload.signature, slot: payload.slot,
-            points: [], trailingBytes: out.trailing?.count ?? null,
-            roundTripByteExact: out.roundTripByteExact ?? null,
-            describedRoundTripByteExact: out.describedRoundTripByteExact ?? null,
-          };
-        }
+      }
+      if (!face.examples.decoded) {
+        face.examples.decoded = {
+          signature: payload.signature, slot: payload.slot,
+          instruction: name, headerCount, points,
+          trailingBytes: out.trailing?.count ?? null,
+          roundTripByteExact: out.roundTripByteExact ?? null,
+          describedRoundTripByteExact: out.describedRoundTripByteExact ?? null,
+        };
       }
     } catch (error) {
       face.refused += 1;
@@ -281,17 +299,24 @@ async function main() {
   const wire = wireFace(payloads);
 
   // Falsification: every number the claim rests on must hold, not just some.
+  // 2026-11-13: the count-from-header rule closed the 72 refusals, so the
+  // PRODUCT face is now 144 decoded / 0 refused / 144 described-byte-exact,
+  // and the WIRE face is unchanged (the layout did not move — the FIX moved).
   if (product.total !== 144) falsifications.push(`product face saw ${product.total} payloads, expected 144`);
-  if (product.refused !== 72) falsifications.push(`product refused ${product.refused}, expected 72`);
-  if (product.decoded !== 72) falsifications.push(`product decoded ${product.decoded}, expected 72`);
-  if (product.refusalReasons['vector length <n> needs <n> byte(s)'] !== 72) {
-    falsifications.push(`refusal family not uniform: ${JSON.stringify(product.refusalReasons)}`);
+  if (product.refused !== 0) falsifications.push(`product refused ${product.refused}, expected 0`);
+  if (product.decoded !== 144) falsifications.push(`product decoded ${product.decoded}, expected 144`);
+  if (product.emptyPoints !== 0) falsifications.push(`empty curve count ${product.emptyPoints}, expected 0`);
+  if (product.pointsMatchHeaderCount !== 144) {
+    falsifications.push(`decoded point count matched the header byte ${product.pointsMatchHeaderCount}/144 times`);
   }
-  if ((product.refusalInstruction.setRiskCurve ?? 0) !== 72) {
-    falsifications.push(`refusals not all setRiskCurve: ${JSON.stringify(product.refusalInstruction)}`);
+  if (product.pointsMismatchHeaderCount !== 0) {
+    falsifications.push(`decoded point count disagreed with the header byte ${product.pointsMismatchHeaderCount} times`);
   }
-  if (product.setCurveEmptyPoints !== 72) {
-    falsifications.push(`setCurve empty-points count ${product.setCurveEmptyPoints}, expected 72`);
+  if (product.describedByteExact !== 144) {
+    falsifications.push(`described-byte-exact ${product.describedByteExact}, expected 144`);
+  }
+  if (Object.keys(product.refusalReasons).length !== 0) {
+    falsifications.push(`refusals remain: ${JSON.stringify(product.refusalReasons)}`);
   }
   if (wire.fit !== 144) falsifications.push(`wire layout fit ${wire.fit}/144`);
   if (wire.byteExact !== 144) falsifications.push(`wire re-encode byte-exact ${wire.byteExact}/144`);
@@ -343,20 +368,23 @@ async function main() {
       diffAgainstStoredIdl: diff,
       verdict: 'the two args the on-chain metadata IDL lacks are exactly the two sequence:u64 tails; the Borsh-vec prefix question the source still declares is the open fix face',
     },
-    verdict: 'hadro-vec-wire-no-borsh-prefix',
+    verdict: 'hadro-vec-wire-count-from-header-wired',
     limits: [
-      'no product code changed: the 72 setRiskCurve refusals and the 72 empty-points setCurve decodes still stand until the fix pulse wires count-from-header',
-      'the first-party IDL ALSO declares points as a Borsh vec — adopting it alone would fix the tail and still refuse every payload',
+      'the count-from-header rule decodes the header-counted vectors; the 8-byte sequence tail the wire carries after the points stays REPORTED as trailing bytes — the stored IDL does not declare it and no code invents it',
+      'the rule is keyed to the measured program address: the same IDL shape under another address keeps the strict u32-prefix codec (measured, not asserted)',
+      'the first-party IDL ALSO declares points as a Borsh vec — adopting it alone would fix the tail and still refuse the payloads',
       'sequence == slot (108) or slot-1 (36) is correlation over 144 chain-accepted payloads, not a claim about how the program computes it',
       'the witness is the committed sample (failed:false, signature per payload); a live re-fetch of one transaction is the skip-gated network test',
-      'one program, one window; no other decoder is touched',
+      'one program, one window; no other decoder is touched — the ecosystem artifact is re-derived by tools/ecosystem-coverage.mjs, not narrated here',
     ],
     committedStoreModified,
   };
   writeFileSync(OUT, JSON.stringify(artifact, null, 2) + '\n');
   console.log(JSON.stringify({
     verdict: artifact.verdict,
-    product: { decoded: product.decoded, refused: product.refused, byteExact: product.byteExact, setCurveEmptyPoints: product.setCurveEmptyPoints },
+    product: { decoded: product.decoded, refused: product.refused, byteExact: product.byteExact,
+      pointsMatchHeaderCount: product.pointsMatchHeaderCount, pointsMismatchHeaderCount: product.pointsMismatchHeaderCount,
+      emptyPoints: product.emptyPoints, describedByteExact: product.describedByteExact },
     wire: { fit: wire.fit, byteExact: wire.byteExact, sequenceSlot: wire.sequenceSlot, sequenceSlotMinus1: wire.sequenceSlotMinus1 },
     source: { sha256: source.sha256, diffs: diff.differences.length },
     committedStoreModified,

@@ -71,7 +71,12 @@ test('D3: the HADRo store keeps all 38 short instruction discriminators', async 
   assert.equal(filled.instructions, 0, 'none of them counts as a derivation gap (pre-fix: 38 filled)');
 });
 
-test('D4+D5+D6: HADRo wire through the product path — 123 decode, 72 stay refused', async () => {
+test('D4+D5+D6: HADRo wire through the product path — 195 decode, 0 refused', async () => {
+  // 2026-11-13: the count-from-header rule (src/wire-layout.mjs) closed the
+  // 72 setRiskCurve refusals this test pinned as the honest remainder. The
+  // short-discriminator fix face (0/195 -> 123/195 -> 195/195) is measured
+  // in both trees by tools/measure-hadro-short-discriminator.mjs; the
+  // prefix tree (c304e80) still answers 0/195 there.
   const sample = JSON.parse(await readFile(SAMPLE, 'utf8'));
   const rows = [];
   for (const tx of sample.transactions) {
@@ -99,25 +104,24 @@ test('D4+D5+D6: HADRo wire through the product path — 123 decode, 72 stay refu
       refusedBy[key] = (refusedBy[key] ?? 0) + 1;
     }
   }
-  // THE NUMBER: 123/195 where the pre-fix tree decoded 0/195.
-  assert.equal(decoded, 123, `short stored discriminators must decode the wire (got ${decoded})`);
-  assert.equal(refused, 72);
+  // THE NUMBER: 195/195 where the pre-fix tree decoded 0/195 — 123 through
+  // the stored-discriminator fix, the final 72 through count-from-header.
+  assert.equal(decoded, 195, `short stored discriminators + count-from-header must decode the wire (got ${decoded})`);
+  assert.equal(refused, 0);
   assert.equal(fullExact, 51, '51 payloads re-encode byte-for-byte');
-  assert.equal(describedExact, 72, '72 setCurve payloads explain the prefix, trailing bytes reported');
+  assert.equal(describedExact, 144, '144 curve payloads explain the prefix, the 8-byte sequence tail reported');
   // Every decode is NAMED — the measurement never counts anonymous bytes.
   assert.deepEqual(decodedBy, {
     setCurve: 72,
+    setRiskCurve: 72,
     updateMidpriceAndSpreadFactor: 41,
     switchPriceCurve: 6,
     updateMidprice: 3,
     swapExactIn: 1,
-  }, 'every decode is named; the setRiskCurve family is NOT here');
-  // The 72 refusals are honest IDL-vs-wire disagreement, not a missing table:
-  // the stored IDL declares a vector length the wire does not carry.
-  assert.ok(Object.values(refusedBy).reduce((a, b) => a + b, 0) === 72,
-    `setRiskCurve refusals must be counted, got ${JSON.stringify(refusedBy)}`);
-  assert.ok(Object.keys(refusedBy).some((k) => k.includes('setRiskCurve')),
-    `the refusal must be NAMED, got ${JSON.stringify(refusedBy)}`);
+  }, 'every decode is named; the setRiskCurve family decoded through the header count');
+  // No refusal may hide behind the fix.
+  assert.equal(refused, 0,
+    `no HADRo refusal may remain, got ${JSON.stringify(refusedBy)}`);
 });
 
 test('G1: 8-byte gap-fill still works exactly as before', () => {

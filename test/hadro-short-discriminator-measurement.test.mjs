@@ -11,11 +11,11 @@
 //     unmeasurable, so the pin is on the falsification being counted);
 //   * every falsification count is zero — including the surgical guards:
 //     pump.fun, pfeeU and Eternal verdicts byte-identical between trees;
-//   * the delta is the measured one: +123 decoded, +38 preserved,
-//     false -> true on both unit faces;
-//   * the honest limits are written down: the 72 setRiskCurve refusals stay
-//     refusals, the 72 setCurve decodes are described-prefix, not full
-//     byte-exact.
+//   * the delta is the measured one: +195 decoded (123 through the stored
+//     discriminators, the final 72 through count-from-header on 2026-11-13),
+//     +38 preserved, false -> true on both unit faces;
+//   * the honest limits are written down: the worktree face decodes all 195,
+//     and the 8-byte sequence tail is reported as trailing, not invented.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -64,7 +64,7 @@ test('the pre-fix tree showed the defect and the fix landed on the pinned number
   assert.equal(artifact.faces.prefix.unit.preservesShortInstruction, false);
   assert.equal(artifact.falsifications.landedOnPinnedNumbers, true);
   assert.deepEqual(artifact.falsifications.landed, []);
-  assert.equal(artifact.delta.hadroWireDecoded, 123);
+  assert.equal(artifact.delta.hadroWireDecoded, 195);
   assert.equal(artifact.delta.hadroShortDiscriminatorsPreserved, 38);
   assert.equal(artifact.delta.unitPreservesShortInstruction, 'false -> true');
   assert.equal(artifact.delta.unitPreservesShortEvent, 'false -> true');
@@ -82,18 +82,18 @@ test('every falsification count is zero — the surgical guards hold', () => {
 
 test('the honest limits are written down, not smoothed over', () => {
   const limits = artifact.honestLimits;
-  assert.match(limits.setRiskCurve, /stay refused/,
-    '72 payloads whose IDL vector length disagrees with the wire remain refusals');
-  assert.match(limits.setCurve, /trailing/,
-    'the 72 described-exact decodes must not be sold as full byte-exact');
+  assert.match(limits.setRiskCurve, /count-from-header rule closed them/,
+    'the 72 refusals this measurement pinned were closed by the 2026-11-13 layout rule — stated, not hidden');
+  assert.match(limits.setCurve, /sequence tail/,
+    'the described-exact decodes must not be sold as full byte-exact');
   assert.match(limits.etrnEvents, /measurable effect none/,
     'preservation without wire effect is stated as such');
   // And the wire face itself keeps the split honest:
   const hadro = artifact.faces.worktree.wire.hadro;
-  assert.equal(hadro.decoded, 123);
+  assert.equal(hadro.decoded, 195);
   assert.equal(hadro.fullExact, 51);
-  assert.equal(hadro.describedExact, 72);
-  assert.equal(hadro.refused, 72);
+  assert.equal(hadro.describedExact, 144);
+  assert.equal(hadro.refused, 0);
   assert.equal(hadro.fullExact + hadro.describedExact, hadro.decoded,
     'every decode is either full or described byte-exact — nothing else counts');
 });

@@ -9,7 +9,10 @@
 //   The card claimed the PULS Z wiring makes the 102 DiabLokxis payloads
 //   "now countable". Re-running the SAME committed fixture (sample + store,
 //   2026-11-11) through the SAME coverage tool on the wired tree shows the
-//   headline UNCHANGED: 18895/21350 = 88.5%, DiabLokxis 0 decoded / 102
+//   headline UNCHANGED: 18967/21350 = 88.8%, DiabLokxis 0 decoded / 102
+//   (the count-from-header fix of 2026-11-13 moved the shipped headline
+//   from 88.5% to 88.8%; this measurement's SUBJECT — the 102 DiabLokxis
+//   payloads — is unchanged),
 //   no-interface. That half of the premise is FALSE — the wiring changed
 //   the codec, not the store, and the diabloarb bytes are NOT vendored
 //   (cryptodiablo/diabloarb carries no license at the pin f5005ac4,
@@ -18,8 +21,8 @@
 //
 //   The other half is TRUE and this tool MEASURES it: the 102 payloads move
 //   from no-interface to decoded EXACTLY for the user who adopts the
-//   first-party copy — 88.5% -> (18895+102)/21350 = 89.0% of measured
-//   traffic, outside-watchlist 62.4% -> 64.4%, the same +102 counted at
+//   first-party copy — 88.8% -> (18967+102)/21350 = 89.3% of measured
+//   traffic, outside-watchlist 63.8% -> 65.9%, the same +102 counted at
 //   the tool's own entry points against a throwaway copy of the committed
 //   store plus ONE adoption through src/adopt.mjs (the product write path,
 //   not a synthetic flag). The evidence class is kept apart: all 102 arrive

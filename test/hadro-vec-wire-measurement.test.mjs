@@ -82,25 +82,22 @@ test('the artifact carries no host path', () => {
   assert.doesNotMatch(text, /\/tmp\//, 'a committed measurement must not name a scratch path');
 });
 
-test('P — the product face: 72 decoded (empty curve), 72 refused with a named family', () => {
+test('P — the product face: 144 decoded, 0 refused, every count equal to the header byte', () => {
   const p = artifact.productFace;
   assert.equal(p.total, 144);
-  assert.equal(p.decoded, 72);
-  assert.equal(p.refused, 72);
+  assert.equal(p.decoded, 144);
+  assert.equal(p.refused, 0);
   assert.equal(p.byteExact, 0,
-    'no HADRo payload is byte-exact through the product path today');
-  assert.equal(p.setCurveEmptyPoints, 72,
-    'the 72 "decodes" carry an EMPTY curve — the label must not be sold as decoded');
-  assert.equal(p.setCurveTrailingHexes['92'], 72,
-    'every described decode carries the same 46-byte trailing run');
-  assert.deepEqual(p.refusalReasons, { 'vector length <n> needs <n> byte(s)': 72 },
-    'the refusal family must be uniform and named');
-  assert.deepEqual(p.refusalInstruction, { setRiskCurve: 72 },
-    'the refusals must all be setRiskCurve');
-  assert.match(p.examples.refusal.message, /vector length 1814753837/,
-    'the pinned garbage count is the evidence that no Borsh prefix exists on the wire');
-  assert.equal(p.examples.refusal.message.includes('decode refused by the only stored source'), true,
-    'the refusal must name its source');
+    'the 144 curve payloads carry the 8-byte sequence tail the IDL does not declare — described-exact, not full byte-exact');
+  assert.equal(p.describedByteExact, 144);
+  assert.equal(p.emptyPoints, 0,
+    'no decode may carry an EMPTY curve — that was the pre-fix defect face');
+  assert.equal(p.pointsMatchHeaderCount, 144,
+    'the decoded point count must equal the header byte on the wire in every payload');
+  assert.equal(p.pointsMismatchHeaderCount, 0);
+  assert.deepEqual(p.refusalReasons, {},
+    'no refusal may remain: the count-from-header rule speaks this layout');
+  assert.deepEqual(p.refusalInstruction, {});
 });
 
 test('W — the wire face: the header-count layout fits and re-encodes 144/144 byte-exact', () => {
@@ -144,15 +141,15 @@ test('S — the first-party source adds exactly the two sequence args and nothin
   assert.equal(diff.sourceInstructionCount, 38);
 });
 
-test('the honest limits are written down: adopting the source alone would still refuse everything', () => {
-  assert.equal(artifact.verdict, 'hadro-vec-wire-no-borsh-prefix');
+test('the honest limits are written down: the sequence tail is reported, not invented', () => {
+  assert.equal(artifact.verdict, 'hadro-vec-wire-count-from-header-wired');
   const limits = artifact.limits.join(' | ');
-  assert.match(limits, /no product code changed/,
-    'the 72 refusals and the 72 empty-points decodes still stand after this pulse');
+  assert.match(limits, /sequence tail the wire carries after the points stays REPORTED/,
+    'the 8-byte tail the wire carries is trailing bytes, never invented as a field');
   assert.match(limits, /ALSO declares points as a Borsh vec/,
     'the first-party source does NOT close the prefix question');
-  assert.match(limits, /count-from-header/,
-    'the fix face (count from the header, encoder half, refusal voice) is named as owed');
+  assert.match(limits, /keyed to the measured program address/,
+    'the rule must not fire for an interface it was not measured on');
   assert.equal(artifact.committedStoreModified, false,
     'the committed store must be byte-untouched by the measurement run');
 });

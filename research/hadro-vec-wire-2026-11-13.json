@@ -1,37 +1,33 @@
 {
   "tool": "tools/measure-hadro-vec-wire.mjs",
-  "measuredAt": "2026-11-13T08:39:37.403Z",
+  "measuredAt": "2026-11-13T13:23:16.128Z",
   "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
   "fixture": "test/fixtures/ecosystem-sample-2026-11-11.json",
   "productFace": {
     "description": "product union path over the committed sample, store untouched",
     "total": 144,
-    "decoded": 72,
-    "refused": 72,
+    "decoded": 144,
+    "refused": 0,
     "byteExact": 0,
-    "setCurveEmptyPoints": 72,
+    "describedByteExact": 144,
+    "emptyPoints": 0,
+    "pointsMatchHeaderCount": 144,
+    "pointsMismatchHeaderCount": 0,
     "setCurveTrailingHexes": {
-      "92": 72
+      "16": 72
     },
-    "refusalReasons": {
-      "vector length <n> needs <n> byte(s)": 72
-    },
-    "refusalInstruction": {
-      "setRiskCurve": 72
-    },
+    "refusalReasons": {},
+    "refusalInstruction": {},
     "examples": {
-      "setCurve": {
+      "decoded": {
         "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
         "slot": 468261981,
-        "points": [],
-        "trailingBytes": 46,
+        "instruction": "setCurve",
+        "headerCount": 2,
+        "points": 2,
+        "trailingBytes": 8,
         "roundTripByteExact": false,
         "describedRoundTripByteExact": true
-      },
-      "refusal": {
-        "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
-        "slot": 468261981,
-        "message": "decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 1814753837 needs 38109830577 byte(s) but 130 remain"
       }
     }
   },
@@ -127,13 +123,14 @@
     },
     "verdict": "the two args the on-chain metadata IDL lacks are exactly the two sequence:u64 tails; the Borsh-vec prefix question the source still declares is the open fix face"
   },
-  "verdict": "hadro-vec-wire-no-borsh-prefix",
+  "verdict": "hadro-vec-wire-count-from-header-wired",
   "limits": [
-    "no product code changed: the 72 setRiskCurve refusals and the 72 empty-points setCurve decodes still stand until the fix pulse wires count-from-header",
-    "the first-party IDL ALSO declares points as a Borsh vec — adopting it alone would fix the tail and still refuse every payload",
+    "the count-from-header rule decodes the header-counted vectors; the 8-byte sequence tail the wire carries after the points stays REPORTED as trailing bytes — the stored IDL does not declare it and no code invents it",
+    "the rule is keyed to the measured program address: the same IDL shape under another address keeps the strict u32-prefix codec (measured, not asserted)",
+    "the first-party IDL ALSO declares points as a Borsh vec — adopting it alone would fix the tail and still refuse the payloads",
     "sequence == slot (108) or slot-1 (36) is correlation over 144 chain-accepted payloads, not a claim about how the program computes it",
     "the witness is the committed sample (failed:false, signature per payload); a live re-fetch of one transaction is the skip-gated network test",
-    "one program, one window; no other decoder is touched"
+    "one program, one window; no other decoder is touched — the ecosystem artifact is re-derived by tools/ecosystem-coverage.mjs, not narrated here"
   ],
   "committedStoreModified": false
 }

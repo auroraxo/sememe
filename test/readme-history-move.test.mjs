@@ -59,6 +59,11 @@ const ANCHORS = [
   ['A dialect it does not speak is a NAMED refusal', 'the dialect gate'],
   ['The product SPEAKS the dialect it named', 'the raw-LE engine record'],
   ['v0.4.23 / v0.4.24: struct-internal absent fields', 'the struct-absent record'],
+  // 2026-11-13: the front page moved to 88.8% (count-from-header closed the
+  // 72 HADRo setRiskCurve refusals); the archive keeps BOTH: the 88.5-era
+  // claims verbatim as history, and a dated section for the new face.
+  ['18,967/21,350 payloads', 'the ecosystem coverage denominator after count-from-header'],
+  ['63.8%', 'the outside-the-watchlist coverage after count-from-header'],
   // honest limits (deleting these would make the archive LESS honest than the
   // front page it replaces)
   ['Evidence and limits', 'the limits section'],
@@ -86,7 +91,7 @@ test('D1b: the claims the front page still makes are the ones it still backs', (
   // The status line keeps the headline numbers; they must be duplicated in the
   // archive (so the archive is a superset), not moved-with-a-typo.
   if (!history) return assert.fail('no archive');
-  for (const needle of ['88.5%', '88.5% (18,895/21,350', '93.4%']) {
+  for (const needle of ['88.8%', '88.8% (18,967/21,350', '93.1%']) {
     assert.ok(history.includes(needle), `archive lost "${needle}"`);
   }
 });

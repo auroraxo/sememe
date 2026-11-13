@@ -22,6 +22,7 @@ import { encodeBase58, decodeBase58 } from './base58.mjs';
 import { isShankIdl, isShankDiscriminant, shankDiscriminatorBytes, SHANK_LEB128_TYPES } from './shank.mjs';
 import { assertIdlShape, unsupportedIdlReason } from './dialect.mjs';
 import { rawLeDialectReason, decodeRawLe, encodeRawLe, RawLeError } from './rawle.mjs';
+import { countFromHeader } from './wire-layout.mjs';
 
 const MAX_DEPTH = 32;
 // Instruction data is bounded by transaction size; a hostile length prefix
@@ -356,6 +357,31 @@ function decodeAt(type, cur, ctx, path, depth) {
     return { __option: 'Some', value: decodeAt(type.option, cur, ctx, `${path}.value`, depth + 1) };
   }
   if ('vec' in type) {
+    // Count-from-header (src/wire-layout.mjs): a measured program+instruction
+    // whose wire carries the element count in a declared header argument and
+    // NO u32 Borsh prefix. The hook fires ONLY when ctx.__countFromHeader
+    // names THIS path — set by the instruction loop after the count argument
+    // decoded, cleared before every other argument — so every other interface
+    // keeps the strict prefix codec byte for byte.
+    if (ctx.__countFromHeader && ctx.__countFromHeader.vectorPath === path) {
+      const length = ctx.__countFromHeader.count;
+      const elementSize = ctx.__countFromHeader.pointBytes;
+      const needed = length * elementSize;
+      if (needed > cur.remaining) {
+        // The measured count does not fit the remaining bytes: this is NOT a
+        // Borsh prefix, so the refusal names the layout rule — never the
+        // garbage number a prefix read would produce.
+        throw new CodecError(
+          `${length} ${elementSize}-byte element(s) need ${needed} byte(s) but ${cur.remaining} remain — ` +
+          `${ctx.__countFromHeader.instruction}.${ctx.__countFromHeader.vectorArg} has no length prefix on the wire; ` +
+          `the count comes from ${ctx.__countFromHeader.countArg}`, path);
+      }
+      const out = [];
+      for (let index = 0; index < length; index++) {
+        out.push(decodeAt(type.vec, cur, ctx, `${path}[${index}]`, depth + 1));
+      }
+      return out;
+    }
     const length = readLittle(cur, 4, false, path);
     const minimum = minSize(type.vec, ctx);
     if (minimum === 0 && length > HARD_VEC_CAP) {
@@ -571,6 +597,23 @@ function encodeAt(type, value, ctx, path, depth) {
     return Buffer.concat([Buffer.from([1]), encodeAt(type.option, value.value, ctx, `${path}.value`, depth + 1)]);
   }
   if ('vec' in type) {
+    // Encoder half of count-from-header (src/wire-layout.mjs): the measured
+    // program+instruction writes the elements with NO u32 prefix. When the
+    // elements disagree with the declared count, the encode is refused by
+    // name — the count IS the layout, so silently fixing it would invent a
+    // wire the program never speaks.
+    if (ctx.__countFromHeader && ctx.__countFromHeader.vectorPath === path) {
+      const { count, countArg, instruction, vectorArg } = ctx.__countFromHeader;
+      if (value.length !== count) {
+        throw new CodecError(
+          `${instruction}.${vectorArg} carries ${value.length} element(s) but ${countArg} says ${count} — ` +
+          `this vector has no length prefix on the wire, the count is the header`, path);
+      }
+      const parts = [];
+      value.forEach((item, index) =>
+        parts.push(encodeAt(type.vec, item, ctx, `${path}[${index}]`, depth + 1)));
+      return Buffer.concat(parts);
+    }
     if (!Array.isArray(value)) throw new CodecError(`expected an array, got ${describe(value)}`, path);
     if (value.length > 0xffffffff) throw new CodecError(`vector length ${value.length} exceeds u32`, path);
     const parts = [writeLittle(4, false, value.length, path)];
@@ -1083,6 +1126,12 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
   const args = {};
   const absentArgs = [];
   const declaredArgs = instruction.args ?? [];
+  // Count-from-header (src/wire-layout.mjs): the measured program+instruction
+  // pair whose vector argument carries NO u32 prefix because the wire states
+  // the element count in a declared header argument. The rule is looked up by
+  // THIS idl's address and THIS instruction name, so an identical shape under
+  // another address or name keeps the strict codec byte for byte.
+  const headerRule = countFromHeader(idl, instruction.name);
   // Struct-internal absences (the payload ends INSIDE a declared struct
   // argument, on that struct's own field boundary) surface as a marker the
   // struct decoder leaves on the decoded value. The struct decoder only
@@ -1106,11 +1155,28 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
     // With absent:'error' (default) this falls through to decodeAt, which
     // reports `truncated input` — the behaviour every existing caller pins.
     ctx.__absentTrail.push(argument.name);
+    // Arm the vec hook ONLY for the argument the table names, and ONLY when
+    // the count it depends on was actually declared and decoded BEFORE this
+    // argument (G3: an interface without a declared count stays strict).
+    const headerCount = headerRule && argument.name === headerRule.vectorArg && 'vec' in (argument.type ?? {})
+      && typeof args[headerRule.countArg] === 'number' && Number.isSafeInteger(args[headerRule.countArg])
+      ? args[headerRule.countArg] : null;
+    if (headerCount !== null) {
+      ctx.__countFromHeader = {
+        count: headerCount,
+        countArg: headerRule.countArg,
+        vectorArg: headerRule.vectorArg,
+        vectorPath: `${instruction.name}.${headerRule.vectorArg}`,
+        pointBytes: headerRule.pointBytes,
+        instruction: instruction.name,
+      };
+    }
     let value;
     try {
       value = decodeAt(argument.type, cursor, ctx, `${instruction.name}.${argument.name}`, 0);
     } finally {
       ctx.__absentTrail.pop();
+      if (headerCount !== null) delete ctx.__countFromHeader;
     }
     // A struct the wire stopped inside carries the `__absentFields` marker;
     // peel it off so the decoded args never show codec-internal keys. The
@@ -1276,10 +1342,38 @@ export function encodeInstructionData(idl, name, args, { absent } = {}) {
   }
   try {
     const parts = [bytes];
+    // Encoder half of count-from-header (src/wire-layout.mjs): same gates as
+    // the decode — the table must name THIS program+instruction, and the
+    // args must carry an integer count for the vector being encoded. A
+    // count that disagrees with the elements is refused by name, never
+    // silently corrected: the count IS the wire layout.
+    const headerRule = countFromHeader(idl, instruction.name);
+    const countIndex = headerRule ? declared.findIndex((argument) => argument.name === headerRule.countArg) : -1;
+    const vectorIndex = headerRule ? declared.findIndex((argument) => argument.name === headerRule.vectorArg) : -1;
     for (const argument of declared) {
       if (absentSet.has(argument.name)) continue;
       if (!(argument.name in args)) throw new CodecError(`missing argument ${JSON.stringify(argument.name)}`, instruction.name);
-      parts.push(encodeAt(argument.type, args[argument.name], ctx, `${instruction.name}.${argument.name}`, 0));
+      const headerCount = headerRule
+        && argument.name === headerRule.vectorArg
+        && 'vec' in (argument.type ?? {})
+        && countIndex !== -1 && vectorIndex !== -1 && countIndex < vectorIndex
+        && typeof args[headerRule.countArg] === 'number' && Number.isSafeInteger(args[headerRule.countArg])
+        ? args[headerRule.countArg] : null;
+      if (headerCount !== null) {
+        ctx.__countFromHeader = {
+          count: headerCount,
+          countArg: headerRule.countArg,
+          vectorArg: headerRule.vectorArg,
+          vectorPath: `${instruction.name}.${headerRule.vectorArg}`,
+          pointBytes: headerRule.pointBytes,
+          instruction: instruction.name,
+        };
+      }
+      try {
+        parts.push(encodeAt(argument.type, args[argument.name], ctx, `${instruction.name}.${argument.name}`, 0));
+      } finally {
+        if (headerCount !== null) delete ctx.__countFromHeader;
+      }
     }
     return Buffer.concat(parts);
   } finally {

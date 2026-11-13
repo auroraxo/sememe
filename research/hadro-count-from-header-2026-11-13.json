@@ -1,0 +1,99 @@
+{
+  "tool": "tools/measure-hadro-count-from-header.mjs",
+  "measuredAt": "2026-11-13T13:25:43.297Z",
+  "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+  "fixture": "test/fixtures/ecosystem-sample-2026-11-11.json",
+  "rule": "a vector whose element count the wire states in a declared header argument carries NO length prefix on the wire; the encoder writes the elements without a prefix; a count that does not fit is refused by name",
+  "prefix": {
+    "commit": "ea074c4",
+    "face": {
+      "total": 144,
+      "decoded": 72,
+      "refused": 72,
+      "byteExact": 0,
+      "describedByteExact": 72,
+      "pointsDecoded": 0,
+      "emptyPoints": 72,
+      "pointsMatchHeaderCount": 0,
+      "pointsMismatchHeaderCount": 72,
+      "refusalReasons": {
+        "vector length <n> needs <n> byte(s)": 72
+      },
+      "refusalInstruction": {
+        "unknown": 72
+      },
+      "trailingBytes": {
+        "46": 72
+      },
+      "examples": {
+        "decoded": {
+          "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+          "slot": 468261981,
+          "instruction": "setCurve",
+          "headerCount": 2,
+          "points": 0,
+          "trailingBytes": 46,
+          "roundTripByteExact": false,
+          "describedRoundTripByteExact": true
+        },
+        "refusal": {
+          "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+          "slot": 468261981,
+          "message": "decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 1814753837 needs 38109830577 byte(s) but 130 remain"
+        }
+      }
+    }
+  },
+  "worktree": {
+    "face": {
+      "total": 144,
+      "decoded": 144,
+      "refused": 0,
+      "byteExact": 0,
+      "describedByteExact": 144,
+      "pointsDecoded": 703,
+      "emptyPoints": 0,
+      "pointsMatchHeaderCount": 144,
+      "pointsMismatchHeaderCount": 0,
+      "refusalReasons": {},
+      "refusalInstruction": {},
+      "trailingBytes": {
+        "8": 144
+      },
+      "examples": {
+        "decoded": {
+          "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+          "slot": 468261981,
+          "instruction": "setCurve",
+          "headerCount": 2,
+          "points": 2,
+          "trailingBytes": 8,
+          "roundTripByteExact": false,
+          "describedRoundTripByteExact": true
+        }
+      }
+    }
+  },
+  "guard": {
+    "otherAddress": "setRiskCurve.points: vector length 1814753837 needs 38109830577 byte(s) but 130 remain",
+    "otherName": "setWhateverElse.points: vector length 1814753837 needs 38109830577 byte(s) but 130 remain",
+    "otherAddressKeepsStrictCodec": true,
+    "otherNameKeepsStrictCodec": true,
+    "ruleLeaked": false
+  },
+  "delta": {
+    "decoded": 72,
+    "refused": -72,
+    "emptyPoints": -72,
+    "pointsMatchHeaderCount": 144
+  },
+  "falsifications": [],
+  "ok": true,
+  "limits": [
+    "one program, one window (144 chain-accepted payloads); no other decoder is touched — the guard faces measure that",
+    "the 8-byte sequence tail the wire carries after the points stays REPORTED as trailing bytes; the stored IDL does not declare it and this fix does not invent it",
+    "the rule is keyed to the measured program address: the same IDL shape under another address keeps the strict u32-prefix codec (measured in the guard face)",
+    "the count comes from the header argument the IDL DECLARES — a program that does not declare one keeps the strict codec (guard in test/hadro-count-from-header.test.mjs)",
+    "coverage moved 88.5% -> 88.8% of measured traffic; the ecosystem artifact is re-derived, not narrated"
+  ]
+}
