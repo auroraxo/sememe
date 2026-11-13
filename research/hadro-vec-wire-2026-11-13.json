@@ -1,0 +1,139 @@
+{
+  "tool": "tools/measure-hadro-vec-wire.mjs",
+  "measuredAt": "2026-11-13T08:39:37.403Z",
+  "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+  "fixture": "test/fixtures/ecosystem-sample-2026-11-11.json",
+  "productFace": {
+    "description": "product union path over the committed sample, store untouched",
+    "total": 144,
+    "decoded": 72,
+    "refused": 72,
+    "byteExact": 0,
+    "setCurveEmptyPoints": 72,
+    "setCurveTrailingHexes": {
+      "92": 72
+    },
+    "refusalReasons": {
+      "vector length <n> needs <n> byte(s)": 72
+    },
+    "refusalInstruction": {
+      "setRiskCurve": 72
+    },
+    "examples": {
+      "setCurve": {
+        "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+        "slot": 468261981,
+        "points": [],
+        "trailingBytes": 46,
+        "roundTripByteExact": false,
+        "describedRoundTripByteExact": true
+      },
+      "refusal": {
+        "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+        "slot": 468261981,
+        "message": "decode refused by the only stored source (metadata @slot 468262003): setRiskCurve.points: vector length 1814753837 needs 38109830577 byte(s) but 130 remain"
+      }
+    }
+  },
+  "wireFace": {
+    "description": "1-byte disc + u8 header (numPoints at offset 4) + numPoints x 21-byte CurvePointInput + 8-byte sequence u64; no Borsh length prefix",
+    "total": 144,
+    "fit": 144,
+    "byteExact": 144,
+    "witnessAccepted": 144,
+    "byInstruction": {
+      "setCurve": {
+        "payloads": 72,
+        "fit": 72,
+        "byteExact": 72,
+        "numPointsHistogram": {
+          "2": 72
+        }
+      },
+      "setRiskCurve": {
+        "payloads": 72,
+        "fit": 72,
+        "byteExact": 72,
+        "numPointsHistogram": {
+          "2": 6,
+          "3": 12,
+          "5": 4,
+          "6": 20,
+          "7": 8,
+          "8": 4,
+          "14": 4,
+          "15": 6,
+          "16": 4,
+          "18": 3,
+          "19": 1
+        }
+      }
+    },
+    "sequenceSlot": 108,
+    "sequenceSlotMinus1": 36,
+    "sequenceOther": 0,
+    "exampleSignatures": [
+      {
+        "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+        "slot": 468261981,
+        "instruction": "setCurve",
+        "numPoints": 2
+      },
+      {
+        "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+        "slot": 468261981,
+        "instruction": "setCurve",
+        "numPoints": 2
+      },
+      {
+        "signature": "3zHeiVEzUDLCXZR346cqJsm85sMkA3aT7B5pqVLF2KTp3KiLrVuMqriy9AqXbK4t16ZytTZR56b9ZatKavd9HSwA",
+        "slot": 468261981,
+        "instruction": "setRiskCurve",
+        "numPoints": 6
+      }
+    ]
+  },
+  "sourceFace": {
+    "repo": "Hadron-Fi/hadron-tx-verifier",
+    "idlPath": "idl/hadron.json",
+    "sha256": "219f44fb63729232b3685fbde49a817b0c8321a0203dcca68c88370fbed1279e",
+    "licenses": {
+      "LICENSE-APACHE": true,
+      "LICENSE-MIT": true
+    },
+    "diffAgainstStoredIdl": {
+      "differences": [
+        {
+          "instruction": "setCurve",
+          "kind": "args-differ",
+          "storedOnly": [],
+          "sourceOnly": [
+            "[\"sequence\",\"u64\"]"
+          ],
+          "discriminatorEqual": true
+        },
+        {
+          "instruction": "setRiskCurve",
+          "kind": "args-differ",
+          "storedOnly": [],
+          "sourceOnly": [
+            "[\"sequence\",\"u64\"]"
+          ],
+          "discriminatorEqual": true
+        }
+      ],
+      "curvePointInputEqual": true,
+      "sourceInstructionCount": 38
+    },
+    "verdict": "the two args the on-chain metadata IDL lacks are exactly the two sequence:u64 tails; the Borsh-vec prefix question the source still declares is the open fix face"
+  },
+  "verdict": "hadro-vec-wire-no-borsh-prefix",
+  "limits": [
+    "no product code changed: the 72 setRiskCurve refusals and the 72 empty-points setCurve decodes still stand until the fix pulse wires count-from-header",
+    "the first-party IDL ALSO declares points as a Borsh vec — adopting it alone would fix the tail and still refuse every payload",
+    "sequence == slot (108) or slot-1 (36) is correlation over 144 chain-accepted payloads, not a claim about how the program computes it",
+    "the witness is the committed sample (failed:false, signature per payload); a live re-fetch of one transaction is the skip-gated network test",
+    "one program, one window; no other decoder is touched"
+  ],
+  "committedStoreModified": false
+}
