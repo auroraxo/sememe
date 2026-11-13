@@ -2,7 +2,7 @@
 
 A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
 
-**Status: v0.4.24 — published on the npm registry AND as a git tag. Pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, verified against real mainnet programs; union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`); the fingerprint lockfile ships (`sememe lock` + `sememe verify`); the decode path installs zero runtime dependencies. The ecosystem-wide measured coverage is 88.8% (18,967/21,350 payloads across 6 finalized blocks, 2026-11-13; 96.4% on the curated watchlist, 63.8% outside it; byte-exact re-encode on 93.1% of decoded). The honest limits ride with every number: zero external users so far — publish is not consumption — one machine, no audit.**
+**Status: v0.4.25 — published on the npm registry AND as a git tag. Pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, verified against real mainnet programs; union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`); the fingerprint lockfile ships (`sememe lock` + `sememe verify`); the decode path installs zero runtime dependencies. The ecosystem-wide measured coverage is 88.8% (18,967/21,350 payloads across 6 finalized blocks, 2026-11-13; 96.4% on the curated watchlist, 63.8% outside it; byte-exact re-encode on 93.1% of decoded). The honest limits ride with every number: zero external users so far — publish is not consumption — one machine, no audit.**
 
 Everything below the fold is what you run. The full measurement and qualification history — every number, artifact, defect found and fixed, and every honest limit — was moved verbatim to [docs/measured-history.md](https://github.com/auroraxo/sememe/blob/main/docs/measured-history.md) on 2026-11-13; nothing was deleted.
 
@@ -56,7 +56,7 @@ Measured on that sample (2026-11-04): 1,000 checked transactions, 6,337 payloads
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.24   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.25   # tagged release; no npm account needed
 ```
 
 ```js
@@ -75,14 +75,14 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.24 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.25 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
 
 `./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
 
-Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.24` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest.
+Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.25` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest.
 
 ## Working now: pin the answers (`sememe lock` + `sememe verify`, 2026-11-05)
 
