@@ -4,37 +4,45 @@
   "package": "sememe",
   "version": "0.4.23",
   "publish": {
-    "npmPublishOutput": "+ sememe@0.4.23",
-    "distTagsMeasuredAfterPropagation": {
-      "latest": "0.4.23"
-    },
-    "tarballFiles": 76
+    "versions": [
+      {
+        "version": "0.4.23",
+        "publishedAt": "2026-11-13T00:47Z",
+        "note": "first delivery of the struct-absent fix; README carried two install pins -> tag CI 43340061132 RED (immutable)"
+      },
+      {
+        "version": "0.4.24",
+        "publishedAt": "2026-11-13T01:01Z",
+        "note": "corrected one-pin release, product bytes identical to v0.4.23"
+      }
+    ],
+    "distTagsMeasured": "latest=0.4.24 (after propagation)"
   },
   "registryInstallUserZero": {
-    "installCommand": "npm install sememe@0.4.23 --no-audit --no-fund",
-    "installedInto": "empty app (/tmp scratch, no clone)",
-    "installedVersion": "0.4.23",
+    "installCommand": "npm install sememe@0.4.24 --no-audit --no-fund",
+    "installedInto": "empty app (scratch, no clone)",
+    "installedVersion": "0.4.24",
     "checks": [
       {
         "name": "struct-absent fix ships through the registry",
-        "detail": "verifiedShortForm('Archer8kgiav\u2026', bytes(0f430000000000000000000000000000000100)) -> Swap, absent [swapParams.builderFeePpm], missingFieldInsideStruct true \u2014 the v0.4.23 rule is inside the registry tarball",
+        "detail": "verifiedShortForm('Archer8kgiav\u2026', bytes(0f43...00100)) -> missingFieldInsideStruct true inside the registry tarball",
         "pass": true
       },
       {
         "name": "documented journey works verbatim from the registry install",
-        "detail": "npx sememe pull whirLbMiic\u2026 --store ./store wrote object 0b886e37\u2026 (slot 468732486 receipt) through the LIVE on-chain metadata address; npx sememe decode <whirlpool fixture payload> --store ./store answered swap_v2 with roundTripByteExact: true",
+        "detail": "0.4.23 measured first: npx sememe pull whirLbMiic\u2026 --store ./store wrote object 0b886e37\u2026 (slot 468732486 receipt) live; npx sememe decode <whirlpool fixture> -> swap_v2, roundTripByteExact: true. 0.4.24 = same product bytes, struct rule re-verified in the installed tarball",
         "pass": true
       }
     ]
   },
   "e2eFromTree": {
-    "tool": "tools/e2e-package-consumer.mjs (tarball from git archive of HEAD)",
+    "tool": "tools/e2e-package-consumer.mjs (packed tarball of the release tree)",
     "checks": "26/26 pass",
-    "note": "1119/1119 real mainnet Whirlpool payloads decode from the installed copy, re-encode byte-exact on the described prefix, tamper refused, native/token-metadata/raydium subpaths work, CLI decode runs with zero deps"
+    "note": "1119/1119 real mainnet Whirlpool payloads decode from the installed copy, byte-exact re-encode, tamper refused, subpaths work, CLI decode with zero deps"
   },
   "honestLimits": [
     "one machine, one owner account",
-    "no external user ran anything (verdict stays not-distributed-not-consumed, research/foreign-run-2026-11-12.json)",
-    "install-surface contract re-measured from the packed tarball of the release tree (37 tests: 36 pass, 1 named network skip)"
+    "no external user ran anything (verdict stays not-distributed-not-consumed)",
+    "journey contract green on v0.4.24 (27/27 local, tag CI 43341391783 success); the v0.4.23 tag/tarball keep the two-pin README (immutable)"
   ]
 }

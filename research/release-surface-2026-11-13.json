@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-13T00:52:48.647Z",
+  "measuredAt": "2026-11-13T01:03:35.609Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.24",
+        "body": "This release corrects the install pin of v0.4.23. **No product change**: `src/` is byte-identical to v0.4.23 (the struct-internal absent-field rule from 3fa9627 — Archer's chain-witnessed 19-byte legacy Swap decodes with the absent field NAMED by its dotted path and re-encodes byte-exactly; enum/vec-body cuts still refuse; strict default untouched).\n\nWhy a successor release: v0.4.23's README carried TWO `github:…#v…` install pins (the front page plus the historical v0.4.22 section line), and the journey contract (`test/base58-journey.test.mjs` and five siblings) requires exactly one — tag CI 43340061132 went red with `README must pin exactly one tag, found v0.4.23, v0.4.22` (fix commit 394b37b). A published tag and a published npm version are immutable, so v0.4.23 keeps that README; v0.4.24 is the corrected, one-pin release.\n\nInstall:\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.24\n```\n\nPins: `test/struct-absent-short-form.test.mjs` (10 tests — 6 red on the v0.4.22 tree, green since 3fa9627). Journey suite green on this tree (27/27).\n\nLimits, stated plainly: this is a docs/pin correction — no product code changed since v0.4.23; the v0.4.23 tag and its npm tarball keep the two-pin README (immutable); the Archer interface still does not ship inside the store (adopt-only, hash-gated); one owner account, zero external users measured, no audit.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-13T01:01:05Z",
+        "createdAt": "2026-11-13T00:59:16Z"
+      },
       {
         "tag": "v0.4.23",
         "body": "The absent-field policy only fired at TOP-LEVEL argument boundaries, so a payload ending on the boundary of the LAST FIELD INSIDE a struct was refused under every policy. Measured on mainnet: Archer's legacy Swap form (tag `0f`, 19 bytes) omits `SwapParams.builderFeePpm` INSIDE `swapParams` and is chain-executed (witness `5Kpdai4oRG…`, slot 468261978, `err: null`, instruction bytes byte-identical to the payload; research/archer-legacy-swap-witness-2026-11-12.json). v0.4.22 refused it with `truncated input: need 4 byte(s) at offset 19`; this release decodes it and re-encodes it byte-exactly.\n\nWhat changed (3fa9627): inside a named struct, under the same decode-only evidence gate, a mid-struct boundary makes the remaining fields ABSENT and NAMED by their dotted path (`swapParams.builderFeePpm`) — never invented. Cuts inside a field and boundary cuts inside vec/array elements still refuse; the strict default policy is untouched; `encodeInstructionData` accepts the dotted absent names (trailing run per struct). `verifiedShortForm` now matches short (sub-8-byte) shank discriminators by prefix — the rule the codec's instruction index already used.\n\nInstall:\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.23\n```\n\nPins: `test/struct-absent-short-form.test.mjs` (10 tests — 6 red on the v0.4.22 tree, green on this one). Suite: 964 tests / 960 pass / 4 named network skips / 0 fail.\n\nLimits, stated plainly: the Archer interface still does not ship inside the store (no on-chain IDL; the Apache-2.0 first-party copy stays adopt-only and hash-gated); enum- and vec-body boundary cuts still refuse until a chain witness names them; tags <= v0.4.22 keep the truncation refusal (a tag is immutable); one owner account, zero external users measured, no audit.\n",
@@ -220,6 +228,7 @@
       "v0.4.21",
       "v0.4.22",
       "v0.4.23",
+      "v0.4.24",
       "v0.4.3",
       "v0.4.4",
       "v0.4.5",
@@ -230,8 +239,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.23",
-        "v0.4.22"
+        "v0.4.24"
       ],
       "documentedCommands": [
         "pull",
@@ -267,6 +275,113 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.24": {
+        "manifest": {
+          "version": "0.4.24",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "gap"
+        ],
+        "entryExports": [
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.24"
+          ],
+          "documentedCommands": [
+            "pull",
+            "lock",
+            "verify",
+            "decode",
+            "gap",
+            "account",
+            "adopt",
+            "adopt-lighthouse"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.23": {
         "manifest": {
           "version": "0.4.23",
@@ -2646,14 +2761,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.23",
-    "latestTag": "v0.4.23",
+    "newestTag": "v0.4.24",
+    "latestTag": "v0.4.24",
     "pinnedTags": [
-      "v0.4.23",
-      "v0.4.22"
+      "v0.4.24"
     ]
   },
   "perRelease": {
+    "v0.4.24": {
+      "defects": []
+    },
     "v0.4.23": {
       "defects": []
     },
