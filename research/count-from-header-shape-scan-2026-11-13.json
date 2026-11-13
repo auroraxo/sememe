@@ -1,0 +1,312 @@
+{
+  "tool": "tools/measure-count-from-header-shape-scan.mjs",
+  "measuredAt": "2026-11-13T20:34:36.059Z",
+  "store": "test/fixtures/ecosystem-store-2026-11-11",
+  "sample": "test/fixtures/ecosystem-sample-2026-11-11.json",
+  "method": "offline scan of every committed receipt+object pair; candidate = declared integer arg before a vec of fixed-size elements; witnesses counted in the committed sample by the program's own stored discriminator length",
+  "ruleQuestion": "src/wire-layout.mjs gates the count-from-header rule on MEASURED program+instruction pairs. This tool measures whether that gating is load-bearing in the committed window: what a shape-keyed generalization would fire on.",
+  "candidateCount": 16,
+  "programs": [
+    "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+    "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8"
+  ],
+  "faces": [
+    {
+      "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+      "instruction": "update_operation_account",
+      "candidates": [
+        {
+          "countArg": "param",
+          "countType": "u8",
+          "vecArg": "keys",
+          "elementBytes": 32
+        }
+      ],
+      "payloads": 0,
+      "accepted": 0,
+      "failed": 0,
+      "inTable": false,
+      "tableCountArg": null,
+      "tableVectorArg": null,
+      "flagDocumented": true
+    },
+    {
+      "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+      "instruction": "setCurve",
+      "candidates": [
+        {
+          "countArg": "slot",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "side",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "defaultInterpolation",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "numPoints",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "xMode",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        }
+      ],
+      "payloads": 72,
+      "accepted": 72,
+      "failed": 0,
+      "inTable": true,
+      "tableCountArg": "numPoints",
+      "tableVectorArg": "points",
+      "flagDocumented": false
+    },
+    {
+      "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+      "instruction": "setRiskCurve",
+      "candidates": [
+        {
+          "countArg": "slot",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "side",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "defaultInterpolation",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "numPoints",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "xMode",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        },
+        {
+          "countArg": "riskMode",
+          "countType": "u8",
+          "vecArg": "points",
+          "elementBytes": 21
+        }
+      ],
+      "payloads": 72,
+      "accepted": 72,
+      "failed": 0,
+      "inTable": true,
+      "tableCountArg": "numPoints",
+      "tableVectorArg": "points",
+      "flagDocumented": false
+    },
+    {
+      "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+      "instruction": "updateSpreadConfig",
+      "candidates": [
+        {
+          "countArg": "numTriggers",
+          "countType": "u8",
+          "vecArg": "triggers",
+          "elementBytes": 66
+        }
+      ],
+      "payloads": 0,
+      "accepted": 0,
+      "failed": 0,
+      "inTable": false,
+      "tableCountArg": null,
+      "tableVectorArg": null,
+      "flagDocumented": false
+    },
+    {
+      "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+      "instruction": "submitCurveUpdates",
+      "candidates": [
+        {
+          "countArg": "sequence",
+          "countType": "u64",
+          "vecArg": "ops",
+          "elementBytes": 33
+        },
+        {
+          "countArg": "numOps",
+          "countType": "u8",
+          "vecArg": "ops",
+          "elementBytes": 33
+        }
+      ],
+      "payloads": 0,
+      "accepted": 0,
+      "failed": 0,
+      "inTable": false,
+      "tableCountArg": null,
+      "tableVectorArg": null,
+      "flagDocumented": false
+    },
+    {
+      "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+      "instruction": "removeSpreadTriggers",
+      "candidates": [
+        {
+          "countArg": "numKeys",
+          "countType": "u8",
+          "vecArg": "keys",
+          "elementBytes": 64
+        }
+      ],
+      "payloads": 0,
+      "accepted": 0,
+      "failed": 0,
+      "inTable": false,
+      "tableCountArg": null,
+      "tableVectorArg": null,
+      "flagDocumented": false
+    }
+  ],
+  "summary": {
+    "wiredWitnessed": [
+      "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8/setCurve payloads=72 accepted=72",
+      "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8/setRiskCurve payloads=72 accepted=72"
+    ],
+    "wiredPrograms": [
+      "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8"
+    ],
+    "unwitnessedShape": [
+      {
+        "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "instruction": "update_operation_account",
+        "candidates": [
+          {
+            "countArg": "param",
+            "countType": "u8",
+            "vecArg": "keys",
+            "elementBytes": 32
+          }
+        ],
+        "payloads": 0,
+        "accepted": 0,
+        "failed": 0,
+        "inTable": false,
+        "tableCountArg": null,
+        "tableVectorArg": null,
+        "flagDocumented": true
+      },
+      {
+        "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+        "instruction": "updateSpreadConfig",
+        "candidates": [
+          {
+            "countArg": "numTriggers",
+            "countType": "u8",
+            "vecArg": "triggers",
+            "elementBytes": 66
+          }
+        ],
+        "payloads": 0,
+        "accepted": 0,
+        "failed": 0,
+        "inTable": false,
+        "tableCountArg": null,
+        "tableVectorArg": null,
+        "flagDocumented": false
+      },
+      {
+        "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+        "instruction": "submitCurveUpdates",
+        "candidates": [
+          {
+            "countArg": "sequence",
+            "countType": "u64",
+            "vecArg": "ops",
+            "elementBytes": 33
+          },
+          {
+            "countArg": "numOps",
+            "countType": "u8",
+            "vecArg": "ops",
+            "elementBytes": 33
+          }
+        ],
+        "payloads": 0,
+        "accepted": 0,
+        "failed": 0,
+        "inTable": false,
+        "tableCountArg": null,
+        "tableVectorArg": null,
+        "flagDocumented": false
+      },
+      {
+        "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+        "instruction": "removeSpreadTriggers",
+        "candidates": [
+          {
+            "countArg": "numKeys",
+            "countType": "u8",
+            "vecArg": "keys",
+            "elementBytes": 64
+          }
+        ],
+        "payloads": 0,
+        "accepted": 0,
+        "failed": 0,
+        "inTable": false,
+        "tableCountArg": null,
+        "tableVectorArg": null,
+        "flagDocumented": false
+      }
+    ],
+    "thirdProgramWitnessed": [],
+    "flagFaces": [
+      {
+        "program": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "instruction": "update_operation_account",
+        "candidates": [
+          {
+            "countArg": "param",
+            "countType": "u8",
+            "vecArg": "keys",
+            "elementBytes": 32
+          }
+        ],
+        "payloads": 0,
+        "accepted": 0,
+        "failed": 0,
+        "inTable": false,
+        "tableCountArg": null,
+        "tableVectorArg": null,
+        "flagDocumented": true
+      }
+    ]
+  },
+  "verdict": "no-third-program-witnessed-in-window",
+  "generalization": "falsified-by-flag-arg",
+  "limits": [
+    "zero payloads in this window is not absence on chain: the HADRo instructions 0x0e/0x12/0x1d and CAMM update_operation_account carry the shape with no payload witness HERE; a live re-scan was attempted 13.11. from this host — api.mainnet-beta answered HTTP 429 to EVERY getTransaction (0 transactions checked), and a rate-limited re-run through a public relay was cut off by a 240-second budget before reaching the wanted instructions; no fresher witness was obtainable and none is claimed",
+    "the flag test (flagDocumented) is a text heuristic over the instruction/arg docs; CAMM update_operation_account is the pinned real case, not a general parser",
+    "candidates with a variable-size vector element (element size unknown) are NOT enumerated — the shape would be undefined",
+    "the tool imports the live COUNT_FROM_HEADER table; it measures the store against the rule, never restates the rule"
+  ]
+}

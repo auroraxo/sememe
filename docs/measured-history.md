@@ -2940,6 +2940,65 @@ measurement (`research/diablo-adoption-coverage-2026-11-12.json`, baseline
 18,967 -> union 19,069 with the same +102 on the adopted column) are
 re-derived by their tools, not edited by hand.
 
+## The header-count shape across the whole store: candidate enumeration and the generalization falsifier (2026-11-13)
+
+The card's standing next step 4 asks: *"a third program with the header-count
+shape ONLY after own measurement."* The rule in `src/wire-layout.mjs` was
+measured against HADRo's two curve instructions (`research/hadro-count-from-header-2026-11-13.json`),
+and its header warns why it is gated on program address rather than shape:
+an integer argument declared before a vector does not mean the wire counts
+elements with that integer.
+
+`tools/measure-count-from-header-shape-scan.mjs` scans every committed
+receipt+object pair and the committed capture offline to answer the two
+generalization questions:
+
+1. **Which instructions carry the integer-before-vec shape in the whole store?**
+   Exactly **six instructions across two programs** carry the shape
+   (16 candidate integer-before-vec pairs, because instructions like `setCurve`
+   declare five integer arguments before the points vector):
+   * **HADRo** `setCurve` (wired, 72 payloads, 72 chain-accepted)
+   * **HADRo** `setRiskCurve` (wired, 72 payloads, 72 chain-accepted)
+   * **HADRo** `updateSpreadConfig` (0x0e: `numTriggers` u8 -> `triggers` Vec<SpreadTriggerInput>, 0 payloads)
+   * **HADRo** `submitCurveUpdates` (0x12: `sequence` u64 / `numOps` u8 -> `ops` Vec<CurveUpdateOp>, 0 payloads)
+   * **HADRo** `removeSpreadTriggers` (0x1d: `numKeys` u8 -> `keys` Vec<SpreadTriggerKey>, 0 payloads)
+   * **Raydium CLMM** `update_operation_account` (`CAMMCzo5…WqK`: `param` u8 -> `keys` Vec<Pubkey>, 0 payloads)
+
+2. **Does a third program carry a witness in this window?**
+   **No.** `verdict: "no-third-program-witnessed-in-window"`. The only
+   program with witnesses for the shape in this 6-block window is HADRo
+   itself. A live re-scan was attempted on 13.11. to find witnesses for the
+   three unwired HADRo instructions on chain: the public endpoint
+   `api.mainnet-beta.solana.com` answered HTTP 429 to every `getTransaction`
+   call (0 transactions checked), and a rate-limited retry via a public
+   relay hit the 240-second execution budget before reaching the wanted
+   instructions. No fresher witness was obtainable and none is claimed.
+   The three unwired instructions stay UNWIRED by measurement, not by
+   neglect.
+
+3. **What would a shape-keyed rule do?**
+   `generalization: "falsified-by-flag-arg"`. Raydium CLMM's
+   `update_operation_account` declares `param` u8 followed by `keys`
+   Vec<Pubkey>. Its own documentation (and the pinned upstream source at
+   `raydium-io/raydium-clmm` commit `edfc5c0`, Apache-2.0) explicitly
+   defines `param` as a **mode flag** (`can be 0 | 1 | 2 | 3` to select
+   update/remove of owner/whitelist-mint) — NOT an element count.
+   A shape-keyed rule would read the mode byte (e.g. `0` for update-owner)
+   as the vector count and decode an empty list, reproducing the exact
+   HADRo garbage-number failure in reverse. The program-address gate in
+   `src/wire-layout.mjs` is load-bearing.
+
+The measurement is pinned in `test/count-from-header-shape-scan.test.mjs`
+(10 tests: re-derivation, CAMM flag documentation, HADRo 72/72 witnesses,
+unwired zero-witness faces, tool exit 2 on missing fixtures and exit 3 on
+fixture drift or missing shape). The falsification ladder
+(`tools/mutation-ladder-count-from-header-shape-scan.sh`) catches 5/5
+mutations (flag hardcoded false, dropped CAMM payload guard, dropped
+setCurve self-check, broken per-instruction dedupe, and name-only table
+lookup).
+
+Artifact: `research/count-from-header-shape-scan-2026-11-13.json`.
+
 ## Next qualification
 
 1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
