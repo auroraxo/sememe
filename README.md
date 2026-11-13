@@ -132,7 +132,7 @@ sememe is a local, content-addressed schema store with a verification contract:
 ## Install (as a consumer, not a contributor)
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.23   # tagged release; no npm account needed
+npm install github:auroraxo/sememe#v0.4.24   # tagged release; no npm account needed
 ```
 
 ```js
@@ -151,14 +151,14 @@ The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` wi
 **From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
 
 ```bash
-npm install github:auroraxo/sememe#v0.4.23 @solana/web3.js   # acquisition needs the peer
+npm install github:auroraxo/sememe#v0.4.24 @solana/web3.js   # acquisition needs the peer
 npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
 npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
 ```
 
 `./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
 
-Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.23` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest.
+Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.24` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest.
 
 ## Working now: pin the answers (`sememe lock` + `sememe verify`, 2026-11-05)
 
@@ -2681,7 +2681,7 @@ Suite after this release: **954 tests / 950 pass / 4 named network skips /
 surface re-measured against that tag is clean (newest = latest = pinned,
 0 defects — `research/release-surface-2026-11-12b.json`).
 
-## v0.4.23: struct-internal absent fields decode under the evidence gate — and the registry stays truthful (2026-11-13)
+## v0.4.23 / v0.4.24: struct-internal absent fields decode under the evidence gate — and the registry stays truthful (2026-11-13)
 
 The absent-field policy (`absent: "report"`) only fired at TOP-LEVEL argument
 boundaries, so a payload that ends on the boundary of the LAST FIELD INSIDE a
@@ -2730,9 +2730,18 @@ immutable); one owner account, zero external users, no audit.
 Suite for this release: **964 tests / 960 pass / 4 named network skips /
 0 fail** (954 → 964: the 10 new pin tests). CI green on `main`
 (43332583023); the release surface re-measured after publishing is CLEAN —
-newest = latest = pinned = v0.4.23, 0 defects
-(`research/release-surface-2026-11-13.json`), and the registry carries 0.4.23
-as `latest` (measured after propagation).
+newest = latest = pinned, 0 defects (`research/release-surface-2026-11-13.json`),
+and the registry carries the release as `latest` (measured after propagation).
+
+v0.4.23 (published 2026-11-13 00:49 UTC) carried this release to both channels
+but its README held TWO install pins — the front page plus the historical
+v0.4.22 section line — and the journey contract
+(`test/base58-journey.test.mjs` and five siblings) requires exactly one:
+tag CI 43340061132 RED with `README must pin exactly one tag, found v0.4.23,
+v0.4.22` (394b37b is the fix). The v0.4.23 tag and its npm tarball are
+published and immutable, so they keep the two-pin README; **v0.4.24 is the
+corrected release** — same product bytes as v0.4.23 (no src/ change since
+3fa9627), one pin, journey suite green (27/27), registry `latest` = 0.4.24.
 
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
