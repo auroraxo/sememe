@@ -1,0 +1,2850 @@
+> **Archived measurement history.** This file preserves the full, unabridged
+> measurement and qualification history of the sememe README up to v0.4.24
+> (2026-11-13), moved here verbatim when the front page became a short
+> landing page. Every number, artifact reference and measured claim below is
+> kept as it was written. Paths like `research/…`, `test/…`, `tools/…` are
+> relative to the repository root, not to `docs/`. Links written as
+> `measured-history.md#…` point to sections preserved in this file. Start at
+> [README.md](../README.md) if you are new.
+
+# sememe
+
+A local meaning layer for Solana bytes. `sememe pull <program>` fetches and verifies a program interface; every process on the machine can then decode instructions, accounts, and events offline.
+
+**Status: pull/store plus an offline decoder for instructions, Anchor event self-CPIs and account state, all runnable (October 2026), verified against nine real mainnet programs (Whirlpool, Jupiter AMM v6, Kamino Lend, OpenBook v2, Marinade, Meteora Vault, Meteora DAMM v1, Meteora DAMM v2/cp-amm and pump.fun), with union decode across a program's on-chain IDL and its adopted first-party published copy (`sememe adopt` + `sememe decode --union`, measured 915/996 on real pump.fun traffic) **and the same arbitration for account bytes (`sememe account --union`, 2026-11-08: measured on 12 real mainnet accounts, byte-exact on 6 of 12 where the single-receipt path managed 0 of 12)**, plus six programs that publish no IDL at all — the two token programs (SPL Token, Token-2022), the two native programs (System, ComputeBudget), Raydium AMM v4 and the SPL Associated Token Account, all six with wire tables DERIVED from pinned upstream Rust — and the ecosystem-wide measured coverage is now 88.5% (18,895/21,350 payloads across 6 finalized blocks, 2026-11-12; 96.4% on the curated watchlist, 62.4% outside it; byte-exact re-encode on 93.4% of decoded), with all 1,410 ATA payloads and all 1,214 Lighthouse payloads decoded byte-for-byte (the Lighthouse copy adopted from the program's own published IDL, hash-pinned, and labelled `adopted` apart from the 17,681 `pulled` decodes) — and one own repository reading it for both checking and producing recipes (`solana-tx-remix`), no external users.** The 20-program coverage qualification does not show demand or general ecosystem coverage. The fingerprint lockfile ships (`sememe lock` + `sememe verify`, 2026-11-05); catalog import and daemon are still proposals.
+
+## Quickstart: the copy-paste 1,000-transaction check (2026-11-04)
+
+The whole product, from a fresh clone, in one command a stranger can paste:
+
+```bash
+git clone https://github.com/auroraxo/sememe && cd sememe
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --harvest test/fixtures/harvest-whirlpool-2026-10-28.json \
+  --limit 1000
+```
+
+Output (exit 0 on pass, 1 on disagreement, 2 on usage/IO):
+
+```json
+{"status":"pass","transactionsChecked":1000,"payloadsChecked":1089,"decoded":1089,"decodeErrors":0,"disagreements":0,"noInterface":0,"byteExactRate":100,"programs":1,"rpcEncoding":null,"chainParsedInstructions":0,"missingBytes":0,"networkAttempts":0}
+```
+
+What that command proves, per payload, through the product's own entry points (`decodeUnionPayload`, plus the native/token/raydium tables):
+
+1. **The payload decodes** (or is refused with a named reason — a refusal is a non-zero exit, not a silent skip).
+2. **Re-encoding the decoded value reproduces the bytes**: byte-exact for the whole payload, or for the described prefix when the wire carries trailing bytes the interface does not describe (`roundTripByteExact` / `describedRoundTripByteExact`). A payload that can do neither is a **disagreement** and fails the run.
+3. **Zero network calls were attempted** — enforced by `tools/lib/network-guard.mjs`, which is loaded before anything else and recorded in the report's `networkAttempts: 0`. Offline is a property of the run, not of the prose.
+
+The same command against the multi-program traffic sample (15 programs, `pump.fun`/PumpSwap short forms included) is:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --sample test/fixtures/traffic-sample-2026-11-04.json \
+  --limit 1000 --absent verified
+```
+
+Measured on that sample (2026-11-04): 1,000 checked transactions, 6,337 payloads, 6,337 decoded, 0 decode errors, 0 disagreements, 0 no-interface, 100% byte-exact across 15 programs, 0 network attempts. `--absent error` (the default) refuses the witnessed short forms on purpose; `verified` applies only forms a chain witness covers, `report` names the absent fields without evidence — the same switch the product CLI exposes.
+
+## Ecosystem coverage measured (2026-11-11): the denominator the watchlist never gave
+
+The 100% figure above is real for what it measured: **contiguous mainnet traffic filtered to the 22 programs this repo curates**. The same committed artifact (`research/traffic-coverage-2026-11-04.json`) also reports, separately and honestly, 320 distinct programs / 36,027 instructions / 22,622 transactions OUTSIDE that list — counted, bytes not stored, explicitly "NOT in the coverage denominator". Nobody had ever measured that outside traffic.
+
+`tools/ecosystem-coverage.mjs` measures it. Capture takes 6 contiguous finalized blocks (2,436 transactions, 22,265 instructions, **192 distinct programs**), ranks programs by observed traffic volume, measures the watchlist plus the top 24 outside programs (46 programs, 21,350 payloads), pulls each interface through the product's own acquisition path and installs it through the product's own write path (`installIdl`), then decodes through the product's own entry points. Store-contents never influence which programs are measured.
+
+Result (`research/ecosystem-coverage-2026-11-11.json`, pinned by `test/ecosystem-coverage.test.mjs`, 7 tests, falsification proven: a hand-doctored artifact turns 3 of them red):
+
+| denominator | payloads | decoded | coverage |
+|---|---|---|---|
+| curated watchlist (the claim's own) | 16,382 | 15,797 | **96.4%** |
+| outside the watchlist (never measured) | 4,968 | 3,098 | **62.4%** |
+| all measured traffic | 21,350 | 18,895 | **88.5%** |
+
+**pfeeU's 459 refusals in this window are ONE instruction the on-chain interface never learned, and the card's own candidate for closing them was byte-identical to what the store holds (measured 2026-11-12, `tools/measure-pfee-second-source.mjs` -> `research/pfee-second-source-2026-11-12.json`, pinned by `test/pfee-second-source.test.mjs`, 10 tests).** Every refusal is the same 57-byte face, unknown instruction discriminator `9aed8a5ca202a2bb`, and both halves of the planned closing step measured wrong: the MIT candidate the card named (`needsmorergb/charlie-protocol-v1`, `_idl_pfeeUxB6.json@eb852415`) canonicalizes to the SAME fingerprint as the stored on-chain pull (`9c1ef6ed…`, 29 instructions, same discriminator per name — adopting it would add a receipt and close nothing), and a live pull at slot 468428470 (capture: 468262003) returned that same stale copy, so the lag is live on chain, not stale in the store. The name→bytes binding is computed here, not trusted from any repo: Anchor's own rule `sha256("global:get_fees_with_quote_mint")[0..8]` produces exactly `9aed8a5ca202a2bb`, sanity-checked against `get_fees`, whose discriminator both copies already store. The source that carries the instruction is first-party — `pump-fun/pump-public-docs@639b87f`, `idl/pump_fees.json` (31 instructions) — and adopting it through the product's one write path into a throwaway store copy decodes **464/464, 0 refusals, 464/464 byte-exact** on the same committed bytes, with all 5 baseline names kept and the pull still answering its own 5 (`adoptedAnswered: 459, pulledAnswered: 5`, receipt `slot: null`). Same license face as pump: the repo ships no LICENSE file, so the bytes stay OUT of this repository and the npm package — `committedStoreModified: false`, and the headline above stays 88.5% on the shipped store.
+
+**Two acquisition faces were closed since that gap was first measured, and the report names the evidence class of every decode.** The SPL Associated Token Account (`ATokenGPvbd…`, 1,410 payloads, v0.4.18) got a wire table derived from pinned upstream Rust. Lighthouse (`L2TExMFK…`, 1,214 payloads — the same program the 2026-11-04 acquisition-gap sweep already found publish-nothing at 42 payloads) turned out to be the case where the program's OWN repository publishes an IDL: `sememe adopt-lighthouse` adopts that first-party copy (`Jac0xb/lighthouse@4c579479`, MIT) through the product's own write path, hash-checked against a vendored pin BEFORE anything is written (falsification ladder `test/lighthouse-acquisition.test.mjs`, 9 tests, 7 red on the tree without the copy; measurement artifact `research/lighthouse-acquisition-2026-11-11.json`). 2,624 payloads moved from *no interface at all* to *decoded*, and coverage of measured traffic moved 75.6% → 82.2% → 87.9% → **88.5%** (outside the watchlist 7.1% → 35.4% → 59.9% → **62.4%**, the last step from the stored-short-discriminator fix below).
+
+An adoption and an on-chain pull are **different evidence classes**, and the headline keeps them apart: `decodedVia` reads `pulled: 17,681, adopted: 1,214`. The pulled number is slot-bound by the chain; the adopted number is hash-bound to a reviewed copy whose origin stays **declared** — nothing checks that the commit is signed or that the bytes describe the deployed program; the evidence for THAT is the byte-exact re-encode on 1,214/1,214 live payloads. The watchlist view carries **zero** adopted decodes: the curated 96.4% still rests entirely on on-chain receipts.
+
+**pump.fun's 442 refusals in this window are source lag, and a second source closes every one of them (measured 2026-11-12, `tools/measure-pump-second-source.mjs` -> `research/pump-second-source-2026-11-12.json`, pinned by `test/pump-second-source.test.mjs`, 7 tests).** Inside the watchlist pump.fun decoded only 400/842 (47.5%) because this capture store holds the on-chain IDL account alone (47 instructions @slot 468262003) while the deployed program emits discriminators it never learned (`e1f7501ed` x251, `20f6bf340` x98, `1c92de772` x84, plus 9 more payloads). Adopting the program's OWN published copy (`pump-fun/pump-public-docs@639b87f`, `idl/pump.json`, 56 instructions) beside the pull — through the product's one write path, into a throwaway copy of the store — decodes **842/842, 0 refusals**, the same committed bytes. The names of all 400 baseline decodes are unchanged (0 renames) and 151 of them are re-answered by the adopted copy where it explains the documented TradeEvent tail byte-exactly (23 go from trailing-bytes to full byte-exact). One license face the pin refuses to look away from: pump-public-docs ships **no LICENSE file**, so its bytes are NOT vendored into this MIT repository or the npm package — the committed artifact carries the sha256 fingerprint and the store gains no receipt (`committedStoreModified: false`); the measurement reads the canonical object that already sits in a committed test fixture and reproduces it at run time. That is why the ecosystem headline above stays at 88.5% on the shipped store: the published copy is not in it. For a consumer who adopts it themselves, the watchlist face moves from 96.4% (582 refusals) to 442 of those refusals closed — the remaining 140 belong to other programs.
+
+The remaining gap stays **acquisition-led**: 1,013 of the 2,455 uncovered measured payloads still have no interface at either pullable address (`FLASH…` 134, `Diab…` 102, …; the queue's former head `MNFSTqtC9…` 307 is now measured closable by the program's own fuzz wire table — above) and 1,135 are **source lag on interfaces that ARE acquirable**: pfeeU… refuses 459 of 464 payloads against its freshly pulled anchor IDL — now measured to a single instruction the account does not list even at slot 468428470, closed by the first-party published copy as above; HADRo… refuses 72 of 195 since 2026-11-12 — its total-refusal face was NOT source lag but a decoder bug (below). Inside the watchlist the same lag shows up: pump.fun — the program the union path decoded 915/996 for — decodes 400 of 842 payloads (47.5%) from the single on-chain source in this window; the union's second source is what carried the old number, and this measurement pulls only on-chain copies. 915 payloads from 152 tail programs were counted, not measured; the report names every one of them so the denominator cannot quietly shrink.
+
+**Manifest's 307 no-interface payloads — the acquisition queue's head — are closed by the program's own generated wire table, and the defect face is the upstream's own client copy (measured 2026-11-12, `tools/measure-manifest-second-source.mjs` -> `research/manifest-second-source-2026-11-12.json`, pinned by `test/manifest-second-source.test.mjs`, 10 tests).** `MNFSTqtC9…` publishes no IDL account at either address (the 11-11 queue names it first: 307 payloads, acquirable:false). The program's own repository — `Bonasa-Tech/manifest`, the annotated successor of `CKS-Systems/manifest`, which this repo's 11-04 parser-upstream research already cited — ships two copies at the SAME commit `d4e908b3`, and only ONE of them is a wire table: `fuzz/crucible/idls/manifest.json` (15 shank instructions, zero duplicate discriminants). Adopting it through the product's one write path into a throwaway store copy decodes **307/307, 0 refusals, 307/307 byte-exact** on the same committed bytes, names per discriminant Deposit 46 / Withdraw 46 / Swap 3 / BatchUpdate 201 / GlobalWithdraw 1 / SwapV2 10. The client copy (`client/idl/manifest.json`, 16 instructions) lists **"Swap" and "SwapV2" on discriminator 04** — the product refuses every one of the 307 payloads by name (`duplicate instruction discriminator 04 (Swap / SwapV2)`), measured against the upstream's own bytes, not a synthetic fixture: an adopt-and-measure area that only ever showed the sunny path would have trusted a table that matches no wire. The pin refuses either copy if it drifts (canonical-fingerprint gates on BOTH files, plus a gate that the claimed duplicate is still present in the client copy and absent from the wire table). License face, stated: the repo is **GPL-3.0** at the pin — its bytes are NOT vendored into this MIT repository or the npm package, the committed store gains no receipt (`committedStoreModified: false`), and the ecosystem headline stays 88.5% on the shipped store. For a consumer who adopts the pinned copy themselves, the queue's largest entry closes.
+
+What this changes about the thesis, stated plainly: sememe's decode path is strong on interfaces it holds (93.4% byte-exact of decoded across all 46 programs), and the honest ecosystem number moved from ~75% to 88.5% — because two named acquisition gaps were CLOSED with pinned, byte-exact artifacts and one decoder bug was fixed against measurement, not because the denominator was softened: the watchlist number stayed 96.4% and the outside denominator stayed 4,968 payloads. The product's remaining value step is still acquisition breadth — the queue's head is now `MNFSTqtC9…` (307) — not decoder polish. "no-interface" remains the named, counted, ranked queue (`acquisitionQueue`), which is where the next cards come from.
+
+**HADRo's 195 refusals were NOT source lag — stored discriminators are stored at ANY length (fixed and measured 2026-11-12, `tools/measure-hadro-short-discriminator.mjs` -> `research/hadro-short-discriminator-2026-11-12.json`, pinned by `test/hadro-short-discriminator.test.mjs` 7 tests + `test/hadro-short-discriminator-measurement.test.mjs` 5 tests).** The ecosystem measurement had labelled HADRo (`HADRo…VDQ8`) a "total source-lag face" at 0/195. It was wrong, and the PULS V two-tree measurement (`git archive c304e80` for the pre-fix tree, a byte-identical probe in both) proved why: the program's published IDL stores **38 one-byte instruction discriminators** — a real, chain-accepted wire table (unique values 0x00..0x26) — and `withDerivedDiscriminators` treated only 8-byte arrays as "stored", so every stored byte was OVERWRITTEN with Anchor's 8-byte sighash, against that module's own header rule ("stored discriminators are never changed"). The replaced table matches no payload: pre-fix 0/195 decoded; post-fix **123/195 decode through the product path** (51 full byte-exact, 72 `setCurve` described-exact with reported trailing bytes), and the remaining 72 (`setRiskCurve`) stay **honestly refused and NAMED** — that IDL declares a vector length the wire bytes do not carry. The same `length === 8` assumption in `src/union.mjs`'s rename-evidence map was fixed the same way (stored means any non-empty byte array). The fix is surgical and the measurement pins that: pump.fun (400/842, 249 byte-exact), pfeeU (5/464) and Eternal (227/242 byte-exact) verdicts are BYTE-IDENTICAL between the trees; Eternal's 76 stored 1-byte EVENT discriminators are now preserved too (the event dispatch path reads 8-byte heads, so that preservation changes no decode in this window — stated, not smoothed). Honest limits ride in the artifact; the unit face flips `false -> true` on both instruction and event preservation, and the store face `0/38 -> 38/38`.
+
+The stranger-facing truth this pins down: **the 1,000-transaction decode is one command, offline, and fails loudly.** What it does not prove is that an outside person has run it — and that is now **measured, not asserted** (`tools/measure-foreign-run.mjs` -> `research/foreign-run-2026-11-05.json`): verdict `not-distributed-not-consumed`, i.e. zero non-owner signals on every channel that was read — 0 non-owner stars/forks/issues/PRs on this repo, 0 non-owner comments on the two outbound threads (`step-finance-oss/step-ingestooor#1` and `jup-ag/rfq-webhook-toolkit#96`, both open), 0 foreign-authored threads containing this project's slug. The first external run therefore remains the open gate. The measurement has limits and names them: the broad mention sweep covers 92 of 93 results (GitHub's search index hides one result in every ordering — measured, not assumed), a registry `404` for the bare name `sememe` on npm/crates.io/PyPI meant **no install channel was published yet** at that time, never "nobody used it" — npm published the name on 2026-11-12 (crates.io/PyPI still have no `sememe`; both are aliasing checks, not consumption evidence), and the code-index absence is only claimed for the indexed part of GitHub (the sweep's self-reference control passes). Reproduce with `npm test` (includes `test/stranger-decode.test.mjs`, which runs this tool against both fixtures and falsifies it three ways: tampered payload, missing store, and a mutation of the pass/fail logic). The funnel a stranger walks before that first run is measured separately (2026-11-05, `tools/measure-stranger-funnel.mjs` -> `research/stranger-funnel-2026-11-05.json`): a fresh GitHub clone ran both quickstart commands verbatim (1,089 and 6,337 payloads, all decoded byte-exactly, exit 0), the published tag `v0.3.0` installed into an empty app with no npm account, and its entry decoded 1,119/1,119 real payloads byte-exactly from `node_modules/sememe` — the harness (tools/test/research) does not travel into the install. The quickstart block itself is pinned by `test/quickstart-funnel.test.mjs`, which caught and fixed one defect on 2026-11-05: the documented output line was the pre-2026-11-04 schema (missing `rpcEncoding`, `chainParsedInstructions`, `missingBytes`) — a stranger comparing her terminal to the README saw two different products. The README now documents the line the tool actually prints, and a hand-edited documented line goes red. Re-measured 2026-11-13 after the registry channel opened (`research/foreign-run-2026-11-12.json`): the registry check reads `npm: found` for the bare name while the verdict stays `not-distributed-not-consumed` — publish is not consumption, and the first external run remains the open gate.
+
+## Your own transactions: raw RPC responses (the shape you already hold)
+
+The two commands above decode sememe's fixtures. A repository, archive, dashboard or indexer does not hold sememe fixtures — it holds **raw RPC responses**, overwhelmingly with the default `encoding: "base64"`, where the transaction is its wire bytes and only the chain's own parser can read it. sememe now reads that shape directly (legacy, v0 and v1 transactions, outer and inner instructions) and **verifies each transaction's ed25519 signatures before decoding it**, so a damaged or forged byte is refused by name (`wire-signature-invalid`) instead of decoded wrongly:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --rpc-response your-getBlock-or-getTransaction-response.json \
+  --absent verified
+```
+
+Accepts a `getBlock` response (`result.transactions`), a `getTransaction` response (`result.transaction`), or an archive document carrying a `transactions` array — each entry in the `["<base64 wire bytes>", "base64"]` shape the RPC returns. Exit codes: 0 pass, 1 a decode disagreement, an unreadable/damaged transaction or a decode error, 2 usage/IO. A transaction whose bytes cannot be parsed or verified is counted under `transactionsUnreadable` with its reason in `unreadableReasons` and fails the run — never silently skipped.
+
+Measured 2026-11-04 on `test/fixtures/foreign-archive-wire-4blocks.json` (real mainnet, contiguous slots 464588080–464588083, 1,947 transactions in their raw base64 wire shape): the first 1,000 transactions carry 6,355 payloads across 115 programs, 4,646 decoded byte-exactly (100%), 0 decode errors, 0 disagreements, 0 unreadable, 0 network attempts. The 1,709 payloads the store has no interface for are reported by program, not dropped. The wire parser itself was validated against the chain's own `encoding:"json"` parser for all 648 transactions of slot 464588080: per-payload, byte-for-byte identical rows (3,528 payload rows, 0 mismatches), pinned in `test/rpc-response-ingest.test.mjs`.
+
+**Honest limits:** the store answers only for the programs it carries (no-interface payloads are counted, not decoded); signature verification covers the static signers the message declares; v1 transactions are parsed per the upstream `MessageV1` layout pinned on 2026-11-04 and verified against the json encoding of the same block; and no third party has run this on their own archive yet — that remains the gate this command exists to make runnable.
+
+### The shape a foreign repository's own test fixtures hold (`encoding:"json"`)
+
+The paragraph above measured what an RPC *returns by default*. But foreign repositories that keep transaction fixtures do not keep that shape: they keep what the chain's parser already read — `encoding:"json"` — and some hold a **flattened dialect** where `instructions` and `accounts` sit at the file level (37 of the 156 fixtures in [step-finance-oss/step-ingestooor](https://github.com/step-finance-oss/step-ingestooor)). Measured on that entire 156-fixture set and the fixture of [CryptGodSon/Solana-Explorer](https://github.com/CryptGodSon/Solana-Explorer) (both MIT): instruction `data` as base58, every instruction carrying `programId` spelled out, address-table keys expanded, and **1,193 instructions already `parsed` by the chain with no bytes left in the document at all**.
+
+Before this, `--rpc-response` read only the base64 shape: pointed at a foreign repository's own fixture it exited 2 (`not-an-rpc-response`). The integration could not read a single artifact a foreign repository actually holds — because the one shape it accepted was the shape sememe's own harvester produces. The same command now reads both shapes, plus the flattened dialect:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --rpc-response their-own-getTransaction-fixture.json
+```
+
+Or sweep a whole directory tree of fixtures with one command:
+
+```bash
+node tools/stranger-decode.mjs \
+  --store test/fixtures/traffic-sample-store-2026-11-04 \
+  --fixtures-dir path/to/foreign/crates/parsers/tests \
+  --out report.json
+```
+
+Measured 2026-11-04 across all 156 fixtures of `step-finance-oss/step-ingestooor` (commit 001cf39, MIT; research artifact `research/step-ingestooor-full-sweep-2026-11-04.json`): **156 files (119 standard getTransaction, 37 flattened dialect), 806 payload rows, 493 decoded byte-exactly (100%), 0 unreadable transactions, 0 disagreements, 0 network attempts**. The 306 payloads the store has no interface for are quantified by program across 70 gap programs (top: Raydium Concentrated Liquidity `L2TExM…` 42, Jupiter DCA `DCA265…` 20, Jito Tip `j1o2qR…` 14, Flash Trade `FLASH6…` 12). Seven payloads refuse with named reasons (3 stale interface, 4 unwitnessed short forms). Pinned in `test/step-ingestooor-full-sweep.test.mjs` (5 tests, red on pre-tree, four mutations each individually red).
+
+Measured 2026-11-04 on the SAME 156 fixtures after closing the measured acquisition gap (`research/acquisition-gap-2026-11-04.json`: 34 of the 70 gap programs publish an on-chain IDL sememe had never pulled): the 34 IDLs were pulled in two batched probes (`tools/batch-pull.mjs`, slots 465308534/465308538, same write path as `sememe pull`) into `test/fixtures/traffic-sample-store-2026-11-04-pulled/`, and the 13 of them that also have a first-party published copy in the foreign repo were adopted next to the pull (union decode arbitrates by bytes, naming-convention differences `closeDca`/`close_dca` and one discriminator-preserving rename decode instead of misreading as interface conflicts — `src/union.mjs`, pinned with 6 new tests and 2 mutations in `test/union.test.mjs`). Result (`research/step-ingestooor-full-sweep-pulled-2026-11-04.json`, pinned in `test/batch-pull.test.mjs`): **noInterface 306 → 129, decoded 493 → 661 (byte-exact 100%, 0 disagreements), decodeErrors 7 → 16 — every remaining refusal named** (deployed-newer discriminators the published IDL does not list, stale IDL layouts against successfully executed transactions, unwitnessed short forms). The pull alone did NOT decode the 177 payloads: 152 decode with the on-chain IDL, 25 refuse for named reasons, 16 more decode only through the union with the published copies.
+
+Measured on the seven committed fixtures (six from step-ingestooor, one from Solana-Explorer, verbatim under `test/fixtures/foreign-repo-json-2026-11-04/` with both MIT licenses): 7 transactions, 160 payload rows of which 56 carry bytes — 48 decoded byte-exactly (100%), 8 named `noInterface` (programs outside the store), and **104 chain-parsed rows counted as `missingBytes`, never fed to the decoder as empty payloads**: a chain-parsed instruction has no bytes to decode, and turning that missing document field into a decode refusal would be a lie about what was measured. Zero disagreements, zero decode errors, zero network attempts. Pinned in `test/foreign-repo-json-ingest.test.mjs` (red against the pre-fix tree; four mutations of the new code each individually red).
+
+**Honest limits of this path:** the json encoding carries **no message bytes, so no signature can be verified against them** — the ed25519 self-verification of the base64 path cannot apply, and a structurally-valid value mutation inside an argument passes decode+re-encode by design (only the wire path's signature check covers value-level tampering). The encoding is detected per transaction; an unresolvable `programIdIndex` is refused by name rather than attributed to nothing. And the same gate as before: no third party has run this against their own repository — the command exists so they can.
+
+## The idea
+
+"What do these bytes mean?" is currently either a paid cloud feature or a decoder rebuilt inside every repository. Vendored IDL files are snapshots without provenance, a fingerprint, or a freshness check.
+
+sememe is a local, content-addressed schema store with a verification contract:
+
+- **pull:** fetch an interface from an on-chain IDL, a curated catalog, or a local file.
+- **validate:** fingerprint the canonical form, check discriminator uniqueness, cross-check the chain where possible, and tolerate Anchor IDL format changes.
+- **resolve (now implemented for instruction data):** decode and encode locally from the stored IDL, with strict errors instead of guesses. A program without a trustworthy source stays explicitly unverifiable.
+- **store:** keep records under `~/.sememe/`; `sememe.lock` pins exact fingerprints per project (**ships** — see *Working now: pin the answers*).
+- **resolve:** decode and encode locally, with strict errors instead of guesses. A program without a trustworthy source stays explicitly unverifiable.
+
+## Install (as a consumer, not a contributor)
+
+```bash
+npm install github:auroraxo/sememe#v0.4.24   # tagged release; no npm account needed
+```
+
+```js
+import { decodePayload } from 'sememe';
+
+const result = await decodePayload('./store', 'whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc', payload);
+// result.name, result.args, result.roundTripByteExact, result.idl.fingerprint
+```
+
+The decode path installs **zero runtime dependencies**: `sememe` itself has none on its entry, and every file it reaches imports only `node:` builtins. Beyond the entry, the package exports `sememe/native` (System + ComputeBudget, derived at import from the pinned upstream sources), `sememe/token` (SPL Token + Token-2022, derived the same way from the pinned interface crates), `sememe/raydium` (Raydium AMM v4, derived from its pinned program source), `sememe/ata` (SPL Associated Token Account, derived from its pinned interface + processor), `sememe/lighthouse` (the Lighthouse first-party IDL copy, hash-checked against its pinned upstream commit at import), `sememe/store` (read/verify receipts), `sememe/pull` (acquisition) and the low-level surfaces a consumer may need directly: `sememe/codec`, `sememe/canonical`, `sememe/discriminators`. Two audit surfaces let a consumer falsify the table it was handed instead of trusting it: `sememe/native-corpus` (the real mainnet System/ComputeBudget harvests the decoder was qualified against, re-hashed on every read) and `sememe/native-audit` (re-derive the native tables from the pinned vendored Rust and byte-compare the shipped artifacts — the same audit the suite runs).
+
+The pull is the one path that needs a package too, because deriving the Program Metadata PDA needs ed25519: install `@solana/web3.js` next to sememe before it. `@solana/web3.js` is declared as an *optional peer* precisely so a decoder-only consumer is never asked to install it. The CLI refuses `sememe pull` and `sememe gap` without it, with that instruction, and still runs every other subcommand. (Measured 2026-11-05: `sememe gap` probes the same on-chain IDL addresses as `sememe pull`, so it needs the peer too — the sentence here used to name only `sememe pull`; `tools/measure-release-surface.mjs` now derives the peer-needing commands from the import graph and fails this README if the claim drifts again.)
+
+The **library** refuses the same way: importing `sememe/pull` or `sememe/gap` without the peer throws `PeerDependencyMissingError` (code `peer_dependency_missing`) whose message is that exact instruction — not Node's raw `ERR_MODULE_NOT_FOUND` stack trace. (Measured 2026-11-06 from a bare tarball install with the peer absent: both subpaths used to surface `Cannot find package '@solana/web3.js' imported from …` with no install command, while the CLI, which wrapped the same failure, was the only surface that named the fix; `test/acquisition-peer-surface.test.mjs` pins it on the working tree and `test/peer-tag-journey.test.mjs` pins it on the PINNED install — the fix reached main on 2026-11-06 but the front-page pin still named v0.4.5, whose bytes still leaked the raw loader error, so this sentence described an install a stranger did not receive. v0.4.6 carries it.) The entry and every decode-only subpath still import zero packages, so this refusal never reaches a decoder-only consumer.
+
+**From an install (not a clone), the CLI is `npx sememe …`** — npm exec resolves the package's own `bin` from `node_modules`; the bare command `sememe` is not on your `PATH` after a plain `npm install`, and `node bin/sememe.mjs` works only inside a clone of the repository (both measured 2026-11-05 from a real tarball install). The consumer journey from the install, verbatim:
+
+```bash
+npm install github:auroraxo/sememe#v0.4.24 @solana/web3.js   # acquisition needs the peer
+npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
+npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a40d0100000000000100000000000000af331ba8327fbb35b1c4feff00000000010001010000000601 --store ./store
+```
+
+`./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
+
+Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.24` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest.
+
+## Working now: pin the answers (`sememe lock` + `sememe verify`, 2026-11-05)
+
+The idea section promises "`sememe.lock` pins exact fingerprints per project" — this is that file, and it shipped the same day the promise was measured against the tree (the README said it; no implementation answered; `test/lock.test.mjs` was written first and went 0/11 red on the pre-lock tree).
+
+From a clone (after `npm ci`), the full sequence, verbatim — the `pull` creates the store these commands pin (a fresh machine has no `/tmp/sememe-demo` yet; measured 2026-11-05: the lock without the pull died with `no sememe store at /tmp/sememe-demo`, exit 1):
+
+```bash
+node bin/sememe.mjs pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store /tmp/sememe-demo
+node bin/sememe.mjs lock --store /tmp/sememe-demo --out /tmp/sememe-demo.lock
+node bin/sememe.mjs verify --store /tmp/sememe-demo --lock /tmp/sememe-demo.lock
+```
+
+From an install (the peer is needed for the `pull` step only), the same journey, verbatim — the `pull` creates the store these commands pin (a fresh machine has no store yet; measured 2026-11-05: the lock without the pull died with `no sememe store at ./store`, exit 1):
+
+```bash
+npx sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store ./store
+npx sememe lock --store ./store --out ./sememe.lock
+npx sememe verify --store ./store --lock ./sememe.lock
+```
+
+`lock` snapshots every program's newest verified receipt into one canonical-JSON document (fingerprint + source + slot + receipt name, one commit-able file); every receipt is re-checked through the store reader first, so a store the reader refuses produces NO lock, never a lock over damage. `verify` re-checks the store against the pin and refuses drift by name — `drifted` (the store now answers with a different fingerprint, both quoted), `missing` (a pinned program has no receipt), `unverified` (an object fails the re-hash), `relabelled` (a DECLARED origin changed), `unbound` (the store declares an origin this lock does not pin, so the gate cannot say whether that label changed — the lock predates origin pinning; the repair is `sememe lock`). An **extra** store program — one the lock does not pin, because the lock pins minimums, not store equality — is **reported, never a violation for being there**; but if its receipt is DAMAGED, that is a violation like any other, marked `scope: "extra"` so the repair is not mistaken for pin drift (the pin is fine; the store's receipt for an unpinned program has to be re-pulled). `--mode error` (verify's default) exits 1 on any violation, so the CI gate is `npx sememe verify` after checkout.
+
+**Measured 2026-11-07 (`verify` must not call clean a store the reader refuses):** a store holding Whirlpool (locked) and Jupiter pulled *afterwards*, so Jupiter is an extra, with Jupiter's object rewritten so it no longer re-hashed to its receipt — the store reader refuses that program, and `sememe decode` on it exits 1 with "object and receipt disagree, refusing to decode". On the published `v0.4.10` install: `sememe lock` exited **1** (no lock written) while `sememe verify` exited **0** with **violations 0** — a green CI gate over a program the reader refuses. The cause was structural, not a typo: `writeLock` re-checked **every** receipt, `checkLock` re-checked only the **pinned** ones, so the shared helper was shared but only ever called on one side. Both paths now re-check the extras through the same helper, and only their FAILURES are reported. See [Working now: `verify` agrees with `lock`(#working-now-verify-agrees-with-lock-about-a-store-whose-extra-program-is-damaged-2026-11-07) and [research/extra-damage-2026-11-07-before.json](research/extra-damage-2026-11-07-before.json) (the published install: 3 contract violations) / [research/extra-damage-2026-11-07.json](research/extra-damage-2026-11-07.json) (this tree: 0).
+
+What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4/SPL Associated Token Account have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
+
+## Working now: `verify` agrees with `lock` about a store whose EXTRA program is damaged (2026-11-07)
+
+A CI gate is only worth its exit code if it refuses what the product itself
+refuses. Measured on the **published `v0.4.10` install** (its tag installed
+into an empty app, no clone), on a store holding two programs:
+
+- Whirlpool, pinned by a committed `sememe.lock`;
+- Jupiter, pulled **afterwards** — so it is an **extra**: the lock pins
+  minimums, not store equality, and an extra's mere presence is not a
+  violation;
+- Jupiter's `objects/<fingerprint>.json` rewritten so it no longer re-hashes
+  to the fingerprint its receipt claims.
+
+The store reader refuses that program: `sememe decode <jupiter> <payload>`
+exits 1 with `object and receipt disagree, refusing to decode`.
+
+| command | answer | exit |
+|---|---|---|
+| `sememe decode <jupiter> …` | refused, `object and receipt disagree` | 1 |
+| `sememe lock` | refused, no lock written | **1** |
+| `sememe verify --mode error` | **`violations: 0`** | **0** |
+| `sememe verify --mode warn` | `violations: 0`, `extra: [<jupiter>]` | 0 |
+
+The writer refused and the checker passed — the same "one store, two
+verdicts" class this repo killed for the *newest-receipt* path earlier the
+same day, one level down. The cause was structural rather than a typo:
+`writeLock` re-checks **every** receipt of **every** program, `checkLock`
+re-checked only the **pinned** programs, and the shared helper
+(`verifyEveryReceipt`) was therefore only ever called from one side. The
+README's promise — "lock and verify cannot disagree about what a clean store
+is" — held for pinned programs and silently stopped holding for extras.
+
+- **The fix:** `checkLock` runs the extras through the **same helper** and
+  reports only their FAILURES: a damaged extra becomes an `unverified` entry
+  with `scope: "extra"`, counted as a violation, so `--mode error` exits 1.
+  What is *not* done: an extra is never held against the lock's origin pin —
+  an unpinned program has no pin to bind to, and demanding one would turn
+  "someone pulled a program" into a CI failure.
+- **Why `scope` is in the report and in the refusal:** the two failures have
+  different repairs. A *pinned* name means the pin no longer describes the
+  store (`sememe lock`); an `extra` name means the lock is fine and the
+  **store** holds a damaged receipt for a program the lock never pinned
+  (re-pull that program, or drop the receipt). One list, two repairs — the
+  refusal names them separately:
+  `unverified: <jupiter> (extra, receipt <name>)`.
+- **The repair is measured, not asserted:** S4 in the tool clears the
+  violation end to end — drop the damaged receipt+object, re-pull, then
+  `verify --mode error` exits 0 again. A violation nobody can clear is not a
+  gate. (The one-step re-pull was measured to *collide*: `adopt` refuses with
+  `digest collision or corrupted local object`, because the stale bytes still
+  occupy the fingerprint's path — so the repair is remove-then-pull.)
+- **Two guards, green on the pre-fix tree:** an **intact** extra is still
+  never a violation, and a damaged **pinned** program is still named. The fix
+  moved neither.
+
+The measurement ships as a tool and two committed artifacts, following the
+repo's "the tool produces the report" rule:
+
+```bash
+node tools/measure-extra-damage.mjs                                  # this tree → research/extra-damage-2026-11-07.json
+node tools/measure-extra-damage.mjs --bin <installed bin> --tag v0.4.10 --out before.json
+```
+
+[research/extra-damage-2026-11-07-before.json](research/extra-damage-2026-11-07-before.json)
+is the published `v0.4.10` install: **3 contract violations** (error mode
+exited 0, warn mode counted 0, no scope marker), with both controls green;
+[research/extra-damage-2026-11-07.json](research/extra-damage-2026-11-07.json)
+is this tree: **0 violations**.
+`test/extra-damage-measurement.test.mjs` pins both artifacts and fails if a
+committed report stops being what the tool derives (plus a portability check:
+neither artifact may carry a host path — the declared-origin artifact had to
+be fixed for exactly that on 2026-11-07 13:5x); the 6-test ladder plus three
+mutations live in [test/extra-program-damage.test.mjs](test/extra-program-damage.test.mjs).
+
+**Measured cost of the change** (`verify` on a 60-program store, median of 6
+runs after a warm-up): the case the fix adds work to — 1 pinned, 59 extras,
+damaged — **236 ms → 637 ms**; the normal committed-lock case where the lock
+covers the store (0 extras) — **1123 ms → 1064 ms**, i.e. unchanged within
+noise. Extras now cost what pinned programs already cost: one re-hash each.
+
+**Stated limits:** the lock still does not cover vendored programs or check
+freshness against the chain; `scope: "extra"` tells you *where* the damage
+is, not *who* wrote it; and the reported extra is an unpinned program, so a
+store can still gain a program the lock has never seen (by design — that is
+the minimums rule). No third party has run this; there are 0 external users,
+0 stars (`npm publish` was credentials-blocked until 2026-11-12, when the
+registry name shipped — see the Install section). The published
+`v0.4.10` tag keeps this defect (a tag is immutable); `v0.4.11` carries
+the fix.
+
+## Working now: a crashed write must not brick the store (2026-11-07)
+
+Every receipt and object is installed through a temporary file
+`<name>.tmp-<pid>-<random>` in the SAME `receipts/` directory and removed in
+a `finally`. A crash between the write and the cleanup (SIGKILL, OOM, power
+loss) leaves that file behind **forever** — and until now every reader
+treated EVERY file in `receipts/` as a receipt. Measured on the published
+`v0.4.10` install (the published v0.4.10 tag, installed into an empty
+app), one leftover `.tmp-4711-9f2c1a` file broke every surface at once:
+
+```
+sememe decode <program> <payload>   -> EXIT 1  "store receipt <tmp file> is unreadable: Unexpected token"
+sememe decode --union <program> ... -> EXIT 1  same refusal
+sememe lock                         -> EXIT 1  "Cannot destructure property 'idl' ... as it is null"
+sememe verify --mode error          -> EXIT 1  "unverified: <program>"   <- the worst one
+```
+
+The last line is the damage: the gate went **red over an intact program**
+and named no repair — the user is told to re-pull a store that is perfectly
+healthy. One crashed write permanently bricked a working store. The same
+root cause made foreign files phantom programs: `.DS_Store` showed up as
+`extra`, and `my-file.json` became a phantom program `my` that failed the
+gate over a file that was never a receipt.
+
+The fix is a single classifier, `src/receipt-name.mjs`, used by every reader
+(`store-read`, `lock`), with the rule kept narrow on purpose:
+
+- `receipt` — a well-formed name (`<program>-<slot>-<source>-<64 hex>.json`):
+  read and verified exactly as before.
+- `malformed` — receipt-shaped (it carries a slot segment) but not
+  well-formed: this may be a renamed or corrupted receipt, so it stays in the
+  verified set and is **refused by name** — ignoring it would be a new green
+  lie, letting a receipt vanish from the store's answers in silence.
+- `debris` — sememe's own `.tmp-<pid>-<hex>` leftover: safe to ignore,
+  because `store-write.mjs` installs by **hard-linking** the temporary to its
+  final name first. Died before the link and only the temp exists (the write
+  was never committed); died after the link and the temp is a byte-identical
+  copy of the committed receipt. Either way it carries no information the
+  final name does not.
+- `foreign` — anything else (`.DS_Store`, a README): not a program, never
+  read as one.
+
+Debris and foreign files are ignored **but never silently**: `verify`'s
+report gains a `stray` field naming each file and its kind, so a user can see
+and delete them. Measured afterwards: decode, union-decode, lock and
+`verify --mode error` all answer green over a store with crash debris, while
+a damaged receipt is still refused and named (the guard did not move).
+
+Ladder: `test/receipt-hygiene.test.mjs` (13 tests — G1-G3 green on the
+pre-fix tree, T1-T6 red there, 4 mutations caught) and
+`test/receipt-hygiene-measurement.test.mjs` (4 tests pinning the artifacts).
+Measurements: [research/receipt-hygiene-2026-11-07-before.json](research/receipt-hygiene-2026-11-07-before.json)
+(published `v0.4.10`: 6 contract violations) /
+[research/receipt-hygiene-2026-11-07.json](research/receipt-hygiene-2026-11-07.json)
+(this tree: 0). Honest limits: 0 external users, no audit, the grammar check
+against 256 real receipt names found 0 mismatches but no store outside this
+host has been observed, and `v0.4.10` keeps the defect (tags are immutable);
+`v0.4.11` carries the fix.
+
+## Working now: the CLI refuses what it does not understand (2026-11-07)
+
+A command line you typed wrong must not turn into a *different* command line that happens to run. Measured on the tree before this (v0.4.6, `641b895`): the parser looked flags up **by name anywhere in the argument list** and dropped what it did not find, so an unknown flag was not an error — it was an invisible edit to your request:
+
+- `sememe lock --store ./store --o out.lock` exited **0** and wrote the lock to `./sememe.lock`, not to `out.lock`. You asked for a file at one path, got a file at another, and the success exit said otherwise.
+- `sememe decode <program> <payload> --stro ./store` ignored the typo'd store and read the **default** `~/.sememe`, failing with `no sememe store at /home/…/.sememe` — a message about a directory you never named.
+- `sememe verify … --mod warn` dropped `--mod`, so verify ran in its default `error` mode and exited 1 on a drift you had asked it to only warn about.
+- `sememe native-provenance --store ./store` read the flag's **value** as the program id: `./store is not a native program sememe pins`.
+- `sememe decode --store ./store <program> <payload>` (flag first) made `--store` the program id and `./store` the payload.
+- `sememe pull <program> --stor ./store` dropped the typo and **pulled into the default store** — a write you never asked for, in a directory you never named.
+
+Every command now declares its surface — the flags it accepts and how many positional arguments it consumes — and that surface is checked **before any work happens**: no store is read, no file is written, no RPC is contacted. A refusal names the closest supported flag and the full list, and it exits 2 (the usage channel) rather than the exit 1 reserved for work that actually failed:
+
+```bash
+node bin/sememe.mjs lock --store ./store --o out.lock
+sememe lock: unknown flag "--o" — did you mean "--out"? supported flags: --store, --out
+node bin/sememe.mjs decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b… --store a --store b
+sememe decode: flag "--store" given more than once — pass it once
+```
+
+What is refused, by name: a flag this command does not accept (including a flag belonging to another command, and a flag that is actually a subcommand), a flag given twice — the first value won and the second was silently discarded — a flag with no value, and more positional arguments than the command consumes. What is *not* refused: too few positional arguments, which each command already refuses in its own words (`decode needs a program id`, `pull needs a program id`), so those messages are unchanged.
+
+The rule is the one the repository already applies to stores, receipts and locks: an unrecognized input is refused by name, never tolerated. `src/cli-surface.mjs` is that table — data, not scattered `if`s — so a flag cannot be added to a command without appearing in one place, and `test/flag-surface.test.mjs` (29 tests) pins the refusals and the repair text, while `test/flag-tag-journey.test.mjs` pins the SAME properties on the bytes a stranger installs — the flag level of the pinned tag, which no instrument measured until 2026-11-07 (measured then on the published `v0.4.7` install: for a flag with no close match the supported list printed **twice in one line**, and a command that takes no flags printed `accepts: (none) supported flags: (none)`; the fix was already on main and the pin pointed behind it — the same class as every pinned-tag defect above, now covered by a journey instead of by luck). Honest limit: this is a behavioural change to argument handling on a package with no external users yet, so nothing downstream has been shown to depend on the old silent acceptance. It shipped the same day it was measured and `v0.4.8` carries both the strict surface and the once-only message: `v0.4.6` still accepts the silent typos above and `v0.4.7` still prints the list twice (tags are immutable), so a pin behind either keeps the old behaviour.
+
+## Working now: pull a program's on-chain IDL
+
+```bash
+npm ci
+npm test
+node bin/sememe.mjs pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store /tmp/sememe-demo
+# optional: --rpc https://your-mainnet-rpc.example
+```
+
+The CLI fetches the canonical Program Metadata and legacy Anchor IDL accounts at a finalized RPC slot, checks account owner/program binding and JSON instruction shape, prefers canonical when both exist, and stores normalized JSON by SHA-256 under `<store>/objects/`. A receipt under `<store>/receipts/` records program ID, source account address, slot, fingerprint and instruction count. Repeating the pull of identical content does not rewrite the stored object; corrupt files are refused rather than overwritten. A public Whirlpool pull succeeded on 27.10. at slot 462039125 with 66 named instructions and fingerprint `sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f` (own run; no outside use).
+
+### Before you pull: ask why an interface is missing (`sememe gap`)
+
+When a consumer hits `no stored IDL for program X`, running `sememe pull` blindly is the wrong reflex: many programs on Solana publish no IDL at all, so a pull will simply fail repeatedly and leave the consumer guessing whether the RPC failed, the address is wrong, or the program was closed. `sememe gap` probes both on-chain IDL addresses (Program Metadata and legacy `anchor:idl`) and returns the exact diagnosis, with the fix that actually applies:
+
+```bash
+node bin/sememe.mjs gap DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M
+```
+
+```json
+{
+  "program": "DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M",
+  "verdict": "pullable",
+  "source": "anchor",
+  "instructions": 12,
+  "next": "sememe pull DCA265Vj8a9CEuX1eb1LWRnDT7uK6q1xMipnNyatn23M"
+}
+```
+
+Pointed at a program that publishes nothing at either address (for example `L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95`, the largest single gap in the 156-fixture set, 42 payloads, Lighthouse):
+
+```json
+{
+  "program": "L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95",
+  "verdict": "no-interface-published",
+  "next": "this program publishes no on-chain interface at either address — pulling it can never succeed. sememe ships its first-party published copy (Jac0xb/lighthouse, MIT, hash-pinned): use sememe adopt-lighthouse --store <dir>, then sememe decode --union."
+}
+```
+
+The five possible verdicts, all mutually exclusive:
+- `pullable`: an on-chain interface exists that your local store does not have yet -> `sememe pull` is the fix.
+- `no-interface-published`: neither address answers -> pulling it forever will never help. Use `sememe adopt` with a first-party published copy, or a pinned upstream derivation.
+- `present-undecodable`: an account exists at one of the addresses, but its schema cannot be decoded (malformed, or declares another program).
+- `vendored`: one of the programs sememe answers via pinned upstream wire tables (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) — there is no on-chain IDL to store.
+- `unknown`: the RPC failed. **An RPC failure is never recorded as an absence** (the crates.io 403 lesson: a client-side failure that reads as missing data). The CLI exits 3 (`no-verdict`) in this case so scripted callers know the chain's state is unmeasured.
+
+Measured 2026-11-04 over all 70 gap programs of the foreign 156-fixture set (`research/acquisition-gap-2026-11-04.json`): **34 programs publish an on-chain IDL (177 payloads)** — never-pulled gaps, not derivation work — and **36 publish nothing (129 payloads)**.
+
+#### Closing a measured gap in one command (`tools/batch-pull.mjs`)
+
+When the gap report says 34 programs are pullable, pulling them one CLI process each is 34 RPC round-trips at 34 different slots. The batch tool probes them in batched `getMultipleAccounts` calls (25 programs = 50 keys per request; the public endpoint rejects larger batches) and stores each IDL through the SAME write path the single-program CLI uses:
+
+```bash
+node tools/batch-pull.mjs --gap research/acquisition-gap-2026-11-04.json \
+  --store my-store \
+  --out research/batch-pull-2026-11-04.json
+```
+
+The artifact records, per program: verdict (`stored` / `undecodable` / `unknown`), source account, slot, fingerprint, instruction count, and — honestly — whether the stored IDL carries its own discriminators or needs Anchor's derivation rule (measured: 12 of the 34 carry stored discriminators, 22 need the rule). An RPC failure is `unknown` and exits 3 (`no-verdict`), never an absence; a hand-edited gap report is refused before any probe runs (its rows must sum to its own headline).
+
+**What a pull does NOT promise:** the pulled IDL describes the program AS PUBLISHED, not as deployed. Measured on the 156-fixture sweep: after pulling all 34, 152 of the 177 payloads decode byte-exactly, but 25 refuse with named reasons — 19 discriminators the deployed program emitted that the published IDL does not list, 6 stale argument layouts — in transactions that SUCCEEDED on chain. Where a first-party published copy exists (the foreign repo ships 13 of them), adopting it next to the pull and decoding through the union closes most of those; see the union section below.
+
+**Limit:** This is acquisition and content-addressed storage, not an independent audit of the on-chain ABI, offline resolver, freshness guarantee or authority check. Fetch responses are trusted to the configured RPC; first-party repo parity has not been established. `resolve`, `decode-tx`, `diff` and the optional local daemon remain proposals — `lock` no longer does (it ships, see below). (Account and event decoding are NOT proposals: they ship — `decodeStoredAccount` for account state and Anchor `emit_cpi!` event self-CPIs are both on the entry; this sentence said otherwise until 2026-11-05, and the contradiction was measured and pinned by `test/release-surface.test.mjs`.) A later Rust core/TypeScript SDK may replace this Node-based prototype; neither exists yet.
+
+## Working now: decode instruction data offline from the stored IDL
+
+```bash
+node bin/sememe.mjs decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc \
+  2b04ed0b1ac91e62... --store /tmp/sememe-demo   # payload: base58 or hex
+```
+
+**Base58 and hex are the same payload (fixed 2026-11-06).** The CLI has always
+accepted "base58 or hex" for a payload, but the base58 path decoded to a byte
+array that was not a `Buffer`, and three consumers need `Buffer` methods. So
+the SAME bytes behaved differently depending on how they were written:
+
+- `sememe decode --union <program> <base58>` failed on EVERY base58 payload
+  with `unionDecode needs the payload bytes as a Buffer` (the union path
+  compared the re-encoded bytes with the input), while the same payload as
+  hex decoded fine — so the README's own union walkthrough, which uses a
+  base58 payload, could not run;
+- an `f64`/`f32` argument died with `slice.readDoubleLE is not a function`
+  (measured on OpenBook v2 `stubOracleCreate`);
+- a `bytes` argument came out as a comma-separated byte list (`1,2,3,255`)
+  instead of base64 (`AQID/w==`) — silent corruption, not an error.
+
+All three were measured against the PUBLISHED v0.4.4 install (a pinned
+install of tag `v0.4.4`), not against a working tree.
+v0.4.5 fixes the root cause (`decodeBase58` returns a `Buffer`; a `Buffer` is
+still a `Uint8Array`, so every existing caller keeps working) and adds a
+second guard at each consumption point, so the shape of the input no longer
+decides whether it decodes. `test/base58-payload-bytes.test.mjs` pins the
+equality: for every one of those three cases, the base58 form and the hex form
+must produce the same instruction, the same fields and the same verdict.
+
+The install-level half of that measurement is `tools/journey-pinned-install.sh`,
+and it takes the tag it installs from the README — the same pin the front page
+hands out — instead of naming one itself. That was a measured defect, not a
+preference: the script used to install `v0.4.5` by name while the README pinned
+a newer tag, so it was measuring an install nobody received (the same class as
+every pinned-tag defect above, one level down, in the instrument). It now
+refuses to run when the README pins no tag or more than one, and
+`test/base58-journey.test.mjs` (G1a) keeps it honest: the script may contain
+no install pin of its own, and a README without one must fail the run with
+exit 2.
+
+`src/codec.mjs` reads the byte layout from the stored IDL itself — no generated code and no third-party codec library — and covers primitives, `option`, `vec`, `array`, `defined` struct/enum types, and both unit, tuple and named enum variants. It is deliberately strict: unknown discriminators, unknown variants, invalid `option` tags, invalid bool bytes, out-of-range integers, unknown types and unknown arguments are errors rather than silent coercions, and hostile field names can never pollute prototypes. Decoded values are JSON-safe: 64/128-bit integers become decimal strings, pubkeys become base58, and re-encoding the decoded value must reproduce the input bytes byte-for-byte (`roundTripByteExact`).
+
+**Bytes the IDL does not describe are reported, not guessed and not dropped.** A payload can carry more bytes than the stored IDL explains; sememe decodes the described prefix and returns the remainder under `trailing: {count, hex}`, with `describedRoundTripByteExact` covering the part the IDL does describe. `--trailing error` (or `{trailing: 'error'}`) restores whole-payload refusal when a caller wants it.
+
+This default was changed by a measurement, not by preference. Two real mainnet `swap_v2` payloads are 50 bytes where the stored IDL accounts for 43; the previous behaviour refused them outright. Checks against both references said they were valid:
+
+- Both transactions **succeeded on-chain** (`meta.err = null`, slot 462101502), and the 43-byte form of the same instruction also succeeds (slot 462101506), so the deployed program accepts both lengths. Anchor deserialises instruction args with Borsh `deserialize` over a slice, which reads what the struct needs without requiring the slice to be exhausted.
+- **Orca's own `@orca-so/whirlpools-client` decoder accepts both payloads and returns the same argument values** sememe returns.
+
+So refusing them rejected 2 of 50 real, successful mainnet payloads — a decoder that fails on valid traffic cannot replace the first-party path it is meant to replace. `trailing.count` still makes unexplained bytes impossible to overlook: the CLI prints a note to stderr, `tools/crosscheck.mjs` reports them under `unexplained`, and `trailing.count === 0` remains a usable completeness assertion. All 2 unexplained tails observed so far are zero bytes (padding); a non-zero tail would mean the IDL is missing a real field, which the test suite asserts separately.
+
+The fidelity claim was tested against two independent references rather than assumed:
+
+- **Real mainnet bytes:** 50 harvested Whirlpool instruction payloads (8 distinct instructions: `swap`, `swap_v2`, `collect_fees`, `collect_fees_v2`, `decrease_liquidity`, `decrease_liquidity_v2`, `close_position_with_token_extensions`, `update_fees_and_rewards`) decode from the stored IDL with byte-exact re-encoding of the described part, pinned in `test/fixtures/mainnet-whirlpool.json` so the suite keeps re-proving it. Every payload in that fixture was re-verified byte-for-byte against `getTransaction` on mainnet (50/50 matched, 0 mismatches), so the fixture is not a transcription of trusted input.
+- **External oracle cross-check:** `tools/crosscheck.mjs` compares sememe against `@orca-so/whirlpools-client` for **all 66 Whirlpool instructions** (oracle-generated bytes → sememe decode → sememe re-encode) plus the same 50 real payloads, checking both byte identity and field-by-field values. Latest run: **66/66 instructions and 50/50 payloads with 0 byte mismatches, 0 value mismatches, 0 errors.** The oracle is used as a test oracle only under the Orca License; nothing from it is vendored into this repository, and it is an optional dependency of the tool.
+
+**Limits of this evidence:** it covers one Anchor program's instruction data on mainnet traffic. Account layouts were untested here and are covered separately below (three programs, 39 real accounts); `repr(C)`/`packed` account types are not decoded yet, and byte-exact agreement with a reference codec shows layout fidelity — not that anyone outside this machine uses sememe. The 50-payload fixture sample was originally the evidence limit; that limit is now closed at scale (see "Verified against an external oracle at scale" below). Run `npm test` and `SEMEME_ORACLE_PATH=<dir>/node_modules node tools/crosscheck.mjs --store <store>` to reproduce. The mainnet-payload tests no longer depend on a live store: the IDL snapshot in `test/fixtures/whirlpool-idl.json` is re-fingerprinted against its receipt on every run, so they execute on a fresh checkout and in CI instead of skipping.
+
+## Compared against my own existing Whirlpool decoder
+
+`tools/decoder-parity.mjs` runs sememe's stored-IDL codec and `solana-tx-remix`'s own first-party Whirlpool decoder path (`src/args.mjs`) over the same 50 real mainnet payloads and compares them field by field. That decoder is the one this repository is supposed to make replaceable, so it is the honest baseline. `disagreed` counts only fields both paths decoded to different values; fields the first-party path declines to decode are counted separately as `firstPartyRefuses`, because a missing value is not a disagreement.
+
+Measured on 27.10. (reproduce: `node tools/decoder-parity.mjs --store <store> --tx-remix <dir> --generated <dir>`):
+
+- **226 of 226 fields both paths decode agree, 0 value disagreements** (50 payloads).
+- **0 fields only one side has** — no silent drift in the other direction either.
+- **36 field instances the first-party path refuses to decode** (it stops at `option` and defined-type arguments and emits `__optionRemaining`/`__unsupportedDecoder` instead of a value); sememe decodes them, e.g. `remaining_accounts_info: {"__option":"None"}` vs `{"__optionRemaining":"AA=="}`. These are the `option`/`defined`-typed arguments of 17 of 66 Whirlpool instructions (`swap_v2`, `decrease_liquidity_v2`, `open_position`, `lock_position`, …). The count is instances across payloads, not distinct fields.
+- The first-party path finds schemas for 65 of 66 instructions (19 have no generated schema file at all).
+
+So the first comparison is exact where both paths overlap, and sememe additionally decodes what that path declines to decode. That clears this repository's own stated gate for the next step.
+
+## One own decoder path is migrated
+
+`solana-tx-remix` now reads the stored sememe artifact for BOTH halves of its single-program Whirlpool path: the verifier decodes arguments from it, and the emitter produces recipes from it (`solana-tx-remix` commits, 28.10). The earlier status — verifier only, emitter still on generated codecs — is superseded. The rest of the paragraph above still holds: other decoder paths, 1,000 transactions, an outside user — none of that has happened.
+
+What was actually measured, on that repository's own flagship recipe `out/remix-6754RLWd.ts` (7 Whirlpool instructions, one real mainnet transaction):
+
+- **The recipe verifies on a fresh clone.** It was `SKIP` in CI for want of an external codec directory; it now passes, all 18 negative controls still failing as declared.
+- **The two decoders cross-check each other**: 7 instructions, 24 fields compared, 17 exact agreements, 7 fields the generated path refuses, **0 disagreements**, and 7/7 instruction names agreeing.
+- **The bytes now name themselves.** Relabelling `SWAP_V2` as `SWAP` (bytes untouched) was `PASS` for the old verifier and is `FAIL` for the new one — the old one looked the layout up *by* the label, so a false label found a false layout.
+- **The artifact is verified, not trusted**: `sha256(canonicalJson(idl) + '\n')` must equal the receipt's fingerprint, re-checked before every decode. Tampering with the stored object is caught and reported as a failure rather than silently falling back to the other decoder — the first version of the verifier did exactly that (found the damage, then printed `PASS`), which was caught by tampering with the store on purpose. That tampering is now performed on purpose by the consumer's own acceptance run, every push: it copies the intact store, edits one argument type so the object still parses as valid JSON, and requires the recipe to fail. Re-disabling the fix makes that check fail loudly, which is how it was shown to be a real control rather than a passing line.
+
+Two enabling changes were needed on this side, both landed and tested:
+
+- **The decode core has no npm dependencies.** `src/base58.mjs` replaces the only third-party import in the decode path (`@solana/web3.js`, used solely to base58 32 raw bytes), and `src/canonical.mjs` holds `canonicalJson` so a consumer can re-check a fingerprint without pulling in the acquisition path. A consumer repository with no `package.json` and no `node_modules` can import the decoder directly — which is what makes the migration above possible without vendoring a copy that could drift. `test/deps.test.mjs` keeps that property: the decode core must import nothing outside `node:` builtins and its own files, and everything else in `src/` must stay within an explicit allowlist. Parity with `@solana/web3.js` is checked on 202 vectors.
+- **`canonicalJson` moved out of the pull path** and is still re-exported from `src/pull.mjs`, so nothing that imports it from there changed.
+
+Honest limits: `solana-tx-remix` is my own repository, so this is one consumer I wrote, not an outside user. It is one program (Whirlpool) and one recipe (7 instructions, one transaction), not 1,000 transactions. Nothing here shows ecosystem coverage or demand.
+
+## Both halves of that consumer now read the artifact
+
+The first migration covered the VERIFIER: it re-derives Whirlpool arguments from the pinned IDL. The EMITTER — the code that produces a recipe in the first place — was still reading Codama-generated codec modules that are not in that repository, so a fresh clone exited with "Whirlpool codec directory not found" before it could name a single argument. It now reads the same artifact (`src/sememe-idl-source.mjs` in `solana-tx-remix`), which changed three things, all measured:
+
+- **The tool can produce a recipe on a fresh clone.** The flagship `out/remix-6754RLWd.ts` was re-emitted from the stored IDL. What the verifier reads — `ACCOUNTS`, `LOOKUP_TABLE_ADDRESSES`, `INSTRUCTION_BYTES`, `INNER_BYTES` — is byte-identical to the previous recipe, and the `.json` is unchanged: the transaction did not move, only the description of it got more accurate.
+- **The stored IDL names more instructions.** It carries all 57 discriminators the generated directory carries, with identical names, and 9 it does not have at all (`close_position_with_token_extensions`, `initialize_position_bundle_with_metadata`, `set_reward_authority_by_super_authority`, …). Those instructions could not be named even with the codecs on disk.
+- **The argument names are the program's own.** `IX6_SWAP_V2_SQRT_PRICE_LIMIT` rather than `IX6_SWAP_V2_SQRTPRICELIMIT`, and `remaining_accounts_info` reads `{"__option":"None"}` rather than the raw `{"__optionRemaining":"AA=="}` the generated path declined to interpret.
+
+The `absent`/`broken` distinction is kept on this side too: an absent store falls back to the generated codecs (or exits naming both sources when neither exists), while a store that is present and does not verify is a hard stop — a damaged artifact must not silently become another source's names.
+
+## Verified against an external oracle at scale (1,000-transaction scale)
+
+The earlier evidence compared 50 harvested payloads. That was a small sample, and "50 payloads, not 1,000 transactions" was the explicitly stated limit of the qualification.
+
+Tools added on 2026-10-28:
+- `tools/harvest.mjs`: reproducible bulk harvest over real mainnet blocks. It queries `getSignaturesForAddress` to identify slots that carry the program, fetches full finalized blocks via `getBlock`, and extracts every instruction of the target program (top-level and CPI). Instructions in the JSON encoding resolve through `programIdIndex` against the transaction's static and loaded address tables, and inner instructions are parsed from `meta.innerInstructions` (two real extraction bugs caught and covered by `test/payloads.test.mjs`). The harvest pins the transactions it actually read, so any caller can re-derive the payloads with `--from-signatures`.
+- `tools/tx-diff.mjs`: cross-decoder diff across all harvested transactions against `@orca-so/whirlpools-client` (Orca License, used only as a test oracle, nothing vendored).
+
+For every payload, the diff answers three separate questions:
+1. **Naming:** does the oracle's encoder reproduce the bytes sememe names the instruction with? (The oracle's per-instruction decoders do not validate discriminators, so the honest naming oracle is the encoder round-trip: the one instruction whose encoder reproduces the bytes is the true name.)
+2. **Values:** field-by-field equality across every argument the IDL declares, with known representation differences (camelCase, hoisted structs, unit enums) handled explicitly.
+3. **Bytes:** re-encoding the decoded values reproduces the IDL-described prefix byte-for-byte. Trailing bytes the IDL does not describe are tracked separately under `unexplained`.
+
+**Measured on real mainnet traffic (run 2026-10-28):**
+- **40,013 transactions** scanned across **148 finalized blocks** (slots 462358216..462358364), with **3,309 pinned signatures** collected by paging `getSignaturesForAddress` backwards until enough slots were covered.
+- **1,029 transactions** contain Whirlpool payloads, yielding **1,119 instruction payloads** (the vast majority are CPIs inside router and aggregator calls — Whirlpool top-level invocations are rare on mainnet).
+- **1,119/1,119 payloads decoded** by sememe (`sememeErrors: 0`).
+- **1,119/1,119 naming agreements** (`namingDisagrees: 0`).
+- **1,119/1,119 value agreements** across every decoded argument (`valueDisagrees: 0`).
+- **1,119/1,119 byte-exact round-trips** of the described prefix (`byteMismatch: 0`).
+- **33 unexplained trailing-byte payloads** (2.95%), all `swap_v2`. The earlier 50-payload sample measured 4.0% (2 of 50), so this phenomenon is confirmed present at over 1,000-payload scale while varying somewhat between samples.
+- Instructions observed at scale: `swap_v2` (910), `swap` (162), `increase_liquidity_v2` (15), `reposition_liquidity_v2` (12), and single instances of `open_position`, `open_position_with_token_extensions`, `close_position_with_token_extensions`, `collect_fees_v2`, `decrease_liquidity_v2`, `update_fees_and_rewards`.
+
+**Falsification:** the diff tool is proven to fail when defects are introduced:
+1. Flipping a byte in instruction data: `sememeErrors: 1`, exit 1.
+2. Identical input to both decoders: exit 0 (no false positives).
+3. IDL tamper (`swap_v2` `amount_specified_is_input` bool → u8): `valueDisagrees: 34`, exit 1 (`sememe: "1"` vs `oracle: "true"`), while `byteMismatch: 0` remains exact because both types are 1 byte.
+4. Swapping `swap` and `swap_v2` discriminators in the IDL: `namingDisagrees: 34`, `sememeErrors: 10`, exit 1.
+
+**Reproducibility:** the committed fixture pins its own payload set. `tools/lib/pinned.mjs` resolves the signature list from the fixture's transaction records first (the payload set itself), falls back to the declared `signatures` array, and throws when a document pins nothing rather than resolving to an empty list. This distinction is measured, not assumed: only **298 of the 1,029** payload-bearing transactions appear in the `getSignaturesForAddress` page, because a transaction that reaches Whirlpool only through a CPI does not list Whirlpool in its own account keys. Pinning the page instead of the payloads would therefore re-derive a different, smaller sample while still reporting success. Two defects on this path were found and fixed on 2026-10-28 (the fixture carried no `signatures` array at all, so the documented command harvested zero and crashed; and the harvester pinned the page), covered by `test/pinned.test.mjs`.
+
+Because the public RPC rate-limits, a re-derivation can also come back **partial** — 37 of 40 transactions fetched — and still write a file and exit 0. `--verify <fixture>` closes that gap: it compares the re-derivation against the fixture and exits non-zero unless every pinned transaction returned byte-identical payloads (`tools/lib/rederive-verify.mjs`, 5 tests). Measured against live mainnet: a 15-transaction subset re-derived completely (15/15, 17 payloads, byte-identical, exit 0); the same command on a tampered payload exited 1 with `payload 0 dataHex differs`.
+
+**Remaining limits:** one Anchor program (Whirlpool); events and (at that point) accounts were still untested; other own decoder paths remain to be migrated; no outside user has adopted sememe yet. But the "50 payloads, not 1,000 transactions" limit is closed: agreement holds across 1,119 real payloads from 1,029 transactions sampled from 40,013 mainnet transactions, with zero value or byte discrepancies.
+
+## Second real program: Jupiter AMM v6 (and two defects it exposed)
+
+Testing against only one program hid a whole class of defects: Whirlpool's enums are simple and its transactions rarely use Anchor event CPIs. On 2026-10-29, sememe pulled Jupiter AMM v6 (`JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4`) from mainnet (slot 462867554, 19 instructions, 6 events, fingerprint `sha256:37fa69c115f5883314374e01c4aa8f242778f7aebccd75f5064d6afb0277afee`), harvested **18,193 transactions** across **48 finalized blocks** (slots 462867935..462867982), and decoded every payload referencing the program (313 transactions, **773 payloads**).
+
+Initial run against the existing codec: **only 35 of 773 payloads decoded**. Two real defects were exposed and fixed:
+
+1. **Enum minSize lower bound was inverted:** `minSize` used the *largest* enum variant as the lower bound for an element in a vector. Jupiter's `Swap` enum has 204 variants; variant 47 (`WhirlpoolSwapV2`) needs 85 bytes, so the hostile-length pre-check required at least 85 bytes per element for every `route` instruction. Real payloads carry smaller variants (e.g. 1 byte for unit variants), so **342 payloads were rejected** with `"vector length 1 needs 85 byte(s) but 25 remain"` — even though the payloads themselves decode byte-exact. Fixed: `minSize` takes the *smallest* variant as the lower bound, and options bound at 1 byte (the `None` tag).
+2. **Anchor `emit_cpi!` event payloads arrive like instructions:** Anchor programs emit events through a self-CPI with instruction data `EVENT_IX_TAG_LE (8) ++ event_discriminator (8) ++ borsh(fields)`. In a transaction (top-level or CPI) these look identical to instructions, but the discriminator table did not know `EVENT_IX_TAG` (`0x1d9acb512ea545e4`, hex `e445a52e51cb9a1d`), so **396 payloads were rejected** with `"unknown instruction discriminator e445a52e51cb9a1d"`. Added `decodeEventData`, `encodeEventData`, `eventIndex`, and transparent dispatch in `decodeData`/`decodePayload`: instructions match first, event self-CPIs match second.
+
+**Measured after the fix (`tools/coverage.mjs`):**
+- **773/773 payloads decoded** (377 instructions + 396 Anchor event self-CPIs).
+- **773/773 round-trip byte-exact** (0 codec errors, 0 unknown discriminators, 0 trailing bytes).
+- Instructions observed: `route_v2` (153), `route` (102), `shared_accounts_route_v2` (39), `set_token_ledger` (30), `route_with_token_ledger` (26), `shared_accounts_route` (18), `create_idempotent_associated_token_account` (5), `shared_accounts_route_with_token_ledger` (4).
+- Events observed: `SwapEvent` (205), `SwapsEvent` (188), `FeeEvent` (3).
+- **Naming cross-check:** compared against the independent bitquery IDL in `solana-tx-remix/idl/multi/jupiter-amm/amm.json`: **768/768 shared discriminators agree on the name** with 0 name disagreements; the remaining 5 payloads are `create_idempotent_associated_token_account`, which is on-chain but absent from the older bitquery copy.
+
+Covered by `test/jupiter-v6.test.mjs` (9 tests) using real pinned mainnet fixtures. Whirlpool qualification re-run: 1,119/1,119 byte-exact, 33 trailing, 0 regressions. Runs: `npm test` (58 tests pass).
+
+## Third real program, family-distant: Kamino Lend (and a gap in the coverage measure)
+
+Whirlpool and Jupiter AMM v6 are both swap venues from the same family. On 2026-10-29 sememe pulled Kamino Lend (`KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD`, a lending market) from mainnet (slot 462900393, legacy `anchor:idl` account, fingerprint `sha256:8a9a5d124ac3a2b50ef096f1fff56557367ee9cb8d08a17bde8a61dd373da4b5`), harvested **142,981 transactions** across **324 finalized blocks** (slots 462905866..462909439) and extracted **1,432 payloads** from 400 payload-bearing transactions.
+
+**The finding: this program's on-chain IDL stores no discriminators at all.** 66 instructions, 5 events, 0 discriminators. A decoder indexes by discriminator, so the index built from the stored IDL is empty and **0 of 1,432 real payloads decoded** — every one refused with "unknown instruction discriminator".
+
+That also exposes a gap in the 20-program coverage measure, which classified a program as *usable* whenever its IDL named at least one instruction. Kamino Lend was counted usable (it was one of the eleven legacy-Anchor pulls) although its schema could not decode a single byte. "Names instructions" is not "can decode".
+
+**Fix:** `src/discriminators.mjs` fills the gaps with Anchor's own rule — `sha256("global:" + snake_case(name))[0..8]` for instructions, `sha256("event:" + name)[0..8]` for events. Stored discriminators are never overwritten, and a stored value that disagrees with the derivation is reported as a conflict rather than silently replaced.
+
+**The rule is verified, not assumed:** against IDLs that *do* store their discriminators, the derivation reproduces **Whirlpool 72/72** and **Jupiter AMM v6 24/25**. The single exception is instructive: Jupiter's `create_idempotent_associated_token_account` stores `5368c096…`, while the name-derived value is `bdbcecfa…` — and 5 real mainnet payloads carry `5368c096…` and round-trip byte-exact, so the stored value is the true one. A name is not proof of a wire discriminator, which is exactly why the derivation only fills gaps.
+
+**Measured after the fix (`tools/coverage.mjs`):**
+- **1,432/1,432 payloads decoded and round-trip byte-exact** (0 codec errors, 0 unknown discriminators, 0 trailing bytes).
+- **Naming cross-check** against Kamino's own published IDL (`@kamino-finance/klend-sdk`): **1,432/1,432 named by both sources, 0 disagreements**.
+- Instructions observed: `refreshReserve` (520), `refreshReservesBatch` (290), `refreshObligation` (268), `depositReserveLiquidityAndObligationCollateralV2` (54), `depositReserveLiquidity` (51), `borrowObligationLiquidityV2` (47), `withdrawObligationCollateralAndRedeemReserveCollateralV2` (45), `repayObligationLiquidityV2` (43), `flashBorrowReserveLiquidity` (36), `flashRepayReserveLiquidity` (36), `redeemReserveCollateral` (33), `initObligation` (5), `initObligationFarmsForReserve` (3), `initUserMetadata` (1).
+
+Covered by `test/klend-derived.test.mjs` (6 tests) using real pinned mainnet fixtures; `test/discriminators.test.mjs` (7 tests) pins the rule and the Jupiter exception. `decodePayload` now reports `discriminatorSource` (`stored` / `derived` / `stored+derived`) and any derivation conflicts, so a consumer can tell a name-derived match from a stored one. Whirlpool and Jupiter re-runs: unchanged, 0 regressions.
+
+**A second, unrelated defect fixed along the way:** `tools/harvest.mjs` computed the slot range with `Math.min(...slots)`. A 142,981-transaction harvest collects far more slots than the call stack accepts, so the run died with `RangeError: Maximum call stack size exceeded` *after* all RPC work and before the file was written. The range is now reduced in a loop (`tools/lib/slot-range.mjs`).
+
+**Remaining limits at that point:** three programs, still no outside user; accounts were still undecoded (now closed below); the derivation is Anchor-specific (a non-Anchor program needs its own scheme); and the coverage measure's "usable" definition should be tightened to require a decodable schema, not just named instructions.
+
+## Fourth program: OpenBook v2, checked against anchor-ts's own sighash
+
+Kamino Lend left one weak spot: the derivation rule was verified against programs that *store* discriminators (Whirlpool, Jupiter) and then *applied* to a program that stores none (Kamino), whose own published SDK happens to hardcode them. A reader could still say: you checked your rule against yourself.
+
+OpenBook v2 (`opnb2LAfJYbRMAHHvqjCwQxanZn7ReEHp1k81EohpZb`, a central limit order book — a third program family after the swap AMMs and the lending market) closes that. Its on-chain IDL was pulled on 2026-10-29 at slot 462921401 (legacy `anchor:idl` account, fingerprint `sha256:d12a2e16314b418a173cc6da755746396e2b15caf9e28ccb4913aa335050913f`): **29 instructions, 8 events, 0 discriminators** — the same premise as Kamino Lend.
+
+**The oracle is an independent implementation of Anchor's sighash:** `@coral-xyz/anchor` (anchor-ts 0.29.0) computes `sha256("global:" + snake_case(name))[0..8]` at runtime from the same IDL, in code this repository shares nothing with. Fixture `test/fixtures/openbook-anchor-ts-discriminators.json` records its 29 instruction + 8 event discriminators; the derived values match **29/29 and 8/8, byte for byte** (`test/openbook-v2.test.mjs`). Events were also reproduced by the event rule, 8/8.
+
+**Measured on real traffic (`tools/coverage.mjs`):** a harvest of **224,894 transactions** across 900+ finalized blocks (slots 462476178..462929711) yielded **600 payload-bearing transactions with 600 payloads**:
+
+- **600/600 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/600** — the discriminator index built from the published bytes alone is empty, exactly as for Kamino Lend.
+- **Naming cross-check** against the independently published IDL (`openbook-dex/openbook-v2`, `idl/openbook_v2.json`, fetched from GitHub): **600/600 named by both, 0 disagreements**; instruction sets identical (29/29 both sides).
+- Instructions observed: `placeTakeOrder` (562), `cancelOrder` (10), `consumeEvents` (7), `placeOrders` (7), `settleFunds` (4), `consumeGivenEvents` (3), `cancelAllOrders` (3), `deposit` (2), `cancelAllAndPlaceOrders` (2).
+
+Covered by `test/openbook-v2.test.mjs` (6 tests) and pinned fixtures (`openbook-v2-idl.json`, `openbook-anchor-ts-discriminators.json`, `openbook-v2-published-idl.json`, `harvest-openbook-v2-2026-10-29.json`). Suite: **82/82**. Disabling the fill in `src/discriminators.mjs` fails the new tests (falsification), restoring it passes.
+
+**Remaining limits after four programs:** still no outside user; both derivation checks (Kamino SDK, anchor-ts) are Anchor-specific — a non-Anchor program needs its own scheme; and the sample remains family-clustered. OpenBook's on-chain and published IDLs are also both legacy shapes, so the naming cross-check shares the Anchor rule on both sides; the byte-exact round-trip against 600 real payloads is what cannot be satisfied by a wrong discriminator.
+
+## Fifth program: Marinade liquid staking (a staking program, and a published SDK that stores nothing either)
+
+Marinade (`MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD`, liquid staking — a staking program, not a swap AMM, lending market or order book) is one of the five programs in the strict coverage table that can only decode because the tool reconstructs the missing discriminators. Its on-chain IDL was pulled on 2026-10-29 at slot 462985426 (legacy `anchor:idl` account, fingerprint `sha256:61ccc0c1a5995dd4aaaa0ec0108e88343642f8da4f74603c67472c8ae42ea14e`): **29 instructions, 26 events, 0 discriminators** — the same premise as Kamino Lend and OpenBook v2, now on a fourth program family.
+
+**Two independent confirmations, one per open question:**
+
+- **Is the rule right?** anchor-ts (0.29.0) computes Anchor's sighash at runtime from the same IDL in code this repo shares nothing with. Fixture `test/fixtures/marinade-anchor-ts-discriminators.json` records its 29 instruction + 26 event discriminators; the derived values match **29/29 and 26/26, byte for byte** — this time including the events (26 of them, four times the OpenBook event set).
+- **Is the interface the one the program ships?** the naming cross-check uses `marinade_finance.json` from `marinade-finance/marinade-ts-sdk`, an artifact fetched from GitHub that this machine's store never sees. **29/29 instruction names identical, 0 only-on-one-side**, and the coverage run reports **623/623 payloads named by both sources, 0 disagreements**.
+
+**Measured on real traffic:** a harvest of **236,290 mainnet transactions** across 560 finalized blocks (slots 462439010..462984538) yielded **600 payload-bearing transactions with 623 payloads**:
+
+- **623/623 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/623** — the discriminator index built from the published bytes alone is empty, exactly as for Kamino Lend and OpenBook v2.
+- Instructions observed (14 distinct): `liquidUnstake` (164), `deposit` (150), `mergeStakes` (136), `updateActive` (125), `setValidatorScore` (24), `updateDeactivated` (6), `stakeReserve` (5), `partialUnstake` (5), `claim` (3), `configLp` (1), `withdrawStakeAccount` (1), `removeLiquidity` (1), `removeValidator` (1), `addValidator` (1).
+
+Covered by `test/marinade.test.mjs` (6 tests) and pinned fixtures (`marinade-liquid-staking-idl.json`, `marinade-anchor-ts-discriminators.json`, `marinade-finance-published-idl.json`, `harvest-marinade-liquid-staking-2026-10-29.json`); measurement in [research/coverage-marinade-liquid-staking-2026-10-29.json](research/coverage-marinade-liquid-staking-2026-10-29.json). Suite: **114/114**. Falsification: flipping one byte of the derived discriminator fails 2 of the 6 new tests (the byte-exact round-trip and the anchor-ts comparison), restoring it passes.
+
+**Remaining limits after five programs:** still no outside user; no Marinade *account* decoding yet (the account branch covers Whirlpool/OpenBook/Kamino); the derivation is still Anchor-specific; and this harvest recorded **0 event payloads** — Marinade's 26 events were verified as discriminators against anchor-ts but none appeared in the sampled traffic, so the event path on this program is confirmed by the oracle, not by real bytes.
+
+## Sixth program: Meteora Vault (a yield vault, and a measured interface drift)
+
+Meteora Vault (`24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi` — strategy rotation over token vaults, a fifth program family: not a swap AMM, lending market, order book or staking program) is one of the five programs in the strict coverage table that can only decode because the tool reconstructs the missing discriminators. Its on-chain IDL was pulled on 2026-10-29 at slot 463051650 (legacy `anchor:idl` account, fingerprint `sha256:945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94`): **14 instructions, 8 events, 0 discriminators** — same premise, fifth family.
+
+**The interface drift finding (new):** the independent published copy (`idl.ts` shipped in MeteoraAg/vault-sdk) is version **0.9.5**, while the on-chain account is **0.7.2**. The inventories are not identical: the on-chain copy carries `collectDust` and `withdraw2`, which the published copy dropped; the published copy carries 7 instructions the on-chain account never heard of (`claimRewards`, `getUnlockedAmount`, `initializeIdleVault`, `migrateVault`, `transferAdmin`, `transferFeeVault`, `updateLockedProfitDegradation`). Every on-chain **event** name exists in the published copy. This is pinned as a measured fact in `test/meteora-vault.test.mjs` so a future pull that changes the drift fails loudly — "same interface" is not asserted where it is not true.
+
+**Two independent confirmations:**
+
+- **Is the rule right?** anchor-ts (0.29.0) computes Anchor's sighash at runtime from the same IDL in code this repo shares nothing with. Fixture `test/fixtures/meteora-vault-anchor-ts-discriminators.json` records its 14 instruction + 8 event discriminators; the derived values match **14/14 and 8/8, byte for byte**.
+- **Does real traffic only use names both copies know?** **1,290/1,290 payloads named by both sources, 0 disagreements**, and the two instructions actually observed (`withdraw`, `deposit`) exist in both interface copies — the drift above is inventory drift, not a name under shipped bytes.
+
+**Measured on real traffic:** a harvest of **325,087 mainnet transactions** across 428 finalized blocks (slots 463049519..463051719) yielded **603 payload-bearing transactions with 1,290 payloads**:
+
+- **1,290/1,290 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/1,290** — the discriminator index built from the published bytes alone is empty.
+- Instructions observed: `withdraw` (654), `deposit` (636). Honest limit: vault traffic is two high-volume flows, not a tour of all 14 instructions; **0 event payloads**, so the event path on this program is confirmed by the oracle (8/8 against anchor-ts), not by real bytes — same limit as Marinade.
+
+Covered by `test/meteora-vault.test.mjs` (7 tests) and pinned fixtures (`meteora-vault-idl.json`, `meteora-vault-anchor-ts-discriminators.json`, `meteora-vault-published-idl.json`, `harvest-meteora-vault-2026-10-29.json`); measurement in [research/coverage-meteora-vault-2026-10-29.json](research/coverage-meteora-vault-2026-10-29.json). Falsification: disabling the derivation fill fails 2 of the 7 new tests (byte-exact round-trip and the anchor-ts comparison), restoring it passes.
+
+**Remaining limits after six programs:** still no outside user; the derivation is still Anchor-specific; **one of the five derivation-only programs remains individually unproven against real payloads (Meteora DAMM v1)** — Kamino Lend, OpenBook v2, Marinade and Meteora Vault now each are; no event bytes observed on this program.
+
+## Seventh program: Meteora DAMM v1 (last derivation-only program, and a case-style finding)
+
+Meteora DAMM v1 (`Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB` — Meteora's constant-product/stable AMM, a sixth program family) is the fifth and last program in the strict coverage table that can only decode because the tool reconstructs the missing discriminators. Its on-chain IDL was pulled on 2026-10-29 at slot 463068495 (legacy `anchor:idl` account, fingerprint `sha256:dd60d3d367986a1d2ad574df3ea5855c5a9801fdaa6fdea57b898deafb95fdba`): **26 instructions, 18 events, 0 discriminators** — same premise as Kamino Lend, OpenBook v2, Marinade and Meteora Vault.
+
+**Two new findings:**
+
+- **Case-style difference between interface copies is not a disagreement.** The on-chain copy names instructions in camelCase (`claimFee`, `removeBalanceLiquidity`), the published `MeteoraAg/damm-v1-sdk` copy in snake_case (`claim_fee`, `remove_balance_liquidity`). Anchor's rule hashes `snake_case(name)`, so the two copies produce identical wire bytes while differing in spelling convention. `tools/coverage.mjs` now counts these apart: `caseOnlyDifference` (cosmetic) versus `nameDisagreement` (survives snake_casing, therefore a real conflict). Before this fix the DAMM run reported 13 false "name disagreements" that were 13× `claimFee`/`claim_fee`. Measured now: **643/643 named by both copies, 0 real disagreements, 13 case-only differences.**
+- **The published copy stores its own discriminators, and the rule reproduces them.** Unlike the on-chain account, the published `idl.json` carries discriminator arrays written by the program's own IDL generator: **30/30 instructions and 19/19 events match the Anchor rule byte for byte**, computed from names this repository never touched. That is confirmation of the rule from a second source that *stores* rather than *derives*.
+
+**Measured on real traffic:** a harvest of **152,097 mainnet transactions** across finalized blocks (slots 463065616..463068621) yielded **602 payload-bearing transactions with 643 payloads**:
+
+- **643/643 decoded and round-trip byte-exact**, 0 codec errors, 0 unknown discriminators, 0 trailing bytes.
+- **Without derivation: 0/643** — the discriminator index built from the published bytes alone is empty.
+- **Two independent oracles agree:** anchor-ts (0.29.0) computes the sighash at runtime — **26/26 instructions + 18/18 events byte-exact**; the published sdk's own stored discriminators — **30/30 + 19/19 byte-exact**.
+- Instructions observed: `swap` (630), `claimFee` (13). Honest limit: two flows in the traffic, not a tour of all 26 instructions; **0 event payloads**, so the event path on this program is confirmed by both oracles (18/18 each), not by real bytes — same limit as Marinade and Meteora Vault.
+- **Inventory drift pinned:** the published copy (0.5.7) carries 4 instructions the on-chain 0.5.2 account does not (`claim_protocol_fee2`, `close_operator_account`, `create_operator_account`, `zap_protocol_fee`); every on-chain instruction exists in the published copy after snake_casing.
+
+Covered by `test/meteora-damm-v1.test.mjs` (7 tests) and pinned fixtures (`meteora-damm-v1-idl.json`, `meteora-damm-v1-anchor-ts-discriminators.json`, `meteora-damm-v1-published-idl.json`, `harvest-meteora-damm-v1-2026-10-29.json`); measurement in [research/coverage-meteora-damm-v1-2026-10-29.json](research/coverage-meteora-damm-v1-2026-10-29.json). Suite: **128/128**. Falsification: disabling the derivation fill fails 2 of the 7 new tests (byte-exact round-trip and the anchor-ts comparison), restoring it passes.
+
+**Remaining limits after seven programs:** all five derivation-only programs are now individually proven against real mainnet payloads (**Kamino Lend 1,432/1,432, OpenBook v2 600/600, Marinade 623/623, Meteora Vault 1,290/1,290, Meteora DAMM v1 643/643**, each byte-exact with 0 decodable without derivation); still no outside user; the derivation is still Anchor-specific; no event bytes observed on the last three programs.
+
+## Accounts: state, not just calls (three programs, 39 real accounts)
+
+Every proof above ends instructions/events and says the same remaining limit: *accounts are still undecoded*. That limit is now closed for the same three programs.
+
+`src/account.mjs` decodes an account's bytes against the same stored IDL:
+
+```bash
+node bin/sememe.mjs account whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc \
+  '<base64 from getMultipleAccounts>' --store /tmp/sememe-demo
+```
+
+The 8-byte Anchor account discriminator picks the account type (no `--name` needed), the struct is read from the IDL — inline in `accounts` for legacy IDLs, via `types` for newer ones — and the decoded value must re-encode to the account's own bytes.
+
+**The account discriminator is derived the same way instructions are, and it is verified by an independent implementation.** Fixture `test/fixtures/account-discriminators-anchor-ts.json` records `BorshAccountsCoder.accountDiscriminator` computed by anchor-ts (0.29.0) for **all 29 account names across 4 IDLs**; sememe's `sha256("account:" + name)[0..8]` matches **29/29, byte for byte**. Whirlpool stores its account discriminators (12/12, so stored = derived, 0 conflicts); OpenBook v2 and Kamino Lend store none, so all 6 + 10 are derived — without derivation **0 of their accounts identify at all** (falsification test in `test/account.test.mjs`).
+
+**Measured on real mainnet accounts** (`tools/account-harvest.mjs` → owner-filtered `getMultipleAccounts`, pinned as fixtures; `tools/accounts.mjs` decodes them from a live store):
+
+| program | accounts | identified | decoded | re-encoded byte-exact | trailing bytes |
+|---|---|---|---|---|---|
+| Whirlpool | 27 | 27 | 27 | 27 | 0 |
+| OpenBook v2 | 4 | 4 | 4 | 4 | 0 |
+| Kamino Lend | 8 | 8 | 8 | 8 | 0 |
+| **total** | **39** | **39** | **39** | **39** | **0** |
+
+Types covered include `Whirlpool`, `Oracle`, `TickArray`, `DynamicTickArray` (Whirlpool), `Market`, `OpenOrdersAccount`, `BookSide`, `EventHeap` (OpenBook v2, including its 90 KB book-side accounts), and `Obligation`, `Reserve`, `LendingMarket`, `UserMetadata` (Kamino Lend).
+
+**Values are checked against anchor-ts, not just round-tripped.** Round-tripping through sememe's own encoder would prove only that decode and encode agree with each other. Instead, anchor-ts decoded every pinned account and the hash of its normalised value is pinned in `test/fixtures/account-values-golden-2026-10-29.json`; the suite recomputes the hash from sememe's own decode. **39/39 agree**, and the live cross-check with the independently published OpenBook IDL (`tools/accounts.mjs --cross-check`) reports 4/4 compared with 0 disagreements.
+
+**What the byte-exactness gate actually proves is itself falsified:** dropping the struct's first field, or flipping a discriminator byte, must not produce "decoded + trailing 0 + byte-exact" — both are asserted to fail (`test/account.test.mjs`), and foreign program bytes must identify as nothing.
+
+Run: `npm test` (the account commit brought the suite to 108; **114** after the fifth program, **128** after the seventh), plus `node tools/accounts.mjs --accounts test/fixtures/accounts-<program>-2026-10-29.json --store <store> --program <id>` to re-measure from a live pull.
+
+**Remaining limits:** still no outside user; **zero trailing bytes were observed**, so the report path for account bytes the IDL does not describe is implemented but unexercised by real data; `repr(C)`/`packed` (zero-copy) accounts are not decoded; account *discriminators* are derived for three Anchor programs — a non-Anchor program's account framing still needs its own scheme, exactly as for instructions; and 39 accounts from traffic of three programs is a convenience sample, not an inventory of what accounts exist on chain.
+
+## Eighth and ninth programs: Meteora DAMM v2 and pump.fun (and a tuple-struct codec fix)
+
+On 2026-10-30 `solana-tx-remix` carried three CPI labels that read `(unknown)` because
+the consumer assumed the programs published no on-chain IDL: **Meteora DAMM v2**
+(`cpamdpZCGKUy5JxQXB4dcpGPiikHawvSWAd6mEn1sGG`, `cp-amm`) and **pump.fun**
+(`6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P`). One sememe pull per program
+falsified the assumption:
+
+| program | on-chain source | slot | instructions | events | stored discriminators |
+|---|---|---|---|---|---|
+| cp-amm | `anchor:idl` @ `F1hSvut...` | 463372654 | 38 | 23 | 38/38 ix, 23/23 ev (100%) |
+| pump.fun | `anchor:idl` @ `AYgC53t...` | 463372656 | 47 | 28 | 47/47 ix, 28/28 ev (100%) |
+
+Every stored value matches Anchor's derivation rule byte for byte (38/38, 47/47, 23/23,
+28/28), so no gaps had to be filled. Both programs are from the frozen 20-ID set
+(indexes 16 and 11) where they were previously classified "usable"; this measurement
+proves they actually decode real mainnet bytes.
+
+**Measured on real traffic:** two fresh mainnet harvests (2026-10-30, slots
+463380807..463380978) collected **2,890 payloads across 1,661 payload-bearing
+transactions** (cp-amm: 1,894 payloads / 809 tx from 22,272 transactions; pump.fun:
+996 payloads / 852 tx from 4,459 transactions):
+
+- **cp-amm decodes every payload:** **1,894/1,894 decoded (100%)**, 0 codec errors, 0
+  unknown discriminators; **1,888/1,894 round-trip byte-exact**, 6 payloads with
+  trailing bytes (all `swap`, 2 with 8 zero bytes, 4 with 1 zero byte) — the deployed
+  swap accepts bytes its own interface file does not declare. That residual is now
+  measured rather than noted: see *Three wire forms, one interface* below.
+- **pump.fun with the on-chain IDL alone:** **669/996 decoded (67.2%)**, 327 refused
+  (326 unknown instruction discriminators across five instructions, 1 unknown event
+  discriminator); **581 byte-exact**, 88 with trailing bytes.
+- **The published first-party IDL names the 326 missing instructions:**
+  `buy_exact_quote_in_v3` (107), `buy_v3` (2), `multi_hop_curve_swap` (1), `sell_v3`
+  (194), `sweep_creator_fee` (22) — all absent from the on-chain account, all present
+  in `pump-fun/pump-public-docs` `idl/pump.json`. The on-chain account is simply stale.
+- **Neither source alone describes the deployed program:** with the published copy,
+  **880/996 decode** (782 instructions + 98 events); the remaining 116 refusals come
+  from `buy` carrying a `partial_fill` argument the deployed program does not always
+  send. With the **union** of both, **914/996 decode (91.8%)**, 82 refused.
+- **Refusal does not predict on-chain failure:** of 116 refused payloads, **32 were
+  part of transactions that SUCCEEDED on-chain** (and 84 failed); of 880 decoded
+  payloads, **715 were from transactions that FAILED on-chain** (slippage, etc.). A
+  decoder refusal is evidence about the IDL, not about whether the program executed.
+- **TradeEvent has an unexplained tail:** every one of the 87 TradeEvents decoded
+  under the published IDL carries exactly **8 trailing zero bytes** (`count: 8, hex:
+  "0000000000000000"`) no declared field explains.
+
+**Codec defect found and fixed:** Anchor describes a Rust tuple struct (`pub struct
+OptionBool(pub bool)`) as `{"name":"OptionBool","type":{"fields":["bool"],"kind":"struct"}}`
+— bare types, no `{name, type}` pairs. sememe's struct branch demanded a `name` on
+every field and threw `OptionBool: malformed struct field` on **18 payloads** under
+the on-chain IDL and **145 payloads** under the published IDL before the fix. The fix
+adds tuple-struct support in both decode and encode, matching Anchor's own
+representation (`{"0": value}`). Falsification: `test/tuple-struct.test.mjs` fails
+against the pre-fix tree (1 pass / 3 fail; the 1 is the fixture-shape guard), passes
+4/4 post-fix. After the fix, on-chain decodes 651 → 669; published decodes 851 → 880.
+
+Covered by `test/tuple-struct.test.mjs` (4 tests) and `test/traffic-coverage.test.mjs`
+(10 tests); fixtures `test/fixtures/cp-amm-idl.json`, `pump-idl.json`,
+`pump-published-idl.json`, `harvest-cp-amm-2026-10-30.json`,
+`harvest-pump-2026-10-30.json`. The numbers above are reproduced, not written:
+`node tools/traffic-coverage.mjs` emits
+[research/traffic-coverage-2026-10-30.json](research/traffic-coverage-2026-10-30.json),
+and a test fails if the committed file differs from what the tool computes
+(measured: one hand-edited number fails it, restoring passes). Suite: **154/154**
+(up from 140).
+
+## Working now: union decode — two verified sources, one payload, disagreement reported
+
+The pump.fun measurement above produced three numbers for the same 996 payloads:
+669 (on-chain copy alone), 880 (published copy alone), 914 (a hand-merged union
+inside a measurement tool). The union was the only view that described the deployed
+program, and it did not exist outside that tool. It does now:
+
+```bash
+sememe adopt 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P idl/pump.json --store <dir> --origin pump-fun/pump-public-docs
+sememe decode --union 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P <payload> --store <dir>
+```
+
+- **`adopt` stores a first-party published copy** content-addressed exactly like a
+  pull: canonical bytes, sha-256 fingerprint, write-once object, receipt. The
+  receipt says `source: published`, `slot: null` and carries the `origin` the
+  caller declared. That distinction is deliberate: `pull` gets its authority from
+  the chain, `adopt` is **provenance of bytes, not proof the bytes describe the
+  deployed program** — and the decode result must keep saying which source
+  answered.
+- **The adopted copy can never become the default source.** It sorts before every
+  real slot in the single-source reader's filename ordering, so plain
+  `sememe decode` reads exactly what it read before this feature existed — the
+  pre-existing 154 tests pass unchanged, and a test pins the selection
+  explicitly (falsified by mutation M4: letting the adopted receipt win turns it
+  red).
+- **Both sources are verified by the same reader** (`src/store-read.mjs`): receipt
+  program binding, object presence, re-hash against the receipt, address
+  agreement. A tampered adopted object is refused **by name in the union path
+  too** — not silently dropped in favour of the surviving source (falsified by
+  mutation M5).
+
+**The arbitration is decided by bytes, not by preference**, strongest evidence first:
+
+1. both sources decode the same name and args → `agree`;
+2. both decode, one re-encodes the **whole** payload and the other does not → the
+   full-round-trip source wins (`byte_evidence_full_roundtrip`);
+3. neither explains everything, one leaves **strictly fewer** unexplained bytes →
+   that source wins (`byte_evidence_fewer_unexplained_bytes`);
+4. evidence does not decide → the on-chain primary stands and the drift is
+   **reported with the differing field paths** — never absorbed;
+5. one source refuses → the other answers, but only with byte evidence behind it
+   (`primary_refused` / `secondary_refused`);
+6. **two different names for the same bytes → refusal**, not a coin flip
+   (`name_conflict`); the same for a secondary source that names bytes it cannot
+   reproduce (`union_fallback_refused`).
+
+**Measured, product path, the same 996 pump.fun payloads**
+(`node tools/union-coverage.mjs` →
+[research/union-coverage-2026-10-30.json](research/union-coverage-2026-10-30.json),
+recomputed in CI — a committed-report mismatch fails the suite):
+
+| verdict | payloads | what it means |
+|---|---|---|
+| `agree` | 546 | both sources decode identical arguments |
+| `fallback_secondary` | 246 | 245 payloads of the five stale on-chain instructions + the `SweepBondingCurveFeeEvent` payload the hand-merged union refused |
+| `primary_only` | 35 | the published copy's layout is taller than the bytes sent (truncated), the on-chain copy decodes them |
+| `layout_drift` | 88 | both decode, arguments differ — reported with field paths, winner chosen by byte evidence |
+| refused by both | 81 | the on-chain copy lacks the instruction entirely AND the published copy cannot decode these bytes |
+| **decoded** | **915/996 (91.9%)** | 915 re-encode their described prefix byte-exactly; **828 re-encode the WHOLE payload** |
+
+The **+1 over the hand-merged 914** is a real difference, not noise: that merge
+added *instructions* only, so the published-only event `SweepBondingCurveFeeEvent`
+(`742b4dbd117a482b`) was refused; the product union carries both sources whole.
+
+The 88 drifts are two real, measured disagreements — the reason the union exists:
+
+- **CreateEvent (1 payload):** the published copy declares `depth: u8`, the
+  on-chain copy does not. On-chain leaves 1 byte unexplained; the published copy
+  re-encodes the **whole** payload, so byte evidence picks it, and the winning
+  decode carries `depth`.
+- **TradeEvent (87 payloads):** the published copy declares an additional
+  `creator_fee_unclaimed: u64`. On-chain leaves 16 bytes unexplained, published
+  leaves 8 (the known 8-byte zero tail neither explains) — strictly-fewer-
+  unexplained-bytes picks the published copy, and the tail stays visible under
+  `drift.trailingBytes` instead of being laundered into a clean decode.
+
+**Falsification:** `bash tools/union-mutations.sh` breaks each rule on purpose —
+M1 name conflict, M2 fallback without byte evidence, M3a/M3b the two
+byte-evidence arbitration rules, M4 adopted-as-default, M5 tamper check — and
+requires exactly the named test to go red in every case, control run green. The
+measurements are pinned twice: `test/union-coverage.test.mjs` deep-equals the
+committed report against what the tool computes right now, and asserts each
+headline count with a message saying what a regression would mean. Suite:
+**169/169** (up from 154).
+
+**Limits, stated:** one program, one harvest window, both sources are mine (on-chain
+pull + first-party published copy), no outside user. Account decoding still reads a
+single receipt — union arbitration is not wired for accounts. An adopted receipt's
+`origin` is a declared label, not a verified origin — it is now *marked* as declared
+everywhere it is shown and *bound* so it cannot be rewritten silently (see
+"Working now: a declared origin is declared, and cannot be rewritten silently"),
+but its truth is still not checked.
+
+## Working now: one store, one answer — multiple copies of one program (2026-11-07)
+
+A store may hold **more than one adopted copy of the same program** (a docs
+pair, or a pull plus a copy adopted again under a different origin). Measured
+on the PUBLISHED `v0.4.8` release (installed from its tag into an empty app,
+no clone) — with two adopted copies of pump.fun in one store:
+
+| command | answer | exit |
+|---|---|---|
+| `sememe decode <payload>` | `sell_v3`, fingerprint `a35349f3…` | 0 |
+| `sememe decode --union <payload>` | **REFUSED** `unknown instruction discriminator 1c92de7726c469d5 (47 known, …)` | **1** |
+| `sememe lock` | pinned `a35349f3…` over a store whose **second copy was damaged** | **0** |
+| `sememe verify` | `violations: 0`, `verified: [pump.fun]` | **0** |
+
+One store, two verdicts depending on the flag you passed — and a green CI gate
+over damage. Both holes are named, in `src/store-read.mjs` and `src/lock.mjs`:
+
+- **The adopted copies were sorted by LABEL, not by content.** `findStoredIdls`
+  sorted adopted receipts by `label.localeCompare(label)` — and the label
+  embeds the **origin the caller typed** (`published (adopted, sdk-copy)`),
+  while the plain reader (`findStoredIdl`) and `src/lock.mjs` sorted by
+  **receipt filename**, which ends in the fingerprint. Two sorts, two winners,
+  no disagreement reported: the union path read the copy the origin spelling
+  pointed at, the plain path and the lock read the copy the content pointed
+  at. The rule is now one ordering everywhere — receipt filename — and when a
+  store holds no on-chain receipt and several adopted copies, they form the
+  arbitrated pair instead of one of them being consulted and the rest dropped.
+  Whatever the pair does not consult is returned as `additionalSources`, so a
+  store holding three copies never reads as a two-source store.
+- **The lock re-checked only the newest receipt per program.** README already
+  promised `every receipt is re-checked through the store reader first, so a
+  store the reader refuses produces NO lock, never a lock over damage` — but
+  `writeLock` only re-verified `names[names.length - 1]`, so a damaged
+  **second** copy (the very copy union decode reads as its secondary) was
+  skipped in silence. `writeLock` and `checkLock` now share ONE helper
+  (`verifyEveryReceipt`), so lock and verify cannot disagree about what a
+  clean store is: a damaged copy refuses the lock **and** is named `unverified`
+  at verify time, and `--mode error` exits 1.
+
+The measurement ships as a tool and two committed artifacts, following the
+repo's `tool produces the report` rule:
+
+```bash
+node tools/measure-multi-copy-store.mjs                       # this tree → research/multi-copy-store-2026-11-07.json
+node tools/measure-multi-copy-store.mjs --bin <installed bin> --tag v0.4.8 --out before.json
+```
+
+[research/multi-copy-store-2026-11-07-before.json](research/multi-copy-store-2026-11-07-before.json)
+is the published `v0.4.8` install: **7 contract violations** (union refused,
+two different copies named, lock written over damage, verify green over
+damage); [research/multi-copy-store-2026-11-07.json](research/multi-copy-store-2026-11-07.json)
+is this tree: **0 violations**, and the single-copy control stays green in both.
+`test/multi-copy-store-measurement.test.mjs` pins both artifacts and fails if
+the committed report stops being what the tool derives; the 11-test ladder in
+[ test/multi-copy-store.test.mjs ](test/multi-copy-store.test.mjs) pins the
+behaviour with three mutations that must each turn a test red (label sort →
+M1 red, newest-only lock → M3 red, dropped second source → M2 red), and
+`test/multi-copy-store-tag-journey.test.mjs` packs the **pinned tag** and runs
+the same measurement against the bytes a stranger installs — red against
+`v0.4.8` by design, green from `v0.4.9` on.
+
+**Stated limit:** `origin` is still a declared label, not a verified origin —
+this fix makes the label *not decide which copy answers*, which is the part
+that was silently changing decode results; it does not verify the label's
+truth. The labelling of a declared origin is now done (a later fix marks it
+declared and binds it); what remains open is verifying the label's truth,
+and adopting published copies for a second program.
+
+## Working now: one ordering for receipts — slot order is not digit order (2026-11-07)
+
+The receipt filename is `<program>-<slot>-<source>-<fingerprint>.json`, and the
+slot inside it is a decimal **number stored as a string**. Sorting receipt
+names with a plain string comparison therefore orders by **digits, not by
+value**: `…-99999999-…` sorts *after* `…-123456789-…`, so the OLDER receipt
+wins "last position" — and `findStoredIdl` takes the last position as
+"newest". Measured on the PUBLISHED `v0.4.9` install (installed from its git
+tag into an empty app, no clone) with a store holding one program's receipts at slots
+99999999 (older) and 123456789 (newer):
+
+| command | answers | exit |
+|---|---|---|
+| `sememe decode <payload>` | **refused** — it read the OLDER copy, which does not know `sell_v3` | **1** |
+| `sememe decode --union <payload>` | `sell_v3`, slot `123456789` (the NEWER copy) | 0 |
+| `sememe lock` | pinned slot `99999999` — a *different* receipt than the union decode read | 0 |
+| `sememe verify` | clean over that lock | 0 |
+
+One store, three surfaces, two different receipts — and a lock pinning a
+receipt the decoders did not read. The union path has sorted on-chain receipts
+by **numeric slot** since it was written (`onChain.sort((a, b) => a.slot -
+b.slot)`), while the plain reader, `receiptNames()` and `src/lock.mjs` sorted
+by **filename**. The v0.4.9 fix collapsed label-order and filename-order into
+"ONE ordering everywhere (receipt filename)" — true for labels, but filename
+order is digit order, and digit order is not slot order. Same defect shape,
+one dimension over: two sorts, two winners.
+
+**The rule now is one comparator** (`src/receipt-order.mjs`), shared by the
+plain reader, the union path and both lock paths: sort by **slot
+numerically** (adopted copies carry filename segment `0`, so they still sort
+before every real slot — adoption never switches the default source), with the
+rest of the filename as byte-wise tiebreak so equal slots stay deterministic.
+
+The measurement ships as a tool and two committed artifacts, following the
+repo's `tool produces the report` rule:
+
+```bash
+node tools/measure-slot-order.mjs                              # this tree → research/slot-order-2026-11-07.json
+node tools/measure-slot-order.mjs --bin <installed bin> --tag v0.4.9 --out before.json
+```
+
+[research/slot-order-2026-11-07-before.json](research/slot-order-2026-11-07-before.json)
+is the published `v0.4.9` install: **5 contract violations** (plain decode
+refused while union answered, lock pinned a different receipt);
+[research/slot-order-2026-11-07.json](research/slot-order-2026-11-07.json) is
+this tree: **0 violations**, and the equal-length control — what a fresh
+`pull` writes today — stays green on both sides.
+[research/slot-order-2026-11-07-v0.4.10.json](research/slot-order-2026-11-07-v0.4.10.json)
+is the **published `v0.4.10` tag** installed into an empty app: **0
+violations** — the fix is in the bytes a stranger receives, not only in this
+tree.
+`test/slot-order-measurement.test.mjs` pins all three artifacts and fails if a
+committed report stops being what the tool derives; the ladder in
+[test/slot-order-store.test.mjs](test/slot-order-store.test.mjs) pins the
+behaviour (O1/O2/O3 red on the pre-fix tree, O4 control green there, two
+mutations that must each turn a test red), and **O6 pins a SECOND program** —
+whirlpool with two adopted copies, plain/union/lock agreeing and a damaged
+second copy refusing the lock — closing the "adopted copies for more than one
+program" item for the lock contract.
+
+**Reachability, stated honestly rather than sold:** every live slot measured
+on this host is 9 digits (44,661 values in `research/` + fixtures, min
+462039125, max 465713413), so two receipts of one program written by `pull`
+today have equal-length slots and both orderings agree — the defect is latent
+for a fresh pull. It becomes LIVE for any store holding receipts whose slot
+strings differ in length: a receipt carried over from another era or cluster,
+a hand-assembled store, or mainnet slots crossing 1,000,000,000. The contract
+("newest stored IDL") has to hold in that store too.
+
+## Working now: a declared origin is declared, and cannot be rewritten silently (2026-11-07)
+
+`sememe adopt` writes a receipt whose `origin` is whatever the caller typed.
+Every reader surface then presented that string as where the bytes came from:
+`"origin": "solana-labs-anchor-deadbeef-does-not-exist.json"`, reader label
+`published (adopted, solana-labs-...)`, union view `primary.label = ...`.
+Nothing checked that the named repository exists, that the file is there, or
+that the bytes came from it at all.
+
+Measured on the published `v0.4.10` tag:
+
+1. **A caller-typed string was shown as provenance without qualification.**
+   The CLI said `"origin": "..."` and reader labels said
+   `published (adopted, ...)`.
+2. **The origin was covered by NOTHING.** The fingerprint covers the
+   object (the canonical IDL bytes); the receipt was covered by nothing.
+   Rewriting `origin` in a receipt to `attacker/rewritten-origin` and running
+   `sememe verify --mode warn` reported **violations: 0, verified: ["6EF8rrec..."]**;
+   `sememe verify --mode error` exited **0**. The CI gate was green over a
+   rewritten provenance label.
+3. **Adopting the SAME bytes under two declared origins was a false collision.**
+   The second adopt failed with `"digest collision or corrupted local object"`
+   because both wrote the same receipt filename with different content.
+
+The fix:
+
+- **Every reader surface marks the origin as DECLARED** (`originStatus: "declared"`,
+  reader label `published (adopted, declared origin: ...)`), and the CLI prints
+  the advisory note that sememe did not check that the repo, commit or file
+  exists.
+- **The receipt carries its own digests** (`originDigest` binds the declared
+  origin; `receiptDigest` binds the whole receipt body). A receipt edited
+  afterwards is refused on every read with a named reason; `sememe lock` pins
+  the declared origin alongside the fingerprint, and `sememe verify` names a
+  rewritten origin as `relabelled`, exiting 1 in error mode.
+- **An existing user's committed lock (which predates origin pinning) does
+  not silently certify the label.** `sememe verify` reports an adopted copy
+  whose lock pins no origin as `unbound`, exiting 1 with the one-command
+  repair (`sememe lock`) named in the refusal. The pre-fix gate passed over
+  the rewrite (measured: exit 0, `verified: [program]`), certifying a
+  provenance label it never pinned.
+- **Two declared origins for one set of bytes are two receipts.** The second
+  adopt writes `<prog>-0-<source>-<originKey>-<fingerprint>.json`, where
+  `originKey` is a short digest of the declared origin. Both receipts keep
+  the same fingerprint, so which of them sorts last cannot change a decoded
+  byte — only which declared label is shown first.
+
+[research/declared-origin-2026-11-07-before.json](research/declared-origin-2026-11-07-before.json)
+is the published `v0.4.10` tag: **12 contract violations**;
+[research/declared-origin-2026-11-07.json](research/declared-origin-2026-11-07.json)
+is this tree: **0 violations**, and the control — an untouched store — stays
+green on both sides.
+`test/declared-origin-measurement.test.mjs` pins both artifacts;
+[test/declared-origin.test.mjs](test/declared-origin.test.mjs) pins the
+behaviour (P1/P2/P3/P3b/P4/P4b red on the pre-fix tree, P5 control green there).
+[research/legacy-unbound-origin-2026-11-07.json](research/legacy-unbound-origin-2026-11-07.json)
+records the legacy case: pre-fix exit 0 (the defect), post-fix exit 1
+(`unbound`, with the one-command repair named), the control (lock first ->
+`relabelled`), and the false-positive guard (a pull-only store declares no
+origin and stays clean). `test/legacy-unbound-measurement.test.mjs` pins that
+artifact; [test/legacy-origin-binding.test.mjs](test/legacy-origin-binding.test.mjs)
+pins the behaviour.
+
+**Stated limit:** an adopted copy's origin is still not verified by this fix.
+What the fix does is stop presenting a typed string as a checked fact, and
+stop letting the string change without the CI gate noticing. Verification of
+provenance remains first-party adoption with a recorded commit and the
+on-chain pull, which needs no label at all.
+
+## Working now: account union — two verified sources, one account (2026-11-08)
+
+Union decode covered instructions and events since v0.4.0. **Accounts never
+had the second half**: `sememe account` read exactly ONE receipt, so a store
+holding two verified copies of a program had two opinions about an account's
+layout and only one of them was ever consulted — the item this README carried
+as open ("the same arbitration for account decoding (accounts still read a
+single receipt)").
+
+```bash
+sememe account --union 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P <base64> --store <dir>
+```
+
+The pairing, the verdicts and the arbitration rules are the instruction
+union's: primary = newest on-chain receipt, secondary = newest adopted copy,
+`agree` / `layout_drift` / `fallback_secondary` / `primary_only` /
+`single_source`, and a **name conflict is refused, never arbitrated** (two
+different account names for the same 8 bytes is an interface conflict, not a
+decision to make).
+
+**The measured case** (`research/account-union-2026-11-08.json`, 12 real
+mainnet pump.fun accounts harvested 2026-11-08 with `tools/account-harvest.mjs`;
+the two committed copies disagree about `BondingCurve` — 13 fields on-chain,
+19 in the published copy):
+
+| | single receipt (before) | union (`--union`) |
+|---|---|---|
+| byte-exact | **0 / 12** | **6 / 12** |
+| bytes left unexplained | **12 / 12** | 6 / 12 |
+| verdict | one source, no verdict | `layout_drift` 6, `agree` 6 |
+
+The 6 recovered accounts (5 `BondingCurve`, 1 `Global`) are the ones where
+the published copy reproduces every byte and the on-chain copy leaves 41 (and
+1) unexplained — byte evidence picks the published copy and records why. The
+6 `UserVolumeAccumulator` accounts are `agree`: both copies say the same
+thing, and **both** leave 31 bytes unexplained — agreement is reported, not
+papered over as coverage.
+
+The rules that make this an arbitration rather than a decoder that always
+answers (`test/account-union.test.mjs`, 14 tests, 2 mutations verified red on
+either side of their fix):
+
+- **A fallback needs byte evidence.** A source that names an account but cannot
+  reproduce it is refused. The honest no-evidence state is reachable and is
+  pinned with a real codec property, not a mock: an `f32` field holding a
+  *signaling* NaN decodes to `null` and re-encodes to a different bit pattern —
+  the decode succeeds, consumes the whole account, and reproduces nothing.
+- **When the evidence ties, the primary stands.** Two layouts can serialise to
+  the same bytes and decode to different values (`u32` vs `i32` over
+  `0xffffffff`): both are `full_roundtrip`, so the on-chain pull is the answer
+  and the drift is reported — never resolved by preference.
+- **The plain path is untouched.** `sememe account` still reads one receipt and
+  carries no `view`; the union is a flag, not a behaviour change.
+
+**Stated limits:** a byte-exact round trip proves the bytes are *reproduced*,
+not that the field names mean what the program intends; the published copy is
+adopted content whose origin stays declared, never verified.
+
+**Does this generalize beyond pump.fun?** Measured 2026-11-08 across all 6
+programs with committed account fixtures (74 real mainnet accounts,
+`research/account-union-cross-2026-11-08.json`, `tools/measure-account-union-cross.mjs`,
+pinned in `test/account-union-cross-measurement.test.mjs`):
+
+| program | two sources? | plain byte-exact | union byte-exact | recovery | verdict |
+|---|---|---|---|---|---|
+| **pump.fun** | yes (12 accts) | 0 / 12 | **6 / 12** | **+6** | `layout_drift` 6, `agree` 6 |
+| **meteora-vault** | yes (12 accts) | 0 / 12 | 0 / 12 | 0 | `primary_only` 12 (copy renames `Vault` -> `vault`) |
+| **meteora-damm-v1** | yes (11 accts) | 0 / 11 | 0 / 11 | 0 | `layout_drift` 11 (both leave 77/512 bytes unexplained) |
+| **openbook-v2** | yes (4 accts) | 4 / 4 | 4 / 4 | 0 | `agree` 4 (both copies already byte-exact) |
+| **whirlpool** | control (27 accts) | 27 / 27 | 27 / 27 | 0 | `single_source` 27 (plain answer untouched) |
+| **kamino-lend** | control (8 accts) | 8 / 8 | 8 / 8 | 0 | `single_source` 8 (plain answer untouched) |
+
+The honest finding: **arbitration recovered a byte-exact answer on exactly 1 of
+the 4 two-source programs.** On the other three, the second copy agreed (openbook-v2),
+disagreed without either side being byte-exact (meteora-damm-v1), or could not
+even identify the account because the copy renames it (meteora-vault: Anchor
+derives the discriminator from the exact name, so `vault` derives `ded54f7c…`
+and can never match the deployed bytes which carry `Vault`'s `d308e82b…` — the
+reader now diagnoses this mechanism explicitly instead of reporting "no such
+account"). The four regression invariants (union never answers worse than
+plain, never refuses what plain answered, never changes single-source
+verdicts, never names a different account type) hold at 0 failures across all
+74 accounts.
+
+### The stale layout behind the rename, measured (2026-11-09)
+
+The `meteora-vault` rename is not only a spelling difference. Measured on the
+same 12 accounts (`research/stale-layout-2026-11-09.json`,
+`tools/measure-stale-layout.mjs`, pinned in
+`test/stale-layout-measurement.test.mjs`):
+
+- the **live on-chain IDL is frozen at v0.7.2** and declares
+  `strategies: publicKey[30]` — a 30th strategy slot that the deployed program
+  never filled;
+- the **published copy** declares `strategies: publicKey[29]` followed by
+  `version: u8`, `totalLpSupply: u64` and `padding0: [u8; 23]` — the same
+  960 bytes, read three more fields;
+- **offline proof, 12 / 12 accounts**: the 32 bytes the old layout calls
+  `strategies[29]` decompose *exactly* as `version || totalLpSupply || padding0`;
+  `version == 1` in 12 / 12 and `padding0` is all zero in 12 / 12;
+- **live oracle on mainnet, 2026-11-09**: the phantom 30th strategy account
+  exists in **0 / 12** vaults, while the 29 real strategy accounts exist in
+  **348 / 348**; the live `totalLpSupply` equals the live LP mint supply in
+  **9 / 12** vaults (the other 3 grew after their harvest, which is why the
+  frozen bytes no longer match the chain).
+
+So the published copy describes the deployed program and the frozen on-chain
+IDL does not. **The verdict still does not move.** The account union refuses
+the renamed copy (Anchor derives the discriminator from the exact name, so
+`vault` can never match the deployed bytes), and `primary_only` stands. The
+layout is reported as `view.declaredLayout` — a *report*, not evidence: it
+says "the answer you got is contested, field by field", and it is attached
+only when a rename was actually diagnosed, never invented.
+
+The rules this report obeys (`test/account-union-stale-layout.test.mjs`, 8
+tests, 2 mutations verified red):
+
+- **the report never arbitrates.** `primary_only` stays `primary_only`; a
+  copy that explains more bytes does not become the winner.
+- **naming style is not a layout difference.** Fields are paired by
+  normalised spelling, so `totalAmount` vs `total_amount` is not reported as
+  drift; a field only one copy declares, or one both declare with a different
+  type, is.
+- **no rename, no report.** The field exists only when a rename was really
+  diagnosed.
+
+**Stated limits:** the on-chain IDL being stale is a claim about the
+*program's* published artifact, not about the deployed program — the
+decomposition above is measured from the harvested bytes and confirmed against
+the chain, but the upstream Meteora IDL is not this repository's to fix. The
+staleness is reported, never repaired here.
+
+
+## Free and paid
+
+- Free, MIT: all acquisition channels, normalization, fingerprint store, checks, decode and encode APIs, CLI, daemon, lock files, and fully offline resolution. No account or quota.
+- Paid later: managed team registries, curated coverage packs for programs without a public interface, and enterprise approval and audit workflows. A decode call is never sold.
+
+## Evidence and limits
+
+Checked on 2026-10-25: about 99 first-party decoder or discriminator sites and four provenance-free vendored IDLs exist across my own repositories — an **estimate from notes, not a counted figure**. A computed scan on 2026-10-27 ([research/decoder-sites-2026-10-27.json](research/decoder-sites-2026-10-27.json), `node tools/decoder-sites.mjs`) found **42 (file, class) sites across 35 files in 5 own repositories** (plus 7 own fork checkouts holding 407 sites that are someone else's code, and 394 in third-party checkouts, which are not mine to replace). The two figures use different counting units, so do not treat 99 and 42 as measuring the same thing; until one unit is fixed and re-counted, the honest statement is that the number of my own decoder sites is *somewhere in that range and not yet pinned down*. Jupiter maintains its own parser, and a static public IDL catalog has users, while earlier registry and deserializer attempts stalled. Helius sells parsed events and streams as a paid product.
+
+The largest risk is coverage. If on-chain acquisition works for fewer than half of the programs I actually touch, sememe is only an import-and-lock tool and the venture depends on paid curation. A first selected sample now tests this **before any product implementation**: on 2026-10-27, a batch mainnet RPC query at finalized slot 462035811 found an IDL with a nonempty instruction list at one of two known account addresses for **15/20 programs (75%)**; 5/20 had neither account, 0 RPC errors. Excluding the two deliberately non-Anchor SPL negative controls: **15/18 (83.3%)**. Four succeeded via Program Metadata, eleven via legacy Anchor. This is a family-clustered convenience sample concentrated in Raydium/Meteora, **not** a representative estimate of all Solana programs or even a systematic inventory of my own production workloads, nor evidence that third parties need sememe. 'Usable' here means decodable JSON with at least one named instruction and correct program binding where declared; it does not prove full ABI fidelity or transaction decoding. **Correction 2026-10-29:** it also does not prove that a decoder can *use* the schema — Kamino Lend, one of the eleven legacy-Anchor successes, stores no discriminators at all (0 of 71 entries), so its schema decoded 0 of 1,432 real payloads until Anchor's rule filled the gaps.
+
+The strict figure **has now been measured** over the same frozen 20 IDs and the same RPC shape (commit `dcb0d3`, [research/coverage-strict-2026-10-29.json](research/coverage-strict-2026-10-29.json)):
+
+| definition | count | share of 20 |
+|---|---|---|
+| IDL present with a named instruction (the old 'usable') | 15/20 | 75% |
+| **decodable from published bytes alone** (the program stored its own discriminators) | **10/20** | **50%** |
+| decodable after Anchor's rule fills a missing discriminator | 15/20 | 75% |
+
+The middle row is the honest headline: **half** of the sample's usable programs publish an interface that decodes as-is; the other five (Kamino Lend, OpenBook v2, Marinade, Meteora DAMM v1, Meteora Vault) publish names and layouts but no wire discriminators, and only become decodable because the tool can reconstruct them from the name. That reconstruction is verified per program, but it is the tool's inference, not the program's published interface — and it is Anchor-specific. **All five are now individually proven against real mainnet payloads** (Kamino Lend 1,432/1,432, OpenBook v2 600/600, Marinade 623/623, Meteora Vault 1,290/1,290, Meteora DAMM v1 643/643, each byte-exact with 0 decodable without derivation). See [frozen 20 IDs](programs-20.json), [raw classification with slot and account addresses](coverage-result.json), and [selection/chronology limitations](research/selection-method.md). The 20 IDs were committed before the full batch run, but the detailed selection-method note came later; one exploratory Whirlpool RPC check preceded the freeze. Do not call the whole study blind or fully preregistered.
+
+## The stale copies in my own repositories, measured
+
+The claim this repository opens with — "vendored IDL files are snapshots without provenance, a fingerprint, or a freshness check" — was an assertion from notes. `tools/vendored-drift.mjs` turns it into a number for the IDL copies checked into my own repositories, by pulling the on-chain artifact for each program the copy names and comparing the two.
+
+Measured on 2026-10-30 (`research/vendored-drift-tx-remix-2026-10-30.json`):
+
+| vendored copy | instructions | on-chain | missing from the vendored copy |
+|---|---|---|---|
+| `solana-tx-remix/idl/multi/jupiter-amm/amm.json` | 17 | 19 | `create_idempotent_associated_token_account`, `withdraw_token_account_excess_lamports` |
+| `solana-tx-remix/idl/multi/dflow/dflow.json` | 17 | 18 | `withdraw_fees` |
+| `solana-tx-remix/idl/multi/jupiter-order_engine/order_engine.json` | 1 | 1 | — |
+| `solana-tx-remix/idl/multi/jupiter-rfq_v2/rfq_v2.json` | 1 | 1 | — |
+| `aquifer`, `bisonfi`, `solfi`, `spl/token-2022` | 2 / 3 / 1 / 44 | — | no on-chain Anchor IDL exists for these programs |
+
+**Every vendored copy that HAS an on-chain IDL is strictly stale.** That is the whole claim, measured rather than asserted — and the staleness is not academic: `create_idempotent_associated_token_account` appears in **real mainnet traffic**, so a decoder built on the vendored copy emitted `(unknown)` for a successful instruction, and `(unknown)` is the one state every label check deliberately skips.
+
+The four programs with no on-chain IDL are not a gap in the store: they are native or shank-origin programs that publish no Anchor IDL account at all. For those the checked-in file is the only description available, and it is kept.
+
+The tool distinguishes three defects, because they are not the same defect: a **stale** copy (has an on-chain IDL, and it differs), an **unbound** copy (declares no program address, so it binds nothing — the `bisonfi.json` failure mode `solana-tx-remix` already documents), and a copy for a program that has no on-chain IDL at all.
+
+### The measurement tool misclassified 396 payloads as "unknown to both" (measured 2026-10-30)
+
+The traffic column of that report split payloads the vendored copy cannot name into three buckets: named by the on-chain copy as an instruction, an Anchor `emit_cpi!` event self-CPI, or unknown to both copies. The published numbers were **773 payloads, 5 unnamed by the vendored copy, 0 event self-CPIs, 396 unknown to both**.
+
+That was wrong, and it was wrong in the direction that looks like a coverage finding. Anchor event payloads are `EVENT_IX_TAG (8) ++ event_discriminator (8) ++ borsh(body)`, so the discriminator that identifies the event sits at bytes **8..16** — the tool looked up bytes **0..8**, which is the *tag*, in the event table. The tag is never an event discriminator, so the lookup always missed: all 396 tagged Jupiter payloads were published as "unknown to both copies" while the event bucket stayed empty, even though this repository's own decoder names every one of them (README above: *773/773 payloads decoded — 377 instructions + 396 Anchor event self-CPIs*). The measurement and the decoder contradicted each other, and the report was the wrong one.
+
+The fix looks up bytes 8..16 when the payload starts with the event tag, and the tag constant is now imported from the decoder (`EVENT_IX_TAG_HEX` in `src/codec.mjs`) instead of being written out a second time. Regenerated against the same committed harvest:
+
+| | payloads | unnamed by vendored | event self-CPIs | unknown to both |
+|---|---|---|---|---|
+| before | 773 | 5 | 0 | 396 |
+| after | 773 | 5 | **396** | **0** |
+
+The finding that mattered is unchanged: the vendored Jupiter copy still cannot name `create_idempotent_associated_token_account`, which appears in **5 real mainnet payloads**. What changed is that the other 396 payloads are no longer charged to a defect that does not exist — a decoder that names them was always in the room.
+
+The falsification is committed: `test/vendored-drift.test.mjs` pins the classification against the real committed harvest (396 event self-CPIs, 0 unknown to both, 5 unnamed by the vendored copy) and against a synthetic three-payload case (one tagged event, one shared instruction, one genuinely unknown). Against the pre-fix tool the synthetic test fails (`eventSelfCpiPayloads` 0 instead of 1) and the real-data assertions fail with it.
+
+## A second consumer reads the artifact for every program it names
+
+`solana-tx-remix` migrated its single-program Whirlpool path first. Its multi-program path kept reading the vendored copies — and the measurement above is what that cost: `(unknown)` on a real Jupiter instruction, in a transaction that was otherwise described in full.
+
+Both of that consumer's entry points now resolve labels through one resolver (`buildStoredResolver` in its `src/dispatch.mjs`) that layers the stored artifacts over the vendored copies. The overlay is additive per program, so the vendored copy still describes the programs the store does not cover.
+
+Two things it does not paper over, both measured:
+
+- A **stored** discriminator wins over a **derived** one, and the disagreement is reported. Jupiter AMM v6 stores `5368c096` for `create_idempotent_associated_token_account` where Anchor's rule derives `bdbcecfa`; five real payloads carry `5368c096` and re-encode byte-exactly. The stored value is the one that survives contact with the chain.
+- Every reader of the store re-hashes the object against its receipt. The consumer's multi-program loader did not at first, and its acceptance harness caught the difference: a tampered Jupiter object (valid JSON, one instruction renamed) was **accepted** by the multi path while the single path refused the identical damage. One store with two readers must verify with one strength.
+
+### The producer's own reader was the weak one (measured 2026-10-30)
+
+The sentence above was true of `solana-tx-remix` and false of `sememe`. A probe against `sememe`'s own reader (`src/decode.mjs`, `findStoredIdl`) built a store from the committed Whirlpool snapshot, renamed one instruction in the object — still valid JSON, still a decodable IDL — and decoded a **real mainnet `swap_v2` payload** against it:
+
+```
+INTACT decode  -> swap_v2                       | fingerprint sha256:0b886e3...
+TAMPERED decode-> totally_honest_name            | roundTripByteExact true
+```
+
+The reader took the receipt's fingerprint as a label, printed it as the provenance of bytes it had never checked, and reported the tampered name as a decode result. `roundTripByteExact: true` is the sting: the damage was *only* in the name, so every byte-level check passed. The consumer refused the identical damage; the library that produced the store accepted it.
+
+Four checks now stand between a receipt and a decode (`src/decode.mjs`, `findStoredIdl`):
+
+1. the receipt's `program` field must be the program asked for (a receipt swapped in from another program's file is refused by name);
+2. the receipt's fingerprint must be a well-formed sha256;
+3. the object must exist, parse as JSON, and carry an instruction list;
+4. `sha256(canonicalJson(idl) + '\n')` must equal the claimed fingerprint — **the check that was missing**, plus a separate refusal when the object's own `address` names another program.
+
+Every one of the five is pinned by a test that asserts the refusal *and its reason*, in `test/store-integrity.test.mjs`. Each was falsified by mutation: removing the re-hash check, the program-binding check, the missing-object message, the address check or the unparsable-JSON message turns exactly one of them red, and restoring it turns it green. The pre-fix behaviour is reproducible from the same test file by deleting the re-hash block.
+
+The CLI now refuses too: `sememe decode` on a tampered store exits 1 with `object and receipt disagree, refusing to decode`, naming both hashes. Before the fix the same command printed the tampered instruction name and exited 0.
+
+The falsification is a committed control: `solana-tx-remix`'s `neg/idl-name-stored-only.ts` relabels the newly-named instruction to a name the stale vendored copy carries, and the verifier answers `bytes resolve to create_idempotent_associated_token_account ... recipe claims create_token_account` — exit 1.
+
+## Native programs: the two every transaction carries, pinned from the runtime (2026-10-31)
+
+System and ComputeBudget have no IDL account to pull — their interface lives in the Solana runtime itself. Sememe decoded neither; its first consumer (`solana-tx-remix`) carried a hand-transcribed copy of both instruction tables instead, which is exactly the per-repository hand-build this repository exists to replace. The cost of that copy was not hypothetical, it was measured: over a real mainnet harvest, **the hand table could name 0 of 63 on-chain `CreateAccountWithSeed` payloads**, because it reads a 4-byte string length header while the chain carries a u64 (bincode fixint) length word — every later field sat 4 bytes off, so the payload never matched the declared shape.
+
+`src/native.mjs` now decodes both programs from a pinned interface, with the provenance chain written into the file: the upstream enum (anza-xyz/solana-sdk, pinned by commit), the runtime's acceptance rule (anza-xyz/agave: borsh `try_from_slice_unchecked`, where an unclaimed tag is `InvalidInstructionData`), and the corroboration (`@solana/web3.js`'s own layouts, read as the same u64 length word). Three facts the pins settle and a hand copy is free to get wrong:
+
+- **Tag 0 of ComputeBudget is wire-rejected.** The runtime refuses the reserved `Unused` variant; `@solana/web3.js@1.98.4` still *encodes* legacy `requestUnits` as tag 0 + (u32, u32). This decoder refuses tag 0 with `wire-rejected` instead of copying the SDK's opinion.
+- **System has 14 variants, not 12.** `UpgradeNonceAccount` (12) and `CreateAccountAllowPrefund` (13) exist upstream; a 12-entry table answers `null` on those bytes.
+- **The string header is u64.** web3.js writes it as u32 length + u32 zero padding; read as one word, that *is* the bincode fixint length. The defect was dropping the padding word, not a layout disagreement.
+
+Measured against real mainnet traffic (1,828 System payloads + 1,348 ComputeBudget payloads, harvested 2026-10-31, [reports](research/native-coverage-system-2026-10-31.json)):
+
+| decoder | System named | ComputeBudget named |
+|---|---|---|
+| hand-written table (the one being replaced) | 1,765 / 1,828 | 1,348 / 1,348 |
+| sememe pinned table | **1,828 / 1,828, all byte-exact re-encodes** | **1,348 / 1,348 (1,321 byte-exact)** |
+
+The 27 ComputeBudget payloads that are not byte-exact all carry trailing bytes after the declared argument. Chain adjudication (9 fetched directly, byte-identical to the harvest) shows the bytes are real and the runtime tolerates the remainder — every one sits in a transaction that failed at a *later* instruction. They decode with `trailing: { count: n }` reported, and are refused under `--trailing error`, the same contract the IDL decoder uses.
+
+Falsification: the new test file (`test/native.test.mjs`, 10 tests) was run against the old hand-written table, adapted to the same API surface with the table itself verbatim: **7/10 fail, 3/10 pass, and the three that pass are the designed ones** — the false-positive guard (a System `Transfer`, the one case the old table decoded correctly), the dependency-free import check, and the report test. Against the pre-module tree the file fails outright. A committed coverage report is re-derived from the committed fixture on every test run, so hand-editing the numbers goes red.
+
+CLI: `sememe decode-native <program> <payload>` decodes with the pinned interface; `sememe native-provenance [program]` prints the pinned sources, the encoding rules and the measured traffic.
+
+### The token tables are derived too (2026-11-02)
+
+The same argument applies to the two token programs, and the stake is higher:
+**SPL Token and Token-2022 publish no IDL account at either pullable address**,
+yet they carry 43% of real watched mainnet traffic. Their interface is the
+upstream Rust interface crate, and their wire rule lives in hand-written
+`pack()`/`unpack()` pairs rather than in a Borsh enum — so the derivation reads
+upstream's own text:
+
+- `vendor/spl-token/<commit>/…` and `vendor/spl-token-2022/<commit>/…` carry the pinned
+  interface files (Apache-2.0, LICENSE included) of `solana-program/token@737788ff` and
+  `solana-program/token-2022@5251dcc0`; their sha256 is the pin.
+- `src/token-interface.mjs` derives each variant's wire shape from the upstream TEXT: the
+  tag is the integer upstream `pack()` writes and `unpack()` matches (explicit tags, so
+  `WithdrawExcessLamports` is 38 and `UnwrapLamports` 45 — the declaration index would
+  say 25 and 26), the arg sequence is the pack arm's byte-write sequence, and the
+  `COption` encoding is upstream's own `pack_pubkey_option`/`pack_u64_option` (1 tag byte
+  + payload, not a bincode option wrapper). It refuses on any surprise: a tag in only one
+  of the two arms, an upstream byte write no pinned rule covers, a field upstream does not
+  declare, a variant upstream declares that this table does not name. The variant list
+  itself is derived from upstream's enum — so a new upstream instruction fails loudly
+  instead of decoding as "unknown".
+- `tools/token-interface.mjs` writes `interface/token-<program>.json` (28 variants for SPL
+  Token, 48 for Token-2022); `--check` fails when the committed artifact differs from a
+  fresh derivation.
+- `src/token.mjs` RE-DERIVES at load and refuses to decode unless the committed artifact
+  equals the derivation byte for byte — the same two-check contract as the native tables.
+  It ships as `sememe/token`; the CLI is `sememe decode-token <program> <payload>` and
+  `sememe token-provenance [program]`.
+
+Measured on the unbiased traffic sample (four contiguous finalized blocks, 12,572 watched
+payloads): the two token programs' 5,402 payloads went from **0 decoded** (no interface
+acquirable at all) to **5,401 decoded**, one refusal (a `spl-token-metadata` fallback
+instruction — a different upstream crate, refused by name rather than force-fitted) and
+422 payloads with explained trailing bytes. Overall coverage on that sample moved from
+**55.5% to 98.5%**; the denominator never moved, the product gained a decode path.
+(A later step — adopting Jupiter Lend's published Liquidity IDL, see below — moved
+it to 98.6%; the Raydium AMM v4 derivation, also below, took no-interface to 0. The
+token-metadata fallback, one step further, closed the last token refusal.)
+
+Falsification (`test/token-interface.test.mjs`, 8 tests, each a mutation in a temp copy of
+the repo): swap two args in the artifact → load refused; edit the vendored Rust → load
+refused with both sha256s named; delete `vendor/spl-token-2022` → load refused. The
+measured-wire test pins the real numbers (a 1,000,000-amount Transfer, a TransferChecked
+amount-then-decimals pair, a SetAuthority byte that decodes to `MintTokens`) and pins the
+refusal reasons for an unknown tag, a truncated payload and an invalid option tag.
+
+Limits: Token-2022's 15 extension dispatch tags are named at the top level only — their
+sub-instruction bytes report as trailing, because the extension crates are separate
+interfaces this table does not vendor. Upstream's `Batch` (tag 255) unpacks but
+the processor refuses it — the table records the wire shape, not a runtime guarantee.
+(The `spl-token-metadata` fallback crate IS vendored now — see the next section.)
+
+Limits: Linux-mainnet measured only; the strict-20 coverage study does not include the native programs (they were never part of the sample, so no coverage number moved); the runtime acceptance rule is checked against the agave source at one point in time, not against a live validator; no outside user yet.
+
+### The rows are derived, not typed (2026-10-31, later the same day)
+
+Even a pinned, measured table is still a table someone typed — and this repository's whole
+premise is that a copy that can drift is the defect. The native tables were the last
+hand-transcribed rows in sememe. They are now DERIVED:
+
+- `vendor/anza-solana-sdk/<commit>/…` carries the two pinned interface files from upstream
+  (Apache-2.0, LICENSE included), fetched at the pinned commit; their sha256 is the pin.
+- `src/native-interface.mjs` parses each pinned `pub enum` — declaration order is the wire
+  selector, struct-variant field order is the wire order, the tuple type is the arg type —
+  and refuses on any surprise (wrong variant count, unknown type, duplicate name, an
+  undeclared unit variant). It is dependency-free like the rest of the decode core.
+- `tools/native-interface.mjs` writes the derived tables to `interface/native-<program>.json`;
+  `--check` fails when the committed artifact differs from a fresh derivation.
+- `src/native.mjs` RE-DERIVES at load and refuses to decode unless the committed artifact
+  equals the derivation byte for byte. Two callers, one derivation: an edited artifact and
+  a swapped vendored file both fail loudly at import, before a single byte is decoded.
+
+Falsification (`test/native-interface.test.mjs`, 7 tests, each a mutation in a temp copy of
+the repo): swap two rows in the artifact → load refused; change `SetComputeUnitLimit(u32)`
+to `(u64)` in the vendored Rust → load refused with both sha256s named; delete `vendor/` →
+load refused. Removing the load-time equality check turns the first two into silent passes.
+A separate pin asserts the three argument names a hand copy actually got wrong upstream —
+`micro_lamports`, `from_seed`, `from_owner` (the in-flight camelCase transcription had all
+three).
+
+The consumer's copy is gone too: `solana-tx-remix/src/native.mjs` is now a thin facade over
+this module (its own hand table removed), and its acceptance suite gained check 7, which
+re-measures every defect the hand table had against committed traffic — 63/63 seeded creates
+named and byte-exact (hand table: 0/63), variants 12/13 nameable, tag 0 refused, upstream
+argument names — plus a run of `native-interface.mjs --check`.
+
+## Harvesting from the local mailbox instead of RPC (2026-10-31)
+
+`tools/harvest-reeflog.mjs` writes the same document `tools/harvest.mjs` writes, but reads the instruction bytes from a local [reeflog](https://github.com/auroraxo/reeflog) mailbox (its account envelope carries `instructions[]` verbatim — program ids resolved against the canonical account list, data base58 as served) instead of paying `getSignaturesForAddress`/`getBlock`/`getTransaction`. The source is in the document (`rpc: none (local reeflog journal)`), and the row accounting keeps the debts the network harvester does not have: rows without an envelope and envelopes without instructions are counted separately, never dropped, and a journal with zero enriched rows exits non-zero instead of writing a zero-payload success document.
+
+**Zero RPC is enforced, not asserted:** `tools/lib/network-guard.mjs` replaces `globalThis.fetch` with a function that records the attempt and rejects; the harvester imports it *first* (pin: `test/harvest-reeflog.test.mjs` fails if the import order changes), and the run exits 1 if `guard.attempts` is ever non-empty.
+
+**Live proof** (`tools/e2e-reeflog-harvest.mjs`, report: [research/reeflog-harvest-e2e-report.json](research/reeflog-harvest-e2e-report.json)): a fresh 45-second mainnet window for Whirlpool — 456 journal events, 452 account envelopes held — harvested for **156 payloads across 137 transactions with 0 network attempts**. Two directions checked against independently fetched chain transactions: **10/10 sampled payload-bearing transactions byte-identical** (`JSON.stringify` of the payload records, same order, same key order), and **10/10 sampled no-target transactions corroborated** (the chain shows no Whirlpool instruction either — a real contradiction there would mean the extractor drops bytes, and it is a named check). 0 different, 0 unavailable.
+
+The equivalence is pinned by mutation, twice: swapping `dataBase58`/`dataHex` in `payloadsFromEnvelope` turns 2 unit tests red, and turns the live run red at `mailbox_bytes_equal_chain_bytes` (8 of 10 sampled different). A third defect this harness caught before any of it: the first version of the e2e requested `maxSupportedTransactionVersion: 0`, which rejects every v1 transaction with rpc error -32015 — the retry loop misreported those as rate limiting (2/12 sampled), while `harvest.mjs` has requested version 1 all along. The harness now reports permanent client errors as what they are.
+
+**Limits:** the mailbox is my own reeflog daemon, not a third-party producer; the sample is 10 + 10 transactions from one 45-second window; the envelope is fetched by reeflog's own `hydrate --accounts` pass (the cost moved to the mailbox, it did not disappear).
+
+## Tenth program: the Jupiter RFQ stack, and the first live "the wire changed shape" firing (2026-11-01)
+
+The suite already said what would count as a serious finding: in `test/decode.test.mjs` the unexplained-bytes guard reads *"a non-zero tail would mean the IDL is missing a real field, which is a different and more serious finding than padding."* Until now every observed tail was zero padding. **The Jupiter RFQ stack now fires that exact case — and the first measurement of it was wrong in a way worth recording.**
+
+**`rfq_v2` (`fd3nMFYTQjX1yr5ER8u7tPdHJB7qt8RpDpNtLQX2Br5`) — the path is whole.** 40 payloads across slots 463374166–463994162 (21,179 pinned transactions, 0 missing): **40/40 named `fill_exact_in`, 40/40 byte-exact round-trip, 0 payloads with a trailing byte.**
+
+**`order_engine` (`2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1`) — the live wire has two forms, and only one is described anywhere.**
+
+| wire form | payloads | described bytes | trailing | full round-trip |
+|---|---|---|---|---|
+| 32 bytes | 82 | 32/32 | 0 | 82/82 byte-exact |
+| 40 bytes | 59 | 32/32 (the described prefix) | **8, undeclared** | 0/59 |
+
+Both forms are `fill`, both are accepted by the same deployed program, and they **coexisted** in the overlapping window (slots 463951326–463985613). After the last 32-byte payload (slot 463985613) the wire carries **only** the 40-byte form — 45 consecutive payloads.
+
+The 8 extra bytes are structured, not padding: **a constant 4-byte tag `0x06942069` (little-endian, present in 59/59) plus 4 varying bytes that are pairwise distinct across all 59 payloads**. The described 32-byte prefix re-encodes byte-exact on every single one, so this is not a decoder bug on the three arguments the sources do describe.
+
+Why the gap is real and not stale-pull noise:
+
+- The program's **own on-chain IDL account** (`GJwPa6DAFzYKNddAgxwzKzuDgnE4NeaWkKPN9FFqkmkb`, owner = the program itself) declares `fill` with **three** arguments (`input_amount: u64`, `output_amount: u64`, `expire_at: i64` = 24 bytes). A fresh `sememe pull` at slot 464073733 returns **the same fingerprint** (`sha256:f13a31e6…`) as the receipt pinned at slot 463089384 — the description did not change.
+- The **first-party source** ([jup-ag/rfq-webhook-toolkit](https://github.com/jup-ag/rfq-webhook-toolkit) @ `3aa4fce`) declares the same three arguments in `programs/order-engine/src/lib.rs`, and `git log --all -S` finds no history with a fourth.
+- The **vendored copy** in `solana-tx-remix/idl/multi/jupiter-order_engine/order_engine.json` has the identical single instruction and the identical discriminator `[168,96,183,163,92,10,40,160]`.
+- The bytes are **accepted**: all 141 payload-bearing transactions succeeded on chain (`txErr: null`).
+- Hypotheses tested and **rejected**: tail equals a declared argument (BE/LE), equals `expire_at` (raw or ×1000), equals the slot (raw or ×1000), equals a window of the transaction signature, or is a price-like ratio of `output_amount`/`input_amount` (spread ~10×). The varying 4 bytes are client-emitted and not derivable from the payload, the signature, the slot, or the declared args.
+- **The rejection is now reproducible, not remembered.** `tools/tail-hypotheses.mjs` re-derives every count from the committed fixture ([research/rfq-order-engine-tail-2026-11-01.json](research/rfq-order-engine-tail-2026-11-01.json), human-readable table in [research/rfq-order-engine-tail-2026-11-01.md](research/rfq-order-engine-tail-2026-11-01.md)). New and stronger this round: the **entire affine class** `tail ≡ A·base + B (mod 2³²)` is refuted for base ∈ {slot, expire_at, input_amount, output_amount} — A and B are derived from the first two payloads with an invertible delta, never fitted to the verdict. One refutation covers the constant offset, every seconds→milliseconds→microseconds rescaling, and every scaling of a declared argument. The SHA-256-prefix and CRC-32 checksum interpretations are refuted per-payload as well. Two measured bands constrain what remains: the varying u32 (LE) never uses the u32 space — its top byte is only `0xAC`/`0xAD` across all 59 payloads (16 high bits confined to [0xACAB, 0xADCC], ~0.004% of the space) while the low 16 bits are fully distinct; and the varying value does not correlate with slot, amounts, or expire_at (|r| ≤ 0.17). The field stays **unidentified**: whatever it is, it is not a single word carried in this instruction, and the strongest surviving hypothesis is a value derived from state outside the instruction bytes (the fixture does not pin the surrounding transaction), or a field of an interface revision whose description was never published.
+
+**The correction, stated plainly.** A first, narrower 30-block harvest saw only the 40-byte form (32 payloads, all with undeclared bytes) and I concluded *"every live fill carries 8 undeclared bytes"*. A 140-block scan **falsified that**: the 32-byte form is real and ran alongside the 40-byte form. The committed fixture is the wide scan, and every number above is derived from it. The difference matters for the product — the finding is not "the decoder misses a field", it is **"the deployed program's wire changed shape and no interface description followed"**. A decoder built only from the published interfaces now refuses 100% of the recent live traffic on this program.
+
+**Both remaining hypotheses were refuted on chain (2026-11-01), and the finding's shape changed.** The 14:00 study left two explanations standing: a value derived from state outside the instruction bytes, or a field of an interface revision that was never published. Two read-only probes (public RPC, every fetch counted in the reports) closed them:
+
+- **No published revision.** A fresh pull of *both* published IDL surfaces — the canonical `anchor:idl` account and the program-owned metadata account — reproduces the receipt fingerprint `sha256:f13a31e6…` (measured at slot 464182250). Nothing on chain declares a 4th argument, so "a revision nobody published" cannot explain bytes that are on the wire **now**, in every transaction.
+- **Nothing outside the instruction carries it.** For 6 fills spread across the slot range: **0** matches of the varying u32 (or the assembled `tag<<32|word` u64) in the transaction's balance surface (pre/post lamport and token balances, raw and `mod 2³²`), **0** in any sibling instruction's bytes (outer + inner), **0** in every touched account's data (`getMultipleAccounts` over the transaction's own account list), and **0** in the program's own state accounts (`getProgramAccounts`: 1 account, 1078 bytes — the compressed IDL itself; the program is stateless).
+- **The attribution that decides it:** every one of the **59** long-form fills was attributed from the chain to counterparty `MfDuWeqS…`, and every one of the **82** short-form fills to a *different* counterparty, `7rhxnLV8C7…` — **141/141 resolved, zero overlap** ([research/order-engine-counterparty-2026-11-01.json](research/order-engine-counterparty-2026-11-01.json)). The 8 undeclared bytes are **one counterparty's own extension of a shared protocol instruction**, not a protocol change and not protocol state.
+
+**Who that counterparty is, measured (2026-11-02).** "Counterparty = the `maker` account" was an inference from the instruction's account list; two premises behind it were still unchecked, and both now have chain measurements ([research/order-engine-maker-identity-2026-11-02.json](research/order-engine-maker-identity-2026-11-02.json), `tools/order-engine-maker-identity.mjs`, all 141 fixture transactions re-fetched, payloads byte-identical to the fixture 141/141):
+
+- **The makers are key-holding clients.** Both maker addresses are on-curve (an exact ed25519 decompression test — an off-curve address *cannot* hold a key, which would have made "client" wrong), system-owned, carry 0 bytes of data, and **sign** their transaction (141/141). The takers sign too (141/141). The maker never pays the fee: the fee payer is the taker in 110 transactions and the undeclared co-signer in 31 (107 distinct fee payers — not one service wallet).
+- **The account list carries more than the IDL declares.** The IDL declares **11** accounts for `fill`; the wire carries **12** (52 transactions) or **13** (89 transactions) — never 11. The extra accounts are constant in role: one variable slot (the order_engine program itself, or an off-curve derived address) plus `pAEmG7…`, which appears in **141/141** transactions and **signs every one of them** — a co-signing party the IDL does not mention at all. An account list is a carrier of meaning on Solana, and this channel was unmeasured until now.
+- **The limit that travels with the verdict:** three parties sign each fill (taker, maker, co-signer), so *which* of them constructed the 8-byte extension is **not** proven by the correlation with `MfDuWeqS…` — the builder among the three signers is explicitly not claimed. The 4 varying bytes still have no identified meaning: sha256 of the referenced account, sha256 of the signature, the slot, both amounts, `expire_at` and the account's address boundaries were all tested against the 59 payloads and refuted (0/59 hits).
+
+So the honest headline is narrower than "the wire changed shape": the deployed program accepts a counterparty-appended tail that no interface source describes. `trailing.count` remains the only place this surfaces for a decoder built from published interfaces, and it must not be normalized away.
+
+**What this changes in the product.** "Unexplained bytes" used to mean padding, and permissive `trailing: 'report'` was a courtesy. It is now a **live-drift signal**: `trailing.count` is the only place this surfaces, and it must not be normalized away. Two behaviours are pinned as measured, not as desired — permissive mode keeps **serving** both forms (the chain accepted them; refusing would be a decoder defect, not a safety property), and strict mode **refuses only** the 40-byte form instead of pretending a field exists that no source declares.
+
+The committed fixtures (`test/fixtures/harvest-{rfq-v2,order-engine}-2026-11-01.json` plus the two on-chain IDL receipts) make this re-measurable: `test/rfq-stack.test.mjs` (8 tests) re-derives every number above from the fixtures. If a future interface description accounts for the extra field, `trailing` drops to 0 and the test goes **red**, so the number gets re-measured instead of going quietly stale. The counter-test pins the fixture itself: editing the committed IDL to declare a 4th `u64` argument fails the suite, because "the interface now covers 40 bytes" is a **new claim that needs new evidence** (a re-pull of the on-chain account), not a fixture edit.
+
+**Limits:** 141 payloads from one program id in one slot range; the extra field's *name and type* are still unknown — what is measured is that 8 structured bytes exist, are stable per payload, and are undeclared by every available interface source, and that the varying word is drawn from a narrow band that no interpretation recorded so far produces. The upstream SDK decodes `fill` with 3 args, so if a 4th field exists it is one the SDK also does not name.
+
+### Reported to the first party (2026-11-02): jup-ag/rfq-webhook-toolkit#96
+
+Both wire findings above were delivered to the first-party repository as [issue #96](https://github.com/jup-ag/rfq-webhook-toolkit/issues/96): the undeclared co-signer account (present in 141/141 fills, signs all of them, pays the fee in 31/141) and the 40-byte form with its constant `0x06942069` tail tag. The issue carries one-click reproductions for each claim (fill tx `3iTpfkc7…` for the account list, `3cQfqyqaD…` for the payload), the fixture and report paths, and the limits stated as limits: which of the three signers builds the 8 bytes is not proven, the 4 varying bytes stay unidentified, and the 19 refuted interpretations remain named. The earlier, separate stale-IDL address finding is tracked as [#95](https://github.com/jup-ag/rfq-webhook-toolkit/issues/95).
+
+This is delivery, not adoption: no response exists yet, and neither issue makes sememe's first outside user — that threshold stays "a third party imports the artifact and 1,000 transactions decode without disagreement."
+
+## Eleventh program, third wire form: cp-amm's `swap` accepts three shapes (2026-11-02)
+
+The RFQ finding above is a program whose wire changed shape with **no** interface following. cp-amm is the opposite shape of problem, and it resolves the residual that the 30.10. traffic-coverage note left open: that note said the deployed `swap` *"reads further than its own interface file"*. **That sentence was wrong in an important way, and the measurement says so.**
+
+**The interface describes exactly one shape.** The program's own on-chain IDL account (`anchor:idl` @ `F1hSvutXSc9iAvB9bQPmjNDwiN2tCXzazTEEvDgNCBMa`) declares `swap` with one argument, `SwapParameters { amount_in: u64, minimum_amount_out: u64 }` — 8-byte discriminator + 16 bytes = **24 bytes, the only length it can describe**. The upstream source agrees ([MeteoraAg/damm-v2](https://github.com/MeteoraAg/damm-v2) @ `5398b5c`, `programs/cp-amm/src/instructions/swap/ix_swap.rs`): `pub struct SwapParameters { pub amount_in: u64, pub minimum_amount_out: u64 }`.
+
+**The chain carries three shapes.**
+
+| wire form | bytes | described by the IDL | trailing | accepted on-chain |
+|---|---|---|---|---|
+| 24 B | 477 (30.10.) / 284 (02.11.) | 24/24 | 0 | yes |
+| 25 B | 4 / 3 | 24/24 (the described prefix) | **1 zero byte, undeclared** | yes, 7/7 |
+| 32 B | 2 / 0 | 24/24 (the described prefix) | **8 zero bytes, undeclared** | yes, 2/2 |
+
+Measured over two independent mainnet windows — the committed harvest of 30.10. (slots 463380931..463380978, 48 blocks, 1,894 payloads) and a **fresh harvest of 02.11.** (slots 464398786..464398809, 24 blocks, 5,633 transactions fetched, 0 missing, 1,001 payloads) — so the wide form is not a one-window artifact: it appears in both, three days apart, and **still appears today**.
+
+**The extra bytes are not read, they are tolerated — and the program's own source proves it.** The deployed program does not use Anchor's dispatcher; it has a hand-written fast entrypoint (`programs/cp-amm/src/entrypoint.rs`) that does:
+
+```rust
+let swap_parameters = unwrap_or_return!(
+    SwapParameters::deserialize(
+        &mut &instruction_data[crate::instruction::Swap::DISCRIMINATOR.len()..]
+    )
+);
+```
+
+`deserialize` here is borsh's **slice** reader: it reads the two `u64` it needs and leaves the rest of the buffer alone. Anchor's own `deserialize` has the same property, which is why sememe's permissive `trailing: 'report'` mode exists at all. So the deployed program does **not** parse bytes past its own struct — it accepts a payload with bytes appended. The 30.10. wording ("reads further than its own interface file") overstated it, and the correction matters for the product: **an over-long payload is not evidence of a missing field**, and a decoder must not invent one. A missing field would carry information; these bytes carry none.
+
+**The 25-byte form is a `swap2` body under the `swap` discriminator.** Its body is **byte-identical** to what the interface's *other* instruction would encode: `swap2` takes `SwapParameters2 { amount_0: u64, amount_1: u64, swap_mode: u8 }`, and re-encoding the same two amounts through `swap2` with `swap_mode = 0` reproduces the 25-byte body exactly — verified on every 25-byte payload, in both windows. The 32-byte form is the same idea with 8 bytes of zero padding (the trailing bytes are **zero in 9/9** wide payloads — padding, not a field). So a client that switched from `swap` to `swap2` and kept sending under the old discriminator produces exactly these shapes.
+
+**Where they come from, measured on chain** ([research/cp-amm-wire-forms-2026-11-02.json](research/cp-amm-wire-forms-2026-11-02.json), `tools/cp-amm-wire-forms.mjs`, every fetch counted, 0 failures):
+
+- **9 wide payloads, 12 IDL-exact controls** — a control group, so "the wide form comes from somewhere else" is a contrast and not a sample of one.
+- **8 of 9 wide payloads are top-level** (8 of 12 controls likewise) — the wide form is **not** a CPI-only artifact; the same mix appears in both groups. One wide payload is a CPI, invoked by `4X3dGCFh63SyE2bNZdGUV7Rj5ukK1XgrxesoxyKQNiRN`.
+- **7 distinct fee payers among 9 wide payloads** — not one service wallet or one bot; and **zero overlap** with the controls' fee payers.
+- **9/9 wide payloads were accepted on-chain** (`txErr: null`), against 8 of 12 controls that failed on-chain — which is the repo's own rule from the RFQ section: *decode refusal is evidence about the IDL, not about whether the program executed*, applied in the other direction here.
+- The wide payloads carry the **declared 14 accounts** (top-level) or 18 (the CPI case) — the account list is not the carrier.
+
+**The interface has not moved.** A fresh `sememe pull` of the program's on-chain IDL today (slot 464399566) returns fingerprint `sha256:e80f49b1…` — **byte-identical** to the fingerprint of the fixture pulled on 30.10. So "the published interface is stale" is refuted by a measurement, not assumed; the description has not changed in three days while the chain kept sending all three shapes.
+
+**What this changes for sememe.** The residual is now a named, reproducible *tolerance* finding instead of an open question:
+
+- The permissive mode is **right** for this case, and now for a measured reason: the program accepts these payloads, so refusing them would be a decoder defect. `trailing.count > 0` stays the place where the fact surfaces.
+- The **strict** mode refuses only the wide forms — and refuses them *as undeclared*, not by inventing a field for the extra bytes. The test pins exactly that: the 25-byte body must equal a `swap2` body, and every trailing byte must be zero.
+- A consumer who wants the narrower meaning can read the 25-byte form as `swap2`/`swap_mode = 0` — that is a **client-side interpretation** the interface does not license, and sememe does not perform it silently.
+
+**Falsification.** `test/cp-amm-wire-forms.test.mjs` (6 tests) re-derives every number above from the two committed fixtures and the committed IDL, and pins the observed wire-length set as exactly `{24, 25, 32}` / `{24, 25}` so a new shape goes red instead of widening the finding silently. The committed report is cross-checked against the fixtures (no hand-edited numbers). Mutation ladder, each mutation red on its own check: editing the report's wide count (1 fail), making one trailing byte non-zero (2 fail), marking a wide payload as failed on-chain (1 fail), introducing a new wire length 26 (3 fail) — restored tree green 6/6. Suite 244 → **250/250**.
+
+**Limits.** Two windows and one program id; 9 wide payloads total, so the *frequency* is not established (1.24% of `swap` payloads in 30.10., 1.05% in 02.11. — small samples on both sides). The 32-byte form did not appear in the fresh window, so it may be rarer now or slot-bound; that is stated, not resolved. The claim that the extra bytes are *tolerated* rests on the upstream source of the deployed program at one commit (`5398b5c`) — the deployed **binary** was not disassembled, and the on-chain IDL is not proof of what the binary does. No third party is involved; this is a measurement about a program's wire, not an adoption claim.
+
+## Coverage measured on unbiased traffic (2026-11-02)
+
+Every qualification above measured programs that were CHOSEN — usually programs
+already in the store. The sample and the store therefore shared a selection
+bias, and a favorable fraction measured against them is not a coverage number.
+This section measures the other way round.
+
+**The sample.** `tools/traffic-sample.mjs` takes the newest finalized mainnet
+blocks (four contiguous slots, 2,214 transactions) and inventories EVERY
+instruction in them, without asking the store anything. Programs outside the
+watched list are counted but their bytes are not stored (fixture size limit), so
+the denominator cannot silently shrink. The fixture is committed
+(`test/fixtures/traffic-sample-2026-11-02.json`, captured 2026-11-02T15:50Z),
+together with a store built for exactly this sample
+(`test/fixtures/traffic-sample-store/`: ten on-chain pulls plus four adopted
+first-party published copies).
+
+**The measurement.** `tools/traffic-coverage-report.mjs` runs every payload
+through the product's own entry points — `decodeUnionPayload`, `decodePayload`,
+and the native, token and Raydium decoders — and asks one question per payload:
+could sememe have NAMED it? The four outcomes are kept apart on purpose.
+
+**First run, same day, same sample (kept for the record):** decoded 6,983,
+refused 171, no-interface 5,418 — 55.5% coverage, with 99.7% of the gap on SPL
+Token + Token-2022, which publish no IDL account at either pullable address.
+That measurement named the fix, and the fix shipped the same day: the two token
+wire tables are now DERIVED from the pinned upstream Rust crates
+(`solana-program/token@737788ff`, `solana-program/token-2022@5251dcc0`, both
+Apache-2.0, both vendored with license + sha256 pin) — the System/ComputeBudget
+pattern, one level up: the wire rule lives in the crates' hand-written pack()
+and unpack() pairs, so the derivation reads the pack arm's byte-write sequence
+cross-checked against the unpack arm's tag set, and refuses any upstream write
+it cannot pin. The decoder ships as `sememe/token` (artifact + load-time
+derivation check, same two-check contract as the native tables).
+
+| outcome (current) | count | meaning |
+| --- | --- | --- |
+| decoded | 12,401 | an available interface named it |
+| refused | 171 | an interface exists and the bytes were refused (source lag in the pump programs' wire forms) |
+| no-interface | **0** | no payload in this sample lacks an interface |
+
+**98.6% coverage** (12,401/12,572 watched payloads), with 11,708/12,401 = 94.4%
+of the decoded payloads re-encoding byte-exactly. What the 700 non-byte-exact
+decodes are, measured: 419 legacy `GetAccountDataSize` payloads carry two extra
+bytes the legacy program itself ignores (upstream's own comment says so), and
+three Token-2022 extension dispatches carry their sub-instruction bytes, which
+this table reports as trailing instead of inventing a field for them. The
+trailing count is part of the result, not a failure hidden by it.
+
+**What the number means now.** The acquisition gap this measurement existed to
+expose is **empty for this sample**: every watched payload now sits on a program
+that has an interface sememe can decode against, so `acquisitionQueue` carries
+no entry. "Refused" (171) is source lag in interfaces that exist — PumpSwap's
+undeclared discriminator form and pump.fun's unexplained event tail are the bulk
+of it, both already reported to the first parties. The denominator never moved:
+same sample, same product entry points, one new decode path per gap.
+
+Empty is a property of these four blocks, not of the ecosystem. The coverage
+illusion the card names is **measured, not removed**: one window, one RPC, no
+outside user. A different window can put a program back in the queue, and the
+queue is derived from the rows, so that would show up as a row first.
+
+**The union path is a coverage lever, not a decode nicety.** Adopting the
+first-party published copy `pump-fun/pump-public-docs` `idl/pump_amm.json` moved
+PumpSwap from 82.0% to 96.4% (487/505 decoded) in one step: its on-chain IDL is
+stale, and the published copy covers 9 of the 10 discriminators seen in the
+window. The tenth (`e445a52e51cb9a1d`, 226 payloads) is declared by neither
+copy.
+
+**An adopted copy may now stand alone (2026-11-03).** The second half of the
+acquisition gap was **Jupiter Liquidity** (`jupeiUmn…`, 7 payloads): no IDL at
+either on-chain surface — measured at capture time, re-measured against live
+mainnet at slot 464744781 (both `null`), so the only verified interface is a
+published copy. Adopting the first-party
+[`jup-ag/jupiter-lend`](https://github.com/jup-ag/jupiter-lend)
+`target/idl/liquidity.json` at commit `0ab370a0` (26 instructions,
+`sha256:8ed1e22661ab…`) into the committed fixture store closed it — **7/7
+payloads decoded byte-exact through `decodeUnionPayload`**, and Jupiter
+Liquidity left the acquisition queue.
+
+Adopting it alone was not enough, because of a defect in the reader:
+`decodeUnionPayload` required a *primary* source, and a store with no on-chain
+receipt for the program has none — so the union path refused with
+`unionDecode needs a primary source` and reported "no interface" about a store
+that held exactly one, while plain `decodePayload` on the same bytes answered
+7/7. Two entry points, two answers, and the coverage measurement used the wrong
+one. **The rule now: an adopted copy may stand alone when there is no on-chain
+pull to displace — it may still never displace one** (the on-chain receipt stays
+primary whenever it exists, pinned by the existing M4 test). The verdict carries
+`view.adoptedOnly: true` plus `idl.source` / `idl.slot: null`, so a consumer can
+see that no chain slot answered. Refusals still refuse: a payload no stored
+source explains is refused **by name**, with the adopted-only provenance
+visible rather than laundered into a decode.
+
+Covered by `test/jupiter-liquidity-acquisition.test.mjs` (5 tests: the
+capture-time verdict still says `acquirable: false`; the store still holds no
+on-chain receipt; all 7 byte-exact with `adoptedOnly: true`; **delete the
+adopted receipt and the gap comes back by name** — the number moved because an
+interface was added, not a counter; the committed report and queue reflect the
+closure) plus the adopted-only union tests in `test/union.test.mjs`.
+
+**The last gap closed by derivation: Raydium AMM v4 (2026-11-03).** The final
+9 payloads sat on a program that publishes no interface at all — no IDL account
+either pullable address, measured at capture time and re-measured live. Unlike
+Jupiter Liquidity there was no first-party copy to adopt: its wire is not an
+Anchor 8-byte discriminator but a hand-written `pack()`/`unpack()` pair over a
+**sparse u8 tag set** (19 declared variants, 12 reachable on the wire, 7 refused
+by upstream with `unimplemented!()`). So the interface was derived from the
+program's own source, exactly as the token tables were derived from their
+crates: `vendor/raydium-amm@91739d8d` (Apache-2.0, license + sha256 pin on both
+files), `src/raydium-interface.mjs` for the rules, `interface/raydium-<program>.json`
+as the reviewable artifact, `src/raydium.mjs` for the two-check load and decode.
+
+The derivation reads upstream's own text rather than transcribing it: the wire
+tag is the literal integer the `pack()` arm pushes, cross-checked against the
+`unpack()` arm that binds that same integer; the args are the arm's byte-write
+sequence, cross-checked against the reads by count and width; a trailing
+optional group carries upstream's own `rest.len() >= N` threshold (**there is no
+option byte**, so a C-style read would misparse every real payload); a branch
+carries upstream's own discriminator values from the `AmmParams` enum. Because
+the seven refused variants have no `pack()` arm to read a number from, their
+tags come from their declaration position — which is checked against all twelve
+reachable variants first, so an upstream reorder fails the derivation instead
+of handing a refused tag a wrong name.
+
+Measured on the same sample, same entry points: **9/9 payloads decode and
+re-encode byte-exact** (`SwapBaseIn` ×2, `SwapBaseInV2` ×7), `no-interface`
+**9 → 0**, and `acquisitionQueue` is empty. The decoder ships as `sememe/raydium`
+with `sememe decode-raydium` / `sememe raydium-provenance`, and `sememe decode`
+on this program now points at it instead of telling the user to pull a receipt
+that can never exist.
+
+Falsification (`test/raydium-interface.test.mjs`, 12 tests, mutations in temp
+copies): a tampered artifact, a tampered `instruction.rs`, a tampered `state.rs`
+and a missing `vendor/` all refuse the load; removing the load-time equality
+check turns all four into silent passes (measured: 9 of 12 tests go red).
+Refusals are pinned by reason — unknown tag, each refused variant, truncated
+u64/pubkey/fees, unmatched discriminator, wildcard rejection — and the optional
+group round-trips in both directions with half a group refused as
+`partial-optional` rather than guessed.
+
+**The largest gap closed by derivation: SPL Associated Token Account
+(2026-11-11).** The ecosystem measurement (`tools/ecosystem-coverage.mjs`, the
+next section) put ATokenGPvbd… first in its acquisition queue: **1,410 payloads
+in 6 finalized mainnet blocks, no IDL account at either pullable address** —
+the single biggest acquisition gap the unbiased denominator exposed. Its
+interface is upstream Rust again, and this time the wire rule is borsh's own:
+`solana-program/associated-token-account@fbf5379` (Apache-2.0, LICENSE + sha256
+pin on all three vendored files) declares `AssociatedTokenAccountInstruction`
+as a borsh UNIT enum — Create, CreateIdempotent, RecoverNested — so the payload
+is exactly the one-byte variant index and no argument bytes follow. The wire
+bytes come from upstream's own builders (`data: vec![2], // …::RecoverNested`
+and the `instruction` argument of `build_associated_token_account_instruction`),
+cross-checked against the declaration index the borsh derive would use — both
+must agree or the derivation refuses. The RUNTIME verdicts are read from the
+pin's processor, not assumed: `input.is_empty()` is EXECUTED as `Create` (so
+the 4 empty payloads the measurement saw are a named Create via the processor's
+own fallback — honest about not being byte-exact, since the canonical encoding
+is `[0]`), everything else is judged by `try_from_slice`, and an unjudged input
+is `InvalidInstructionData` — this decoder refuses it under the same name.
+
+Measured on the committed 6-block sample, product entry points only:
+**1,410/1,410 decode (1,406 byte-exact), `no-interface` 1,410 → 0**, ecosystem
+coverage **75.6% → 82.2%** (watchlist 96.4% unchanged, outside-watchlist
+**7.1% → 35.4%**), and `acquisitionQueue`'s head moved from ATA to pump L2
+(L2TExMFK…, 1,214). A re-run of the 1,000-transaction foreign-archive wire
+sweep decodes **5,032** (was 4,646) with zero disagreements. The decoder ships
+as `sememe/ata` with `sememe decode-ata` / `sememe ata-provenance` (the empty
+payload is real input here: `sememe decode-ata ATokenGPvbd… --empty`), and
+`sememe decode` on this program points at it instead of telling the user to
+pull a receipt that can never exist.
+
+## The #1 remaining acquisition gap decodes: Lighthouse adopted from first-party (2026-11-11)
+
+Closing the SPL Associated Token Account left `L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95`
+standing at the top of the acquisition queue: **1,214 payloads across the 6
+committed blocks**, no on-chain IDL account at either address. But unlike ATA
+(which publishes no IDL anywhere and needed a Rust wire table), Lighthouse is
+the program whose **own repository publishes an IDL** (`Jac0xb/lighthouse`,
+commit `4c579479c98635e419b1b167f08be02a71604a71`, MIT; `programs/lighthouse/lighthouse.json`,
+18 instructions in the [shank](https://github.com/metaplex-foundation/shank) dialect).
+
+`sememe adopt-lighthouse` ships that verified first-party copy and adopts it
+through the product's one write path (`src/adopt.mjs`), with the vendored bytes
+hash-checked against their pin BEFORE anything is written:
+
+```bash
+sememe adopt-lighthouse --store my-store
+sememe decode L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95 0500000c6a0a0f0000000004 --store my-store --union
+# -> AssertAccountInfo (Lamports >= 252340748), byte-exact re-encode, origin declared:
+#    github.com/Jac0xb/lighthouse@4c579479:programs/lighthouse/lighthouse.json
+```
+
+**Measured on the committed 6-block sample (1,214 payloads):**
+- **1,214 / 1,214 decoded (100%)**
+- **1,214 / 1,214 byte-exact re-encode (100%)**
+- 0 disagreements, 0 refusals
+- 4 instruction faces active: `AssertAccountInfo` (342), `AssertTokenAccount` (386), `AssertSysvarClock` (337), `AssertAccountData` (149)
+- `no-interface` on this program: **1,214 → 0**
+- Ecosystem coverage of measured traffic moves **82.2% → 87.9% → 88.5%** (outside the watchlist: **35.4% → 59.9% → 62.4%**; total outside-watchlist decoded: **2,975 → 3,098 / 4,968**)
+- `acquisitionQueue`'s new head is `MNFSTqtC93rEfYHB6hF82sKdZpUDFWkViLByLd1k1Ms` (307 payloads)
+
+**The evidence class stays honest.** The headline split in `research/ecosystem-coverage-2026-11-11.json`
+names every decode: `pulled: 17,681, adopted: 1,214`. The 1,214 Lighthouse decodes
+are hash-bound to a reviewed copy whose origin stays **declared** (the commit is
+not checked for a signature, and nothing proves the bytes describe the deployed
+program; the byte evidence for that is the 100% byte-exact re-encode on live
+traffic). The curated watchlist carries zero adopted decodes: its 96.4% still
+rests entirely on slot-bound on-chain receipts.
+
+Falsification (`test/lighthouse-acquisition.test.mjs`, 9 tests):
+- **L1..L5:** a tampered vendor file, a missing file, a file declaring another address, and a tampered shank discriminant table all refuse the load by name before any write is attempted;
+- **L6:** adopting the verified copy into an empty store makes all 1,214 payloads decode byte-exactly, while the store before the adoption refuses every one as `no stored IDL`;
+- **G1/G2:** the 1,214 denominator is pinned, and adopt's product refusal for a foreign address is guarded.
+
+`sememe gap` on this program points directly at `sememe adopt-lighthouse` instead
+of telling the stranger to search for a file the package already carries.
+
+Falsification (`test/ata-interface.test.mjs`, 8 tests): a tampered artifact, a
+tampered vendored source and a missing `vendor/` all refuse the load; the wire
+and runtime shape is pinned against upstream's own text (tags, unit enum, empty
+fallback, `InvalidInstructionData`); every measured payload must decode, and
+the 4 empty ones must come out as Create — named, not refused. Guards: ATA
+stays OUT of the token table, and a real SPL Token payload keeps decoding
+through its own table.
+
+**Limits.** One 6-block window, one RPC, one pin. The table describes the
+program AT THE PIN: a tagged upstream release that changes the enum or the
+processor refuses the load loudly instead of decoding stale. No account list
+and no PDA derivation is claimed — the table covers instruction data only. The
+empty-input verdicts carry `roundTripByteExact: false` BY DESIGN: upstream
+never writes a zero-length payload, the canonical encoding is `[0]`, and the
+4 empty wire forms are named through the processor's own empty-input branch.
+
+**Limits.** One four-block window (~20 seconds of mainnet), one RPC. The
+acquisability check ran at capture time and reflects that moment. The token
+tables are derived from upstream's interface crates at one pin each; a tagged
+upstream release that changes a pack() arm refuses the load loudly instead of
+decoding stale. Token-2022 extension sub-instructions (the 15 extension
+dispatch tags) are named at the top level only; their sub-instruction bytes
+report as trailing. The spl-token-metadata fallback interface (8-byte
+discriminators, own crate) is vendored and derived like the others — see below.
+Traffic outside the watched list (181 further programs, 4,842 instructions) is
+counted in the report but excluded from the denominator, because their bytes are
+not stored. A coverage number over one window is a window, not the ecosystem —
+this one can only be compared with another measurement of the same kind. The
+Raydium table is derived at one pin of one repository; a tagged upstream change
+to a `pack()` arm refuses the load loudly rather than decoding stale. Reproduce:
+`npm test` (the report is pinned twice — as a deep-equal against
+what the tool computes, and as explicit assertions), or
+`node tools/traffic-coverage-report.mjs`.
+
+## Short wire forms: 171 of 172 refusals were chain-accepted (2026-11-03)
+
+The 172-payload refusal column above is 172 separate facts about an
+*interface*, not about the chain. This section asked which side was right, one
+shape at a time.
+
+**The method.** `tools/short-form-wire-forms.mjs` groups the refused payloads by
+`(program, discriminator, wire length)` and, for each group, pulls a FINALIZED
+mainnet transaction witness with `maxSupportedTransactionVersion: 1`, resolves
+versioned account keys through their address lookup tables, reads the
+instruction data as base58 (that is how `encoding:"json"` carries it — the
+first version of this tool read it as base64 and compared nonsense), and
+requires three independent things before it will say the chain executed the
+payload: the transaction's `err` is `null`, the witness bytes are byte-IDENTICAL
+to the fixture payload, and the program's own `Program log: Instruction: ...`
+line matches the name the decode will report. A control group of already-decoded
+shapes runs alongside, so a witness fetch that silently failed would show up as
+a wrong answer rather than as evidence. Report:
+[`research/short-form-wire-forms-2026-11-03.json`](research/short-form-wire-forms-2026-11-03.json).
+
+**The result.** The five refused shapes are:
+
+| program | discriminator | wire bytes | payloads | instruction | field the wire does not carry |
+| --- | --- | --- | --- | --- | --- |
+| Pump.fun bonding curve | `e1f7501ed5b38488` | 24 | 152 | `buy_exact_quote_in_v3` | `partial_fill` |
+| PumpSwap | `c62e1552b4d9e870` | 24 | 17 | `buy_exact_quote_in` | `track_volume` |
+| Pump.fun bonding curve | `07051dc4f5176550` | 24 | 1 | `buy_v3` | `partial_fill` |
+| PumpSwap | `66063d1201daebea` | 24 | 1 | `buy` | `track_volume` |
+| Token-2022 | `d2e11ea258b84d8d` | 131 | 1 | not named | — |
+
+**171 of 172 payloads were executed by the chain** with bytes identical to the
+fixture. **0 were genuine chain-rejected refusals.** The stored interfaces
+over-describe the wire: they declare one `OptionBool` more than the deployed
+program reads, and a payload that ends where that field would start is refused
+as truncated. The published first-party IDL knows all four discriminators; it is
+the trailing option tag it expects that the 24-byte form does not carry. The
+fifth shape (Token-2022, tag 210) is not a short form and stays refused.
+
+**Why this is not simply "decode whatever ends on a field boundary."**
+Byte-exact re-encoding — the evidence that makes trailing bytes trustworthy —
+does NOT carry over. A payload truncated by a capture bug also ends on a field
+boundary and also re-encodes byte-exactly to the shortened bytes. Offline, on
+bytes alone, "the program accepts a shorter form" and "this payload was cut
+short" are indistinguishable. So `src/codec.mjs` keeps the default strict, and
+the opt-in comes in two flavours:
+
+| `--absent` | behaviour | risk |
+| --- | --- | --- |
+| `error` (default) | refuse, as before | none — and the 171 stay unnamed |
+| `report` | decode any payload ending on a field boundary, name the absent fields | names truncated payloads too |
+| `verified` | decode only shapes with a chain witness | evidence can go stale |
+
+`verified` is the product form of the measurement: the witnesses travel with
+the decoder as `src/short-forms.mjs`, keyed on program + discriminator + exact
+length, and a decode whose absent set differs from the measured one is REFUSED
+rather than decoded and labelled unverified — stale evidence is not spent on a
+shape nobody measured. A 16-byte truncation of the 24-byte form, which ends on a
+field boundary and re-encodes exactly, is accepted under `report` and refused
+under `verified`; that asymmetry is the whole point, and it is a test
+(`test/short-form-decoding.test.mjs`).
+
+**Coverage, same sample, same entry points, one opt-in** (after the token-metadata
+fallback landed, which closed the last strict refusal — see below):
+
+| outcome | strict | `--absent verified` |
+| --- | --- | --- |
+| decoded | 12,401 | 12,572 (+171) |
+| refused | 171 | **0** |
+| no-interface | 0 | 0 |
+| coverage | 98.6% | **100%** |
+| byte-exact | 11,708 | 11,879 (+171, every short form re-encodes exactly) |
+
+The denominator did not move; the strict measurement is unchanged and still
+committed, because a gain that only exists when you relax the decoder is a
+finding to measure, not a number to replace. Reproduce:
+`node tools/traffic-coverage-report.mjs --absent=verified`
+([`research/short-form-coverage-2026-11-03.json`](research/short-form-coverage-2026-11-03.json)).
+
+**What is still open.** The strict-verified gap is closed for this sample: after the
+token-metadata fallback below landed, the last strict refusal decodes, so
+`--absent=verified` reports 0 refusals on this window. The acquisition queue is empty
+*for this sample* (the Raydium closure above removed the last entry, and a different
+window can put a program back); and the short-form table covers one four-block window —
+a longer window may well find a short form nobody has witnessed, which must refuse
+under `verified` until a witness exists.
+
+## The last refusal was the program's own fallback: Token-2022 token-metadata (2026-11-03)
+
+One payload in the unbiased sample refused every path sememe had: a Token-2022
+instruction whose first byte is `0xd2`, 112 bytes long. It was not source lag and not
+an acquisition gap — it was a decode path sememe did not have.
+
+**What the program does.** Token-2022's processor tries the ONE-BYTE token selector
+first (`decode_instruction_type(input)`); when that byte is not a token variant it
+falls through to `TokenMetadataInstruction::unpack(input)` and, if that fails too, to
+`TokenGroupInstruction::unpack`. The token-metadata instructions therefore carry
+**EIGHT-BYTE discriminators** (`sha256("spl_token_metadata_interface:<action>")[..8]`)
+and never match the token table's 1-byte tags. sememe's refusal was a true statement
+about the token table and a false one about the program.
+
+**What landed.** `vendor/spl-token-metadata-interface/7038969e` (Apache-2.0, byte-
+identical to crates.io `spl-token-metadata-interface` 1.0.1 — the version Token-2022's
+own `Cargo.lock` pins; the directory name is the crate's upstream git sha) plus two
+modules and one artifact, honouring the same two-check contract as every other table:
+
+- `src/token-metadata-interface.mjs` derives the table FROM the vendored source:
+  the discriminator from upstream's own `#[discriminator_hash_input("...")]` string,
+  the argument order from each struct's Borsh field declaration, and the wire rules
+  (string = u32 LE length + bytes, enum = 1-byte variant index, option = 1 tag byte,
+  `MaybeNull<Address>` = 32 transparent bytes where all-zero is `None`).
+  It refuses on anything it cannot pin: an unknown field type, a variant upstream
+  declares that the table does not name, a discriminator collision.
+- The **discriminator rule is anchored by upstream's own literal**: `state.rs`
+  hardcodes the `TokenMetadata` account discriminator `[112,132,90,90,11,88,157,87]`,
+  and upstream's own test derives it from `sha256("<NAMESPACE>:token_metadata")`. The
+  derivation recomputes it and throws if it differs — so the hash rule cannot drift
+  silently while the five instruction discriminators ride along with it.
+- `src/token-metadata.mjs` loads it with the two-check contract (fresh derivation must
+  byte-equal the committed artifact) and decodes; `src/token.mjs` reaches it exactly
+  where upstream does — the 1-byte selector is consulted FIRST, and only a payload
+  whose first byte is not a token variant gets there. Legacy SPL Token has no such
+  branch and still refuses.
+- `interface/token-metadata.json` + `tools/token-metadata-interface.mjs [--check]`.
+
+**Strictness, verified rather than assumed.** Upstream's `unpack` calls
+`try_from_slice`, which REFUSES a payload with unexplained trailing bytes — and it does
+so in the upstream crate itself: a trailing byte is a `BorshIoError`. sememe mirrors
+that (trailing bytes are a refusal, not a reported count), so the decoder never claims
+the chain accepts bytes the chain rejects.
+
+**The falsifier is the program, not a second reading of the source.**
+`tools/token-metadata-oracle.mjs` builds a Rust program
+(`tools/token-metadata-oracle/`) against the exact pinned crates —
+`spl-token-metadata-interface 1.0.1`, `spl-discriminator 0.5.2`, `solana-nullable 1.3.0`,
+`borsh 1.8.1` — and asks them: it packs every variant, unpacks the observed mainnet
+payloads, and reports which inputs it refuses
+([`research/token-metadata-oracle-2026-11-03.json`](research/token-metadata-oracle-2026-11-03.json)).
+`test/token-metadata.test.mjs` then compares sememe's table against that output:
+all five discriminators (produced by upstream's own `SplDiscriminate` derive macro),
+all ten re-encodes, and all nine refusal reasons agree.
+
+**Measured, same sample, same product entry points:** Token-2022 goes from 1,597/1,598
+(the one refusal was this payload) to **1,598/1,598**; strict coverage 12,400 →
+**12,401 decoded** / 172 → **171 refused**; `--absent=verified` 12,571 →
+**12,572 / 0 refusals = 100%**. The denominator never moved.
+
+**Tests: 10 new** (`test/token-metadata.test.mjs`, 306 → 316). The mutation ladder:
+tampered artifact → load refused; tampered vendored `instruction.rs` → load refused;
+deleted `vendor/spl-token-metadata-interface` → load refused; a hand-mutated
+`RemoveKey` field order (bool moved behind the string) is caught by the artifact check
+AND by the oracle comparison. Refusals stay named: unknown 8-byte discriminator,
+truncated discriminator, forged Borsh string length, trailing byte, invalid bool byte,
+undeclared `Field` tag.
+
+**Known limits, kept explicit.** This is the instruction path only — the `TokenMetadata`
+account (the TLV account those instructions mutate) is a different structure and is not
+decoded. The `TokenGroup` fallback (`spl-token-group-interface`) is the third branch in
+that same processor and is still not vendored, so a group instruction would refuse by
+name; it has no payload in this window, so this is a stated boundary rather than a
+measured gap.
+
+## The interface's other half: the account list, checked against the wire (2026-11-03)
+
+Everything before this section verifies BYTES. An instruction is bytes AND an
+account list, and the account list is where a real first-party program diverged
+from its own interface: jup-ag's `order_engine` declared 11 accounts for `fill`
+while every observed fill carried 12 or 13 — and the extra account SIGNS every
+fill (reported as [jup-ag/rfq-webhook-toolkit#96](https://github.com/jup-ag/rfq-webhook-toolkit/issues/96)).
+A consumer that builds its signer/authority reasoning from the interface alone is
+blind to an account that signs.
+
+So the interface sememe stores now answers that question too, offline, from the
+same receipt-verified store:
+
+- `src/account-list.mjs` — `checkAccountList(instruction, observedAccounts)`:
+  compares an instruction's declared account list with the list one transaction
+  passed. Verdicts: `missing-declared-accounts`, `declared-signer-not-signing`,
+  `fixed-address-mismatch`, `undeclared-signing-account`, and the informational
+  `remaining-accounts` (extras that do NOT sign — Anchor's legitimate
+  `remaining_accounts`).
+- `src/conformance.mjs` — `checkTransaction(tx, store)`: every instruction of an
+  RPC `json`-shaped transaction (top level and CPI) checked against the stored
+  interface. The signer flags are derived from `message.header`'s counts —
+  `accountKeys` in that encoding carries addresses only — and a shape this file
+  cannot read is REFUSED (`ConformanceRefusal`), never reported as conforming.
+- `sememe conform <tx.json> --store <dir>`: the CLI entry; exit 1 on any
+  disagreement.
+- `tools/account-list-conformance.mjs`: the live measurement (program's own
+  signature page → `getTransaction` → every instruction checked).
+
+Four rules came out of the measurement, each from a case the first version got
+wrong, each pinned by a test that fails without its rule (19/20 on the stripped
+tree, 21/21 with it):
+
+1. **The optional flag has two spellings.** OpenBook v2's legacy IDL marks
+   `openOrdersAdmin` `isOptional: true, isSigner: true`; live traffic passes it
+   unsigned in 40/40 of one sample because the admin is not needed. Reading only
+   `optional` (the new spec) turned the account being ABSENT into 40 violations.
+2. **A declared signer that does not sign is a violation at depth 0 only.**
+   Whirlpool `swap_v2` invoked via CPI by the Titan router: the inner
+   instruction's `token_authority` is signed for inside the CPI stack
+   (`invoke_signed` PDA seeds), which never appears in the top-level
+   `numRequiredSignatures`. At depth > 0 the signer flag is not observable from
+   the header, so such a position is a named note (`cpi-signer-not-observable`),
+   not a violation. At depth 0 the header IS the authority and the check stands.
+3. **Anchor's absent-optional placeholder is the program's own id.** Comparing
+   that position's signer flag manufactures a violation out of the convention.
+4. **A declared-OPTIONAL signer arriving unsigned is absent, not violating**
+   (the same account being absent, reached through a different shape).
+
+**The measurement** ([research/account-list-conformance-2026-11-03.json](research/account-list-conformance-2026-11-03.json),
+2026-11-03T21:26Z, 170 RPC calls, 0 failures, 236 instructions from 137
+transactions of 6 programs, every row committed so the summaries re-derive from
+them):
+
+| program | instructions | verdicts |
+|---|---|---|
+| Whirlpool | 57 | 40 conforms, 17 remaining-accounts, 0 violations |
+| Jupiter v6 | 22 | 13 unknown-instruction, 2 conforms, 7 undeclared-signing-account |
+| OpenBook v2 | 43 | 36 conforms, 7 remaining-accounts, 0 violations |
+| PumpSwap | 56 | 25 remaining-accounts, 31 unknown-instruction |
+| pump.fun | 18 | 7 remaining-accounts, 10 unknown-instruction, 1 conforms |
+| jup-ag order\_engine | 40 | **40 undeclared-signing-account** |
+
+The contrast is the finding. Jupiter's signing extras sit inside routes of 14–43
+extra accounts and belong to 6 distinct caller wallets per 7 fills — the router
+passing the user's authority through, a legitimate `remaining_accounts` shape
+that happens to sign. order\_engine's signing extra is ONE CONSTANT address
+(`pAEmG7…`) in 40/40 fills, always at the LAST position, signing every fill and
+paying the fee in 31/141 of the November-1 sample: a hidden authority the
+published interface does not name. Same verdict kind, opposite meanings — which
+is why the report commits the rows, not just the counts.
+
+The `unknown-instruction` rows (54 total) are honest, not noise: pump.fun and
+PumpSwap's IDLs store all their discriminators (88/88 and 65/65 agree with
+Anchor's derivation), but the sampled fills carry NEWER instruction revisions
+than the stored pull (the `*_v2`/`*_v3` families measured in the short-form
+section above). A stale pull shows up here as unknown-instruction instead of a
+wrong decode — that is the check doing its job.
+
+**Known limits:** the signer observation is the transaction-level view — a CPI
+can sign for its PDAs and the header cannot see it (rule 2 handles the
+consequence, not the visibility); a program that legitimately accepts several
+account-list shapes produces one verdict per transaction, and only repeated
+agreement/disagreement across a sample means anything; writability disagreements
+are reported per position but never decide a verdict (the runtime enforces from
+the transaction, not the IDL); a failed transaction can have been rejected FOR
+one of these reasons, and `executed` is carried so a reader can tell.
+
+## A filter that selects nothing is a refusal, not a green CI gate (2026-11-09)
+
+`sememe conform` is a CI gate: exit 1 on any disagreement, exit 0 when the
+checked instructions agree with the store. `--only <program-id>` narrows the
+check to one program. Measured on the published `v0.4.12` install, a filter
+that selected **zero** instructions still exited **0**:
+
+```
+sememe conform tx.json --store ./store --only 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P
+  -> { "rows": [], "summary": { "instructions": 0, "executed": { "disagreements": 0 } } }
+  -> exit 0
+```
+
+The program id above is a real one — it is just not invoked by that
+transaction. A caller who mistyped the id they meant to gate on was told the
+transaction conformed: a green gate over a check that never ran. The second
+face of the same defect: `--only not-a-program-id` produced the identical
+empty green, and the value was never validated as a program id at all — it
+could not be one.
+
+This is the class this repository has already measured twice (`sememe verify`
+green over a store the reader refuses, 2026-11-07; `conform` refusing an
+unreadable transaction SHAPE but not an empty selection). The rule is the one
+this file already states for an unknown shape: an empty check is not a clean
+bill of health.
+
+**What changed.** Two refusals, both before the store is read:
+
+- a filter that is not a canonical 32-byte base58 program id is refused by
+  name (`filter-is-not-a-program-id`) — the check is dependency-free
+  (`src/program-id.mjs` round-trips the base58 itself), because the decode
+  core is imported by consumers with no npm dependencies at all and a CLI
+  refusal must not be the thing that makes them install a peer;
+- a filter that selects none of the transaction's instructions is refused with
+  `filter-matched-no-instruction`, and the refusal **names the programs the
+  transaction actually invokes**, so a typo is visible instead of green.
+
+The unfiltered path is untouched, and a filter that does match still runs.
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-filter.mjs` derives
+[research/conform-filter-domain-2026-11-09.json](research/conform-filter-domain-2026-11-09.json)
+by running the SAME probe file in the pre-fix tree (`git archive 58d3228`) and
+in this tree: on the pre-fix tree both defect cases exited 0 over 0
+instructions; in this tree both are refused with the reason named above, and
+the unfiltered run's exit code and instruction count are unchanged. The tool
+fails if the baseline ever shows no defect, and
+`test/conformance-filter-measurement.test.mjs` fails if the committed
+artifact stops being what the tool derives. The ladder
+`test/conformance-filter-domain.test.mjs` is 6 red on the pre-fix tree and
+11 green here; `tools/mutation-ladder-conform-filter.sh` catches 5/5
+mutations (the empty-selection guard, the program-id check, the reason name,
+the invoked-program detail, and the filter actually applying).
+
+## A lock that pins nothing is a refusal, not a green CI gate (2026-11-09)
+
+`sememe lock` + `sememe verify --mode error` is the CI gate the section above
+(*pin the answers*) tells a stranger to run after checkout. Two faces of ONE
+defect made that gate able to pass without checking anything:
+
+```bash
+npx sememe lock --store ./store --out ./sememe.lock   # store: receipts/ exists, no receipt in it
+  -> { "lockVersion": 1, "programs": {} }
+  -> exit 0
+
+npx sememe verify --store ./store --lock ./empty.lock --mode error   # empty.lock pins 0 programs
+  -> { "pinned": 0, "violations": 0, "extra": [ ...18 real programs... ] }
+  -> exit 0
+```
+
+The first command wrote a lock pinning **zero** answers: no fingerprint, no
+receipt, no origin — nothing a drifted store could ever contradict. The second
+command then certified a **real 18-program store** as clean against it: every
+program appeared as an `extra`, extras are never violations for being there
+(that rule is correct and stayed), so the report even *looked* informative
+while pinning nothing. `--mode warn` did the same. This is the same class this
+repository has measured three times: `verify` green over a store the reader
+refuses (2026-11-07), `conform --only` green over a filter selecting nothing
+(fixed in v0.4.13), and now `lock`/`verify` green over a lock pinning nothing.
+
+**What changed.** Two refusals, both named `lock-pins-nothing`:
+
+- `sememe lock` over a store with no receipt **refuses and writes no file** —
+  the repair (a `sememe pull` first) is named in the refusal. A lock over a
+  store whose `receipts/` directory does not exist is still refused as
+  `no sememe store`: the two refusals have different repairs and must not
+  collapse into one message;
+- `sememe verify` against a lock whose `programs` map is empty **refuses in
+  both modes** — the defect is a property of the DOCUMENT, not of the store,
+  so `--mode warn` (which exists to downgrade *store* violations) does not
+  certify it either. The check runs after the `lockVersion` check, so an
+  unsupported version is still reported as a version problem.
+
+The ordinary journey is untouched: locking a real store writes a lock pinning
+every program, and verifying it against an intact store still exits 0.
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-lock-nothing-pinned.mjs` derives
+[research/lock-nothing-pinned-2026-11-09.json](research/lock-nothing-pinned-2026-11-09.json)
+by running the SAME probe file in the pre-fix tree (`git archive f22dbf5`) and
+in this tree: on the pre-fix tree **all three defect faces are green** (lock
+exit 0 writing a 0-program file; verify exit 0 with `pinned: 0` in both modes);
+in this tree all three are refused with `lock-pins-nothing`, and the ordinary
+lock-then-verify journey exits 0 with 18 programs pinned in BOTH trees. The
+tool fails if the baseline ever shows no defect, and
+`test/lock-nothing-pinned-measurement.test.mjs` fails if the committed artifact
+stops being what the tool derives. The ladder
+`test/lock-nothing-pinned.test.mjs` is 5 red on the pre-fix tree and 12 green
+here; `tools/mutation-ladder-lock-nothing-pinned.sh` catches 5/5 mutations
+(the writer's guard, the reader's guard, the reason name, the repair sentence,
+and the empty check running after the version check).
+
+The delivery side is measured separately, because "main fixed, the pin behind
+it" is this repository's most-repeated defect: `tools/measure-lock-nothing-pinned-tag.mjs`
+installs PUBLISHED TAGS into an empty directory and runs the same cases against
+the bytes a stranger receives — see
+[research/lock-nothing-pinned-tag-2026-11-09.json](research/lock-nothing-pinned-tag-2026-11-09.json).
+
+## A store the reader refuses cannot pass the conformance gate (2026-11-10)
+
+`sememe conform <tx.json> --store <dir>` is a CI gate: exit 1 on any
+disagreement, exit 0 when the checked instructions agree with the store. The
+gate read the store through **one line that swallowed every failure**:
+
+```js
+const sources = await findStoredIdls(storeDir, instruction.programId);
+idl = sources.primary?.idl ?? sources.secondary?.idl ?? null;
+// ... inside:  } catch { idl = null; }
+```
+
+`findStoredIdls` is the ONE store reader that refuses damage by name
+(`src/store-read.mjs`: a receipt whose object no longer re-hashes to its
+fingerprint, a receipt bound to another program, a missing object, a
+malformed receipt, a rewritten origin). `sememe decode` on such a store exits
+1 with the reader's own message. `sememe conform` on the **same store** turned
+that refusal into a verdict and exited 0.
+
+Three faces of ONE defect, measured on the committed fixture transaction
+([test/fixtures/order-engine-conformance-tx.json](test/fixtures/order-engine-conformance-tx.json),
+which invokes `2En5Y11SEAGLNmEezTuRUCwTyzyNReHaMbSnS5gjGsL1`):
+
+```bash
+# the store the fixture reports a REAL disagreement against:
+npx sememe conform tx.json --store ./store --only 2En5Y11…
+  -> { "byVerdict": { "undeclared-signing-account": 1 } }   # exit 1  (correct)
+
+# one receipt's fingerprint tampered (the reader already refuses it on decode):
+npx sememe conform tx.json --store ./store-damaged --only 2En5Y11…
+  -> { "byVerdict": { "no-stored-interface": 1 } }          # exit 0  (green)
+
+# the --store directory does not exist, or has objects/ but no receipts/:
+npx sememe conform tx.json --store ./nowhere
+  -> 12 rows, all "no-stored-interface", disagreements 0     # exit 0  (green)
+```
+
+The tampered-receipt face is the one a real user hits, and it is worse than a
+false green: the transaction's actual disagreement **disappeared**. The gate
+reported "12 instructions, 0 disagreements" for a transaction that
+demonstrably disagrees, because the program it could no longer read was
+reported as a program the store never held. Damage was indistinguishable from
+an acquisition gap — so the gap verdict, which is honest and useful, was
+carrying a lie.
+
+This is the same class this repository has measured four times before:
+`verify` green over a store the reader refuses (2026-11-07), `conform --only`
+green over a filter selecting nothing (v0.4.13), `lock`/`verify` green over a
+lock pinning nothing (v0.4.14) — and structurally the same as the
+`receipt-hygiene` finding: one reader's refusal being dropped by a caller.
+
+**What changed.** The store reader's two *absence* errors now carry a machine
+readable `code` (`no-sememe-store`, `no-stored-idl`) so a caller can tell
+them apart **without parsing prose** — their messages are byte-identical to
+before, because `bin/sememe.mjs`, this README and several tests quote them.
+`checkTransaction` then distinguishes exactly three cases:
+
+- **the store holds no receipt for this program** (`no-stored-idl`) — an
+  honest acquisition gap, unchanged: the row keeps its
+  `no-stored-interface` verdict and the gate keeps running;
+- **the store does not exist** (`no-sememe-store`) — refused as
+  `no-sememe-store`;
+- **anything else the reader refuses** — refused as `store-reader-refused`.
+
+Both refusals are `ConformanceRefusal` and **lead with the program id**,
+followed by the reader's own message and the repair, so the CLI exits 1 with
+`conformance refused: <reason>` instead of printing a clean report.
+
+**The limits of this fix, in the same breath.** A refusal means the gate could
+not answer — it is not a statement that the transaction disagrees. The gate
+now fails CLOSED on stores it cannot read; it does not decide anything about
+the transaction in that case. A program the store genuinely does not hold
+still produces `no-stored-interface` (exit 0 when nothing else disagrees),
+because that is the acquisition gap the coverage numbers depend on: the fix
+had to separate the two without collapsing either. `--only` filtering still
+applies before the store is read, so a filter that matches no instruction is
+refused first (`filter-matched-no-instruction`), and this fix does not change
+the `unknown-instruction` / `unknown-discriminator` verdicts.
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-store-damage.mjs` derives
+[research/conform-store-damage-2026-11-10.json](research/conform-store-damage-2026-11-10.json)
+by running the SAME probe file in the pre-fix tree (`git archive 3d386b2`) and
+in this tree: on the pre-fix tree **all three defect faces are green** (exit 0
+over a store the reader refused); in this tree all three are refused with the
+named reasons, and both controls — the honest acquisition gap and the real
+disagreement on an intact store — are byte-identical between the trees. The
+tool also counts the measured HARM directly (`hiddenDisagreement`): the
+pre-fix intact store showed `undeclared-signing-account` and the pre-fix
+damaged store showed nothing. The tool fails if the baseline ever shows no
+defect, and `test/conform-store-damage-measurement.test.mjs` fails if the
+committed artifact stops being what the tool derives. The ladder
+`test/conform-store-damage.test.mjs` is 7 red on the pre-fix tree and 11 green
+here; `tools/mutation-ladder-conform-store-damage.sh` catches 5/5 mutations.
+
+The delivery side is measured separately, because "main fixed, the pin behind
+it" is this repository's most-repeated defect:
+`tools/measure-conform-store-damage-tag.mjs` installs PUBLISHED TAGS into an
+empty directory and runs the same cases against the bytes a stranger receives.
+
+## An instruction the gate cannot resolve must refuse, not vanish (2026-11-11)
+
+`sememe conform <tx.json> --store <dir>` resolves each instruction's program
+one of two ways: `instruction.programId` directly, or `instruction.programIdIndex`
+by INDEX into the canonical key list. An index past the end of the list
+resolves to nothing — and the gate's row loop simply stepped over it:
+
+```js
+for (const instruction of instructions) {
+  if (!instruction.programId) continue;   // no row, no count, no refusal
+```
+
+The instruction disappeared from `rows`, from `summary.instructions`, and from
+every verdict count. The report it produced was over a **subset of the
+transaction it was handed** — while describing itself as a check of that
+transaction. The file's own header already states the rule ("an unknown shape
+must never be reported as a clean bill of health") and the code already
+refuses when **NO** instruction resolves
+(`transaction-has-no-resolvable-program-id`); only the middle case — some
+resolve, some do not — was silent.
+
+**The worst face, measured on the order-engine fixture** (committed fixture,
+no network): the fill instruction is the ONE instruction with a real
+disagreement (an undeclared signing account). Pushing its `programIdIndex`
+past the end of `accountKeys`:
+
+```
+intact transaction:  rows 12, byVerdict {no-stored-interface: 11, undeclared-signing-account: 1}, exit 1
+broken fill index:   rows 11, byVerdict {no-stored-interface: 11},                 exit 0
+```
+
+The disagreement was not just unchecked — it was **hidden**, behind a report
+that looked complete over 11 of 12 instructions. Same class as the store the
+reader refuses (2026-11-10), one level over: not the store, the transaction.
+
+**What changed.** One refusal, `instruction-program-id-unresolvable`, raised
+**before** the store is read and **before** the filter selection:
+
+- some resolve, some do not -> refused, naming each offending instruction by
+  position (top-level or `CPI of top-level #n`) and by the raw
+  `programIdIndex` value it carried, plus the repair;
+- ALL unresolvable keeps its **existing** reason
+  (`transaction-has-no-resolvable-program-id`) — that refusal predates this
+  fix and must not be rewritten (it is pinned as guard G2);
+- a filter that selects nothing still fires its own reason first for callers
+  whose argument is the problem — the filter check stays ahead of both;
+- CPI instructions (`meta.innerInstructions`) are covered too: an unresolved
+  inner instruction is part of the transaction and cannot silently shrink the
+  report.
+
+The unfiltered and `--only` paths now agree: a transaction with a broken
+shape refuses on both, and the CLI exits 1 with the reason on stderr and no
+decision-carrying report (the decision is the refusal).
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-unresolvable.mjs` derives
+[research/conform-unresolvable-2026-11-11.json](research/conform-unresolvable-2026-11-11.json)
+by running the SAME probe in the pre-fix tree (`git archive 94aa00b` = the
+published v0.4.15) and in this tree: on the pre-fix tree the defect case exits
+0 over the dropped instruction AND the transaction's real disagreement is
+absent from the report (`hiddenDisagreement: true`); in this tree all three
+defect cases refuse with the named reason, the intact control still exits 1
+with its disagreement, and the all-dropped control keeps its original reason
+in **both** trees. The tool exits non-zero if the baseline ever shows no
+defect, and
+`test/conform-unresolvable-measurement.test.mjs` fails if the committed
+artifact stops being what the tool derives. The ladder
+`test/conform-unresolvable-program-id.test.mjs` is **6 red on the pre-fix
+tree and 16 green here** (6 defect cases U1–U6, 4 guards G1–G4 that pass on
+both trees); `tools/mutation-ladder-conform-unresolvable.sh` catches **6/6**
+mutations (the refusal itself, the reason name, the refusal order vs the
+filter, the detail naming positions, the all-dropped reason staying put, and
+CPI coverage).
+
+**Limits.** The refusal is about a shape no reader can interpret — it does
+not decide what the *right* program id is, only that the gate must not guess.
+A transaction whose `programIdIndex` legitimately points at a lookup-table
+loaded address is resolved through `meta.loadedAddresses` first (unchanged);
+an instruction that omits both `programId` and `programIdIndex` lands in the
+same refusal (`(none)` in the detail). One transaction fixture, committed —
+no live RPC shape was sampled for this pulse.
+
+The delivery side is measured separately, because "main fixed, the pin behind
+it" is this repository's most-repeated defect:
+`tools/measure-conform-unresolvable-tag.mjs` installs PUBLISHED TAGS into an
+empty directory and runs the same defect cases against the bytes a stranger
+receives — see
+[research/conform-unresolvable-tag-2026-11-11.json](research/conform-unresolvable-tag-2026-11-11.json).
+v0.4.15 is shown to carry the defect on all three dropped shapes (and exits 0
+with the disagreement hidden on the worst face); v0.4.16 refuses all three
+with `instruction-program-id-unresolvable`, with both controls unchanged.
+`test/conform-unresolvable-tag-measurement.test.mjs` fails if those roles ever
+blur.
+
+## An account index the gate cannot resolve is the same defect one level over (2026-11-11)
+
+One pulse ago the program reference was fixed; the ACCOUNT reference still
+had the identical shape. `sememe conform` resolves each instruction's
+accounts by index into the canonical key list, and in the published v0.4.16
+an index that did not resolve — past the end, negative, or a non-integer
+entry such as the `jsonParsed` OBJECT shape this file's own header says it
+does not model — silently became `{address: null, signer: null,
+writable: null}`. `checkAccountList` files a null signer under
+`unknownSigner`: a note, never a violation. The report looked complete.
+
+**The worst face, measured on the order-engine fixture** (committed fixture,
+no network): the fill instruction carries the transaction's ONE real
+disagreement — a signing account the interface does not declare, at position
+11. Replacing exactly that index with an out-of-range value:
+
+```
+intact transaction:          verdict undeclared-signing-account, EXIT 1
+broken extra account index:  verdict remaining-accounts,        EXIT 0
+whole transaction in jsonParsed object shape:      remaining-accounts, EXIT 0
+```
+
+The disagreement was not just unchecked — it was **hidden**, behind a green
+gate. This is the class this repository keeps finding one level down: not
+the program reference, the account reference.
+
+**What changed.** One refusal, `instruction-account-index-unresolvable`,
+raised **before** the store is read and **before** the filter selection —
+the same ordering discipline as the program-id sibling:
+
+- any instruction whose accounts list carries an index the key list cannot
+  resolve is refused, naming each offending instruction (top-level `#n`, or
+  `CPI of top-level #n at position p`), the account POSITION, and the RAW
+  value it carried, plus the repair;
+- CPI instructions are covered — an inner instruction is part of the
+  transaction;
+- the `jsonParsed` object entries are refused by name instead of folding
+  into null rows — the header's own "this file handles the `json` shape"
+  is now enforced, not just stated;
+- the older refusals did not move: an unresolvable PROGRAM index keeps
+  `instruction-program-id-unresolvable` even beside broken accounts (guard
+  G4), an EMPTY accounts list stays legal (guard G2 — emptiness is not
+  unresolvability), and indices into the loaded (ALT) range stay resolvable
+  (guard G3).
+
+**The measurement ships as an instrument, not a claim.**
+`tools/measure-conform-unresolvable-accounts.mjs` derives
+[research/conform-unresolvable-accounts-2026-11-11.json](research/conform-unresolvable-accounts-2026-11-11.json)
+by running the SAME probe in the pre-fix tree (`git archive 7b30c68` = the
+published v0.4.16) and in this tree: on the pre-fix tree **three of the four
+drop shapes exit 0** (`droppedExtraSigner`, `droppedFillAll`,
+`parsedObjectAccounts`) AND the fill's real disagreement is gone from the
+report (`hiddenDisagreement: true`); in this tree all four refuse with the
+named reason, and both controls — the intact disagreement (exit 1 in BOTH
+trees) and the legal empty-accounts shape — are unchanged. The tool exits
+non-zero if the baseline ever shows no defect, and
+`test/conform-unresolvable-accounts-measurement.test.mjs` re-derives the
+artifact and fails if the committed numbers stop being reproducible. The
+ladder `test/conform-unresolvable-accounts.test.mjs` is **6 red on the
+pre-fix tree and 10 green here** (A1–A6 defect, G1–G4 guards that pass on
+both trees); `tools/mutation-ladder-conform-unresolvable-accounts.sh` catches
+**6/6** mutations (the refusal itself, the reason name, the detail's
+positions and raw values, CPI coverage, the non-integer check, the
+unfiltered path).
+
+One ladder error, own-fault, caught by the ladder's own gates: the first
+M3/M5/M6 were VACUOUS — M3's replacement string matched the program-id
+refusal first (wrong block mutated, suite stayed green), M5's
+`typeof index !== 'number'` still refused objects (the mutation did not
+remove the behaviour under test), and M6's `[] && x` is truthy in bash-side
+JS. All three were rewritten to bite, and the vacuous first run is why the
+ladder requires an ANCHORED mutation, not just a plausible one.
+
+**Limits.** The refusal is about a shape no reader can interpret — it does
+not decide what the *right* account is. The check covers indices at the
+`transactionInstructions` seam; a transaction that resolves every index
+still passes through `checkAccountList` unchanged, so honest
+`unknownSigner` notes (a genuinely mangled encoding downstream of this
+seam) keep their existing meaning. One transaction fixture, committed — no
+live RPC shape was sampled for this pulse.
+
+## The largest publish-nothing gap decodes in its own dialect: shank (2026-11-04)
+
+The acquisition-gap classification left one program standing at the top of the
+list: `L2TExMFKdjpN9kozasaurPirfHy9P8sbXoAN1qA3S95` (Lighthouse, 42 payloads in
+the 156-fixture foreign sweep) publishes **no IDL account at either address**.
+`sememe pull` can never fetch it — so the biggest single remaining gap was not
+an acquisition question but a dialect question: its interface exists as a
+file in the upstream repository (`Jac0xb/lighthouse`, MIT), generated by
+[shank](https://github.com/metaplex-foundation/shank), and it is NOT an Anchor
+IDL.
+
+**What was actually different, measured rather than assumed.** Shank IDLs
+change two things sememe had hard-coded:
+
+1. **Dispatch is a 1-byte variant selector, not an 8-byte sighash.** Each
+   instruction carries `discriminant: { type: "u8", value: N }` — Lighthouse's
+   18 instructions are discriminants 0..17 (`MemoryWrite=0` …
+   `AssertBubblegumTreeConfigAccount=17`). sememe's `withDerivedDiscriminators`
+   ran Anchor's `sha256("global:<name>")` over these and filled all 18 with
+   sighashes that match no real wire — a table that would REFUSE every
+   Lighthouse payload while looking fully populated. The rule now: a stored
+   shank discriminant is copied verbatim, counted as a stored value (not an
+   Anchor derivation), and never checked against the sighash rule; the two
+   schemes are independent.
+2. **The lighthouse family encodes lengths as LEB128, not Borsh's u32.**
+   `CompactU64`, `CompactBytes` and the six `*Assertions` vector types are
+   referenced by the IDL but never defined in it — their wire form is pinned
+   upstream in `lighthouse_common::CompactU64`/`LEB128Vec` and mirrored by the
+   program's own generated JS client (`clients/js/src/hooked.ts`). sememe now
+   hooks exactly those names, **only** inside a shank-dialect IDL, and only
+   when the IDL does not define the name itself: an Anchor IDL that mentions
+   `CompactU64` still refuses it (`unknown defined type`), and a name the IDL
+   defines wins over the hook. Nothing is inferred from a value's shape.
+
+**What landed.** `src/shank.mjs` (dialect detection, discriminant extraction,
+the LEB128 hook table) wired into `src/codec.mjs` and
+`src/discriminators.mjs`; the first-party IDL adopted into the store through
+`sememe adopt` (`test/fixtures/shank-lighthouse-2026-11-04/lighthouse.json`,
+receipt fingerprint `sha256:461e28fd…`, origin
+`Jac0xb-lighthouse-4c579479c986`), so the decode goes through the product's
+own store path like every other program.
+
+**Measured, same sweep, same instrument**
+([`research/step-ingestooor-full-sweep-shank-2026-11-04.json`](research/step-ingestooor-full-sweep-shank-2026-11-04.json),
+2026-11-04T15:44Z, 156 fixtures, 806 payloads, 0 network attempts): decoded
+661 → **703**, acquisition gap 129 → **87**, byte-exact 654 → **696**, rate
+**100%**, disagreements **0**, decode errors unchanged at 16. Exactly one
+program row moved — Lighthouse 0 → **42/42 decoded**, both of its observed
+instructions (`AssertAccountInfoMulti` 21, `AssertTokenAccountMulti` 21)
+round-tripping byte-exactly; the refusal reasons of every other program are
+byte-identical to the previous run.
+
+**Tests: 11 new** (9 in `test/shank-discriminants.test.mjs`, 2 in
+`test/shank-sweep-report.test.mjs` pinning the committed report against the
+byProgram sum and the store receipt hash). The ladder, run against the
+pre-fix tree `4174bb3`: **7/9 RED** — T1–T5 and T8 fail exactly because the
+shank support is missing (T8's error on the old tree is the refusal this work
+fixes: `unknown instruction discriminator 0605020053bb5016 (18 known, e.g.
+7f92fad78d80cfee…)` — i.e. the old table holds 18 invented Anchor sighashes
+and none of the real 1-byte selectors); T6 and T9 are the false-positive
+guards and pass on **both** trees (Anchor 8-byte sighashes fill and decode
+unchanged; an Anchor IDL mentioning a shank-named type still refuses).
+
+**Known limits, kept explicit.** This is one program from one upstream
+repository — shank is a tool family, and the dialect was pinned from
+Lighthouse's own generated client, not from every shank-generated IDL that
+exists; a shank IDL whose hooked type is defined in its own `types` follows the
+IDL, and one with a different hooked set is unknown until pinned the same way.
+The two observation dialects (json/flat fixtures) carry no message bytes, so
+the ed25519 verification path still does not apply to this payload family.
+Lighthouse publishes no on-chain interface: the store copy is only as honest
+as its upstream source (first-party, fingerprinted, origin-labelled) — if
+upstream changes the wire, sememe will refuse by name, not decode wrongly.
+
+## A dialect it does not speak is a NAMED refusal, never a crash (2026-11-12)
+
+The acquisition queue's fourth face looked like a data problem and turned out
+to be a product defect. `DiabLokxisGR8P4Qqp2QL6PmBhhVsdzPstCE4WoLxc5z` — 102
+payloads in the committed ecosystem sample — has a first-party interface
+([cryptodiablo/diabloarb](https://github.com/cryptodiablo/diabloarb),
+`sdk/diabloarb-executor.idl.json` @ `f5005ac4`), and that file says in its own
+description what it is: *"Raw little-endian byte layout (NOT Anchor/Borsh:
+list lengths are u8 counters in the header)"*. It dispatches on a 1-byte
+`tag` with fields under `data`, its `types` is a dict keyed by name
+(`{Hop, Base, Route}`), and it declares its program under `program_id`.
+
+Feeding it to sememe before this section's fix produced three measured defect
+faces, none of them a refusal:
+
+1. **The codec CRASHED.** `context()` iterated `idl.types ?? []` — a dict is
+   not iterable — so all 102 payloads died with the unnamed
+   `TypeError: object is not iterable (cannot read property
+   Symbol(Symbol.iterator))`. A crash voice cannot be counted, grouped or
+   gated on: the coverage artifact recorded 102 `noInterface` and never saw
+   that the codec was broken one layer under.
+2. **The derivation LIED.** `withDerivedDiscriminators` filled all four
+tag-dispatch instructions with Anchor sighashes (`filled {instructions: 4,
+   events: 0}`, zero conflicts) — an authoritative-looking table matching no
+   wire byte, the stored-discriminator defect one dialect up.
+3. **adopt RE-LABELLED.** The file declares its program under `program_id`;
+   adopt and the store reader checked `idl.address` only, so adopting the
+   diabloarb interface under WSOL's program id **succeeded** without a word.
+
+**What landed.** `src/dialect.mjs` defines the named refusal ONCE
+(`unsupported IDL dialect: …`) and every boundary the defect entered through
+checks it: the codec's `context()` (before any iteration), the derivation
+(no table over a dialect it does not speak), `sememe adopt` (write path) and
+`store-read` (read path, so a store that already contains such an object
+refuses on every read). The declared-program check now reads `address`,
+`metadata.address` **and** `program_id`, and the refusal names the field that
+carried the declaration. Post-fix, the honest product answer for an
+unadoptable interface is `no stored interface` — 102 payloads in a state you
+can COUNT, group and gate on, never a TypeError.
+
+**The gate is surgical, and measured as such**
+([`research/dialect-named-refusal-2026-11-12.json`](research/dialect-named-refusal-2026-11-12.json),
+two-tree falsification against the pre-fix commit `aa6901b`): 24
+falsification counts, all zero. The prefix tree SHOWS every face — crash
+102/102, fill 4/0, adopt true under both ids, read boundary open; this tree
+lands on the named voices. The supported-dialect controls pass unchanged: a
+full anchor IDL, a shank IDL, and — deliberately — a legacy **name-only**
+anchor IDL (Kamino's, no selectors): such IDLs have no wire claims, the
+conform gate reads their account lists for layout checking, and the decode
+path already refused their payloads by name (`unknown instruction
+discriminator`) before this gate existed. Calling that shape "unsupported"
+would have changed attested behavior without a single measured wire failure.
+All 22 committed store objects stay readable. The upstream bytes carry no
+license at the pin, so they are **not vendored**: the measurement takes
+`--source` (the file fetched at the pin) and verifies the pinned canonical
+fingerprint `sha256:d6d4e8aa…` before anything runs.
+
+**Tests: 19 new** (9 in `test/dialect-named-refusal.test.mjs`, 10 in
+`test/dialect-named-refusal-measurement.test.mjs` — the artifact-vs-tool pin
+re-derives the whole two-tree measurement and is network-skipped by name).
+Suite 893 → **912: 908 pass / 4 named network skips / 0 fail**. Released as
+v0.4.21: product code changed, so the pin moved.
+
+**Known limits, kept explicit.** Naming the refusal is not support: none of
+the 102 DiabLokxis payloads decode yet. A raw little-endian dialect with
+header-counted vectors is a real second dialect family and the follow-up
+work is to decode it — pinned per program from its first-party source, the
+way shank was. What this fix guarantees is that until that happens, the
+interface is refused by name at every boundary and never crashes the codec
+or pretends to be decodable.
+
+## The product SPEAKS the dialect it named: the raw-LE engine is wired (2026-11-12)
+
+PULS X named the refusal ("naming a dialect is not speaking it") and PULS Y
+built the speaker — an engine for exactly the grammar the diabloarb file
+DECLARES (`encoding: "little-endian; u8/u16/u32/u64 unsigned, i64 signed; no
+padding; no length prefixes except the u8 counters named in each header"`):
+u8-tag dispatch, dict `types` with declared fixed sizes, counter-prefixed
+vectors (`Base[n_bases]`, `u8[n_hops]`), one byte-decided optional trailing
+field. 102/102 committed payloads decoded byte-exactly, and the product
+boundary stayed untouched — deliberately: capability first, the wiring with
+the pins it rewrites.
+
+**This pulse is the wiring** (the card's own declared next step):
+
+- `src/codec.mjs` routes every decode/encode of a file OUTSIDE the Anchor
+  shape but INSIDE the engine grammar through `src/rawle.mjs`, before the
+  shape gate. The result carries the codec's own fields (`discriminator` is
+  the dispatch prefix in hex; `dialect: 'raw-le'`), and every engine refusal
+  is translated into `CodecError` — one refusal family at the product
+  boundary, never a `RawLeError` leak, never a crash.
+- `src/dialect.mjs` splits the question "can anything read this file?" from
+  "can the Anchor codec read it?": `unreadableDialectReason`/`assertReadableDialect`
+  pass an engine-readable file and keep the exact named refusal (code
+  `unsupported-idl-dialect`) for everything else; `idlDialect` reports
+  `'raw-le'` for a wired dialect.
+- The store gates (`src/adopt.mjs` write path, `src/store-read.mjs` read
+  path) use the readable-dialect guard: a raw-LE object adopts under its
+  own program id, reads back, and the CLI loop `sememe adopt` → `sememe
+  decode` works end-to-end offline (measured 2/2). Mislabelling under a
+  foreign program id stays refused via `program_id` — the wiring opens the
+  dialect gate, not the re-labelling gate.
+- The derivation (`src/discriminators.mjs`) passes the file WITHOUT filling
+  any Anchor sighash table (the PULS X fill defect stays dead — measured
+  filled {instructions: 0, events: 0}); the union (`src/union.mjs`)
+  decodes through the engine like through any source.
+
+Measured two-tree, byte-identical probe
+([`research/rawle-product-2026-11-12.json`](research/rawle-product-2026-11-12.json),
+pinned in `test/rawle-product-measurement.test.mjs` with a full
+gh-gated re-derivation): prefix tree = the PULS Y engine commit `05e6643`
+(engine present, product refuses — 0/102, store loop closed), this tree =
+102/102 decoded AND 102/102 byte-exact re-encoded at `decodeInstructionData`,
+5/5 product-level refusals as named `CodecError` faces (unknown tag,
+truncated payload, trailing bytes, unknown instruction on encode, missing
+argument on encode), derivation passes with NO table, adopt/read/union open,
+CLI store loop 2/2, Whirlpool control unchanged, a file that defeats BOTH
+engines keeps the exact PULS X named refusal at codec AND union. 24
+falsification counts, all zero. The PULS X measurement
+([`research/dialect-named-refusal-2026-11-12.json`](research/dialect-named-refusal-2026-11-12.json))
+was re-derived in its invariant form: its delta now reads crash → decodes
+through the engine, fill {4,0} → {0,0} — the no-crash, no-fill, no-mislabel
+invariants pinned on every payload. The PULS Y artifact stays the frozen
+pre-wiring baseline; its tool now exits 3 NO VERDICT in a wired tree BY
+DESIGN (stated in the tool header).
+
+**Tests: 1 new pin file** (`test/rawle-product-measurement.test.mjs`, 12
+tests) plus the bent faces in `test/dialect-named-refusal.test.mjs` (D1b),
+`test/rawle-decoder.test.mjs` (G1) and
+`test/dialect-named-refusal-measurement.test.mjs`. Suite 912 → **933: 929
+pass / 4 named network skips / 0 fail**. Product code changed; the pin is
+the next release.
+
+## The wiring SHIPS in v0.4.22 — and the ecosystem number it moves is +102 for the user who adopts, not the shipped store (2026-11-12)
+
+This release carries the raw-LE wiring above to the install channel: the
+pinned tag now contains `src/rawle.mjs` and every wired boundary, so
+the v0.4.22 install degrades nobody (Whirlpool,
+shank, name-only anchor controls pin unchanged) and answers the diabloarb
+dialect where v0.4.21 refused it by name.
+
+The wiring also prompted the card's declared coverage re-measurement, and
+the honest answer is TWO-HALVED (`tools/measure-diablo-adoption-coverage.mjs`
+→ `research/diablo-adoption-coverage-2026-11-12.json`, pinned by
+`test/diablo-adoption-coverage.test.mjs`, 9 tests, gh-gated re-derivation
+included):
+
+- **At the shipped store the headline does NOT move.** Re-running the
+  committed 2026-11-11 fixture through the coverage tool on this tree
+  reproduces the committed artifact exactly: **88.5%, DiabLokxis 0 decoded
+  / 102 no-interface.** The wiring changed the codec, not the store, and
+  the diabloarb copy cannot ship inside the store: `cryptodiablo/diabloarb`
+  carries **no license** at the pin `f5005ac4` — live re-checked inside the
+  pin test (GitHub license API 404 at the pin AND at HEAD, repo field
+  null), not narrated. The bytes stay out of the repository and the
+  package; `committedStoreModified: false` (readdir + per-file hash digest
+  before/after).
+- **For the user who adopts, the 102 are real.** ONE `adopt` of the
+  hash-gated first-party copy (canonical fingerprint
+  `d6d4e8aa…` verified before anything runs) through the product's own
+  write path, into a throwaway copy of the committed store, and the SAME
+  report tool answers **102/102 decoded, 0 refused, 102 byte-exact**:
+  headline **88.5% → 89.0%** of measured traffic, outside the watchlist
+  **62.4% → 64.4%**. Every one of the 102 rides the **adopted** evidence
+  column (`decodedVia.adopted +102`; `pulled` moves by exactly zero) — the
+  same class split the pfeeU, manifest and archer measurements keep, so an
+  adoption can never silently inflate the on-chain-pull number.
+
+So "102 jetzt zählbar" was half true: countable **yes** — as adoption-path
+coverage, with a name and a byte-exact check — and **not** as a shipped
+headline. The acquisition gap at that program is a LICENSE gap, not a
+decoder gap: the one thing between the user and those 102 payloads is a
+licensed first-party copy, which is exactly what `sememe adopt` exists to
+carry while origin stays declared.
+
+Suite after this release: **954 tests / 950 pass / 4 named network skips /
+0 fail** (945 → 954: the 9 new pin tests). CI green on `main`
+(43287274405) and on the published tag v0.4.22 (43287274209); the release
+surface re-measured against that tag is clean (newest = latest = pinned,
+0 defects — `research/release-surface-2026-11-12b.json`).
+
+## v0.4.23 / v0.4.24: struct-internal absent fields decode under the evidence gate — and the registry stays truthful (2026-11-13)
+
+The absent-field policy (`absent: "report"`) only fired at TOP-LEVEL argument
+boundaries, so a payload that ends on the boundary of the LAST FIELD INSIDE a
+struct argument was refused under every policy. Measured on mainnet: Archer's
+legacy Swap form (tag `0f`, 19 bytes) omits `SwapParams.builderFeePpm`
+INSIDE `swapParams` and is chain-executed — witness `5Kpdai4oRG…`, slot
+468261978, `err: null`, instruction bytes byte-identical to the payload
+(`research/archer-legacy-swap-witness-2026-11-12.json`; the pinned IDL's own
+`SwapParams` docs describe the shorter form as supported and read as a 0 fee,
+with the program's own `success` log line). One of the 83 payloads in
+`research/archer-second-source-2026-11-12.json` hit exactly this and v0.4.22
+refused it with `truncated input: need 4 byte(s) at offset 19`.
+
+This release decodes it and re-encodes it byte-exactly: inside a named struct,
+under the same decode-only evidence gate (`ctx.__absentPolicy`), a boundary
+ending mid-struct makes the remaining fields ABSENT, named by their dotted path
+(`swapParams.builderFeePpm`), never invented; cuts INSIDE a field and boundary
+cuts inside vec/array elements still refuse; the strict default policy is
+untouched; `encodeInstructionData` accepts the dotted absent names (trailing
+run per struct). `verifiedShortForm` now matches short (sub-8-byte) shank
+discriminators by prefix — the rule the codec's instruction index already used
+— so the 1-byte Archer tag reaches the chain-verified short-form table. Pinned
+by `test/struct-absent-short-form.test.mjs` (10 tests: the falsification
+ladder is 6 red on the v0.4.22 tree, green here).
+
+The registry channel is live and carries this release with the tag: the
+foreign-run sweep measured `npm: found` for the bare name with the verdict
+still `not-distributed-not-consumed`
+(`research/foreign-run-2026-11-12.json`) — publish is not consumption, and
+the first external run stays the open gate.
+
+Install — the registry and the tag ship the same product files (`npm install
+sememe` resolves to 0.4.23, the one tag this README pins above):
+
+```bash
+npm install sememe   # registry: 0.4.23, zero runtime dependencies
+```
+
+Limits, stated plainly: the Archer interface still does not ship inside the
+store (no on-chain IDL; the Apache-2.0 first-party copy stays adopt-only and
+hash-gated — unchanged); enum- and vec-body boundary cuts still refuse until a
+chain witness names them (the rule stays evidence-gated; no speculative wire
+form is accepted); tags <= v0.4.22 keep the truncation refusal (a tag is
+immutable); one owner account, zero external users, no audit.
+
+Suite for this release: **964 tests / 960 pass / 4 named network skips /
+0 fail** (954 → 964: the 10 new pin tests). CI green on `main`
+(43332583023); the release surface re-measured after publishing is CLEAN —
+newest = latest = pinned, 0 defects (`research/release-surface-2026-11-13.json`),
+and the registry carries the release as `latest` (measured after propagation).
+
+v0.4.23 (published 2026-11-13 00:49 UTC) carried this release to both channels
+but its README held TWO install pins — the front page plus the historical
+v0.4.22 section line — and the journey contract
+(`test/base58-journey.test.mjs` and five siblings) requires exactly one:
+tag CI 43340061132 RED with `README must pin exactly one tag, found v0.4.23,
+v0.4.22` (394b37b is the fix). The v0.4.23 tag and its npm tarball are
+published and immutable, so they keep the two-pin README; **v0.4.24 is the
+corrected release** — same product bytes as v0.4.23 (no src/ change since
+3fa9627), one pin, journey suite green (27/27), registry `latest` = 0.4.24.
+
+## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
+
+With Lighthouse decoded under shank, exactly **35 programs (87 payloads)** remained
+in the `no-interface-published` set. Rather than polishing the coverage headline,
+`tools/classify-publish-nothing.mjs` measured where an interface for each one
+could come from, scanning the foreign repository's own committed source
+(`step-finance-oss/step-ingestooor @001cf39`, MIT; committed artifact:
+`research/publish-nothing-classification-2026-11-04.json`, pinned in
+`test/classify-publish-nothing.test.mjs`):
+
+| Category | Programs | Payloads | Nature |
+|---|---|---|---|
+| `first-party-foreign-idl` | **7** | **22** | First-party Anchor/Shank IDL in foreign repo (`crates/idl-gens/idls/`) declaring the program address |
+| `dedicated-foreign-parser` | **9** | **32** | Custom hand-written Rust parser under `crates/parsers/src/` (Solend: 10, Saber: 5, Stake Pool: 4, etc.) — no published IDL exists |
+| `core-runtime-program` | **3** | **5** | Core Solana runtime / sysvar programs (`Stake111...`, `Ed25519SigVerify...`, `noopb9bk...`) — no IDL by protocol design |
+| `unrepresented-source-gap` | **16** | **28** | Appears in test fixture traces; neither an IDL nor a dedicated parser in the foreign repo |
+| **Total** | **35** | **87** | Partition verified without remainder (pinned in `test/classify-publish-nothing.test.mjs`) |
+
+### Seven first-party copies adopted, sweep re-measured
+
+The 7 first-party foreign IDLs were swept into the store via
+`tools/adopt-foreign-first-party.mjs` through `sememe adopt` (`test/fixtures/traffic-sample-store-2026-11-04-pulled/`,
+receipts source `first-party`, origin naming repo, commit and file; artifact:
+`research/adopt-foreign-first-party-2026-11-04.json`, pinned in `test/adopt-foreign-first-party.test.mjs`):
+Lulo (`FL3X2p...`), NX Lending (`NXFiKi...`), Solayer Restake (`sSo1iU...`),
+Solayer AVS (`endoLN...`), Reward Options (`RopsJ7...`), Titan (`T1TANp...`),
+Step Staking (`Stk5NC...`).
+
+Re-measurement of the full 156-fixture foreign set with identical flags
+(`--absent error`, `research/step-ingestooor-full-sweep-classified-2026-11-04.json`,
+pinned in `test/classified-sweep-report.test.mjs`):
+
+- **decoded:** 703 → **724** (+21 payloads decoded)
+- **gap (`noInterface`):** 87 → **65** (-22 payloads; 21 decoded, 1 refused by name)
+- **byteExactFull:** 696 → **716** (+20 full byte-exact)
+- **byteExactDescribed:** 7 → **8** (+1 Titan swap described exact)
+- **byteExactRate:** 100% (every decoded payload re-encodes byte-for-byte)
+- **decodeErrors:** 16 → **17** — the single non-decoded payload is **REFUSED BY NAME**:
+  `T1TANpTeScyeqVzzgNViGDNrkQ6qHz9KrSBS4aNXvGT: Venue: unknown variant index 40` (an honest
+  refusal on an unrepresented enum variant, not a silent mis-parse).
+- **disagreements:** 0 (still completely diff-free)
+- Exactly the 7 adopted programs moved in `byProgram`; the remaining 28 programs
+  sum to exactly 65 payloads.
+
+The true acquisition gap for this sweep is now **65 payloads** across 28 programs —
+all of which have NO published IDL (9 dedicated custom parsers, 3 core runtime,
+16 unrepresented trace programs).
+
+### The 16 unrepresented trace programs, measured against external sources (2026-11-04)
+
+The 16 programs (28 payloads) were labeled `unrepresented-source-gap` because they
+appeared in the foreign repository ONLY inside `crates/parsers/tests/**` transaction
+traces (local premise check: 16/16 verified trace-only via `git grep HEAD`). Rather
+than assuming they have no interface anywhere, `tools/measure-unrepresented-external.mjs`
+scanned GitHub's code index for the literal program address, with a positive control
+(`bitquery/solana-idl-lib solfi/solfi.json` declares `SoLFiHG9Tfgt...` -> 1 index match,
+file readable and declares program -> control resolved; artifact:
+`research/unrepresented-external-sweep-2026-11-04.json`, pinned in
+`test/unrepresented-external.test.mjs`):
+
+- **4 programs (9 payloads)** have a published external interface whose file explicitly
+  **DECLARES** the program (`metadata.address` match, content-verified):
+  - SolFi (`SoLFiHG9TfgtdUXUjWAxi3LtvYuFyDLVhBWxdMZxyCe`, 4 payloads): `bitquery/solana-idl-lib solfi/solfi.json`
+  - ZeroFi (`ZERor4xhbUycZ6gb9ntrhqscUcZmAbQDjEAtCf4hbZY`, 1 payload): `bitquery/solana-idl-lib zerofi/zerofi.json`
+  - HumidiFi (`9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp`, 1 payload): `bitquery/solana-idl-lib humidifi/humidifi.json`
+  - Manifest Wrapper (`wMNFSTkir3HgyZTsB7uqu3i7FA73grFCptPXgrZjksL`, 3 payloads): `Bonasa-Tech/manifest client/idl/wrapper.json`
+- **12 programs (19 payloads)** have external references (code or docs) but no published IDL file.
+- **0 unknown** (positive control resolved, no partial-sweep claims).
+
+### External adoption preview (falsification against fixture bytes)
+
+Does a declared external interface actually decode the foreign repo's fixture bytes?
+The claim was previewed via `tools/preview-external-adoption.mjs` on a throwaway store
+copy (artifact: `research/external-adoption-preview-2026-11-04.json`, pinned in
+`test/external-adoption-preview.test.mjs`):
+
+- **decoded:** 724 → **732** (+8 payloads decoded: SolFi 4/4, Manifest Wrapper 3/3, ZeroFi 1/1)
+- **gap (`noInterface`):** 65 → **56** (-9 payloads resolved)
+- **decodeErrors:** 17 → **18** — HumidiFi's single payload is **REFUSED BY NAME**:
+  `9H6tua7jkLhdm3w8BvgpTn5LZNU7g4ZynDmCiNN3q6Rp: unknown instruction discriminator f6dc6...`
+  (an honest refusal, not a silent mis-parse).
+- **disagreements:** 0 (still completely diff-free).
+- **byteExactRate:** 100% (all 8 decoded payloads reproduce byte-for-byte).
+- **isolation:** exactly the 4 adopted programs moved in `byProgram`; 0 unadopted rows shifted.
+- **license gate:** `bitquery/solana-idl-lib` has license `null` (no LICENSE file),
+  `Bonasa-Tech/manifest` is `GPL-3.0`. Neither may be copied into this MIT repository or
+  the published npm package. The preview therefore ran on a throwaway work-dir;
+  the committed store remains untouched (`committedStoreModified: false`, 76 receipts).
+
+## Next qualification
+
+1. Reproduce the classification with `npm ci && npm test && node tools/measure.mjs programs-20.json another-run.json` (or set `SOLANA_RPC_URL` to another mainnet RPC). The script checks canonical Program Metadata and legacy Anchor IDL accounts in one finalized batch, separates RPC failures from missing accounts, and checks PDA derivation against independently pinned fixtures from `auroraxo/idl-drift`. It is **not** a pull/store/decode implementation. An incomplete RPC run is not zero coverage; absences at these two addresses do not mean no interface exists elsewhere.
+2. **Whirlpool pull + content fingerprint has landed, the instruction decoder decodes real mainnet bytes, one own consumer reads the stored artifact for BOTH checking and producing, and the decoder is verified against an independent oracle across 1,000+ transactions** (see sections above): `solana-tx-remix` uses the pinned IDL for its single-program Whirlpool path (verifier + emitter), and `tools/tx-diff.mjs` verifies 1,119 real mainnet payloads from 1,029 transactions (sampled across 40,013 mainnet transactions in 148 finalized blocks) with 0 naming disagreements, 0 value disagreements, 0 byte mismatches, and 33 unexplained trailing-byte payloads (2.95%). Still to do, in order: migrate the remaining own decoder paths; then seek an outside user. The selected-sample threshold does not validate other program families. The `41 paths` figure above is an unverified note estimate; the computed scan in [research/decoder-sites-2026-10-27.json](research/decoder-sites-2026-10-27.json) reports **42 (file, class) decoder sites across 35 files in 5 own repositories**, of which 36 sit in `solana-tx-remix` + `sememe` — the counting unit matters and the two numbers are not interchangeable.
+3. **Account decoding has landed** (see "Accounts: state, not just calls"): 39 real mainnet accounts across three programs, 39/39 re-encoded byte-exact, values checked against anchor-ts, 29/29 account discriminators matching anchor-ts's own computation. Still open: `repr(C)`/`packed` accounts, non-Anchor account framing, and the report path for account bytes the IDL does not describe (no real data has exercised it yet — 0 trailing bytes observed).
+4. **Union decode has landed** (see "Working now: union decode"): `sememe adopt` puts a first-party published copy in the store, `sememe decode --union` answers from both verified sources with byte-evidence arbitration and a reported drift ledger — measured 915/996 decoded on real pump.fun traffic (the on-chain account alone decodes 669, the published copy alone 880). The declared-origin qualification has landed too (see "Working now: a declared origin is declared, and cannot be rewritten silently"): reader surfaces mark it as declared, the receipt carries its own digests, `sememe verify` names rewritten origins as relabelled, and the false collision on identical bytes is gone. **The account half has landed too (2026-11-08, see "Working now: account union"): `sememe account --union` arbitrates the same two sources over account bytes — measured on 12 real mainnet pump.fun accounts, the single-receipt path was byte-exact on 0 of 12 and the union path on 6 of 12, with the drift named per account.** A cross-program re-measurement over all 6 programs with account fixtures (74 accounts, `research/account-union-cross-2026-11-08.json`) put the honest bound on that number: recovery happened on 1 of 4 two-source programs, the other three agreed, disagreed without deciding, or could not name the account because the copy renames it — with 0 failures on the four regression invariants. Still open: verifying an adopted copy's provenance against its upstream source.
+5. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.
