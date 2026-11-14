@@ -3135,3 +3135,80 @@ Artifact: `research/count-from-header-shape-scan-2026-11-13.json`.
 3. **Account decoding has landed** (see "Accounts: state, not just calls"): 39 real mainnet accounts across three programs, 39/39 re-encoded byte-exact, values checked against anchor-ts, 29/29 account discriminators matching anchor-ts's own computation. Still open: `repr(C)`/`packed` accounts, non-Anchor account framing, and the report path for account bytes the IDL does not describe (no real data has exercised it yet — 0 trailing bytes observed).
 4. **Union decode has landed** (see "Working now: union decode"): `sememe adopt` puts a first-party published copy in the store, `sememe decode --union` answers from both verified sources with byte-evidence arbitration and a reported drift ledger — measured 915/996 decoded on real pump.fun traffic (the on-chain account alone decodes 669, the published copy alone 880). The declared-origin qualification has landed too (see "Working now: a declared origin is declared, and cannot be rewritten silently"): reader surfaces mark it as declared, the receipt carries its own digests, `sememe verify` names rewritten origins as relabelled, and the false collision on identical bytes is gone. **The account half has landed too (2026-11-08, see "Working now: account union"): `sememe account --union` arbitrates the same two sources over account bytes — measured on 12 real mainnet pump.fun accounts, the single-receipt path was byte-exact on 0 of 12 and the union path on 6 of 12, with the drift named per account.** A cross-program re-measurement over all 6 programs with account fixtures (74 accounts, `research/account-union-cross-2026-11-08.json`) put the honest bound on that number: recovery happened on 1 of 4 two-source programs, the other three agreed, disagreed without deciding, or could not name the account because the copy renames it — with 0 failures on the four regression invariants. Still open: verifying an adopted copy's provenance against its upstream source.
 5. Test a less family-clustered, independently selected sample and seek an outside user actually importing an interface before claiming this is a venture. A favorable fraction or self-run tests alone are not adoption.
+
+## 2026-11-14 — PULS AL: THE TWO RELEASE CHANNELS WERE NEVER COMPARED WITH EACH OTHER
+
+The README claimed (and still claims) that `npm install sememe` and
+`npm install github:auroraxo/sememe#v<version>` "deliver the same product
+files from the same code". The release-surface contract
+(`tools/measure-release-surface.mjs`) checks the newest TAG against the
+README. Nothing compared the bytes the REGISTRY actually serves against the
+bytes the TAG of the same name carries.
+
+`tools/measure-channel-parity.mjs` measures exactly that gap, per published
+version, file by file and byte for byte:
+
+* registry side: `npm pack sememe@<version>` — the tarball the registry serves;
+* tag side: `npm pack` of the exported `v<version>` tree — the bytes a
+  `github:auroraxo/sememe#v<version>` install gets;
+* plus npm's own `gitHead` for the version, classified against the tag commit
+  with git itself (`same` / `gitHead-is-descendant-of-tag` /
+  `gitHead-is-ancestor-of-tag` / `unrelated`).
+
+**Verdict `channel-parity-broken`** (artifact:
+`research/channel-parity-2026-11-14.json`, 8 published versions measured):
+
+| version | classification | mechanism |
+| --- | --- | --- |
+| 0.0.0-stage | `stage-placeholder` | published stub (`package.json`: `"stub": true`), no tag, ships no product code |
+| **0.4.21** | **`product-divergence`** | the registry ships `src/rawle.mjs`; tag `v0.4.21` does NOT contain it. npm's `gitHead` is `05e6643`, a DESCENDANT of the tag commit `a0cfd70` — the publish came from the tree after the tag. The later wiring commit `3401f9f` is not in the published tarball either |
+| **0.4.22** | **`doc-divergence`** | published from `40204fd`, one commit AFTER tag `725d946`; only `README.md` differs (the release-record block). Product files byte-identical |
+| 0.4.23 … 0.4.27 | `parity` | same files, same bytes; `gitHead` equals the tag commit (0.4.27's `gitHead` `84398b8` is the tag commit's ancestor — the tag was re-cut later over `research/` files only, the shipped product bytes are unchanged) |
+
+**What this means for a stranger.** Pinning `0.4.21` gives different code
+depending on the channel: the registry copy contains a product file the tag
+copy does not have. Both divergences are IMMUTABLE — npm versions and git
+tags cannot be rewritten — so the honest remedy is not a fix but a NAMED,
+MEASURED record plus a gate, and that is what this section is.
+
+**The gate.** `test/channel-parity.test.mjs` (10 tests):
+
+* D1 the committed verdict is DERIVED from the committed summary (editing a
+  classification without its counter fails; editing the verdict string fails);
+* D2a–D2e the git-side truth, fully OFFLINE: `git cat-file -e
+  v0.4.21:src/rawle.mjs` fails (the tag really lacks the file) while
+  `05e6643:src/rawle.mjs` exists (the recorded publish really had it); the
+  0.4.22 tag..gitHead delta touches `README.md` and nothing under `src/`,
+  `index.mjs`, `bin/`, `interface/`, `vendor/`, `LICENSE`, `package.json`;
+  every recorded `tagCommit` resolves to the real local tag and every recorded
+  `npmGitHead` is a real commit of this repository;
+* D2f the NEWEST recorded release measures `parity`, and every release from
+  0.4.23 on does — the artifact is a gate, not a museum piece;
+* G1 falsifier: editing the committed 0.4.21 classification turns the pin red
+  (measured: 3 faces red, then restored);
+* G3 (named network skip, `SEMEME_CHANNEL_PARITY=1`): a live re-derivation
+  against the registry reproduces the committed artifact — measured green
+  (10/10);
+* G4 the tool refuses to run without an output target (exit 2).
+
+**Falsification ladder.** `tools/mutation-ladder-channel-parity.sh` mutates
+the measurement code in a throwaway copy (the working tree is never touched)
+and re-runs it against the LIVE registry: **5/5 CAUGHT**, control green —
+M1 product divergences collapse to `parity`; M2 `src/` stops counting as a
+product file; M3 registry-only files are dropped from the comparison; M4 the
+stage placeholder is not recognized; M5 the verdict is hard-coded clean.
+
+**Honest limits.** Both sides are measured through `npm pack`, so the
+comparison is about the shipped file CONTENT, not about runtime behaviour of
+the two channels (the registry user-zero probe covers that separately). The
+0.4.21 divergence is a divergence of ONE FILE (`src/rawle.mjs`, 450 lines)
+between two releases that are four days old and both superseded by 0.4.27;
+0 external users are affected so far. This record does not repair the past —
+it names what was published, proves it, and makes the next release unable to
+repeat it silently.
+
+**Own error caught by the own gate.** The first ladder run reported M2 as
+CAUGHT for the wrong reason: the mutation's temporary filename contained a
+`/`, so the copy failed and the pin went red on a missing file rather than on
+the mutated logic. Fixed (index-based mutation filenames) and re-run: 5/5
+caught for the right reasons, control green.
