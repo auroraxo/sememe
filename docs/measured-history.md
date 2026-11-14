@@ -2840,6 +2840,79 @@ CAMM `update_operation_account` stay unwired at 0 payloads in their windows
 machine, no audit — publish is not consumption; tags <= v0.4.25 keep the
 garbage-number refusal (immutable).
 
+## The on-chain interface copy was complete on instructions and incomplete ON THE WIRE — and neither half of the fix was sufficient alone (2026-11-14)
+
+Most acquisition gaps are "no interface exists at all". HADRo
+(`HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8`) is the other kind: the
+on-chain metadata IDL (receipt at slot 468262003) declares **all 38
+instructions and every type**, and is still incomplete on the wire. It lacks
+exactly two argument declarations — `sequence: u64`, last on `setCurve` and
+`setRiskCurve` — and the wire carries those 8 bytes after the points.
+
+Measured on the 144 committed chain-accepted payloads of those two
+instructions, from the stored copy alone: 144/144 decoded, 0 refused;
+144/144 end in 8 unexplained bytes; **0/144 re-encode byte-exactly**; 144/144
+are refused under `--trailing error`. A consumer had no path to byte-exactness
+on real mainnet traffic.
+
+**The four-face ladder** (`tools/measure-hadron-adoption.mjs`,
+`research/hadron-adoption-2026-11-14.json`). The same 144 payloads in every
+face, identified by the discriminator byte 0x04/0x08 ONLY, so no face's
+decoder selects another face's rows:
+
+| face | decoded | refused | byte-exact |
+|---|---|---|---|
+| F1 prefix tree `ea074c4` + on-chain IDL | 72 | 72 | 0 |
+| F2 prefix tree `ea074c4` + first-party IDL | 72 | 72 | 0 |
+| F3 current tree + on-chain IDL | 144 | 0 | 0 |
+| F4 current tree + first-party IDL | 144 | 0 | **144** |
+
+F2 is the falsifier for "just adopt the source IDL": the first-party copy
+(`Hadron-Fi/hadron-tx-verifier` @ `0c1bca1d`, Apache-2.0 AND MIT) declares
+`points` as a Borsh vector TOO, so without the count-from-header rule it
+refuses the same 72 payloads and reproduces 0 bytes. F3 alone is the
+falsifier for "the header rule alone is the fix": it stops the refusals but
+drops the 8-byte tail, so 0/144 still round-trip. Only the composition
+reproduces every byte. Neither half had ever been measured together — the
+13.11. measurement saw the tail as an honest limit, and the source IDL was
+recorded as a file that could not fix anything on its own.
+
+**The fix.** `sememe adopt-hadron` adopts the first-party published copy from
+a sha256-pinned vendored file, hash-checked BEFORE any write, through the
+product's own write path (`src/adopt.mjs`). The union then reproduces
+144/144 payloads byte-exactly, 0 unexplained bytes, 0 refusals under
+`--trailing error`, and NAMES the disagreement with the on-chain copy
+(`verdict: layout_drift`, drift path `sequence`, arbitration basis
+`byte_evidence_full_roundtrip`) instead of silently picking one.
+
+**The guards, and the one a hash pin cannot make.** The loader checks the
+CLAIM the bytes make, not only the bytes: sha256 of every vendored file, the
+declared program address, and the two `sequence:u64` tail args present and
+last. The third check is what mutation M4 exercises — the copy is mutated AND
+the pin is updated with the mutated bytes, so only the claim check can catch
+it. `test/hadron-adoption.test.mjs`: 9 tests, 7 RED on the tree without
+`vendor/hadron` + `src/hadron.mjs` + the command, 2 guards green on BOTH
+trees. Mutation ladder `tools/mutation-ladder-hadron.sh`: 5/5 CAUGHT (M1
+tampered bytes, M2 missing file, M3 re-labelled address, M4 dropped tail, M5
+origin label truncated by adopt's 64-character cap), control green before and
+after, tree byte-identical afterwards.
+
+**A detail worth naming.** `sememe adopt` caps a declared origin at 64
+characters and TRUNCATES silently — which already costs the 105-character
+lighthouse origin its commit tail and its file path. This acquisition's label
+is deliberately 59 characters (`hadron-tx-verifier@<40-hex commit>`), so the
+WHOLE commit is recorded; a commit truncated to 35 hex characters is not a
+commit.
+
+**What it does not do.** Plain `sememe decode` keeps the on-chain receipt as
+its default answer — measured unchanged on both sides of the adoption (the
+adopted receipt sorts at slot 0, so it never wins the single-source read).
+The receipt's origin stays `declared`: a commit is content-addressed, not
+signed, and nothing here proves the bytes describe the deployed program. The
+ecosystem headline does NOT move: 88.8% is a coverage number, and this closes
+a byte-exactness gap inside one program, not a new program. Zero external
+users, one machine, no audit.
+
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
 With Lighthouse decoded under shank, exactly **35 programs (87 payloads)** remained

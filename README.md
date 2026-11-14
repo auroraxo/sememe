@@ -110,6 +110,41 @@ npx sememe verify --store ./store --lock ./sememe.lock
 
 What the lock does NOT do: it is not a freshness check against the chain (the pin says "this is what I answered", not "this is what the program is now"); it does not cover vendored programs (System/ComputeBudget/SPL Token/Token-2022/Raydium AMM v4/SPL Associated Token Account have no receipts, they are pinned from upstream sources instead); and it cannot stop you from re-pulling — it makes every re-pull that changes an answer visible.
 
+## Working now: when the on-chain interface copy is complete but incomplete on the wire (`sememe adopt-hadron`, 2026-11-14)
+
+Most interface gaps are "no interface exists at all" — the ATA, Lighthouse and Manifest cases, closed by a derived wire table or a vendored first-party copy. HADRo (`HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8`) is the other kind: the on-chain metadata IDL declares **all 38 instructions and every type**, and it is still incomplete **on the wire**. It lacks exactly two argument declarations — `sequence: u64`, last on `setCurve` and `setRiskCurve` — and the wire carries those 8 bytes after the points.
+
+Measured on the 144 committed chain-accepted payloads of those two instructions:
+
+| from the on-chain copy alone | |
+|---|---|
+| decoded | 144/144, 0 refused |
+| payloads ending in unexplained bytes | 144/144 (8 bytes each) |
+| **re-encoding byte-exactly** | **0/144** |
+| refused under `--trailing error` | 144/144 |
+
+So a consumer had no path to byte-exactness on real mainnet traffic, and `--trailing error` refused every one of those payloads outright.
+
+```bash
+npx sememe adopt-hadron --store ./store
+npx sememe decode --union HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8 <payload> --store ./store
+```
+
+`adopt-hadron` adopts the program's **first-party published copy** (`Hadron-Fi/hadron-tx-verifier`, Apache-2.0 AND MIT) from a sha256-pinned vendored file, hash-checked **before** any write, through the product's own write path. Afterwards the union reproduces **144/144 payloads byte-exactly**, 0 unexplained bytes, 0 refusals under `--trailing error` — and *names* the disagreement with the on-chain copy instead of silently picking one (`verdict: layout_drift`, drift path `sequence`, arbitration basis `byte_evidence_full_roundtrip`).
+
+Neither half of this was sufficient alone, and that was measured rather than argued (`research/hadron-adoption-2026-11-14.json`, four faces over the same 144 payloads):
+
+| face | decoded | refused | byte-exact |
+|---|---|---|---|
+| before the header-count rule + on-chain IDL | 72 | 72 | 0 |
+| before the header-count rule + first-party IDL | 72 | 72 | 0 |
+| after the header-count rule + on-chain IDL | 144 | 0 | 0 |
+| after the header-count rule + first-party IDL | 144 | 0 | **144** |
+
+The second row is the falsifier for "just adopt the source IDL": the first-party copy declares `points` as a Borsh vector too, so on its own it refuses the same 72 payloads. The third row is the falsifier for "the header rule alone is the fix": it stops the refusals but drops the 8-byte tail, so nothing round-trips. Only the composition reproduces every byte.
+
+What it does **not** do: plain `sememe decode` keeps the on-chain receipt as its default answer (measured unchanged on both sides of the adoption — the adopted receipt sorts at slot 0, so it never wins the single-source read), and the receipt's origin stays `declared`: a commit is content-addressed, not signed, and nothing here proves the bytes describe the deployed program. Chain proof stays with the decode — every payload must re-encode byte-exactly or the union refuses. See [docs/measured-history.md](https://github.com/auroraxo/sememe/blob/main/docs/measured-history.md) and [research/hadron-adoption-2026-11-14.json](research/hadron-adoption-2026-11-14.json).
+
 ## Where the numbers come from
 
 Every claim above is pinned by a test and backed by a committed artifact. If you want to know **why** a number is what it is, and what was measured wrong before it was measured right:

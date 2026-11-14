@@ -50,6 +50,14 @@ const CAMM = 'CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK';
 
 const hadro = readArtifact('live-layout-scan-hadro-2026-11-14.json');
 const camm = readArtifact('live-layout-scan-camm-2026-11-14.json');
+// A SECOND, INDEPENDENT live window (12,000 signatures, 24,041 payloads,
+// slots 469337454..469343584 — disjoint from the first window's
+// 469179697..469180764). It re-confirms the wired rule on fresh traffic and
+// finds NO witness for the four unwitnessed targets. One window can be a
+// sampling accident; two disjoint windows with the same answer is a
+// measurement, and the gap between them is the evidence the windows are
+// actually independent.
+const hadroWindow2 = readArtifact('live-layout-scan-hadro-window2-2026-11-14.json');
 
 /** The committed IDL of one program, from the committed store. */
 function committedIdl(address) {
@@ -125,6 +133,50 @@ test('HADRo wired instructions re-confirm count-from-header from the COMMITTED B
       assert.equal(example.trailingBytes, 8, `${name}: the measured 8-byte sequence tail`);
     }
   }
+});
+
+// A SECOND INDEPENDENT WINDOW. Same questions, fresh traffic, disjoint
+// slots — and the same answers. This is the artifact an interrupted pulse
+// left uncommitted; it is verified here rather than deleted or trusted.
+test('the second HADRo window is independent of the first and re-confirms the rule', () => {
+  // Disjoint: the second window starts long after the first one ended.
+  assert.ok(hadroWindow2.window.fromSlot > hadro.window.toSlot,
+    `the two windows must not overlap: ${hadro.window.toSlot} -> ${hadroWindow2.window.fromSlot}`);
+  assert.equal(hadroWindow2.tool, 'tools/measure-live-layout-scan.mjs');
+  assert.equal(hadroWindow2.analyzer, 'tools/lib/live-layout.mjs');
+  // It scanned MORE traffic than the first window, with nothing missed.
+  assert.ok(hadroWindow2.scanned.payloads > hadro.scanned.payloads,
+    'the second window must be a bigger sample than the first');
+  assert.equal(hadroWindow2.scanned.missed, 0, 'a missed transaction would make every count a lower bound');
+  assert.equal(hadroWindow2.verdict, 'no-live-witness-in-window');
+  // The four unwitnessed targets stay unwitnessed in a SECOND window.
+  assert.equal(hadroWindow2.targets.witnessed.length, 4);
+  for (const t of hadroWindow2.targets.witnessed) {
+    assert.equal(t.witnessed, false, `${t.instruction} must not claim a witness`);
+    assert.equal(t.payloads, 0);
+    assert.ok(!hadroWindow2.discriminatorList.some((d) => d.discriminator === t.discriminator));
+  }
+  // The wired rule re-confirms on fresh traffic, from the committed bytes.
+  const { perInstruction, byDiscriminator } = analyze(hadroWindow2.payloadSample, hadroIdl, loadTypes(hadroIdl));
+  for (const name of ['setCurve', 'setRiskCurve']) {
+    const entry = perInstruction.get(`${name}|numPoints|points`);
+    assert.ok(entry, `${name} not measured in the second window`);
+    assert.ok(entry.accepted > 0, `${name} has no chain-accepted payload in the second window`);
+    assert.deepEqual(entry.hypotheses, { 'count-from-header': entry.accepted },
+      `${name}: the second window must carry the count in the header, not a Borsh prefix`);
+  }
+  // The sample covers every discriminator the full scan recorded.
+  const fullDisc = new Set(hadroWindow2.discriminatorList.map((d) => d.discriminator));
+  const sampleDisc = new Set([...byDiscriminator.keys()]);
+  for (const disc of sampleDisc) {
+    assert.ok(fullDisc.has(disc), `sample discriminator ${disc} is not in the full-scan histogram`);
+  }
+  assert.equal(sampleDisc.size, fullDisc.size, 'the sample must cover every discriminator');
+  // The histogram sums to the scanned payload count.
+  const total = hadroWindow2.discriminatorList.reduce((sum, d) => sum + d.count, 0);
+  assert.equal(total, hadroWindow2.scanned.payloads);
+  // The honest limit is stated again, in this artifact.
+  assert.ok(hadroWindow2.limits.some((l) => /window, not an absence/i.test(l)));
 });
 
 test("CAMM discriminators resolve at the program's OWN 8-byte length", () => {
