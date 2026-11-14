@@ -365,7 +365,7 @@ function decodeAt(type, cur, ctx, path, depth) {
     // keeps the strict prefix codec byte for byte.
     if (ctx.__countFromHeader && ctx.__countFromHeader.vectorPath === path) {
       const length = ctx.__countFromHeader.count;
-      const elementSize = ctx.__countFromHeader.pointBytes;
+      const elementSize = ctx.__countFromHeader.elementBytes;
       const needed = length * elementSize;
       if (needed > cur.remaining) {
         // The measured count does not fit the remaining bytes: this is NOT a
@@ -1167,7 +1167,7 @@ export function decodeInstructionData(idl, data, { allowTrailing, trailing, abse
         countArg: headerRule.countArg,
         vectorArg: headerRule.vectorArg,
         vectorPath: `${instruction.name}.${headerRule.vectorArg}`,
-        pointBytes: headerRule.pointBytes,
+        elementBytes: headerRule.elementBytes,
         instruction: instruction.name,
       };
     }
@@ -1365,7 +1365,7 @@ export function encodeInstructionData(idl, name, args, { absent } = {}) {
           countArg: headerRule.countArg,
           vectorArg: headerRule.vectorArg,
           vectorPath: `${instruction.name}.${headerRule.vectorArg}`,
-          pointBytes: headerRule.pointBytes,
+          elementBytes: headerRule.elementBytes,
           instruction: instruction.name,
         };
       }

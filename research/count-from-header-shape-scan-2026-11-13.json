@@ -1,6 +1,6 @@
 {
   "tool": "tools/measure-count-from-header-shape-scan.mjs",
-  "measuredAt": "2026-11-13T20:34:36.059Z",
+  "measuredAt": "2026-11-14T08:49:23.250Z",
   "store": "test/fixtures/ecosystem-store-2026-11-11",
   "sample": "test/fixtures/ecosystem-sample-2026-11-11.json",
   "method": "offline scan of every committed receipt+object pair; candidate = declared integer arg before a vec of fixed-size elements; witnesses counted in the committed sample by the program's own stored discriminator length",
@@ -136,9 +136,9 @@
       "payloads": 0,
       "accepted": 0,
       "failed": 0,
-      "inTable": false,
-      "tableCountArg": null,
-      "tableVectorArg": null,
+      "inTable": true,
+      "tableCountArg": "numTriggers",
+      "tableVectorArg": "triggers",
       "flagDocumented": false
     },
     {
@@ -228,9 +228,9 @@
         "payloads": 0,
         "accepted": 0,
         "failed": 0,
-        "inTable": false,
-        "tableCountArg": null,
-        "tableVectorArg": null,
+        "inTable": true,
+        "tableCountArg": "numTriggers",
+        "tableVectorArg": "triggers",
         "flagDocumented": false
       },
       {

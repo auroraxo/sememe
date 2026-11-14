@@ -49,21 +49,25 @@
 // tail after the points is 8 bytes for all 144 (an undeclared field the IDL
 // does not name — reported as trailing, never invented).
 
-const POINT_BYTES = 21;
-
 /**
  * The measured count-from-header table, keyed by program address.
  *
  * Every entry is a program+instruction pair whose wire layout was measured
  * against chain-accepted payloads with a committed artifact; nothing here is
- * inferred from an IDL claim or from a shape match.
+ * inferred from an IDL claim or from a shape match. `elementBytes` is the
+ * measured size of ONE vector element — a property of the element TYPE the
+ * measurement walked, never a global constant: CurvePointInput is 21 bytes
+ * (research/hadro-vec-wire-2026-11-13.json: 144/144 payloads fit n x 21),
+ * SpreadTriggerInput is 66 (research/live-layout-scan-hadro-witness-
+ * 2026-11-14.json: 2/2 chain-accepted live payloads numTriggers=5 x 66 =
+ * 330 body bytes, trailingBytes 0).
  */
 export const COUNT_FROM_HEADER = {
   HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8: {
-    source: 'research/hadro-vec-wire-2026-11-13.json',
     instructions: {
-      setCurve: { countArg: 'numPoints', vectorArg: 'points' },
-      setRiskCurve: { countArg: 'numPoints', vectorArg: 'points' },
+      setCurve: { countArg: 'numPoints', vectorArg: 'points', elementBytes: 21, source: 'research/hadro-vec-wire-2026-11-13.json' },
+      setRiskCurve: { countArg: 'numPoints', vectorArg: 'points', elementBytes: 21, source: 'research/hadro-vec-wire-2026-11-13.json' },
+      updateSpreadConfig: { countArg: 'numTriggers', vectorArg: 'triggers', elementBytes: 66, source: 'research/live-layout-scan-hadro-witness-2026-11-14.json' },
     },
   },
 };
@@ -79,10 +83,10 @@ export const COUNT_FROM_HEADER = {
  *
  * @param {object} idl  the IDL being decoded (must carry `address`)
  * @param {string} name  the instruction name being decoded/encoded
- * @returns {{countArg: string, vectorArg: string, pointBytes: number}|null}
+ * @returns {{countArg: string, vectorArg: string, elementBytes: number, source: string}|null}
  */
 export function countFromHeader(idl, name) {
   const entry = COUNT_FROM_HEADER[idl?.address]?.instructions?.[name];
   if (!entry) return null;
-  return { ...entry, pointBytes: POINT_BYTES };
+  return { ...entry };
 }

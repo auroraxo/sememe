@@ -119,17 +119,40 @@ test('D3 the wired pair is in the table and witnessed 72/72 chain-accepted', () 
   }
 });
 
-test('D4 the three unwired HADRo shape instructions carry no witness in this window', () => {
+test('D4 the unwired HADRo shape instructions carry no witness in this window', () => {
   const artifact = JSON.parse(readFileSync(ARTIFACT, 'utf8'));
-  for (const name of ['updateSpreadConfig', 'submitCurveUpdates', 'removeSpreadTriggers']) {
+  for (const name of ['submitCurveUpdates', 'removeSpreadTriggers']) {
     const f = artifact.faces.find((x) => x.instruction === name
       && x.program === 'HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8');
     assert.ok(f, `${name} shape face missing`);
     assert.equal(f.payloads, 0, `${name} has a witness now — wiring it becomes a new measurement, update this pin`);
     assert.equal(f.inTable, false, `${name} must not be wired without a witness`);
   }
-  const artifact2 = artifact;
-  assert.ok(artifact2.summary.unwitnessedShape.length >= 4,
+  // updateSpreadConfig CHANGED (14.11. PULS AH): the LIVE scan found two
+  // chain-accepted 0e payloads (research/live-layout-scan-hadro-witness-
+  // 2026-11-14.json, slots 469240017/469240022, numTriggers=5, elementBytes
+  // 66, trailingBytes 0), so the rule table now names it. The 13.11. STORE
+  // window still holds ZERO 0e payloads — the two windows are different
+  // measurements, and neither replaces the other. So this face stays in the
+  // unwitnessed-shape summary (it is unwitnessed IN THIS WINDOW) while the
+  // table entry points at the LIVE artifact.
+  const spread = artifact.faces.find((x) => x.instruction === 'updateSpreadConfig'
+    && x.program === 'HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8');
+  assert.ok(spread, 'updateSpreadConfig shape face missing');
+  assert.equal(spread.payloads, 0,
+    'the 13.11. store window gained a 0e payload — re-derive this pin against the live artifact');
+  assert.equal(spread.inTable, true,
+    'updateSpreadConfig is wired on its LIVE witness — the table must name it');
+  assert.equal(spread.tableCountArg, 'numTriggers');
+  assert.equal(spread.tableVectorArg, 'triggers');
+  const live = JSON.parse(readFileSync(path.join(
+    ROOT, 'research', 'live-layout-scan-hadro-witness-2026-11-14.json'), 'utf8'));
+  const liveTarget = (live.targets?.witnessed ?? []).find((t) => t.discriminator === '0e');
+  assert.ok(liveTarget, 'the live artifact must carry the 0e target status');
+  assert.equal(liveTarget.witnessed, true,
+    'the table entry must be backed by the live witness, not by this window');
+  assert.equal(liveTarget.payloads, 2);
+  assert.ok(artifact.summary.unwitnessedShape.length >= 4,
     'the unwitnessed-shape summary shrank — the store changed under the pin');
 });
 
