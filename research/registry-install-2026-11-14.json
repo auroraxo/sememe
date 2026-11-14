@@ -1,0 +1,60 @@
+{
+  "measuredAt": "2026-11-14T12:05:47.499618Z",
+  "channel": "registry.npmjs.org",
+  "package": "sememe",
+  "version": "0.4.26",
+  "install": {
+    "command": "npm install sememe@0.4.26 --no-audit --no-fund",
+    "installedInto": "empty app (scratch, no clone)",
+    "installedVersion": "0.4.26",
+    "filesInPackage": 77
+  },
+  "checks": [
+    {
+      "name": "the live-witnessed count-from-header rule ships through the registry",
+      "detail": "the committed byte-identical probe tools/hadro-count-header-probe.mjs run against the INSTALLED copy (only ROOT/paths retargeted to node_modules/sememe, fixtures kept as local test data): 144 total, 144 decoded, 0 refused, 144 pointsMatchHeaderCount, 0 mismatch, 0 emptyPoints, 703 points, describedByteExact 144, trailingBytes 8-byte tail on 144 (the sequence:u64 the stored IDL does not declare \u2014 REPORTED, not invented)",
+      "pass": true,
+      "numbers": {
+        "total": 144,
+        "decoded": 144,
+        "refused": 0,
+        "byteExact": 0,
+        "describedByteExact": 144,
+        "pointsDecoded": 703,
+        "emptyPoints": 0,
+        "pointsMatchHeaderCount": 144,
+        "pointsMismatchHeaderCount": 0
+      },
+      "trailingBytes": {
+        "8": 144
+      },
+      "refusalReasons": {}
+    },
+    {
+      "name": "the NEW rule (updateSpreadConfig, disc 0x0e) decodes its live witnesses from the installed copy",
+      "detail": "both chain-accepted witnesses from research/live-layout-scan-hadro-witness-2026-11-14.json decoded through the installed src/decode.mjs against the committed store: name updateSpreadConfig, numTriggers 5 (the header byte), 5 real triggers, describedRoundTripByteExact true; the installed src/wire-layout.mjs table entry reads {countArg: numTriggers, vectorArg: triggers, elementBytes: 66, source: research/live-layout-scan-hadro-witness-2026-11-14.json}",
+      "pass": true,
+      "witnesses": [
+        {
+          "signature": "2vCUNpizeB3Cu9vdnhFPEFnsnpnBMLgJHSRCdRd2BdYfQKF4xz49CrkejUuL4d1iwUCsG6FQ6BBBSVjDuLafc1g1",
+          "slot": 469240017
+        },
+        {
+          "signature": "5WazqL16rgdgeCvUXUsd2gSow71sHn9aKU8kBePdzjVs44rZcahfr2FPZQh8L5BbBTzbM61417wafyZnXLB2pZU3",
+          "slot": 469240022
+        }
+      ],
+      "witnessCount": 2
+    },
+    {
+      "name": "the element size travels PER MEASUREMENT, not as a global constant",
+      "detail": "installed countFromHeader('updateSpreadConfig') answers elementBytes 66; the curve pairs keep 21 in the same table",
+      "pass": true
+    }
+  ],
+  "honestLimits": [
+    "0.4.26 changes no ecosystem headline: the committed store window (2026-11-11) carries 0 payloads for disc 0e, so the measured coverage stays 88.8% (18,967/21,350) \u2014 the witness lives in the LIVE window, not in the committed store",
+    "submitCurveUpdates (12), removeSpreadTriggers (1d) and CAMM update_operation_account stay unwired: 0 payloads in their live windows (a window is a window, not an absence on chain)",
+    "this is my own user-zero, not a foreign user; zero external users, one machine, no audit"
+  ]
+}

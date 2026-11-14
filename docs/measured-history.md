@@ -2784,6 +2784,62 @@ identical — verdict `not-distributed-not-consumed`, zero external users; the
 8-byte `sequence: u64` tail stays described-exact, not byte-exact (the stored
 IDL does not declare it); tags <= v0.4.24 keep the old refusal (immutable).
 
+## v0.4.26: updateSpreadConfig decoded on its LIVE witness (2026-11-14)
+
+Product code changed on main since v0.4.25 (`76751a4`), so the pin and
+package version moved to v0.4.26 (`2f066d4`, tag, GitHub release page,
+`npm publish` -> `sememe@0.4.26`; `latest = 0.4.26` measured after
+propagation).
+
+The witness came from the live channel: the 14.11. scan
+(`research/live-layout-scan-hadro-witness-2026-11-14.json`,
+solana-rpc.publicnode.com, 10,000 signatures / 22,243 payloads / 0 missed,
+slots 469235826..469246302) found **two chain-accepted `updateSpreadConfig`
+(disc 0x0e) payloads** — the pair the 13.11. shape scan and the earlier live
+window both measured at 0. Both carry `numTriggers=5` with 5 x 66 = 330 body
+bytes and trailingBytes 0. Before the rule knew the pair, the product answered
+those bytes with `vector length 891366665 needs 58830199890 byte(s)` — a
+number never on the wire.
+
+The design change outlives this one instruction: the table no longer carries
+one global element size (the curve measurement's `POINT_BYTES = 21`).
+`elementBytes` now travels **per table entry** — 21 for
+`setCurve`/`setRiskCurve` (from `research/hadro-vec-wire-2026-11-13.json`),
+66 for `updateSpreadConfig` (from the live artifact) — because it is a
+property of the measured element type. The program-address gate stays
+load-bearing.
+
+Gates: ladder `test/hadro-update-spread-config-count-from-header.test.mjs`
+(11: six defect faces red on the pre-fix tree, four guards green on both —
+including D6, which picks a count where 21 and 66 disagree so a shared
+element size cannot pass by luck); mutation ladder
+`tools/mutation-ladder-hadro-update-spread-config.sh` 6/6 CAUGHT, control
+byte-identical; shape-scan pin D4 rebalanced (the 13.11. store window still
+holds 0 payloads for 0e — the two windows are different measurements and
+neither replaces the other); suite 1012 -> 1023: 1019 pass / 4 named
+network skips / 0 fail; CI green on main (43592579344) and tag
+(43592579338).
+
+Registry install user-zero (`research/registry-install-2026-11-14.json`):
+`npm install sememe@0.4.26` into an empty app, the committed byte-identical
+probe against the INSTALLED copy answers 144/144 decoded, 0 refused,
+144 pointsMatchHeaderCount (unchanged, as it must be), and both 0e
+witnesses decode through the installed `src/decode.mjs` — `numTriggers 5`,
+five real triggers, byte-exact re-encode — with the installed table entry
+reading `elementBytes: 66`. Release surface re-measured after publishing:
+clean, 0 defects, newest = latest = pinned = v0.4.26
+(`research/release-surface-2026-11-14.json`). e2e from the packed tarball:
+26/26.
+
+Limits, stated plainly: the ecosystem headline does NOT move (the committed
+store window carries 0 payloads for 0e, so 88.8% = 18,967/21,350 stays as
+measured 2026-11-13 — the witness lives in the live window, not in the
+committed store); `submitCurveUpdates` (12), `removeSpreadTriggers` (1d) and
+CAMM `update_operation_account` stay unwired at 0 payloads in their windows
+(a window is a window, not an absence on chain); zero external users, one
+machine, no audit — publish is not consumption; tags <= v0.4.25 keep the
+garbage-number refusal (immutable).
+
 ## The remaining 35 publish-nothing programs, classified against foreign sources (2026-11-04)
 
 With Lighthouse decoded under shank, exactly **35 programs (87 payloads)** remained

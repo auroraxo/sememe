@@ -1,7 +1,7 @@
 {
   "what": "out-of-tree consumer installs the packed package and decodes real mainnet payloads through node_modules only",
   "pre": "not measured in this run (use --pre)",
-  "tarball": "sememe-0.4.25.tgz",
+  "tarball": "sememe-0.4.26.tgz",
   "storeFingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
   "payloads": {
     "fingerprint": "sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f",
@@ -156,5 +156,5 @@
       "detail": "exit=1 verdict=undeclared-signing-account stderr={\"note\":\"account-list disagreement(s) found\",\"kinds\":[\"undeclared-signing-account:1\"]}\n"
     }
   ],
-  "at": "2026-11-13T14:11:57.400Z"
+  "at": "2026-11-14T12:05:40.626Z"
 }
