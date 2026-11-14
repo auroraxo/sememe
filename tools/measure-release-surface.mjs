@@ -153,12 +153,23 @@ export function parseReadme(markdown) {
   // "git clone .../sememe && cd sememe" line, followed by
   // "node tools/stranger-decode.mjs", produce a command named "node".
   // Prose and JSON that MENTIONS a command are not documentation.
+  //
+  // MEASURED 2026-11-14 (HEAD ab474f0, README pins v0.4.26): the regex also
+  // had to accept the `npx ` prefix. The README's install channel is
+  // `npx sememe <cmd>` — line 79 pull, line 80 decode, line 129
+  // adopt-hadron — and without the prefix NONE of those were read:
+  //   documentedCommands === ['pull','lock','verify']   (clone form only)
+  // so C3 checked no install-channel command at all, and reported verdict
+  // `clean` while the pinned tag shipped no `adopt-hadron`: a stranger
+  // copy-pasting the README's own block got usage/exit 2. The prefix is
+  // optional so the clone forms and the two measured false positives above
+  // stay exactly as they were.
   const documentedCommands = [];
   const fenceRe = /```([A-Za-z]*)\n([\s\S]*?)```/g;
   let f;
   while ((f = fenceRe.exec(md))) {
     if (!/^(bash|sh|shell|zsh)$/i.test(f[1])) continue;
-    const lineRe = /^(?:\s*\$\s+|\s+)?(?:node\s+bin\/sememe\.mjs|sememe)\s+([a-z][a-z0-9-]*)/gm;
+    const lineRe = /^(?:\s*\$\s+|\s+)?(?:npx\s+)?(?:node\s+bin\/sememe\.mjs|sememe)\s+([a-z][a-z0-9-]*)/gm;
     let c;
     while ((c = lineRe.exec(f[2]))) if (!documentedCommands.includes(c[1])) documentedCommands.push(c[1]);
   }
