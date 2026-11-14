@@ -1,0 +1,102 @@
+{
+  "tool": "tools/measure-hadron-adoption.mjs",
+  "measuredAt": "2026-11-14T16:53:05.761Z",
+  "program": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+  "prefixCommit": "ea074c4",
+  "pin": {
+    "repo": "Hadron-Fi/hadron-tx-verifier",
+    "commit": "0c1bca1d8c9bc2abaa1b3d651d450c814cdd6328",
+    "license": "Apache-2.0 AND MIT"
+  },
+  "payloadBasis": "144 committed chain-accepted setCurve/setRiskCurve payloads, identified by discriminator byte 0x04/0x08 only",
+  "faces": {
+    "F1_prefix_tree_stored_idl": {
+      "decoded": 72,
+      "refused": 72,
+      "byteExact": 0,
+      "trailing": {
+        "46": 72
+      },
+      "refusalReasons": {
+        "setRiskCurve vector length": 72
+      }
+    },
+    "F2_prefix_tree_first_party_idl": {
+      "decoded": 72,
+      "refused": 72,
+      "byteExact": 0,
+      "trailing": {
+        "38": 72
+      },
+      "refusalReasons": {
+        "setRiskCurve vector length": 72
+      }
+    },
+    "F3_current_tree_stored_idl": {
+      "decoded": 144,
+      "refused": 0,
+      "byteExact": 0,
+      "trailing": {
+        "8": 144
+      },
+      "refusalReasons": {}
+    },
+    "F4_current_tree_first_party_idl": {
+      "decoded": 144,
+      "refused": 0,
+      "byteExact": 144,
+      "trailing": {
+        "0": 144
+      },
+      "refusalReasons": {}
+    }
+  },
+  "userFace": {
+    "before": {
+      "byteExact": 0,
+      "refusalsUnderStrict": 144
+    },
+    "after": {
+      "byteExact": 144,
+      "refusalsUnderStrict": 0
+    },
+    "plainDecodeBefore": {
+      "byteExact": 0,
+      "trailing": {
+        "8": 144
+      }
+    },
+    "plainDecodeAfter": {
+      "byteExact": 0,
+      "trailing": {
+        "8": 144
+      }
+    },
+    "driftPaths": [
+      "sequence"
+    ],
+    "arbitrationBasis": "byte_evidence_full_roundtrip"
+  },
+  "missingArgsOnChain": [
+    {
+      "instruction": "setCurve",
+      "arg": "sequence",
+      "type": "u64"
+    },
+    {
+      "instruction": "setRiskCurve",
+      "arg": "sequence",
+      "type": "u64"
+    }
+  ],
+  "falsifications": [],
+  "ok": true,
+  "limits": [
+    "the two fixes compose only for THIS program: the header rule is keyed to the measured address and instruction names, and the tail args are pinned by sha256 to one commit",
+    "F2 falsifies \"adopt the source IDL alone\" — the first-party copy declares points as a Borsh vec too and refuses the same 72 payloads without count-from-header",
+    "the 8-byte tail is named `sequence: u64` because the first-party copy declares it and the bytes sit where it says; the value itself is not interpreted here",
+    "adoption is provenance of bytes, not proof the copy describes the deployed program: the receipt origin stays `declared` and the commit is content-addressed, not signed",
+    "plain `sememe decode` keeps the on-chain receipt as its default answer — measured unchanged on both sides of the adoption (slot 0 sorts before every real slot)",
+    "one program, one sample window (slots in the committed fixture); no other program's payloads are touched"
+  ]
+}

@@ -52,6 +52,18 @@ const usage = `usage:
       (L2TExMFK…, 1,214 payloads in the committed 6-block window) from the
       vendored first-party copy (Jac0xb/lighthouse, MIT), hash-checked against
       its pin BEFORE any write; the receipt's origin stays declared.
+  sememe adopt-hadron [--store <directory>]
+      the measured case where the ON-CHAIN interface copy is complete but
+      incomplete ON THE WIRE: HADRo (HADRoNbLovy…) declares every instruction
+      and type, yet lacks the trailing "sequence: u64" of setCurve and
+      setRiskCurve, so 144 committed chain-accepted payloads decode with 8
+      unexplained trailing bytes and 0 of them re-encode byte-exactly
+      (research/hadron-adoption-2026-11-14.json). This adopts the first-party
+      published copy (Hadron-Fi/hadron-tx-verifier, Apache-2.0 AND MIT) from a
+      sha256-pinned vendored file, hash-checked BEFORE any write. Afterwards
+      "sememe decode --union" reproduces 144/144 payloads byte-exactly and
+      NAMES the disagreement with the on-chain copy (drift path "sequence").
+      Plain "sememe decode" keeps the on-chain receipt as its answer.
   sememe lock [--store <directory>] [--out <file>]
       snapshot the WHOLE store into a sememe.lock document: for every program,
       the exact fingerprint its newest verified receipt answered with, plus
@@ -278,6 +290,23 @@ try {
       instructionCount: result.receipt.instructionCount,
       path: result.receipt.path,
       receiptPath: result.receipt.receiptPath,
+    }, null, 2));
+  } else if (command === 'adopt-hadron') {
+    const store = option('--store', path.join(os.homedir(), '.sememe'));
+    const { adoptHadron } = await import('../src/hadron.mjs');
+    const { adopt: adoptFn } = await import('../src/adopt.mjs');
+    const result = await adoptHadron(store, { adopt: adoptFn });
+    console.log(JSON.stringify({
+      program: result.receipt.program,
+      source: result.receipt.source,
+      origin: result.receipt.origin,
+      originStatus: result.receipt.originStatus,
+      originNote: result.receipt.originNote,
+      fingerprint: result.receipt.fingerprint,
+      instructionCount: result.receipt.instructionCount,
+      path: result.receipt.path,
+      receiptPath: result.receipt.receiptPath,
+      note: 'the on-chain receipt still answers plain "sememe decode"; use "sememe decode --union" to let the two sources arbitrate by bytes',
     }, null, 2));
   } else if (command === 'decode') {
     if (!program) throw Error('decode needs a program id');

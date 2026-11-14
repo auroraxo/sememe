@@ -1,0 +1,954 @@
+{
+  "address": "HADRoNbLovyqhCsocfYQYB7QdfCAAinN9HTePvBCVDQ8",
+  "metadata": {
+    "name": "hadron",
+    "version": "2.0.0",
+    "spec": "0.1.0",
+    "description": "WE STRONGLY ENCOURAGE USING A HADRON SDK — THE @hadron-fi/sdk-v2 TypeScript package OR THE hadron-sdk-v2 Rust crate — NOT THIS IDL — TO BUILD/SEND TRANSACTIONS: Hadron's instruction wire format is custom (non-Borsh), so a generic Anchor/IDL/Borsh client will mis-encode instructions. This IDL is intended for structural/read use only (explorers, account decoding, Surfpool). See idl/README.md. — Hadron: Programmable Prop AMM Engine."
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [0],
+      "accounts": [
+        { "name": "payer", "writable": true, "signer": true },
+        { "name": "creator", "writable": false, "signer": true, "docs": ["Must equal the signer that called allocateCurvePrefabs (curve_prefabs PDA is creator-bound, L-14)."] },
+        { "name": "config", "writable": true },
+        { "name": "mintX", "writable": false },
+        { "name": "mintY", "writable": false },
+        { "name": "vaultX", "writable": true },
+        { "name": "vaultY", "writable": true },
+        { "name": "tokenProgramX", "writable": false },
+        { "name": "tokenProgramY", "writable": false },
+        { "name": "ataProgram", "writable": false },
+        { "name": "systemProgram", "writable": false },
+        { "name": "midpriceOracle", "writable": true },
+        { "name": "curveMeta", "writable": true },
+        { "name": "curvePrefabs", "writable": true },
+        { "name": "curveUpdates", "writable": true }
+      ],
+      "args": [
+        { "name": "seed", "type": "u64" },
+        { "name": "mintX", "type": "pubkey" },
+        { "name": "mintY", "type": "pubkey" },
+        { "name": "authority", "type": "pubkey" },
+        { "name": "initialMidpriceQ32", "type": "u64" },
+        { "name": "lpSelfRotate", "type": "bool" },
+        { "name": "maxPrefabSlots", "type": { "option": "u8" } },
+        { "name": "maxCurvePoints", "type": { "option": "u8" } },
+        { "name": "combinedFactorMaxQ32", "type": { "option": "u64" } }
+      ]
+    },
+    {
+      "name": "deposit",
+      "discriminator": [1],
+      "accounts": [
+        { "name": "user", "writable": false, "signer": true },
+        { "name": "vaultX", "writable": true },
+        { "name": "vaultY", "writable": true },
+        { "name": "userXAta", "writable": true },
+        { "name": "userYAta", "writable": true },
+        { "name": "config", "writable": true, "docs": ["Mutated by the I-27 drawdown guard re-anchor / trip (Config::load_mut)."] },
+        { "name": "midpriceOracle", "writable": false, "docs": ["Read for the drawdown guard (v2)."] },
+        { "name": "tokenProgramX", "writable": false },
+        { "name": "tokenProgramY", "writable": false },
+        { "name": "mintX", "writable": false, "optional": true, "docs": ["Token2022 mint X (for TransferChecked when mint has extensions)"] },
+        { "name": "mintY", "writable": false, "optional": true, "docs": ["Token2022 mint Y (for TransferChecked when mint has extensions)"] }
+      ],
+      "args": [
+        { "name": "xAmount", "type": "u64" },
+        { "name": "yAmount", "type": "u64" },
+        { "name": "expiration", "type": "i64" }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "discriminator": [2],
+      "accounts": [
+        { "name": "user", "writable": false, "signer": true },
+        { "name": "vaultX", "writable": true },
+        { "name": "vaultY", "writable": true },
+        { "name": "userXAta", "writable": true },
+        { "name": "userYAta", "writable": true },
+        { "name": "config", "writable": true, "docs": ["Mutated by the I-27 drawdown guard re-anchor / trip (Config::load_mut)."] },
+        { "name": "midpriceOracle", "writable": false, "docs": ["Read for the drawdown guard (v2)."] },
+        { "name": "tokenProgramX", "writable": false },
+        { "name": "tokenProgramY", "writable": false },
+        { "name": "mintX", "writable": false, "optional": true, "docs": ["Token2022 mint X (for TransferChecked when mint has extensions)"] },
+        { "name": "mintY", "writable": false, "optional": true, "docs": ["Token2022 mint Y (for TransferChecked when mint has extensions)"] }
+      ],
+      "args": [
+        { "name": "xAmount", "type": "u64" },
+        { "name": "yAmount", "type": "u64" },
+        { "name": "expiration", "type": "i64" }
+      ]
+    },
+    {
+      "name": "swapExactIn",
+      "discriminator": [3],
+      "accounts": [
+        { "name": "tokenProgramX", "writable": false },
+        { "name": "tokenProgramY", "writable": false },
+        { "name": "config", "writable": true },
+        { "name": "midpriceOracle", "writable": false },
+        { "name": "curveMeta", "writable": false, "docs": ["Read-only: swap loads CurveMeta::load and never mutates it."] },
+        { "name": "curvePrefabs", "writable": true },
+        { "name": "authority", "writable": false, "docs": ["Unused slot (destructured as _authority on-chain); kept for v1 layout compatibility."] },
+        { "name": "user", "writable": false, "signer": true },
+        { "name": "userSource", "writable": true },
+        { "name": "vaultSource", "writable": true },
+        { "name": "vaultDest", "writable": true },
+        { "name": "userDest", "writable": true },
+        { "name": "feeConfig", "writable": false },
+        { "name": "feeRecipientAta", "writable": true },
+        { "name": "clock", "writable": false },
+        { "name": "curveUpdates", "writable": true },
+        { "name": "mintX", "writable": false, "optional": true, "docs": ["Token2022 mint X (for TransferChecked when mint has extensions)"] },
+        { "name": "mintY", "writable": false, "optional": true, "docs": ["Token2022 mint Y (for TransferChecked when mint has extensions)"] },
+        { "name": "spreadConfig", "writable": false, "optional": true, "docs": ["Required when the pool has an initialized SpreadConfig."] },
+        { "name": "instructionsSysvar", "writable": false, "optional": true, "docs": ["Required alongside spreadConfig for instruction introspection."] }
+      ],
+      "args": [
+        { "name": "isX", "type": "bool" },
+        { "name": "amount", "type": "u64" },
+        { "name": "minOut", "type": "u64" },
+        { "name": "expiration", "type": "i64" }
+      ]
+    },
+    {
+      "name": "setCurve",
+      "discriminator": [4],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "curveMeta", "writable": true },
+        { "name": "curvePrefabs", "writable": true }
+      ],
+      "args": [
+        { "name": "slot", "type": "u8" },
+        { "name": "side", "type": "u8" },
+        { "name": "defaultInterpolation", "type": "u8" },
+        { "name": "numPoints", "type": "u8" },
+        { "name": "xMode", "type": "u8" },
+        { "name": "points", "type": { "vec": { "defined": { "name": "CurvePointInput" } } } },
+        { "name": "sequence", "type": "u64" }
+      ]
+    },
+    {
+      "name": "updateMidprice",
+      "discriminator": [5],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "midpriceOracle", "writable": true },
+        { "name": "clock", "writable": false }
+      ],
+      "args": [
+        { "name": "sequence", "type": "u64" },
+        { "name": "newMidpriceQ32", "type": "u64" }
+      ]
+    },
+    {
+      "name": "initializeFeeConfig",
+      "discriminator": [6],
+      "accounts": [
+        { "name": "payer", "writable": true, "signer": true },
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "feeConfig", "writable": true },
+        { "name": "systemProgram", "writable": false }
+      ],
+      "args": [
+        { "name": "feePpm", "type": "u32" },
+        { "name": "feeAdmin", "type": "pubkey" },
+        { "name": "feeRecipient", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "updateFeeConfig",
+      "discriminator": [7],
+      "accounts": [
+        { "name": "feeAdmin", "writable": false, "signer": true },
+        { "name": "feeConfig", "writable": true }
+      ],
+      "args": [
+        { "name": "feePpm", "type": "u32", "docs": ["u32::MAX (0xFFFFFFFF) means no change."] },
+        { "name": "feeRecipient", "type": "pubkey", "docs": ["Always 32 bytes; an all-zero pubkey leaves the recipient unchanged."] }
+      ]
+    },
+    {
+      "name": "setRiskCurve",
+      "discriminator": [8],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "curveMeta", "writable": true },
+        { "name": "curvePrefabs", "writable": true }
+      ],
+      "args": [
+        { "name": "slot", "type": "u8" },
+        { "name": "side", "type": "u8" },
+        { "name": "defaultInterpolation", "type": "u8" },
+        { "name": "numPoints", "type": "u8" },
+        { "name": "xMode", "type": "u8" },
+        { "name": "riskMode", "type": "u8" },
+        { "name": "points", "type": { "vec": { "defined": { "name": "CurvePointInput" } } } },
+        { "name": "sequence", "type": "u64" }
+      ]
+    },
+    {
+      "name": "updateSpreadFactor",
+      "discriminator": [9],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "midpriceOracle", "writable": true },
+        { "name": "clock", "writable": false }
+      ],
+      "args": [
+        { "name": "spreadFactorQ32", "type": "u64", "docs": ["Spread as a discount factor in Q32 (e.g. toQ32(0.9995) = 5 bps)."] }
+      ]
+    },
+    {
+      "name": "updateMidpriceAndSpreadFactor",
+      "discriminator": [10],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "midpriceOracle", "writable": true },
+        { "name": "clock", "writable": false }
+      ],
+      "args": [
+        { "name": "sequence", "type": "u64" },
+        { "name": "newMidpriceQ32", "type": "u64" },
+        { "name": "spreadFactorQ32", "type": "u64" }
+      ]
+    },
+    {
+      "name": "switchPriceCurve",
+      "discriminator": [11],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "curveMeta", "writable": true }
+      ],
+      "args": [
+        { "name": "sequence", "type": "u64" },
+        { "name": "side", "type": "u8" },
+        { "name": "slot", "type": "u8" }
+      ]
+    },
+    {
+      "name": "switchRiskCurve",
+      "discriminator": [12],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "curveMeta", "writable": true }
+      ],
+      "args": [
+        { "name": "sequence", "type": "u64" },
+        { "name": "side", "type": "u8" },
+        { "name": "slot", "type": "u8" }
+      ]
+    },
+    {
+      "name": "initializeSpreadConfig",
+      "discriminator": [13],
+      "accounts": [
+        { "name": "payer", "writable": true, "signer": true },
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "spreadConfig", "writable": true },
+        { "name": "systemProgram", "writable": false }
+      ],
+      "args": [
+        { "name": "admin", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "updateSpreadConfig",
+      "discriminator": [14],
+      "accounts": [
+        { "name": "admin", "writable": false, "signer": true },
+        { "name": "config", "writable": false },
+        { "name": "spreadConfig", "writable": true }
+      ],
+      "args": [
+        { "name": "numTriggers", "type": "u8" },
+        { "name": "triggers", "type": { "vec": { "defined": { "name": "SpreadTriggerInput" } } } }
+      ]
+    },
+    {
+      "name": "updateDeltaStaleness",
+      "discriminator": [15],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true, "docs": ["Quoting authority (CurveMeta.authority)."] },
+        { "name": "config", "writable": true },
+        { "name": "curveMeta", "writable": false }
+      ],
+      "args": [
+        { "name": "deltaStaleness", "type": "u8" }
+      ]
+    },
+    {
+      "name": "nominateAuthority",
+      "discriminator": [16],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "clock", "writable": false }
+      ],
+      "args": [
+        { "name": "newAuthority", "type": "pubkey" },
+        { "name": "expirySlot", "type": "u64" }
+      ]
+    },
+    {
+      "name": "acceptAuthority",
+      "discriminator": [17],
+      "accounts": [
+        { "name": "newAuthority", "writable": false, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "clock", "writable": false }
+      ],
+      "args": []
+    },
+    {
+      "name": "submitCurveUpdates",
+      "discriminator": [18],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "curveUpdates", "writable": true }
+      ],
+      "args": [
+        { "name": "sequence", "type": "u64" },
+        { "name": "numOps", "type": "u8" },
+        { "name": "ops", "type": { "vec": { "defined": { "name": "CurveUpdateOp" } } } }
+      ]
+    },
+    {
+      "name": "applyCurveUpdates",
+      "discriminator": [19],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "curveMeta", "writable": false },
+        { "name": "curvePrefabs", "writable": true },
+        { "name": "curveUpdates", "writable": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "closePool",
+      "discriminator": [20],
+      "accounts": [
+        { "name": "authority", "writable": true, "signer": true, "docs": ["Writable: close_token_account CPIs vault lamports to the authority."] },
+        { "name": "config", "writable": true },
+        { "name": "midpriceOracle", "writable": true },
+        { "name": "curveMeta", "writable": true },
+        { "name": "curvePrefabs", "writable": true },
+        { "name": "curveUpdates", "writable": true },
+        { "name": "vaultX", "writable": true },
+        { "name": "vaultY", "writable": true },
+        { "name": "tokenProgramX", "writable": false },
+        { "name": "tokenProgramY", "writable": false },
+        { "name": "mintX", "writable": false, "optional": true, "docs": ["Required for a Token-2022 mint X when vault X holds a balance: the sweep uses TransferChecked."] },
+        { "name": "mintY", "writable": false, "optional": true, "docs": ["Required for a Token-2022 mint Y when vault Y holds a balance: the sweep uses TransferChecked."] },
+        { "name": "spreadConfig", "writable": true, "optional": true, "docs": ["Required when the pool has an initialized SpreadConfig."] },
+        { "name": "authorityAtaX", "writable": true, "optional": true },
+        { "name": "authorityAtaY", "writable": true, "optional": true }
+      ],
+      "args": []
+    },
+    {
+      "name": "setPoolState",
+      "discriminator": [21],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "curveMeta", "writable": false, "docs": ["Read for the quoting-authority check (v2)."] }
+      ],
+      "args": [
+        { "name": "newState", "type": "u8" }
+      ]
+    },
+    {
+      "name": "allocateCurvePrefabs",
+      "discriminator": [22],
+      "accounts": [
+        { "name": "payer", "writable": true, "signer": true },
+        { "name": "creator", "writable": false, "signer": true, "docs": ["curve_prefabs PDA is bound to this signer (L-14)."] },
+        { "name": "curvePrefabs", "writable": true },
+        { "name": "systemProgram", "writable": false }
+      ],
+      "args": [
+        { "name": "seed", "type": "u64" },
+        { "name": "mintX", "type": "pubkey" },
+        { "name": "mintY", "type": "pubkey" },
+        { "name": "maxPrefabSlots", "type": "u8" },
+        { "name": "maxCurvePoints", "type": "u8" }
+      ]
+    },
+    {
+      "name": "rotateFeeAdmin",
+      "discriminator": [24],
+      "accounts": [
+        { "name": "feeAdmin", "writable": false, "signer": true },
+        { "name": "feeConfig", "writable": true }
+      ],
+      "args": [
+        { "name": "newFeeAdmin", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "initializePoolFeeConfig",
+      "discriminator": [25],
+      "accounts": [
+        { "name": "payer", "writable": true, "signer": true },
+        { "name": "feeAdmin", "writable": false, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "poolFeeConfig", "writable": true },
+        { "name": "globalFeeConfig", "writable": false },
+        { "name": "systemProgram", "writable": false }
+      ],
+      "args": [
+        { "name": "feePpm", "type": "u32" },
+        { "name": "feeAdmin", "type": "pubkey" },
+        { "name": "feeRecipient", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "updatePoolFeeConfig",
+      "discriminator": [26],
+      "accounts": [
+        { "name": "feeAdmin", "writable": false, "signer": true },
+        { "name": "config", "writable": false },
+        { "name": "poolFeeConfig", "writable": true }
+      ],
+      "args": [
+        { "name": "feePpm", "type": "u32", "docs": ["u32::MAX (0xFFFFFFFF) means no change."] },
+        { "name": "feeRecipient", "type": "pubkey", "docs": ["Always 32 bytes; an all-zero pubkey leaves the recipient unchanged."] }
+      ]
+    },
+    {
+      "name": "setAssetFee",
+      "discriminator": [27],
+      "accounts": [
+        { "name": "payer", "writable": true, "signer": true },
+        { "name": "feeAdmin", "writable": false, "signer": true },
+        { "name": "feeConfig", "writable": true },
+        { "name": "systemProgram", "writable": false }
+      ],
+      "args": [
+        { "name": "mintA", "type": "pubkey" },
+        { "name": "mintB", "type": "pubkey" },
+        { "name": "feePpm", "type": "u32", "docs": ["0 removes the per-pair override. Mints are sorted canonically on-chain."] }
+      ]
+    },
+    {
+      "name": "validateCurveUpdates",
+      "discriminator": [28],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "curveMeta", "writable": false },
+        { "name": "curvePrefabs", "writable": true },
+        { "name": "curveUpdates", "writable": true }
+      ],
+      "args": [],
+      "docs": ["Dry-run: applies queued ops in-place then intentionally reverts with ValidationSimulationSuccess (73). Use via simulateTransaction."]
+    },
+    {
+      "name": "removeSpreadTriggers",
+      "discriminator": [29],
+      "accounts": [
+        { "name": "admin", "writable": false, "signer": true },
+        { "name": "config", "writable": false },
+        { "name": "spreadConfig", "writable": true }
+      ],
+      "args": [
+        { "name": "numKeys", "type": "u8" },
+        { "name": "keys", "type": { "vec": { "defined": { "name": "SpreadTriggerKey" } } } }
+      ]
+    },
+    {
+      "name": "updateDrawdownGuard",
+      "discriminator": [30],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "config", "writable": true },
+        { "name": "midpriceOracle", "writable": false },
+        { "name": "vaultX", "writable": false },
+        { "name": "vaultY", "writable": false }
+      ],
+      "args": [
+        { "name": "thresholdBps", "type": "u16", "docs": ["Sum-of-losses trip threshold in bps. 0 disables the guard."] },
+        { "name": "rotationIntervalSlots", "type": "u32", "docs": ["Half-period for HWM rotation, in slots. 0 disables."] }
+      ]
+    },
+    {
+      "name": "updateFactorClamp",
+      "discriminator": [31],
+      "accounts": [
+        { "name": "authority", "writable": true, "signer": true },
+        { "name": "config", "writable": true }
+      ],
+      "args": [
+        { "name": "combinedFactorMaxQ32", "type": "u64", "docs": ["Hard ceiling on combined factor. Must be >= Q32_ONE (1.0)."] }
+      ]
+    },
+    {
+      "name": "closePoolFeeConfig",
+      "discriminator": [32],
+      "accounts": [
+        { "name": "feeAdmin", "writable": true, "signer": true, "docs": ["Writable: receives the closed pool_fee_config rent. Signer is the GLOBAL fee_admin."] },
+        { "name": "config", "writable": true },
+        { "name": "poolFeeConfig", "writable": true },
+        { "name": "globalFeeConfig", "writable": false }
+      ],
+      "args": []
+    },
+    {
+      "name": "rotateDepositAuthority",
+      "discriminator": [33],
+      "accounts": [
+        { "name": "signer", "writable": false, "signer": true, "docs": ["deposit_authority, or pool authority when lp_self_rotate == false."] },
+        { "name": "config", "writable": true }
+      ],
+      "args": [
+        { "name": "newAuthority", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "rotateWithdrawAuthority",
+      "discriminator": [34],
+      "accounts": [
+        { "name": "signer", "writable": false, "signer": true, "docs": ["withdraw_authority, or pool authority when lp_self_rotate == false."] },
+        { "name": "config", "writable": true }
+      ],
+      "args": [
+        { "name": "newAuthority", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "rotateQuotingAuthority",
+      "discriminator": [35],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true },
+        { "name": "config", "writable": false },
+        { "name": "midpriceOracle", "writable": true },
+        { "name": "curveMeta", "writable": true },
+        { "name": "curveUpdates", "writable": true }
+      ],
+      "args": [
+        { "name": "newQuotingAuthority", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "rotateSpreadAdmin",
+      "discriminator": [36],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true, "docs": ["Pool authority (config.authority), not the spread admin."] },
+        { "name": "config", "writable": false },
+        { "name": "spreadConfig", "writable": true }
+      ],
+      "args": [
+        { "name": "newSpreadAdmin", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "rotatePauseAuthority",
+      "discriminator": [37],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true, "docs": ["Pool authority (config.authority)."] },
+        { "name": "config", "writable": true }
+      ],
+      "args": [
+        { "name": "newAuthority", "type": "pubkey" }
+      ]
+    },
+    {
+      "name": "pokeDrawdownGuard",
+      "discriminator": [38],
+      "accounts": [
+        { "name": "authority", "writable": false, "signer": true, "docs": ["Must equal the midprice oracle authority."] },
+        { "name": "config", "writable": true },
+        { "name": "midpriceOracle", "writable": false },
+        { "name": "vaultX", "writable": false },
+        { "name": "vaultY", "writable": false }
+      ],
+      "args": [],
+      "docs": ["Oracle-authority-gated drawdown-guard evaluation; acts purely on current state (no args). Signer must be the midprice oracle authority."]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "discriminator": [],
+      "size": 724,
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "state", "type": "u8" },
+          { "name": "seed", "type": { "array": ["u8", 8] } },
+          { "name": "authority", "type": "pubkey" },
+          { "name": "mintX", "type": "pubkey" },
+          { "name": "mintY", "type": "pubkey" },
+          { "name": "configBump", "type": { "array": ["u8", 1] } },
+          { "name": "curveMeta", "type": "pubkey" },
+          { "name": "spreadConfigInitialized", "type": "u8" },
+          { "name": "deltaStaleness", "type": "u8" },
+          { "name": "oracleMode", "type": "u8" },
+          { "name": "hasPoolFee", "type": "u8" },
+          { "name": "lpSelfRotate", "type": "u8" },
+          { "name": "padding", "type": { "array": ["u8", 1] } },
+          { "name": "pendingAuthority", "type": "pubkey" },
+          { "name": "nominationExpiry", "type": { "array": ["u8", 8] } },
+          { "name": "tokenProgramX", "type": "pubkey" },
+          { "name": "tokenProgramY", "type": "pubkey" },
+          { "name": "depositAuthority", "type": "pubkey" },
+          { "name": "withdrawAuthority", "type": "pubkey" },
+          { "name": "pauseAuthority", "type": "pubkey" },
+          { "name": "hwmBaseCurrent", "type": { "array": ["u8", 16] } },
+          { "name": "hwmBasePrevious", "type": { "array": ["u8", 16] } },
+          { "name": "hwmQuoteCurrent", "type": { "array": ["u8", 16] } },
+          { "name": "hwmQuotePrevious", "type": { "array": ["u8", 16] } },
+          { "name": "lastRotationSlot", "type": { "array": ["u8", 8] } },
+          { "name": "rotationIntervalSlots", "type": { "array": ["u8", 4] } },
+          { "name": "thresholdBps", "type": { "array": ["u8", 2] } },
+          { "name": "combinedFactorMaxQ32", "type": { "array": ["u8", 8] } },
+          { "name": "curvePrefabs", "type": "pubkey" },
+          { "name": "tailPadding", "type": { "array": ["u8", 6] } },
+          { "name": "reserved", "type": { "array": ["u8", 256] } }
+        ]
+      }
+    },
+    {
+      "name": "MidpriceOracle",
+      "discriminator": [],
+      "size": 128,
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "authority", "type": "pubkey" },
+          { "name": "sequence", "type": "u64" },
+          { "name": "midpriceQ32", "type": "u64" },
+          { "name": "spreadFactorQ32", "type": "u64" },
+          { "name": "lastUpdateSlot", "type": "u64" },
+          { "name": "reserved", "type": { "array": ["u8", 64] } }
+        ]
+      }
+    },
+    {
+      "name": "CurveMeta",
+      "discriminator": [],
+      "size": 56,
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "authority", "type": "pubkey" },
+          { "name": "activePriceBidSlot", "type": "u8" },
+          { "name": "activePriceAskSlot", "type": "u8" },
+          { "name": "activeRiskBidSlot", "type": "u8" },
+          { "name": "activeRiskAskSlot", "type": "u8" },
+          { "name": "initializedSlots", "type": { "array": ["u8", 8] } },
+          { "name": "maxPrefabSlots", "type": "u8" },
+          { "name": "maxCurvePoints", "type": "u8" },
+          { "name": "padding", "type": { "array": ["u8", 2] } },
+          { "name": "switchSequence", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "FeeConfig",
+      "discriminator": [],
+      "size": 72,
+      "docs": ["Global FeeConfig header. The global account may carry an appended per-asset-pair fee table after byte 72: u16 LE count, then up to 64 entries of {mintA(32), mintB(32), feePpm(4)} = 68 bytes each (mints canonically sorted)."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "initialized", "type": "u8" },
+          { "name": "feePpm", "type": { "array": ["u8", 4] } },
+          { "name": "bump", "type": { "array": ["u8", 1] } },
+          { "name": "padding", "type": { "array": ["u8", 2] } },
+          { "name": "feeAdmin", "type": "pubkey" },
+          { "name": "feeRecipient", "type": "pubkey" }
+        ]
+      }
+    },
+    {
+      "name": "SpreadConfig",
+      "discriminator": [],
+      "size": 7272,
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "initialized", "type": "u8" },
+          { "name": "bump", "type": { "array": ["u8", 1] } },
+          { "name": "numTriggers", "type": "u8" },
+          { "name": "padding", "type": { "array": ["u8", 5] } },
+          { "name": "admin", "type": "pubkey" },
+          { "name": "config", "type": "pubkey" },
+          { "name": "triggers", "type": { "array": [{ "defined": { "name": "SpreadTrigger" } }, 100] } }
+        ]
+      }
+    },
+    {
+      "name": "CurveUpdates",
+      "discriminator": [],
+      "size": 998,
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "authority", "type": "pubkey" },
+          { "name": "curveMeta", "type": "pubkey" },
+          { "name": "sequence", "type": "u64" },
+          { "name": "numOps", "type": "u8" },
+          { "name": "padding", "type": { "array": ["u8", 1] } },
+          { "name": "ops", "type": { "array": [{ "defined": { "name": "CurveUpdateOp" } }, 28] } }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CurvePoint",
+      "docs": ["On-chain stored curve point (24 bytes, repr(C, packed)). Stored inside the variable-length CurvePrefabs account."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "xIn", "type": "u64" },
+          { "name": "priceFactorQ32", "type": "u64" },
+          { "name": "interpolation", "type": "u8" },
+          { "name": "params", "type": { "array": ["u8", 4] } },
+          { "name": "reserved", "type": { "array": ["u8", 3] } }
+        ]
+      }
+    },
+    {
+      "name": "CurvePointInput",
+      "docs": ["Wire-format curve point in setCurve / setRiskCurve instruction data (21 bytes, no reserved tail)."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "amountIn", "type": "u64" },
+          { "name": "priceFactorQ32", "type": "u64" },
+          { "name": "interpolation", "type": "u8" },
+          { "name": "params", "type": { "array": ["u8", 4] } }
+        ]
+      }
+    },
+    {
+      "name": "CurveUpdateOp",
+      "docs": ["Pending curve update op (33 bytes, repr(C, packed)). Same layout in CurveUpdates.ops and in submitCurveUpdates instruction data."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "curveType", "type": "u8" },
+          { "name": "opKind", "type": "u8" },
+          { "name": "pointIndex", "type": "u8" },
+          { "name": "interpolation", "type": "u8" },
+          { "name": "amountIn", "type": "u64" },
+          { "name": "priceFactorQ32", "type": "u64" },
+          { "name": "params", "type": { "array": ["u8", 4] } },
+          { "name": "targetSlot", "type": "u8" },
+          { "name": "expectedXIn", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "SpreadTrigger",
+      "docs": ["On-chain spread trigger (72 bytes, repr(C)). Stored inside SpreadConfig.triggers."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "account", "type": "pubkey" },
+          { "name": "programId", "type": "pubkey" },
+          { "name": "spreadBps", "type": "u16" },
+          { "name": "padding", "type": { "array": ["u8", 6] } }
+        ]
+      }
+    },
+    {
+      "name": "SpreadTriggerInput",
+      "docs": ["Wire-format spread trigger in updateSpreadConfig instruction data (66 bytes, no padding)."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "account", "type": "pubkey" },
+          { "name": "programId", "type": "pubkey" },
+          { "name": "spreadBps", "type": "u16" }
+        ]
+      }
+    },
+    {
+      "name": "SpreadTriggerKey",
+      "docs": ["Trigger identity key in removeSpreadTriggers instruction data (64 bytes)."],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "account", "type": "pubkey" },
+          { "name": "programId", "type": "pubkey" }
+        ]
+      }
+    },
+    {
+      "name": "PoolState",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Uninitialized" },
+          { "name": "Initialized" },
+          { "name": "Paused" },
+          { "name": "RejectSwaps" },
+          { "name": "Closed" }
+        ]
+      }
+    },
+    {
+      "name": "OracleMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Authority" },
+          { "name": "Relative" }
+        ]
+      }
+    },
+    {
+      "name": "CurvePrefabType",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "PriceBid" },
+          { "name": "PriceAsk" },
+          { "name": "RiskBid" },
+          { "name": "RiskAsk" }
+        ]
+      }
+    },
+    {
+      "name": "CurveUpdateOpKind",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Edit" },
+          { "name": "Add" },
+          { "name": "Remove" }
+        ]
+      }
+    },
+    {
+      "name": "Interpolation",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Step" },
+          { "name": "Linear" },
+          { "name": "MarginalStep" },
+          { "name": "Hyperbolic" },
+          { "name": "Quadratic" },
+          { "name": "Cubic" }
+        ]
+      }
+    },
+    {
+      "name": "CurveXMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Native" },
+          { "name": "Alternate" }
+        ]
+      }
+    },
+    {
+      "name": "RiskMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Virtual" },
+          { "name": "Integrated" }
+        ]
+      }
+    },
+    {
+      "name": "Side",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "SellBase" },
+          { "name": "BuyBase" }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    { "code": 0, "name": "NotSigner", "msg": "Not the signer" },
+    { "code": 1, "name": "InvalidOwner", "msg": "Invalid account owner" },
+    { "code": 2, "name": "InvalidAccountData", "msg": "Invalid account data" },
+    { "code": 3, "name": "InvalidAddress", "msg": "Invalid address" },
+    { "code": 4, "name": "Unauthorized", "msg": "Unauthorized: not the pool authority" },
+    { "code": 5, "name": "PoolNotInitialized", "msg": "Pool not initialized" },
+    { "code": 6, "name": "PoolAlreadyInitialized", "msg": "Pool already initialized" },
+    { "code": 7, "name": "InsufficientLiquidity", "msg": "Insufficient liquidity" },
+    { "code": 8, "name": "SlippageExceeded", "msg": "Slippage exceeded" },
+    { "code": 9, "name": "CurvePointsNotSorted", "msg": "Invalid curve: points not sorted" },
+    { "code": 10, "name": "CurveDuplicateX", "msg": "Invalid curve: duplicate x values" },
+    { "code": 11, "name": "CurveTooManyPoints", "msg": "Invalid curve: too many points" },
+    { "code": 12, "name": "CurveEmpty", "msg": "Invalid curve: empty curve" },
+    { "code": 13, "name": "InvalidMidprice", "msg": "Invalid midprice" },
+    { "code": 14, "name": "MathOverflow", "msg": "Overflow in calculation" },
+    { "code": 15, "name": "ZeroSwapAmount", "msg": "Swap amount is zero" },
+    { "code": 16, "name": "PoolPaused", "msg": "Pool is paused" },
+    { "code": 17, "name": "FeeConfigAlreadyInitialized", "msg": "Fee config already initialized" },
+    { "code": 18, "name": "FeeConfigNotInitialized", "msg": "Fee config not initialized" },
+    { "code": 19, "name": "NotFeeAdmin", "msg": "Not the fee admin" },
+    { "code": 20, "name": "InvalidFeePpm", "msg": "Invalid fee PPM" },
+    { "code": 21, "name": "RiskCurveXOutOfRange", "msg": "Risk curve x-value out of range (must be 0 to Q32_ONE)" },
+    { "code": 22, "name": "SequenceTooOld", "msg": "Sequence too old - must be >= current sequence" },
+    { "code": 23, "name": "PrefabSlotOutOfRange", "msg": "Prefab slot index out of range (must be 0 to max_prefab_slots-1)" },
+    { "code": 25, "name": "PrefabSlotNotInitialized", "msg": "Prefab slot not initialized" },
+    { "code": 27, "name": "SpreadConfigAlreadyInitialized", "msg": "Spread config already initialized" },
+    { "code": 28, "name": "SpreadConfigNotInitialized", "msg": "Spread config not initialized" },
+    { "code": 29, "name": "TooManySpreadTriggers", "msg": "Too many spread triggers" },
+    { "code": 30, "name": "SpreadConfigRequired", "msg": "Spread config required - pool has spread config initialized but it was not provided" },
+    { "code": 31, "name": "SpreadConfigInvalidOwner", "msg": "Spread config account not owned by program" },
+    { "code": 32, "name": "ConfigInvalidOwner", "msg": "Config account not owned by program" },
+    { "code": 33, "name": "MidpriceOracleInvalidOwner", "msg": "MidpriceOracle account not owned by program" },
+    { "code": 34, "name": "CurveMetaInvalidOwner", "msg": "CurveMeta account not owned by program" },
+    { "code": 35, "name": "CurvePrefabsInvalidOwner", "msg": "CurvePrefabs account not owned by program" },
+    { "code": 36, "name": "FeeConfigInvalidOwner", "msg": "FeeConfig account not owned by program" },
+    { "code": 37, "name": "StaleOracle", "msg": "Stale oracle" },
+    { "code": 38, "name": "Expired", "msg": "Transaction expired" },
+    { "code": 39, "name": "NoPendingNomination", "msg": "No pending authority nomination" },
+    { "code": 40, "name": "NominationExpired", "msg": "Authority nomination has expired" },
+    { "code": 41, "name": "InvalidNominee", "msg": "Signer is not the nominated authority" },
+    { "code": 42, "name": "NominateSelf", "msg": "Cannot nominate self as new authority" },
+    { "code": 43, "name": "InvalidNominationExpiry", "msg": "Nomination expiry must be in the future" },
+    { "code": 44, "name": "InvalidTokenProgram", "msg": "Invalid token program (must be SPL Token or Token2022)" },
+    { "code": 45, "name": "PriceCurveXOutOfRange", "msg": "Price curve x-value out of range (must be 0 to Q32_ONE in percent mode)" },
+    { "code": 46, "name": "CurveUpdatesBufferFull", "msg": "Curve updates buffer is full" },
+    { "code": 47, "name": "CurveUpdatesInvalidOwner", "msg": "CurveUpdates account not owned by program" },
+    { "code": 48, "name": "CurveMetaMismatch", "msg": "CurveMeta address mismatch: account does not belong to this pool" },
+    { "code": 50, "name": "InvalidRiskMode", "msg": "Invalid risk mode (must be 0=Virtual or 1=Integrated)" },
+    { "code": 51, "name": "IntegratedRiskUnsupportedInterpolation", "msg": "Integrated risk mode is not supported for this interpolation type" },
+    { "code": 52, "name": "VaultsNotEmpty", "msg": "Vaults must be empty before closing pool" },
+    { "code": 53, "name": "InvalidPoolState", "msg": "Invalid pool state (must be 1=Initialized, 2=Paused, or 3=RejectSwaps, and different from current)" },
+    { "code": 54, "name": "MaxPrefabSlotsOutOfRange", "msg": "Max prefab slots out of range (must be 1-16)" },
+    { "code": 55, "name": "MaxCurvePointsOutOfRange", "msg": "Max curve points out of range (must be 1-128)" },
+    { "code": 56, "name": "VaultAddressMismatch", "msg": "Vault address does not match derived PDA" },
+    { "code": 57, "name": "VaultTokenAccountTooSmall", "msg": "Vault token account data too small" },
+    { "code": 58, "name": "UserTokenAccountTooSmall", "msg": "User token account data too small" },
+    { "code": 59, "name": "VaultMintMismatch", "msg": "Vault token account mint does not match config" },
+    { "code": 60, "name": "UserTokenAccountInvalid", "msg": "User token account has wrong owner or mint" },
+    { "code": 61, "name": "ConcavityViolation", "msg": "Curve interpolation params violate output concavity constraints" },
+    { "code": 62, "name": "PriceFactorTooLarge", "msg": "Price factor exceeds 1.0 (Q32_ONE) — price curves must have factors <= 1.0" },
+    { "code": 63, "name": "PoolFeeConfigAlreadyInitialized", "msg": "Pool fee config already initialized" },
+    { "code": 64, "name": "PoolFeeConfigNotInitialized", "msg": "Pool fee config not initialized" },
+    { "code": 66, "name": "AssetFeeCapExceeded", "msg": "Asset fee cap exceeded" },
+    { "code": 67, "name": "CurveUpdateSlotMismatch", "msg": "Curve update target_slot does not match active slot for the op's curve_type" },
+    { "code": 68, "name": "RiskCurveMonotonicityViolation", "msg": "Risk curve is not monotone (segment shape or factor sequence)" },
+    { "code": 70, "name": "InvalidTriggerSpreadBps", "msg": "Spread trigger spread_bps must be non-zero" },
+    { "code": 71, "name": "PoolAlreadyClosed", "msg": "Pool is closed (terminal state); operation not permitted" },
+    { "code": 72, "name": "CurveUpdateExpectedXMismatch", "msg": "Curve update expected_x_in does not match the current point at point_index" },
+    { "code": 73, "name": "ValidationSimulationSuccess", "msg": "ValidateCurveUpdates dry-run succeeded" },
+    { "code": 74, "name": "NotDepositAuthority", "msg": "Not the deposit authority" },
+    { "code": 75, "name": "NotWithdrawAuthority", "msg": "Not the withdraw authority" },
+    { "code": 76, "name": "RotateToZero", "msg": "Rotation target is the zero pubkey" },
+    { "code": 77, "name": "RotateNoOp", "msg": "Rotation target equals the current authority (no-op)" },
+    { "code": 78, "name": "DrawdownGuardDisabled", "msg": "Drawdown guard is disabled" },
+    { "code": 79, "name": "UnsupportedMintExtension", "msg": "Unsupported Token-2022 mint extension" }
+  ]
+}

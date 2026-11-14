@@ -100,6 +100,10 @@ export const COMMAND_SPECS = {
     flags: { '--store': 'value' },
     positionals: 0,
   },
+  'adopt-hadron': {
+    flags: { '--store': 'value' },
+    positionals: 0,
+  },
   decode: {
     flags: { '--store': 'value', '--trailing': 'value', '--absent': 'value', '--union': 'boolean' },
     positionals: 2,

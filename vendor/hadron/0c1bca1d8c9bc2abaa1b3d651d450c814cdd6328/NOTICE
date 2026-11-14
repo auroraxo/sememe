@@ -1,0 +1,33 @@
+hadron-tx-verifier
+==================
+
+This project is a fork of multisig-verifier:
+
+  https://github.com/Solana-Multisig-Tools/multisig-verifier
+  (forked at commit ccf3b5b, 2026-08-20)
+  Copyright (c) 2025 Squads Labs, Inc.
+  Dual-licensed under MIT and Apache-2.0 (LICENSE-MIT / LICENSE-APACHE).
+
+The full upstream git history is preserved in this repository so the changes
+made in this fork can be audited with:
+
+  git diff upstream/main...HEAD
+
+Modifications for Hadron (transaction paste-and-decode input mode, Hadron /
+fee-share / Squads v4 / BPF-loader instruction decoders generated from the
+audited Hadron IDL, balance-change simulation, red-flag heuristics, removal of
+the wallet signing flow) are:
+
+  Copyright (c) 2026 Hadron
+  Dual-licensed under the same MIT and Apache-2.0 terms.
+
+This tool is verification-only: it never connects to a wallet and cannot sign
+or send transactions.
+
+DISCLAIMER
+
+Open-source software, provided "AS IS" without warranty of any kind (MIT /
+Apache-2.0). Decoding, red flags, and simulation are best-effort verification
+aids - they do not guarantee that any transaction or instruction is safe, and
+no liability is accepted for losses arising from its use. You alone are
+responsible for what you sign.

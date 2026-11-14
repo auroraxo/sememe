@@ -24,6 +24,7 @@
     "./raydium": "./src/raydium.mjs",
     "./ata": "./src/ata.mjs",
     "./lighthouse": "./src/lighthouse.mjs",
+    "./hadron": "./src/hadron.mjs",
     "./gap": "./src/gap.mjs"
   },
   "files": [
