@@ -60,7 +60,11 @@ const BEFORE = path.join(ROOT, 'research', 'release-surface-2026-11-05-before.js
 // and release-surface-2026-11-08.json the v0.4.12 one,
 // and release-surface-2026-11-09.json the v0.4.13 one this file pins
 // (newest = latest = pinned = v0.4.13).
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-09.json');
+// The after-artifact moves WITH the release. The record committed with the
+// CURRENT release is release-surface-2026-11-14b.json (v0.4.27-era:
+// newest = latest = pinned = v0.4.27, verdict clean). Older records stay in
+// research/ as history — they still reproduce their own verdict.
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-14b.json');
 const NETWORK = process.env.SEMEME_RELEASE_SURFACE_NETWORK === '1';
 
 // On the pre-fix tree the tool module does not exist; the import failure must

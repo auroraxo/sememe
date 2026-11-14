@@ -60,7 +60,12 @@ let parseReadme, derive, binCommandsOf, normalizeExportsKeys, readTreeForTest;
 // release-surface artifact. A synthetic body would import body defects
 // (body-no-install-command / body-no-limits) into this ladder and blur what
 // is being measured: C3, the pin-lag rule.
+// The after-artifact moves WITH the release: release-surface-2026-11-14b.json
+// is the v0.4.27-era record (newest = latest = pinned = v0.4.27, verdict
+// clean). The 2026-11-14.json record is the v0.4.26 one — its body is the
+// frozen input L3 reads.
 const ARTIFACT = path.join(ROOT, 'research', 'release-surface-2026-11-14.json');
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-14b.json');
 
 test.before(async () => {
   const mod = await import(new URL(`file://${TOOL}`).href);
@@ -87,10 +92,15 @@ test.before(async () => {
 const liveReadme = () => parseReadme(readFileSync(path.join(ROOT, 'README.md'), 'utf8'));
 
 const pinnedBody = (tag) => {
-  const artifact = JSON.parse(readFileSync(ARTIFACT, 'utf8'));
-  const release = (artifact.surfaces.releases || []).find((r) => r.tag === tag);
-  assert.ok(release, `the committed release-surface artifact must carry ${tag}'s real body`);
-  return release.body;
+  // Search the release-surface records for the tag's REAL body. The v0.4.26
+  // body is in the v0.4.26-era record; the v0.4.27 body in the current one.
+  for (const file of [ARTIFACT, AFTER]) {
+    const artifact = JSON.parse(readFileSync(file, 'utf8'));
+    const release = (artifact.surfaces.releases || []).find((r) => r.tag === tag);
+    if (release) return release.body;
+  }
+  assert.fail(`no committed release-surface record carries ${tag}'s real body`);
+  return '';
 };
 
 test('L1: a fenced `npx sememe <cmd>` block yields <cmd> in documentedCommands', () => {
