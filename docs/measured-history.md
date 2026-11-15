@@ -3371,3 +3371,92 @@ the encoder path has been measured. One machine, no audit. `submitCurveUpdates`,
 `removeSpreadTriggers` and CAMM's flag-arg instruction remain unwired: three
 disjoint live windows measured zero payloads for each (a window is a window,
 not an absence on chain).
+
+---
+
+## 2026-11-15 — the README that SHIPS is gated, not only the README you read (v0.4.29)
+
+**The defect, measured on the bytes a stranger receives.** The one-pin rule
+("this README names exactly one install tag") was enforced on the **checkout's**
+README by eight gates — `base58-journey`, `flag-tag-journey`,
+`installed-tag-journey`, `peer-tag-journey`, `lock-journey`,
+`multi-copy-store-tag-journey`, `readme-history-move`,
+`published-pin-user-zero` — and on **nothing that leaves the machine**. Every
+one of them reads `<checkout>/README.md`; none opens a tarball.
+
+Publishing here is manual, so the order went wrong. `npm publish` ran from the
+release commit `729bbaa` (= tag `v0.4.28`), whose README carried **two** install
+tags: `#v0.4.28` in the install blocks and `#v0.4.27` inside the
+channel-parity paragraph. npm accepted it, and only *afterwards* did CI go red
+on that same commit (runs `43741650634` and `43741650472`, both `failure`) with
+`README must pin exactly one tag, found v0.4.28, v0.4.27`. The gate that should
+have refused the publish ran behind it.
+
+**Consumer impact, measured per published version** (`tools/measure-shipped-readme-pin.mjs`
+→ `research/shipped-readme-pin-2026-11-15.json`, verdict
+`shipped-readme-pin-defective`): 7 of 9 published versions carry exactly one
+correct tag; **2 carry two** — `0.4.23` (`#v0.4.23` + `#v0.4.22`) and `0.4.28`
+(`#v0.4.28` + `#v0.4.27`), and `0.4.28` was npm `latest`. The README inside the
+tarball and the README npm renders on the package page both told a stranger to
+install two different releases, without saying which one the package was.
+
+**A measurement of the measurement.** `npm view sememe@<v> readme` does NOT
+return that version's readme — npm keeps **one** package-level `readme`
+document and serves it for every version (measured: after 0.4.29 published,
+`npm view sememe@0.4.25 readme` returned 0.4.29's pins), and the per-version
+documents under `registry.npmjs.org/sememe/<v>` carry **no** `readme` key at
+all. The first version of this tool therefore compared a package-level page
+readme against a per-version tarball and reported a false disagreement. The
+tool now fetches the page readme once, compares it with the **newest** tarball,
+and records `null` for older rows instead of a false per-version claim.
+
+**The remedy.** The two defective versions are immutable (an npm version cannot
+be rewritten), so they are named, classified and pinned rather than repaired —
+the same treatment the identical `0.4.23` defect got at `0.4.24`. The user-facing
+repair is a corrected successor: **`v0.4.29`** ships `src/` byte-identical to
+`0.4.28` with a README that pins exactly one tag, itself.
+
+**The gate that stops the next one.** `tools/gate-shipped-readme-pin.mjs` packs
+this tree the way `npm publish` does, opens the tarball and refuses unless the
+**shipped** README pins exactly one tag (R1), that tag equals the published
+version (R2), and a README is present at all (R4 — an empty README would make
+the rule vacuously clean). It is wired as `prepublishOnly`, which npm runs
+before `npm publish` and **not** before `npm pack` — so
+`tools/measure-channel-parity.mjs`, which packs every historical tag, keeps
+measuring the immutable two-pin versions unchanged.
+
+**The gate caught its own author.** Bumping the version to `0.4.29` and the two
+install blocks left the channel-parity paragraph still naming `#v0.4.28`. The
+gate refused the publish with exit 1 — the exact defect, caught on the release
+that was about to become npm `latest`.
+
+**Evidence.** `test/shipped-readme-pin.test.mjs` (9 faces) gates the artifact
+and the gate: **8 red / 1 green on the pre-fix tree** (`27ebc41` + the test
+file alone), 9/9 green here. The one green face pre-fix is `G2` — the
+false-positive guard asserting the hook is *not* on `npm pack`.
+`tools/mutation-ladder-shipped-readme-pin.sh` proves the gate can go red:
+**8/8 mutations caught, control green, tree byte-identical** after every run.
+
+**Released as v0.4.29** (both channels, measured after publish):
+
+- `research/release-surface-2026-11-15.json` — verdict `clean`,
+  newest = latest = pinned = `v0.4.29`, no defects.
+- `research/channel-parity-2026-11-15.json` — 0.4.23 through **0.4.29**
+  measure byte parity; the two immutable divergences are unchanged (0.4.21
+  product, 0.4.22 README).
+- `research/published-pin-user-zero-2026-11-15b.json` — registry serves
+  0.4.29, zero-dependency install into an empty app, the README example
+  answers `swap_v2` / `roundTripByteExact: true`, the byte-identical probe
+  answers **144/144 decoded, 0 refused**, and both chain-accepted `0x0e`
+  witnesses decode byte-exact through the installed copy. Verdict `measured`,
+  6/6 checks pass.
+- Registry readme and tarball readme for `0.4.29`: **one pin each**
+  (`#v0.4.29`), the page and the tarball agreeing.
+
+**Honest remainder.** Zero external users — publish is not consumption. The
+user-zero above is my own, run against my own package. One machine, no audit.
+The ecosystem coverage headline does not move: **88.8% (18,967/21,350 payloads;
+byte-exact 17,652, 93.1% of decoded)** — this release is a publishing-surface
+fix, not a decoding change. The defect class is not fully closed: the gate
+covers the README of THIS package, and the same order-of-operations gap could
+still exist in a channel the gate does not pack.

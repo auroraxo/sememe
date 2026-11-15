@@ -82,42 +82,29 @@ npx sememe decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b1ac91e62a4
 
 `./store` is the local content-addressed store the error `no sememe store at ./store: run "sememe pull" first` tells you to create — the `pull` above is that creation step; the vendored programs (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) need no store at all: `npx sememe decode-native 11111111111111111111111111111111 <payload>` answers offline from the pinned upstream tables. If you ever point the decoder at a store directory that does not exist yet, the refusal names the fix; `npx sememe` is the form of that fix that runs where you are. Measured 2026-11-05 from the packed tarball of this tree: install (zero deps) → `npx sememe pull` (live mainnet) → `npx sememe decode` (byte-exact, live-pulled object byte-identical to the fixture store object `0b886e37…660f`).
 
-Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.29` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest. That sameness is now MEASURED per published version, not assumed (`tools/measure-channel-parity.mjs`, `test/channel-parity.test.mjs`, `research/channel-parity-2026-11-15.json`): 0.4.23 through 0.4.28 measure byte parity, while the two first releases diverge and cannot be repaired — `sememe@0.4.21` shipped `src/rawle.mjs` that the tag `v0.4.21` never contained (it was published from the commit *after* the tag), and `sememe@0.4.22` carries a README one commit newer than tag `v0.4.22`; both are named, classified and pinned so the record survives the immutable versions.
+Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now live on registry.npmjs.org (first shipped as 0.4.21; the measured registry install of `sememe@0.4.22` into an empty app decoded the Whirlpool fixture payload `swap_v2`, `roundTripByteExact: true`). `npm install sememe` and `npm install github:auroraxo/sememe#v0.4.29` deliver the same product files from the same code: the files allowlist already ships none of this repository's tests, fixtures or qualification harness (pinned by `test/package.test.mjs`), so the git tag remains the release artifact — `test/package.test.mjs` (the contract above), `tools/e2e-package-consumer.mjs` (a real install into an empty directory) and `test/install-surface.test.mjs` (the shipped README's install commands run verbatim from the packed tarball) keep both channels honest. That sameness is now MEASURED per published version, not assumed (`tools/measure-channel-parity.mjs`, `test/channel-parity.test.mjs`, `research/channel-parity-2026-11-15.json`): 0.4.23 through 0.4.29 measure byte parity, while the two first releases diverge and cannot be repaired — `sememe@0.4.21` shipped `src/rawle.mjs` that the tag `v0.4.21` never contained (it was published from the commit *after* the tag), and `sememe@0.4.22` carries a README one commit newer than tag `v0.4.22`; both are named, classified and pinned so the record survives the immutable versions.
 
-The **user-zero against the published pin** — a stranger's first run against the version the channels actually serve — is now a repeatable measurement, not a hand-run script: `tools/measure-published-pin-user-zero.mjs` installs the README's pin from the npm registry into an empty app, runs the README's own decode example verbatim, retargets the committed byte-identical HADRo probe at the INSTALLED copy, and decodes both chain-accepted `updateSpreadConfig` (0x0e) witnesses through the installed `src/decode.mjs`. The expectation is not a number written down in a previous pulse: the same probe is run against this checkout first, and the installed copy must answer the identical question identically. `test/published-pin-user-zero.test.mjs` gates the committed artifact (a check that failed, a pin that drifted off the README, or a host path in the artifact all turn it red), and `tools/mutation-ladder-published-pin-user-zero.sh` proves the gate can go red: 8/8 mutations caught, control green, tree byte-identical. Measured 2026-11-15 (`research/published-pin-user-zero-2026-11-15b.json`, verdict `measured`, 6/6 checks pass): registry serves 0.4.28, zero-dependency install, the README example answers `swap_v2` / `roundTripByteExact: true`, the probe answers 144/144 identically on both trees, both 0x0e witnesses decode byte-exact through the installed copy.
+The **user-zero against the published pin** — a stranger's first run against the version the channels actually serve — is now a repeatable measurement, not a hand-run script: `tools/measure-published-pin-user-zero.mjs` installs the README's pin from the npm registry into an empty app, runs the README's own decode example verbatim, retargets the committed byte-identical HADRo probe at the INSTALLED copy, and decodes both chain-accepted `updateSpreadConfig` (0x0e) witnesses through the installed `src/decode.mjs`. The expectation is not a number written down in a previous pulse: the same probe is run against this checkout first, and the installed copy must answer the identical question identically. `test/published-pin-user-zero.test.mjs` gates the committed artifact (a check that failed, a pin that drifted off the README, or a host path in the artifact all turn it red), and `tools/mutation-ladder-published-pin-user-zero.sh` proves the gate can go red: 8/8 mutations caught, control green, tree byte-identical. Measured 2026-11-15 (`research/published-pin-user-zero-2026-11-15b.json`, verdict `measured`, 6/6 checks pass): registry serves 0.4.29, zero-dependency install, the README example answers `swap_v2` / `roundTripByteExact: true`, the probe answers 144/144 identically on both trees, both 0x0e witnesses decode byte-exact through the installed copy.
 
 ## Working now: the README that ships is gated, not just the README you read (2026-11-15)
 
-The one-pin rule — "this README names exactly one install tag" — was enforced on
-**the checkout's** README by eight gates and on nothing that leaves the machine.
-Publishing is manual here, so the order went wrong: `npm publish` ran from the
-release commit, that README carried **two** install tags (`0.4.28` in the install
-blocks, `0.4.27` in the channel-parity paragraph), npm accepted it, and only
-*afterwards* did CI go red on the same commit. The gate ran behind the publish
-instead of in front of it, and the page a stranger reads — the README npm
-renders on the package page, and the one inside the tarball — told them to
-install two different releases. Measured across every published version
-(`tools/measure-shipped-readme-pin.mjs` → `research/shipped-readme-pin-2026-11-15.json`,
-verdict `shipped-readme-pin-defective`): 6 of 8 published versions carry exactly
-one correct tag, and **2 carry two** — `0.4.23` and `0.4.28` (npm `latest`). Those
-versions are immutable and cannot be repaired, so they are named, classified and
-pinned instead.
+The one-pin rule was enforced on **this checkout's** README by eight gates and on
+nothing that leaves the machine. Publishing is manual here, so on `0.4.28` the
+order went wrong: `npm publish` ran first, npm accepted a README naming **two**
+install tags, and only *afterwards* did CI go red on that same commit. Measured
+per published version (`tools/measure-shipped-readme-pin.mjs` →
+`research/shipped-readme-pin-2026-11-15.json`, verdict
+`shipped-readme-pin-defective`): 7 of 9 carry exactly one correct tag, **2 carry
+two** — `0.4.23` and `0.4.28`. Both are immutable, so they are named rather than
+repaired, and `v0.4.29` is the corrected successor: same `src/`, one pin.
 
-What is repaired is the *next* publish: `tools/gate-shipped-readme-pin.mjs` packs
-this tree exactly the way `npm publish` does, opens the tarball, and refuses the
-publish unless the shipped README pins exactly one tag, that tag equals the
-version being published, and a README is present at all. It is wired as
-`prepublishOnly`, which npm runs before `npm publish` and **not** before
-`npm pack` — so the channel-parity tool, which packs every historical tag (two of
-which carry two pins forever), keeps measuring them unchanged.
-
-`test/shipped-readme-pin.test.mjs` gates the artifact and the gate (a soft-past
-to a two-pin README, a missing hook, or a verdict edited to `clean` all turn it
-red; `G2` — the assertion that the hook is *not* on `npm pack` — is the guard that
-must stay green on both trees), and `tools/mutation-ladder-shipped-readme-pin.sh`
-proves the gate can go red: **8/8 mutations caught, control green, tree
-byte-identical**. On the pre-fix tree that test is 8 red / 1 green; the one green
-face is the false-positive guard, as it should be.
+`prepublishOnly` now runs `tools/gate-shipped-readme-pin.mjs`, which packs this
+tree the way `npm publish` does and refuses unless the **shipped** README pins one
+tag equal to the published version — and *not* on `npm pack`, so the channel-parity
+tool keeps measuring the immutable two-pin tags. The gate caught its own author
+during this release. `test/shipped-readme-pin.test.mjs` is 8 red / 1 green on the
+pre-fix tree; `tools/mutation-ladder-shipped-readme-pin.sh` is 8/8 caught with a
+green control. Full measurement in [docs/measured-history.md](docs/measured-history.md).
 
 ## Working now: pin the answers (`sememe lock` + `sememe verify`, 2026-11-05)
 

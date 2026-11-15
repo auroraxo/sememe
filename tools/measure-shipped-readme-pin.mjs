@@ -17,11 +17,21 @@
 //
 //   R1 the shipped README pins exactly ONE tag
 //   R2 that tag equals the version it ships with
-//   R3 the README the npm PAGE shows (registry readme) carries the same
-//      number of pins as the README inside the tarball — the page and the
-//      tarball must not disagree
+//   R3 the README the npm PAGE shows (registry readme) pins the same tag the
+//      NEWEST published tarball ships — the page and the tarball must not
+//      disagree
 //   R4 the pinned tag EXISTS upstream (a pin to a tag nobody can install is
 //      an ambiguous pin of the worst kind)
+//
+// MEASURED CORRECTION (2026-11-15, from this very artifact): npm keeps ONE
+// package-level `readme` document and serves it for every version —
+// `npm view sememe@0.4.25 readme` returned the pins of 0.4.29 after 0.4.29
+// published, and the per-version documents under registry.npmjs.org/sememe/<v>
+// carry NO readme key at all. So "the page readme for version X" is not a
+// thing: the page always shows the CURRENT readme. R3 is therefore measured
+// once, at the package level, against the newest tarball — and a per-version
+// `pageAgreesWithTarball` is only meaningful for that newest version; older
+// rows record `null` and say why, rather than reporting a false disagreement.
 //
 // It also measures the tree's OWN packed tarball, so the difference between
 // "what this checkout would ship" and "what is already published" is a
@@ -106,6 +116,12 @@ if (!list) {
 
 const scratch = mkdtempSync(path.join(os.tmpdir(), 'sememe-shipped-pin-measure-'));
 const rows = [];
+
+// npm serves ONE package-level readme for the whole package (see the R3 note
+// above), so it is fetched once and compared against the newest tarball.
+const pageReadme = npmJson(['sememe', 'readme']);
+const pagePins = pageReadme.error ? null : pinsOf(String(pageReadme.value || ''));
+
 try {
   for (const version of list) {
     const row = { version, pins: null, verdict: null, registryReadmePins: null, pageAgreesWithTarball: null, pinnedTagExists: null };
@@ -117,8 +133,10 @@ try {
       rows.push(row);
       continue;
     }
-    const registryReadme = typeof readmeView.value === 'string' ? readmeView.value : '';
-    row.registryReadmePins = pinsOf(registryReadme);
+    // Kept for the record: this is the PACKAGE-LEVEL readme npm returns for
+    // every version, not this version's readme. Stored under a name that
+    // says so, so no later reader mistakes it for per-version evidence.
+    row.npmPackageLevelReadmePins = pinsOf(typeof readmeView.value === 'string' ? readmeView.value : '');
 
     const packed = spawnSync('npm', ['pack', `sememe@${version}`, '--pack-destination', scratch, '--json', '--ignore-scripts'], {
       cwd: scratch, encoding: 'utf8', timeout: 180000,
@@ -143,8 +161,11 @@ try {
     }
     row.pins = pinsOf(extract.stdout);
     row.verdict = classify(row.pins, version);
-    row.pageAgreesWithTarball = row.registryReadmePins.length === row.pins.length
-      && row.registryReadmePins.every((p) => row.pins.includes(p));
+    // The page is package-level: it is compared with the NEWEST tarball
+    // below, once the list is complete. Older rows record null explicitly
+    // instead of a false disagreement.
+    row.pageAgreesWithTarball = null;
+    row.pageIsPackageLevel = true;
 
     if (row.pins.length) {
       // Does the pinned tag exist upstream? A pin to a tag nobody can install
@@ -184,6 +205,15 @@ const defective = rows.filter((r) => r.verdict === 'two-pins' || r.verdict === '
 const measured = rows.filter((r) => r.verdict !== 'no-verdict');
 const verdict = defective.length === 0 ? 'shipped-readme-pins-clean' : 'shipped-readme-pin-defective';
 
+// The package-level page readme, compared with the NEWEST tarball's README.
+const newest = measured[measured.length - 1];
+let pageAgreesWithNewest = null;
+if (newest && pagePins) {
+  pageAgreesWithNewest = pagePins.length === newest.pins.length
+    && pagePins.every((p) => newest.pins.includes(p));
+  if (newest) newest.pageAgreesWithTarball = pageAgreesWithNewest;
+}
+
 const artifact = {
   tool: 'tools/measure-shipped-readme-pin.mjs',
   measuredAt: new Date().toISOString(),
@@ -200,6 +230,12 @@ const artifact = {
     noVerdict: rows.filter((r) => r.verdict === 'no-verdict').length,
   },
   versions: rows,
+  packageLevelPageReadme: {
+    note: 'npm keeps ONE package-level readme and serves it for every version; this is what the npm page shows for the package, compared with the newest tarball',
+    pins: pagePins,
+    agreesWithNewestTarball: pageAgreesWithNewest,
+    newestVersion: newest ? newest.version : null,
+  },
   thisTree,
   limits,
 };

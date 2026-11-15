@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-15T17:33:24.967Z",
+  "measuredAt": "2026-11-15T19:12:10.817Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.29",
+        "body": "The README a stranger receives now names **exactly one** release.\n\n**What shipped.** `sememe@0.4.28` — npm `latest` until now — ships a README that names **two** install tags: `#v0.4.28` in the install blocks and `#v0.4.27` inside the channel-parity paragraph. The page npm renders on the package page and the README inside the tarball both told a stranger to install two different releases, without saying which one the package actually is.\n\n**Measured, not assumed.** `tools/measure-shipped-readme-pin.mjs` packs every published version from the registry, opens the tarball and reads the README the consumer gets, then reads the same version's registry readme (the page npm renders) and compares both with the version itself (`research/shipped-readme-pin-2026-11-15.json`, verdict `shipped-readme-pin-defective`):\n\n| version | shipped README | |\n|---|---|---|\n| 0.4.21, 0.4.22, 0.4.24 – 0.4.27 | one tag, its own | clean (6 of 8) |\n| 0.4.23 | `#v0.4.23` **and** `#v0.4.22` | two pins |\n| 0.4.28 | `#v0.4.28` **and** `#v0.4.27` | two pins |\n\nnpm `latest` was one of the two. Both versions are immutable — an npm version cannot be rewritten — so they are named, classified and pinned rather than repaired, and the remedy is the one this project used for the identical 0.4.23 defect: a corrected successor. `0.4.29` ships `src/` byte-identical to `0.4.28` with a README that pins exactly one tag — itself.\n\n**The gate now stands in front of the publish.** The one-pin rule was enforced on the *checkout's* README by eight gates and on nothing that leaves the machine. Publishing here is manual, so on 0.4.28 the order went wrong: `npm publish` ran first, npm accepted the two-pin README, and only afterwards did CI go red on that same commit (runs `43741650634` + `43741650472`, both failure). `prepublishOnly` now runs `tools/gate-shipped-readme-pin.mjs`, which packs this tree the way `npm publish` does, opens the tarball and **refuses** unless the shipped README pins exactly one tag, that tag equals the published version, and a README is present at all (an empty README would make the rule vacuously clean). It is deliberately NOT on `npm pack`, so the channel-parity tool keeps measuring the immutable two-pin tags unchanged.\n\nThe gate caught its own author during this release: bumping the version and the two install blocks left the parity paragraph still naming `#v0.4.28`, and the gate refused with exit 1 — the exact defect, caught on the release that was about to become `latest`.\n\n**Install**\n\n```bash\nnpm install sememe\nnpm install github:auroraxo/sememe#v0.4.29\n```\n\n**Evidence.** `test/shipped-readme-pin.test.mjs` (9 faces) gates the artifact and the gate: 8 red on the pre-fix tree, the one green face being the false-positive guard `G2`. `tools/mutation-ladder-shipped-readme-pin.sh` proves it can go red: 8/8 mutations caught, control green, tree byte-identical after every run. Suite 1079: 1074 pass / 0 fail / 5 skipped.\n\n**Honest limits.** No external users — publish is not consumption; zero foreign runs of `sememe` have been measured, and the user-zero runs here are my own, against my own package. One machine, not an audit. The ecosystem coverage headline does not move: **88.8% (18,967/21,350 payloads; byte-exact 17,652, 93.1% of decoded)** — this release is a publishing-surface fix, not a decoding change.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-15T19:11:49Z",
+        "createdAt": "2026-11-15T19:08:31Z"
+      },
       {
         "tag": "v0.4.28",
         "body": "The decoder could NAME a Token-2022 payload that the encoder refused to reproduce.\n\n**What shipped.** `tokenNames(TOKEN_2022)` and `isTokenName(TOKEN_2022, …)` advertise 53 names for the Token-2022 program — 48 token instructions plus five token-metadata variants (`Initialize`, `UpdateField`, `RemoveKey`, `UpdateAuthority`, `Emit`). `encodeTokenInstruction(TOKEN_2022, …)` refused all five with `unknown-variant`, even though the decoder's own fallback branch handles exactly these payloads. A consumer could be handed the name of a payload and then be unable to re-encode it.\n\nMeasured against the unchanged prefix tree `e28c849` (which is tag `v0.4.27` and npm `latest`):\n\n| face | prefix tree `e28c849` | v0.4.28 |\n|---|---|---|\n| metadata names the encoder refuses | 5 of 5 | 0 of 5 |\n| fixture payloads re-encoded byte-exactly | 0/10 | 10/10 |\n| chain-witness payloads re-encoded byte-exactly | 0/4 | 4/4 |\n| the refusal reason printed | twice (`trailing-bytes: trailing-bytes: …`) | once |\n\nThe round trip stayed green only because the decoder happened to be byte-exact on all ten sampled payloads — that short-circuits the encoder, so the existing gate never reached the broken path. The gap was invisible to the test that was supposed to watch it.\n\n**The second face of the same fallback.** The wrapper re-wrapped the metadata error's message into a constructor that prefixes the reason again, so a consumer read `trailing-bytes: trailing-bytes: …`. One reason, one voice now.\n\n**The guard did not move.** Legacy SPL Token (`Tokenkeg…`) still refuses all five metadata names with `unknown-variant` — measured on both trees. The fallback is Token-2022-only, exactly as the decoder's gate is.\n\n**Install**\n\n```bash\nnpm install sememe                          # registry\nnpm install github:auroraxo/sememe#v0.4.28  # tagged release\n```\n\n**Evidence.** `research/token-encoder-fallback-2026-11-15.json` is a two-tree measurement (the prefix tree extracted from history, the working tree) with verdict `encoder-reproduces-its-own-names` and no falsifications; `test/token-encoder-fallback-measurement.test.mjs` pins it (a drifted artifact, a host path, a changed delta or a broken guard turns it red). `test/token-encoder-fallback.test.mjs` carries the four defect faces (red on `e28c849`, green here) and the four guards (green on both trees). `tools/mutation-ladder-token-encoder-fallback.sh` proves the gate can go red: 6/6 mutations caught, control green, tree byte-identical after every run.\n\n**The headline does not move.** The pre-fix and post-fix coverage runs are byte-identical at **88.8% (18,967/21,350 payloads; byte-exact 17,652, 93.1% of decoded)** — this closes an encoder gap inside one program, not a coverage hole.\n\n**Honest remainder.** Zero external users — publish is not consumption. One machine, no audit. `submitCurveUpdates`, `removeSpreadTriggers` and CAMM's flag-arg instruction stay unwired because no own chain witness has been measured for them (three disjoint live windows, zero payloads each — a window is a window, not an absence on chain). No foreign live consumer of the encoder path has been measured either: the user-zero here is my own, run against my own trees.\n",
@@ -265,6 +273,7 @@
       "v0.4.26",
       "v0.4.27",
       "v0.4.28",
+      "v0.4.29",
       "v0.4.3",
       "v0.4.4",
       "v0.4.5",
@@ -275,8 +284,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.28",
-        "v0.4.27"
+        "v0.4.29"
       ],
       "documentedCommands": [
         "pull",
@@ -309,6 +317,114 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.29": {
+        "manifest": {
+          "version": "0.4.29",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-hadron",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "hadron",
+          "gap"
+        ],
+        "entryExports": [
+          "COUNT_FROM_HEADER",
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "countFromHeader",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.29"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "lock",
+            "verify",
+            "adopt-hadron"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.28": {
         "manifest": {
           "version": "0.4.28",
@@ -3232,14 +3348,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.28",
-    "latestTag": "v0.4.28",
+    "newestTag": "v0.4.29",
+    "latestTag": "v0.4.29",
     "pinnedTags": [
-      "v0.4.28",
-      "v0.4.27"
+      "v0.4.29"
     ]
   },
   "perRelease": {
+    "v0.4.29": {
+      "defects": []
+    },
     "v0.4.28": {
       "defects": []
     },

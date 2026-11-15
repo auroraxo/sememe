@@ -77,14 +77,37 @@ test('D2: the artifact records the DEFECTIVE verdict and its counts agree with i
   assert.ok(twoPins.length > 0, 'the artifact claims a defect but names none');
 });
 
-test('D3: the live defect is named — npm latest (0.4.28) ships two pins', () => {
+test('D3: the defect is named forever, and the CURRENT latest is clean', () => {
   assert.ok(artifact, 'the measurement artifact is missing');
-  const latest = artifact.versions.find((r) => r.version === '0.4.28');
-  assert.ok(latest, 'the artifact does not measure 0.4.28');
-  assert.equal(latest.verdict, 'two-pins', '0.4.28 must be recorded as carrying two pins');
-  assert.ok(latest.pins.includes('v0.4.28'), 'the artifact must name the release pin');
-  assert.ok(latest.pins.includes('v0.4.27'), 'the artifact must name the second, wrong pin');
-  assert.equal(latest.pageAgreesWithTarball, true, 'the npm page and the tarball must agree that the README is ambiguous');
+
+  // The named history: 0.4.28 was npm `latest` when this defect was found and
+  // its two pins are immutable — this face must stay true for every future
+  // release, so it does not depend on what `latest` happens to be today.
+  const defective = artifact.versions.find((r) => r.version === '0.4.28');
+  assert.ok(defective, 'the artifact does not measure 0.4.28');
+  assert.equal(defective.verdict, 'two-pins', '0.4.28 must be recorded as carrying two pins');
+  assert.ok(defective.pins.includes('v0.4.28'), 'the artifact must name the release pin');
+  assert.ok(defective.pins.includes('v0.4.27'), 'the artifact must name the second, wrong pin');
+  // The ambiguity is in the SHIPPED bytes. The npm page is measured once, at
+  // package level, because npm serves one readme for the whole package —
+  // asserting a per-version page/tarball agreement for 0.4.28 would be
+  // asserting something npm does not provide.
+  assert.equal(defective.pageIsPackageLevel, true,
+    'the artifact must record that npm served a package-level readme for this version, not a per-version one');
+
+  const page = artifact.packageLevelPageReadme;
+  assert.ok(page, 'the artifact does not record the package-level page readme');
+  assert.equal(page.agreesWithNewestTarball, true,
+    `the npm page pins ${JSON.stringify(page.pins)} but the newest tarball ships something else`);
+
+  // The live invariant: whatever is published NEWEST must carry exactly one
+  // correct pin. This is what the prepublishOnly gate guarantees, so the
+  // measurement must show it holding — a two-pin release was published again.
+  const releases = artifact.versions.filter((r) => /^\d+\.\d+\.\d+$/.test(r.version) && r.verdict !== 'no-verdict');
+  assert.ok(releases.length >= 2, 'record too short to be a record');
+  const newest = releases[releases.length - 1];
+  assert.equal(newest.verdict, 'clean',
+    `the newest published version ${newest.version} ships ${JSON.stringify(newest.pins)} — the gate let a two-pin README publish`);
 });
 
 test('D4: the artifact carries no host path and states its limits', () => {
