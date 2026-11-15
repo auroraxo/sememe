@@ -37,6 +37,7 @@
     "README.md"
   ],
   "scripts": {
+    "prepublishOnly": "node tools/gate-shipped-readme-pin.mjs",
     "test": "node --test",
     "crosscheck": "node tools/crosscheck.mjs",
     "txdiff": "node tools/tx-diff.mjs",

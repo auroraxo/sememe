@@ -86,6 +86,39 @@ Publishing to the npm registry changed on 2026-11-12: the `sememe` name is now l
 
 The **user-zero against the published pin** — a stranger's first run against the version the channels actually serve — is now a repeatable measurement, not a hand-run script: `tools/measure-published-pin-user-zero.mjs` installs the README's pin from the npm registry into an empty app, runs the README's own decode example verbatim, retargets the committed byte-identical HADRo probe at the INSTALLED copy, and decodes both chain-accepted `updateSpreadConfig` (0x0e) witnesses through the installed `src/decode.mjs`. The expectation is not a number written down in a previous pulse: the same probe is run against this checkout first, and the installed copy must answer the identical question identically. `test/published-pin-user-zero.test.mjs` gates the committed artifact (a check that failed, a pin that drifted off the README, or a host path in the artifact all turn it red), and `tools/mutation-ladder-published-pin-user-zero.sh` proves the gate can go red: 8/8 mutations caught, control green, tree byte-identical. Measured 2026-11-15 (`research/published-pin-user-zero-2026-11-15b.json`, verdict `measured`, 6/6 checks pass): registry serves 0.4.28, zero-dependency install, the README example answers `swap_v2` / `roundTripByteExact: true`, the probe answers 144/144 identically on both trees, both 0x0e witnesses decode byte-exact through the installed copy.
 
+## Working now: the README that ships is gated, not just the README you read (2026-11-15)
+
+The one-pin rule — "this README names exactly one install tag" — was enforced on
+**the checkout's** README by eight gates and on nothing that leaves the machine.
+Publishing is manual here, so the order went wrong: `npm publish` ran from the
+release commit, that README carried **two** install tags (`0.4.28` in the install
+blocks, `0.4.27` in the channel-parity paragraph), npm accepted it, and only
+*afterwards* did CI go red on the same commit. The gate ran behind the publish
+instead of in front of it, and the page a stranger reads — the README npm
+renders on the package page, and the one inside the tarball — told them to
+install two different releases. Measured across every published version
+(`tools/measure-shipped-readme-pin.mjs` → `research/shipped-readme-pin-2026-11-15.json`,
+verdict `shipped-readme-pin-defective`): 6 of 8 published versions carry exactly
+one correct tag, and **2 carry two** — `0.4.23` and `0.4.28` (npm `latest`). Those
+versions are immutable and cannot be repaired, so they are named, classified and
+pinned instead.
+
+What is repaired is the *next* publish: `tools/gate-shipped-readme-pin.mjs` packs
+this tree exactly the way `npm publish` does, opens the tarball, and refuses the
+publish unless the shipped README pins exactly one tag, that tag equals the
+version being published, and a README is present at all. It is wired as
+`prepublishOnly`, which npm runs before `npm publish` and **not** before
+`npm pack` — so the channel-parity tool, which packs every historical tag (two of
+which carry two pins forever), keeps measuring them unchanged.
+
+`test/shipped-readme-pin.test.mjs` gates the artifact and the gate (a soft-past
+to a two-pin README, a missing hook, or a verdict edited to `clean` all turn it
+red; `G2` — the assertion that the hook is *not* on `npm pack` — is the guard that
+must stay green on both trees), and `tools/mutation-ladder-shipped-readme-pin.sh`
+proves the gate can go red: **8/8 mutations caught, control green, tree
+byte-identical**. On the pre-fix tree that test is 8 red / 1 green; the one green
+face is the false-positive guard, as it should be.
+
 ## Working now: pin the answers (`sememe lock` + `sememe verify`, 2026-11-05)
 
 The idea section promises "`sememe.lock` pins exact fingerprints per project" — this is that file, and it shipped the same day the promise was measured against the tree (the README said it; no implementation answered; `test/lock.test.mjs` was written first and went 0/11 red on the pre-lock tree).
