@@ -1,0 +1,68 @@
+{
+  "tool": "tools/measure-token-encoder-fallback.mjs",
+  "measuredAt": "2026-11-15T16:40:15.898Z",
+  "question": "can sememe encode every name its own token table advertises for Token-2022?",
+  "program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "fixture": "test/fixtures/ecosystem-sample-2026-11-11.json",
+  "oracle": "research/token-metadata-oracle-2026-11-03.json",
+  "method": "byte-identical probe copied into both trees; prefix extracted with git archive; only src/ differs",
+  "prefix": {
+    "commit": "e28c849",
+    "face": {
+      "namesAdvertised": 53,
+      "metadataNamesAdvertised": 5,
+      "unknownVariantNames": [
+        "Initialize",
+        "UpdateField",
+        "RemoveKey",
+        "UpdateAuthority",
+        "Emit"
+      ],
+      "fixtureReencoded": "0/10",
+      "fixtureRefusals": {
+        "unknown-variant": 10
+      },
+      "oracleReencoded": "0/4",
+      "oracleRefusals": {
+        "unknown-variant": 4
+      },
+      "wrappedVoice": "trailing-bytes: trailing-bytes: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: UpdateAuthority explains 40 of 41 byte(s); upstream's unpack refuses trailing bytes",
+      "reasonDoubled": true,
+      "legacySPLToken": {
+        "Initialize": "unknown-variant",
+        "UpdateField": "unknown-variant",
+        "RemoveKey": "unknown-variant",
+        "UpdateAuthority": "unknown-variant",
+        "Emit": "unknown-variant"
+      }
+    }
+  },
+  "worktree": {
+    "face": {
+      "namesAdvertised": 53,
+      "metadataNamesAdvertised": 5,
+      "unknownVariantNames": [],
+      "fixtureReencoded": "10/10",
+      "fixtureRefusals": {},
+      "oracleReencoded": "4/4",
+      "oracleRefusals": {},
+      "wrappedVoice": "trailing-bytes: TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb: UpdateAuthority explains 40 of 41 byte(s); upstream's unpack refuses trailing bytes",
+      "reasonDoubled": false,
+      "legacySPLToken": {
+        "Initialize": "unknown-variant",
+        "UpdateField": "unknown-variant",
+        "RemoveKey": "unknown-variant",
+        "UpdateAuthority": "unknown-variant",
+        "Emit": "unknown-variant"
+      }
+    }
+  },
+  "verdict": "encoder-reproduces-its-own-names",
+  "falsifications": [],
+  "limits": [
+    "measures the ENCODER against names the table advertises, not a live foreign consumer",
+    "the five metadata names are the pinned upstream variant list; extension sub-instructions are still reported as trailing",
+    "the metadata fallback is Token-2022 only; legacy SPL Token is a guard face here, not a claim",
+    "a payload whose first byte IS a token variant never reaches the fallback (upstream dispatch order, unchanged)"
+  ]
+}

@@ -121,6 +121,22 @@ export class TokenCodecError extends Error {
   }
 }
 
+/**
+ * Normalize a token-metadata refusal into the token module's ONE error type
+ * without printing the reason twice: the fallback's `message` already leads
+ * with its own reason ("<reason>: <detail>"), and the constructor would add
+ * it again. Exactly one leading "<reason>: " is stripped when present, so the
+ * consumer sees "trailing-bytes: <detail>" — one voice, one reason.
+ */
+function normalizeMetadataError(error) {
+  if (!(error instanceof TokenMetadataCodecError)) return error;
+  const prefix = `${error.reason}: `;
+  const detail = error.message.startsWith(prefix)
+    ? error.message.slice(prefix.length)
+    : error.message;
+  return new TokenCodecError(error.reason, detail);
+}
+
 /** Whether `program` is one of the token programs this module owns. */
 export function isTokenProgram(program) {
   return ARTIFACTS.has(program);
@@ -329,10 +345,7 @@ export function decodeTokenInstruction(program, bytes, { trailing = 'report' } =
         // The fallback raises its own error type; the token module's
         // contract is one error type with a named reason, so the reason is
         // preserved and the type is normalized here.
-        if (error instanceof TokenMetadataCodecError) {
-          throw new TokenCodecError(error.reason, error.message);
-        }
-        throw error;
+        throw normalizeMetadataError(error);
       }
     }
     throw new TokenCodecError(
@@ -395,7 +408,25 @@ export function encodeTokenInstruction(program, name, values = {}) {
   const artifact = ARTIFACTS.get(program);
   if (!artifact) throw new TokenCodecError('not-token', program);
   const entry = artifact.instructions.find((ix) => ix.name === name);
-  if (!entry) throw new TokenCodecError('unknown-variant', `${program}: ${name}`);
+  if (!entry) {
+    // The metadata fallback is part of what this program accepts: the decoder
+    // names those payloads (through the processor's own fallback branch), so
+    // the encoder must be able to reproduce them. Measured 2026-11-15: the
+    // name list advertised five metadata variants that the encoder refused
+    // with `unknown-variant` — a payload the product could NAME but not
+    // re-encode. The round trip only stayed green because the decoder
+    // happened to be byte-exact on all ten sampled payloads, which short-
+    // circuited the encoder. The contract is restored here: every name the
+    // table can claim is a name the encoder can reproduce.
+    if (hasTokenMetadataFallback(program) && tokenMetadataNames().includes(name)) {
+      try {
+        return encodeTokenMetadataInstruction(name, values);
+      } catch (error) {
+        throw normalizeMetadataError(error);
+      }
+    }
+    throw new TokenCodecError('unknown-variant', `${program}: ${name}`);
+  }
   const chunks = [Buffer.from([entry.tag])];
   for (const spec of entry.args) {
     const value = values[spec.name];
