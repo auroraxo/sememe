@@ -1,0 +1,88 @@
+{
+  "tool": "tools/measure-published-pin-user-zero.mjs",
+  "measuredAt": "2026-11-15T08:16:25.905Z",
+  "package": "sememe",
+  "pin": "v0.4.27",
+  "checks": [
+    {
+      "name": "channel",
+      "pass": true,
+      "detail": "README pins v0.4.27; registry dist-tags.latest serves 0.4.27",
+      "readmePin": "v0.4.27",
+      "registryLatest": "0.4.27"
+    },
+    {
+      "name": "install",
+      "pass": true,
+      "detail": "npm install sememe@0.4.27 into an empty app: exit 0, node_modules holds exactly ['sememe'] (zero runtime deps)",
+      "installedVersion": "0.4.27"
+    },
+    {
+      "name": "readme-example",
+      "pass": true,
+      "detail": "npx --no-install sememe decode (README install section, verbatim): name swap_v2, roundTripByteExact true",
+      "roundTripByteExact": true
+    },
+    {
+      "name": "count-header",
+      "pass": true,
+      "detail": "byte-identical probe, ROOT retargeted to the installed copy: total 144, decoded 144, refused 0, pointsMatchHeaderCount 144, points 703 — identical to this checkout's answer",
+      "checkout": {
+        "total": 144,
+        "decoded": 144,
+        "refused": 0,
+        "pointsDecoded": 703
+      },
+      "installed": {
+        "total": 144,
+        "decoded": 144,
+        "refused": 0,
+        "pointsDecoded": 703
+      }
+    },
+    {
+      "name": "live-witness",
+      "pass": true,
+      "detail": "both chain-accepted 0x0e witnesses decode through the installed src/decode.mjs: updateSpreadConfig numTriggers 5=5 byte-exact; updateSpreadConfig numTriggers 5=5 byte-exact; updateSpreadConfig numTriggers 5=5 byte-exact; installed count-from-header table entry elementBytes 66",
+      "rule": {
+        "countArg": "numTriggers",
+        "vectorArg": "triggers",
+        "elementBytes": 66,
+        "source": "research/live-layout-scan-hadro-witness-2026-11-14.json"
+      },
+      "witnesses": [
+        {
+          "signature": "5WazqL16rgdgeCvUXUsd2gSow71sHn9aKU8kBePdzjVs44rZcahfr2FPZQh8L5BbBTzbM61417wafyZnXLB2pZU3",
+          "name": "updateSpreadConfig",
+          "numTriggers": 5,
+          "triggers": 5,
+          "describedRoundTripByteExact": true
+        },
+        {
+          "signature": "5WazqL16rgdgeCvUXUsd2gSow71sHn9aKU8kBePdzjVs44rZcahfr2FPZQh8L5BbBTzbM61417wafyZnXLB2pZU3",
+          "name": "updateSpreadConfig",
+          "numTriggers": 5,
+          "triggers": 5,
+          "describedRoundTripByteExact": true
+        },
+        {
+          "signature": "2vCUNpizeB3Cu9vdnhFPEFnsnpnBMLgJHSRCdRd2BdYfQKF4xz49CrkejUuL4d1iwUCsG6FQ6BBBSVjDuLafc1g1",
+          "name": "updateSpreadConfig",
+          "numTriggers": 5,
+          "triggers": 5,
+          "describedRoundTripByteExact": true
+        }
+      ]
+    },
+    {
+      "name": "readme-pin-unique",
+      "pass": true,
+      "detail": "README pins exactly one tag: v0.4.27"
+    }
+  ],
+  "verdict": "measured",
+  "limits": [
+    "this is my own user-zero against the published channel, not a foreign user; zero external users, one machine, no audit",
+    "the store, sample and witness bytes are LOCAL FIXTURE DATA from this checkout — the install channel is the registry, the evidence is committed"
+  ]
+}
