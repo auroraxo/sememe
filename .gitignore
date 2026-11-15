@@ -1,3 +1,6 @@
 node_modules/
 tools/token-metadata-oracle/target/
 research/release-surface-live.tmp.json
+
+# test byproducts (written by the qualification suite, never committed)
+research/.diablo-adoption-*.json
