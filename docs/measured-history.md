@@ -3297,3 +3297,77 @@ histogram sums to the scanned payload count, honest limit present.
 audit; `submitCurveUpdates`, `removeSpreadTriggers` and CAMM's
 `update_operation_account` remain unwired because no own chain witness has
 been measured for them.
+
+## 2026-11-15: the encoder refused the names the decoder advertises (Token-2022 metadata) — v0.4.28
+
+`tokenNames(TOKEN_2022)` (and `isTokenName`) advertise 53 names for the
+Token-2022 program: the 48 token instructions the table carries plus five
+token-metadata variants that reach the decoder through its own fallback
+branch — `Initialize`, `UpdateField`, `RemoveKey`, `UpdateAuthority`, `Emit`.
+`encodeTokenInstruction(TOKEN_2022, …)` refused **all five** with
+`unknown-variant`. A consumer could be handed the name of a payload and then
+be unable to re-encode it.
+
+Two faces, one defect:
+
+1. The encoder had no fallback at all. The decoder routes those payloads
+   through `hasTokenMetadataFallback(program)`; the encoder only walked the
+   instruction table, and the five names live in no table.
+2. The fallback that DID exist re-wrapped the metadata error's message into a
+   constructor that prefixes the reason again, so the consumer read
+   `trailing-bytes: trailing-bytes: …` — the reason twice, once from each
+   layer.
+
+**Why the gate never saw it.** The round trip short-circuits the encoder
+whenever the decoder is byte-exact — and on all ten sampled payloads the
+decoder *was* byte-exact. The broken path was never reached. This is the
+same shape as the empty-filter gate: a check that only runs on the failure
+path cannot watch the failure path it skips.
+
+**Measured on the unchanged prefix tree** (`e28c849`, which is tag `v0.4.27`
+and npm `latest` until 2026-11-15), with the working tree beside it:
+
+| face | prefix tree `e28c849` | working tree |
+|---|---|---|
+| metadata names the encoder refuses | **5 of 5** | 0 of 5 |
+| fixture payloads re-encoded byte-exactly | **0/10** | 10/10 |
+| chain-witness payloads re-encoded byte-exactly | **0/4** | 4/4 |
+| refusal reason printed | **twice** | once |
+| legacy SPL Token still refuses all five | yes (guard) | yes (guard) |
+
+**Evidence.** `research/token-encoder-fallback-2026-11-15.json`
+(`tools/measure-token-encoder-fallback.mjs`, two-tree, verdict
+`encoder-reproduces-its-own-names`, no falsifications) is pinned by
+`test/token-encoder-fallback-measurement.test.mjs` (a drifted delta, a host
+path, a broken guard or a changed verdict all turn it red).
+`test/token-encoder-fallback.test.mjs` carries the four defect faces —
+red on `e28c849`, green here — plus four guards that are green on both
+trees. `tools/mutation-ladder-token-encoder-fallback.sh` proves the gate can
+go red: **6/6 mutations caught**, control green, tree byte-identical after
+every run.
+
+**The headline did not move.** The pre-fix and post-fix coverage runs are
+byte-identical at **88.8% (18,967/21,350 payloads; byte-exact 17,652,
+93.1% of decoded)** — this closes an encoder gap inside one program, not a
+coverage hole. The honest claim is the delta, not the headline.
+
+**Released as v0.4.28** (both channels, measured after publish):
+
+- `research/release-surface-2026-11-15.json` — verdict `clean`,
+  newest = latest = pinned = `v0.4.28`, no defects.
+- `research/channel-parity-2026-11-15.json` — 0.4.23 through **0.4.28**
+  measure byte parity (`gitHead` equals the tag commit); the two immutable
+  divergences are unchanged (0.4.21 product, 0.4.22 README).
+- `research/published-pin-user-zero-2026-11-15b.json` — registry serves
+  0.4.28, zero-dependency install into an empty app, the README example
+  answers `swap_v2` / `roundTripByteExact: true`, the byte-identical probe
+  answers **144/144 decoded, 0 refused, identical to this checkout**, and
+  both chain-accepted `0x0e` witnesses decode byte-exact through the
+  installed copy. Verdict `measured`, 6/6 checks pass.
+
+**Honest remainder.** Zero external users — publish is not consumption. The
+user-zero above is my own, run against my own trees; no foreign consumer of
+the encoder path has been measured. One machine, no audit. `submitCurveUpdates`,
+`removeSpreadTriggers` and CAMM's flag-arg instruction remain unwired: three
+disjoint live windows measured zero payloads for each (a window is a window,
+not an absence on chain).

@@ -9,7 +9,7 @@
 //
 //   parity / doc-divergence / product-divergence / stage-placeholder / no-tag
 //
-// MEASURED (research/channel-parity-2026-11-14.json, verdict
+// MEASURED (research/channel-parity-2026-11-15.json, verdict
 // channel-parity-broken):
 //   * 0.4.21 PRODUCT-DIVERGENCE: the registry ships src/rawle.mjs, the tag
 //     v0.4.21 does not. npm's own gitHead for 0.4.21 is 05e6643 — a
@@ -66,7 +66,7 @@ const ROOT = path.resolve(HERE, '..');
 const TOOL = path.join(ROOT, 'tools', 'measure-channel-parity.mjs');
 const ARTIFACT = process.env.SEMEME_CHANNEL_PARITY_ARTIFACT
   ? path.resolve(process.env.SEMEME_CHANNEL_PARITY_ARTIFACT)
-  : path.join(ROOT, 'research', 'channel-parity-2026-11-14.json');
+  : path.join(ROOT, 'research', 'channel-parity-2026-11-15.json');
 
 assert.ok(existsSync(ARTIFACT), 'committed channel-parity artifact missing — run the tool first');
 const artifact = JSON.parse(readFileSync(ARTIFACT, 'utf8'));
