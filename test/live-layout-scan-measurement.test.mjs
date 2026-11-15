@@ -58,6 +58,11 @@ const camm = readArtifact('live-layout-scan-camm-2026-11-14.json');
 // measurement, and the gap between them is the evidence the windows are
 // actually independent.
 const hadroWindow2 = readArtifact('live-layout-scan-hadro-window2-2026-11-14.json');
+// A THIRD independent window (6,000 signatures, 10,870 payloads, slots
+// 469657551..469661553), scanned 2026-11-15 while the pin that reads it was
+// being written. Three disjoint windows that answer the same question are
+// three measurements; two could still be a pair of accidents.
+const hadroWindow3 = readArtifact('live-layout-scan-hadro-witness2-2026-11-15.json');
 
 /** The committed IDL of one program, from the committed store. */
 function committedIdl(address) {
@@ -261,4 +266,47 @@ test('the element sizer agrees with the IDLs documented byte sizes', () => {
     assert.equal(typeSize({ defined: { name: typeName } }, loadTypes(idl)), expectedBytes,
       `${typeName}: the analyzer's sizer must agree with the IDL's own documented byte size`);
   }
+});
+
+// A THIRD INDEPENDENT WINDOW (2026-11-15). The two earlier windows answered
+// the same question; a third disjoint one makes the answer a measurement
+// rather than a pair of accidents — and it is the window that also shows how
+// small the admin traffic is: 10,870 payloads over 6,000 transactions, and
+// ZERO of the four unwitnessed targets.
+test('the third HADRo window is independent of the first two and re-confirms the rule', () => {
+  assert.ok(hadroWindow3.window.fromSlot > hadroWindow2.window.toSlot,
+    `the third window must not overlap the second: ${hadroWindow2.window.toSlot} -> ${hadroWindow3.window.fromSlot}`);
+  assert.equal(hadroWindow3.tool, 'tools/measure-live-layout-scan.mjs');
+  assert.equal(hadroWindow3.analyzer, 'tools/lib/live-layout.mjs');
+  assert.equal(hadroWindow3.scanned.missed, 0, 'a missed transaction would make every count a lower bound');
+  assert.ok(hadroWindow3.scanned.payloads > 0);
+  assert.equal(hadroWindow3.verdict, 'no-live-witness-in-window');
+  // The four unwitnessed targets stay unwitnessed in the THIRD window.
+  assert.equal(hadroWindow3.targets.witnessed.length, 4);
+  for (const t of hadroWindow3.targets.witnessed) {
+    assert.equal(t.witnessed, false, `${t.instruction} must not claim a witness`);
+    assert.equal(t.payloads, 0);
+    assert.ok(!hadroWindow3.discriminatorList.some((d) => d.discriminator === t.discriminator));
+  }
+  // The wired rule re-confirms on this window's traffic, re-derived HERE from
+  // the committed bytes with the same analyzer the CLI runs.
+  const { perInstruction, byDiscriminator } = analyze(hadroWindow3.payloadSample, hadroIdl, loadTypes(hadroIdl));
+  for (const name of ['setCurve', 'setRiskCurve']) {
+    const entry = perInstruction.get(`${name}|numPoints|points`);
+    assert.ok(entry, `${name} not measured in the third window`);
+    assert.ok(entry.accepted > 0, `${name} has no chain-accepted payload in the third window`);
+    assert.deepEqual(entry.hypotheses, { 'count-from-header': entry.accepted },
+      `${name}: the third window must carry the count in the header, not a Borsh prefix`);
+  }
+  // The sample covers every discriminator the full scan recorded, and the
+  // histogram sums to the scanned payload count.
+  const fullDisc = new Set(hadroWindow3.discriminatorList.map((d) => d.discriminator));
+  const sampleDisc = new Set([...byDiscriminator.keys()]);
+  for (const disc of sampleDisc) {
+    assert.ok(fullDisc.has(disc), `sample discriminator ${disc} is not in the full-scan histogram`);
+  }
+  assert.equal(sampleDisc.size, fullDisc.size, 'the sample must cover every discriminator');
+  const total = hadroWindow3.discriminatorList.reduce((sum, d) => sum + d.count, 0);
+  assert.equal(total, hadroWindow3.scanned.payloads);
+  assert.ok(hadroWindow3.limits.some((l) => /window, not an absence/i.test(l)));
 });

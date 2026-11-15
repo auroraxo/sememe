@@ -3212,3 +3212,88 @@ CAUGHT for the wrong reason: the mutation's temporary filename contained a
 `/`, so the copy failed and the pin went red on a missing file rather than on
 the mutated logic. Fixed (index-based mutation filenames) and re-run: 5/5
 caught for the right reasons, control green.
+
+## 2026-11-15 — PUBLISHED-PIN USER-ZERO BECAME A TOOL, AND A THIRD WINDOW SAYS THE SAME THING
+
+Two moves, one card step each.
+
+### The user-zero against the published pin is now produced by the tree, not by hand
+
+The standing next step 3 is *"user-zero am PUBLISHED Pin je Puls"* — a
+stranger's first run against the version the channels actually serve. Until
+today every pulse ran that by hand and WROTE the artifact
+(`research/registry-install-*.json`) by hand; nothing committed produced it,
+so the numbers could drift between pulses without a gate noticing, and a
+pulse that forgot to re-run it left the last artifact standing as if it were
+fresh.
+
+`tools/measure-published-pin-user-zero.mjs` is the repeatable half:
+
+* installs the README's pin from the **npm REGISTRY** into an empty app —
+  the channel a stranger who copies `npm install sememe` actually gets, not
+  this checkout;
+* runs the README's OWN install-section decode command verbatim through
+  `npx --no-install sememe` from inside that app;
+* retargets the byte-identical committed HADRo probe
+  (`tools/hadro-count-header-probe.mjs`) at the **INSTALLED** copy — `src`
+  symlinks to the installed tree, `test/fixtures` to this checkout's local
+  test data — and requires the installed copy to answer the identical
+  question **identically** to this checkout. The expectation is this tree's
+  own answer, not a number written down in a previous pulse;
+* decodes both chain-accepted `updateSpreadConfig` (0x0e) witnesses through
+  the installed `src/decode.mjs` and the installed count-from-header table
+  entry (`elementBytes 66`);
+* refuses to write a clean artifact when a check failed (`exit 3`) and
+  records an unreachable registry as `no-verdict` instead of a clean run.
+
+**MEASURED** (`research/published-pin-user-zero-2026-11-15.json`, verdict
+`measured`, 6/6 checks pass): registry serves **0.4.27** = the README pin;
+zero-dependency install (node_modules holds exactly `sememe`); the README
+example answers `swap_v2` with `roundTripByteExact: true`; the probe answers
+**total 144 / decoded 144 / refused 0** identically on both trees; both 0x0e
+witnesses decode byte-exact through the installed copy (`numTriggers 5`,
+five triggers).
+
+**PIN** `test/published-pin-user-zero.test.mjs` (6): a check that failed, a
+pin that drifted off the README, a host path in the artifact, a second
+README install pin, or a tool that stops installing from the registry all
+turn it red.
+
+**LADDER** `tools/mutation-ladder-published-pin-user-zero.sh`: **8/8
+CAUGHT**, control green, tree byte-identical after every mutation. M5 (a
+second README install pin) was NOT caught on the first run — the mutation
+added the SAME tag twice, which deduplicates to one pin, so the gate
+correctly did not fire; the mutation now adds a second *different* tag and
+is caught. The tool was reported as `swap_v2` instead of `readme-example`
+on the first run too: the extras object carried a `name` key that silently
+overwrote the check's own identity — the `record` helper drops it now.
+
+### A THIRD independent live window: same answers
+
+Standing next step 2 (*"12/1d/CAMM only with a real payload window"*):
+`research/live-layout-scan-hadro-witness2-2026-11-15.json`, 6,000 pinned
+signatures, 6,000 fetched, **0 missed**, 10,870 payloads, slots
+469657551..469661553 — disjoint from both earlier windows (which ended at
+469180764 and 469343584).
+
+* The wired rule re-confirms on fresh traffic, re-derived from the
+  committed bytes with the same analyzer the CLI runs: `setCurve` 5/5 and
+  `setRiskCurve` 1,845/1,845 chain-accepted payloads answer
+  `count-from-header`, never `borsh-prefix`.
+* The four unwitnessed targets (`submitCurveUpdates 12`,
+  `removeSpreadTriggers 1d`, `updateSpreadConfig 0e`, CAMM
+  `update_operation_account`) stay unwitnessed: **zero payloads** in this
+  window. Three disjoint windows now give the same answer.
+* Honest limit, again in the artifact: *a zero-payload window is a window,
+  not an absence on chain* — these are admin instructions and may simply not
+  have been called in the scanned range.
+
+**Pinned** in `test/live-layout-scan-measurement.test.mjs` (12 tests,
+green): window independence, re-derivation from the committed sample,
+histogram sums to the scanned payload count, honest limit present.
+
+**No product code changed** in either move → the release pin stays
+**v0.4.27**. Honest remainder unchanged: 0 external users, one machine, no
+audit; `submitCurveUpdates`, `removeSpreadTriggers` and CAMM's
+`update_operation_account` remain unwired because no own chain witness has
+been measured for them.
