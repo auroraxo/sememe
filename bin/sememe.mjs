@@ -31,7 +31,7 @@ const usage = `usage:
   sememe absent-help
       print the chain-verified short wire forms that --absent verified licenses.
   sememe pull <program-id> [--store <directory>] [--rpc <https-url>]
-  sememe gap <program-id> [--rpc <https-url>]
+  sememe gap <program-id> [--store <dir>] [--rpc <https-url>]
       answer the question "why is there no interface here?" BEFORE you pull.
       Probes both on-chain IDL addresses and returns one of:
         pullable              an interface exists on chain that this program's
@@ -201,6 +201,11 @@ try {
   } else if (command === 'gap') {
     if (!program) throw Error('gap needs a program id');
     const rpc = option('--rpc', 'https://api.mainnet-beta.solana.com');
+    // The LOCAL store first, exactly like pull/lock/verify: gap answers "what
+    // is missing", and what is missing is relative to what THIS machine holds.
+    // Measured 2026-11-16: without this, gap sent a stranger to pull a program
+    // it had already pulled and to adopt a copy it already owned.
+    const store = option('--store', path.join(os.homedir(), '.sememe'));
     let probe, where, nextStep;
     try {
       // Lazily imported like `pull`: the only path that needs web3.js.
@@ -211,8 +216,10 @@ try {
       throw Error(`gap needs @solana/web3.js: install it next to sememe (npm i @solana/web3.js@1.98.4) — ${String(error?.message ?? error).slice(0, 120)}`);
     }
     // The same classifier the qualification report uses, so what a user is
-    // told and what the research artifact records are one code path.
-    const { rows } = await probe([{ program, payloads: 0 }], { url: rpc });
+    // told and what the research artifact records are one code path. No
+    // `payloads` field: this command never measured one, and a fabricated 0
+    // reads like a measurement (removed 2026-11-16).
+    const { rows } = await probe([{ program }], { url: rpc, storeDir: store });
     const row = rows[0];
     console.log(JSON.stringify({ ...row, addresses: await where(program), next: nextStep(row, program) }, null, 2));
     if (row.verdict === 'unknown') process.exitCode = 3;

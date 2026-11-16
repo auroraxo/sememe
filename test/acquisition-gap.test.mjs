@@ -228,9 +228,11 @@ test('M2: a classifier that folds an RPC failure into "publishes nothing" goes r
   const tmp = await mkdtemp(path.join(ROOT, '.mut2-'));
   try {
     const source = await readFile(path.join(ROOT, 'src', 'gap.mjs'), 'utf8');
+    // The failure row now flows through withStore() (the store-aware fold,
+    // 2026-11-16); the mutation targets the same unknown-verdict row as before.
     const mutated = source.replace(
-      "rows.push({ program, payloads, verdict: 'unknown', error: response.error });",
-      "rows.push({ program, payloads, verdict: 'no-interface-published', error: response.error });",
+      "withStore({ program, payloads, verdict: 'unknown', error: response.error }, stores?.get(program))",
+      "withStore({ program, payloads, verdict: 'no-interface-published', error: response.error }, stores?.get(program))",
     );
     assert.notEqual(mutated, source, 'the mutation must actually change the source');
     const mutatedPath = path.join(ROOT, 'src', `.gap-mutant-${path.basename(tmp)}.mjs`);

@@ -77,7 +77,10 @@ export const COMMAND_SPECS = {
     positionalNames: ['program id'],
   },
   gap: {
-    flags: { '--rpc': 'value' },
+    // `--store` is what makes the answer half local: the store is consulted
+    // BEFORE the chain (see src/gap.mjs), so a program the store already
+    // holds is never sent off to acquire it again.
+    flags: { '--rpc': 'value', '--store': 'value' },
     positionals: 1,
     positionalNames: ['program id'],
   },

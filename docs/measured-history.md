@@ -416,6 +416,26 @@ The five possible verdicts, all mutually exclusive:
 - `vendored`: one of the programs sememe answers via pinned upstream wire tables (System, ComputeBudget, SPL Token, Token-2022, Raydium AMM v4, SPL Associated Token Account) — there is no on-chain IDL to store.
 - `unknown`: the RPC failed. **An RPC failure is never recorded as an absence** (the crates.io 403 lesson: a client-side failure that reads as missing data). The CLI exits 3 (`no-verdict`) in this case so scripted callers know the chain's state is unmeasured.
 
+#### The store half of the answer (`--store`), measured 2026-11-16
+
+The five verdicts above answer only the CHAIN half of "what is missing". The other half is local: what THIS machine already holds. Until 2026-11-16 `sememe gap` never read a store at all, so two opposite worlds produced identical output — measured from a stranger's install of the published `v0.4.29` into an empty app with the fixture store copied to `~/.sememe`:
+
+| program | what the store held | verdict it got | advice it got |
+| --- | --- | --- | --- |
+| `whirLbMiicV…` (Whirlpool) | the pulled on-chain receipt (slot 465104921) | `pullable` | `sememe pull whirLbMiicV…` — the pull it had already run |
+| `L2TExMFKd…` (Lighthouse) | the adopted first-party copy | `no-interface-published` | `… use sememe adopt-lighthouse …` — the copy it already owned |
+
+The JSON also carried a `payloads: 0` line that no probe had ever measured. Both are gone.
+
+`sememe gap` now reads the store FIRST (before any RPC, so a store the reader refuses costs no request) and reports the store's own answer next to the chain's:
+
+- `store.state` is `held` (a verified receipt exists for this program), `not-held` (the store exists and has no receipt for it) or `no-store` (there is no store directory yet). A missing store is an ANSWER, not an error; a tampered object is refused BY NAME (`refusing to decode`) and never folded into `not-held`.
+- When the store holds the program, the verdict becomes `stored` and the chain verdict survives as `chainVerdict` — a `stored` row never erases the fact it was built on.
+- The RPC half keeps its precedence: a failed probe stays `unknown` / `no-verdict` even when the store holds the program (the crates.io-403 rule outranks local knowledge), and the local half is still named in the advice so an offline decode is available.
+- The advice follows the store: a held program gets `sememe decode …`, never `sememe pull`. The ONE exception is a store that holds only an ADOPTED copy while the chain publishes an on-chain interface — then the on-chain receipt is genuinely missing and the pull advice survives.
+
+The research sweep (`tools/acquisition-gap.mjs`) passes no store, on purpose: a published artifact measures THE CHAIN, so a private store must not be able to move it.
+
 Measured 2026-11-04 over all 70 gap programs of the foreign 156-fixture set (`research/acquisition-gap-2026-11-04.json`): **34 programs publish an on-chain IDL (177 payloads)** — never-pulled gaps, not derivation work — and **36 publish nothing (129 payloads)**.
 
 #### Closing a measured gap in one command (`tools/batch-pull.mjs`)
