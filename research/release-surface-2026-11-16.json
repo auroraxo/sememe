@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-16T09:33:33.592Z",
+  "measuredAt": "2026-11-16T10:27:22.545Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.30",
+        "body": "The gap answer now knows what this machine already holds.\n\n**What shipped.** A stranger who had already pulled Whirlpool was told to pull Whirlpool again, and a stranger who had already adopted Lighthouse was told to adopt Lighthouse again — two opposite worlds, one answer: redo what you already did. The gap question was never store-relative, and `sememe gap` never read a store.\n\n**Measured, not assumed.** `sememe gap <program> --store <dir>` now reads the store FIRST, before any RPC, so a store the reader refuses costs no request. The verdict has six values: the five chain-side ones (`pullable`, `no-interface-published`, `present-undecodable`, `vendored`, `unknown`) plus `stored`, which only the local store can produce. The chain fact survives as `chainVerdict`; a failed probe stays `unknown` / `no-verdict` even when the store holds the program (the crates.io-403 rule outranks local knowledge), and the advice still names the offline decode. A held program is told to DECODE, never to pull or adopt again — with the one exception where the store holds only an ADOPTED copy while the chain publishes an on-chain interface.\n\n**Evidence.** `test/gap-store.test.mjs` (10 tests) and `tools/mutation-ladder-gap-store.sh` (7/7 mutations caught, control green). Suite 1089: 1060 pass / 5 fail / 24 skipped — the five failures are release-gate faces that need the published artifact and are closed by the follow-up verify commit, exactly like v0.4.29.\n\n**Install**\n\n```bash\nnpm install sememe\nnpm install github:auroraxo/sememe#v0.4.30\n```\n\n**Honest limits.** No external users — publish is not consumption. The ecosystem coverage headline does not move: 88.8% (18,967/21,350 payloads). This release is a gap-advice fix, not a decoding change.",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-16T10:21:30Z",
+        "createdAt": "2026-11-16T10:19:29Z"
+      },
       {
         "tag": "v0.4.29",
         "body": "The README a stranger receives now names **exactly one** release.\n\n**What shipped.** `sememe@0.4.28` — npm `latest` until now — ships a README that names **two** install tags: `#v0.4.28` in the install blocks and `#v0.4.27` inside the channel-parity paragraph. The page npm renders on the package page and the README inside the tarball both told a stranger to install two different releases, without saying which one the package actually is.\n\n**Measured, not assumed.** `tools/measure-shipped-readme-pin.mjs` packs every published version from the registry, opens the tarball and reads the README the consumer gets, then reads the same version's registry readme (the page npm renders) and compares both with the version itself (`research/shipped-readme-pin-2026-11-15.json`, verdict `shipped-readme-pin-defective`):\n\n| version | shipped README | |\n|---|---|---|\n| 0.4.21, 0.4.22, 0.4.24 – 0.4.27 | one tag, its own | clean (6 of 8) |\n| 0.4.23 | `#v0.4.23` **and** `#v0.4.22` | two pins |\n| 0.4.28 | `#v0.4.28` **and** `#v0.4.27` | two pins |\n\nnpm `latest` was one of the two. Both versions are immutable — an npm version cannot be rewritten — so they are named, classified and pinned rather than repaired, and the remedy is the one this project used for the identical 0.4.23 defect: a corrected successor. `0.4.29` ships `src/` byte-identical to `0.4.28` with a README that pins exactly one tag — itself.\n\n**The gate now stands in front of the publish.** The one-pin rule was enforced on the *checkout's* README by eight gates and on nothing that leaves the machine. Publishing here is manual, so on 0.4.28 the order went wrong: `npm publish` ran first, npm accepted the two-pin README, and only afterwards did CI go red on that same commit (runs `43741650634` + `43741650472`, both failure). `prepublishOnly` now runs `tools/gate-shipped-readme-pin.mjs`, which packs this tree the way `npm publish` does, opens the tarball and **refuses** unless the shipped README pins exactly one tag, that tag equals the published version, and a README is present at all (an empty README would make the rule vacuously clean). It is deliberately NOT on `npm pack`, so the channel-parity tool keeps measuring the immutable two-pin tags unchanged.\n\nThe gate caught its own author during this release: bumping the version and the two install blocks left the parity paragraph still naming `#v0.4.28`, and the gate refused with exit 1 — the exact defect, caught on the release that was about to become `latest`.\n\n**Install**\n\n```bash\nnpm install sememe\nnpm install github:auroraxo/sememe#v0.4.29\n```\n\n**Evidence.** `test/shipped-readme-pin.test.mjs` (9 faces) gates the artifact and the gate: 8 red on the pre-fix tree, the one green face being the false-positive guard `G2`. `tools/mutation-ladder-shipped-readme-pin.sh` proves it can go red: 8/8 mutations caught, control green, tree byte-identical after every run. Suite 1079: 1074 pass / 0 fail / 5 skipped.\n\n**Honest limits.** No external users — publish is not consumption; zero foreign runs of `sememe` have been measured, and the user-zero runs here are my own, against my own package. One machine, not an audit. The ecosystem coverage headline does not move: **88.8% (18,967/21,350 payloads; byte-exact 17,652, 93.1% of decoded)** — this release is a publishing-surface fix, not a decoding change.\n",
@@ -275,6 +283,7 @@
       "v0.4.28",
       "v0.4.29",
       "v0.4.3",
+      "v0.4.30",
       "v0.4.4",
       "v0.4.5",
       "v0.4.6",
@@ -284,7 +293,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.29"
+        "v0.4.30"
       ],
       "documentedCommands": [
         "pull",
@@ -317,6 +326,114 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.30": {
+        "manifest": {
+          "version": "0.4.30",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-hadron",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "hadron",
+          "gap"
+        ],
+        "entryExports": [
+          "COUNT_FROM_HEADER",
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "countFromHeader",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.30"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "lock",
+            "verify",
+            "adopt-hadron"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.29": {
         "manifest": {
           "version": "0.4.29",
@@ -3348,13 +3465,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.29",
-    "latestTag": "v0.4.29",
+    "newestTag": "v0.4.30",
+    "latestTag": "v0.4.30",
     "pinnedTags": [
-      "v0.4.29"
+      "v0.4.30"
     ]
   },
   "perRelease": {
+    "v0.4.30": {
+      "defects": []
+    },
     "v0.4.29": {
       "defects": []
     },

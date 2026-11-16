@@ -65,7 +65,7 @@ let parseReadme, derive, binCommandsOf, normalizeExportsKeys, readTreeForTest;
 // clean). The 2026-11-14.json record is the v0.4.26 one — its body is the
 // frozen input L3 reads.
 const ARTIFACT = path.join(ROOT, 'research', 'release-surface-2026-11-14.json');
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-15.json');
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-16.json');
 
 test.before(async () => {
   const mod = await import(new URL(`file://${TOOL}`).href);

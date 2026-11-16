@@ -64,7 +64,7 @@ const BEFORE = path.join(ROOT, 'research', 'release-surface-2026-11-05-before.js
 // CURRENT release is release-surface-2026-11-14b.json (v0.4.27-era:
 // newest = latest = pinned = v0.4.27, verdict clean). Older records stay in
 // research/ as history — they still reproduce their own verdict.
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-15.json');
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-16.json');
 const NETWORK = process.env.SEMEME_RELEASE_SURFACE_NETWORK === '1';
 
 // On the pre-fix tree the tool module does not exist; the import failure must

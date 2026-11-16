@@ -66,7 +66,7 @@ const ROOT = path.resolve(HERE, '..');
 const TOOL = path.join(ROOT, 'tools', 'measure-channel-parity.mjs');
 const ARTIFACT = process.env.SEMEME_CHANNEL_PARITY_ARTIFACT
   ? path.resolve(process.env.SEMEME_CHANNEL_PARITY_ARTIFACT)
-  : path.join(ROOT, 'research', 'channel-parity-2026-11-15.json');
+  : path.join(ROOT, 'research', 'channel-parity-2026-11-16.json');
 
 assert.ok(existsSync(ARTIFACT), 'committed channel-parity artifact missing — run the tool first');
 const artifact = JSON.parse(readFileSync(ARTIFACT, 'utf8'));

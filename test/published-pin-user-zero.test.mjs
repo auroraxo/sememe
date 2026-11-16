@@ -41,7 +41,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const ARTIFACT = 'published-pin-user-zero-2026-11-15b.json'; // the 2026-11-15 re-measure (pin v0.4.29 after the v0.4.29 publish); the 2026-11-15.json record (0.4.27) stays as history
+const ARTIFACT = 'published-pin-user-zero-2026-11-16.json'; // the 2026-11-16 re-measure (pin v0.4.30 after the v0.4.30 publish); the 2026-11-15b record (0.4.29) stays as history
 const TOOL = 'tools/measure-published-pin-user-zero.mjs';
 
 const artifact = JSON.parse(readFileSync(path.join(ROOT, 'research', ARTIFACT), 'utf8'));
