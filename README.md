@@ -175,13 +175,19 @@ Measured against the unchanged prefix tree `e28c849` (= tag `v0.4.27` = npm `lat
 
 Why the round trip stayed green anyway: the encoder is only reached when the decoder is not byte-exact — and on all ten sampled payloads the decoder was byte-exact. The gap was invisible to the gate that was supposed to watch it.
 
+## Working now: a path you named is answered in the product's voice, not the kernel's (2026-11-16)
+
+`sememe` refuses almost everything by name — a typo'd flag names the supported flag, a damaged store names the receipt. The one input class it had not closed was **the file you point at**: when the path was wrong the answer was the kernel's, verbatim (`{"error":"ENOENT: no such file or directory, open '/tmp/nope.json'"}`, exit 1) — no name to branch on, no subject saying which argument, and sharing exit 1 with a real refusal so a CI script could not tell "you pointed me at nothing" from "your store drifted".
+
+Measured on the published `sememe@0.4.30` and reproduced against pre-fix tree `3ef9ca8`: **10 of 12** caller-named faces leaked a raw errno. Now **0 of 12**, every refusal naming a code, a subject, a reason and a repair — and the IO faces travel on the usage/IO channel (exit 2), because nothing ran, while a file that *is* there but holds wrong bytes keeps exit 1. `src/file-input.mjs` is the one classifier; the errno is input, never output. `research/file-input-voice-2026-11-16.json` pins both trees (verdict `file-input-voice-closed`, 0 control regressions), `test/file-input-voice.test.mjs` carries the twelve faces and the controls, and `tools/mutation-ladder-file-input-voice.sh` proves the gate can go red (8/8 caught, control green). See [docs/measured-history.md](https://github.com/auroraxo/sememe/blob/main/docs/measured-history.md).
+
 ## Where the numbers come from
 
 Every claim above is pinned by a test and backed by a committed artifact. If you want to know **why** a number is what it is, and what was measured wrong before it was measured right:
 
 - [docs/measured-history.md](https://github.com/auroraxo/sememe/blob/main/docs/measured-history.md) — the unabridged record: per-program verification (9+ programs, real mainnet payloads), the ecosystem coverage measurement and its corrections, acquisition-gap closings (ATA, Lighthouse, Manifest, Archer, DiabLokxis, pfeeU, pump.fun, HADRo), the dialect gate and raw-LE engine, short-form and struct-absent rules with chain witnesses, and the registry-channel measurements. Sections are named by date.
 - `research/` — the JSON artifacts the README used to quote inline; the history file links them by path.
-- `npm test` — 970 tests: the quickstart output line, the documented commands against the pinned tag, the install channels, the journey from a bare `node_modules` install, and the measurement artifacts themselves are all pinned. A hand-edited number in this README goes red.
+- `npm test` — 1,141 tests: the quickstart output line, the documented commands against the pinned tag, the install channels, the journey from a bare `node_modules` install, and the measurement artifacts themselves are all pinned. A hand-edited number in this README goes red.
 
 ## Free and paid
 

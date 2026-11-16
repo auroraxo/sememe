@@ -4,3 +4,4 @@ research/release-surface-live.tmp.json
 
 # test byproducts (written by the qualification suite, never committed)
 research/.diablo-adoption-*.json
+research/.pump-second-source-store/

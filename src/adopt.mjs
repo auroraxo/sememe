@@ -37,6 +37,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
+import { readInputFile, fileInputRefusal } from './file-input.mjs';
 import { writeOnce } from './store-write.mjs';
 import { originDigestOf, receiptDigestOf } from './receipt-digest.mjs';
 import { assertIdlShape, assertReadableDialect, declaredProgram } from './dialect.mjs';
@@ -78,16 +79,22 @@ export async function adopt(programInput, filePath, storeDir, { source = 'publis
   const originLabel = safeLabel(origin ?? path.basename(filePath), '--origin');
 
   let idl;
-  let raw;
-  try {
-    raw = await readFile(filePath);
-  } catch (error) {
-    throw Error(`cannot read ${filePath}: ${String(error?.message ?? error).slice(0, 140)}`);
-  }
+  // The file the CALLER named, read through the one classifier. A path that
+  // does not exist, is a directory, or cannot be read is refused with the
+  // product's own reason and repair — never as the kernel's errno (measured
+  // 2026-11-16 on the published 0.4.30: "cannot read X: ENOENT: no such file
+  // or directory, open 'X'" with exit 1). Nothing had run yet, so this is
+  // the usage/IO channel.
+  const raw = await readInputFile(filePath, { label: 'adopt', subject: 'interface file' });
   try {
     idl = JSON.parse(raw.toString('utf8'));
   } catch (error) {
-    throw Error(`${filePath} is not JSON: ${String(error?.message ?? error).slice(0, 140)}`);
+    // The file IS there but holds something else: the work ran and the bytes
+    // are wrong, so this stays on the work channel (exit 1) — but it is
+    // still NAMED, and it still says which file.
+    throw fileInputRefusal({
+      label: 'adopt', subject: 'interface file', filePath, kind: 'not_json', exitCode: 1,
+    });
   }
   if (!idl || typeof idl !== 'object' || Array.isArray(idl)) throw Error(`${filePath} is not an IDL object`);
   if (!Array.isArray(idl.instructions)) throw Error(`${filePath} has no instructions array — not an interface copy`);

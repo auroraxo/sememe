@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 import os from 'node:os';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+// The file the CALLER named, read through the one classifier. A missing
+// transaction file, a directory in its place, or an unreadable file is
+// refused by NAME with a repair — never as the kernel's errno (measured
+// 2026-11-16 on the published 0.4.30: `sememe conform /tmp/nope.json`
+// answered "ENOENT: no such file or directory, open '/tmp/nope.json'" with
+// exit 1, naming neither the argument nor the fix).
+import { readInputJson } from '../src/file-input.mjs';
 // `pull` is imported LAZILY (inside the branch): it is the only path that
 // needs @solana/web3.js. A consumer who installed the package for DECODING
 // only — the common case — must be able to run `sememe decode` without any
@@ -392,7 +398,11 @@ try {
     if (!file) throw Error('conform needs a transaction JSON file');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const only = option('--only', undefined);
-    const envelope = JSON.parse(readFileSync(file, 'utf8'));
+    // Accept either a bare transaction entry or the full RPC envelope. A
+    // file that is not there (or is not a file, or cannot be read) is
+    // refused by name; a file that IS there but holds something else keeps
+    // the work channel (exit 1) with the parser's detail.
+    const envelope = await readInputJson(file, { label: 'conform', subject: 'transaction file' });
     // Accept either a bare transaction entry or the full RPC envelope.
     const transaction = envelope?.result ?? envelope;
     const { checkTransaction } = await import('../src/conformance.mjs');
@@ -589,6 +599,15 @@ try {
     // readable JSON error channel stays for errors the work itself produced.
     console.error(error.message);
     process.exitCode = 2;
+  } else if (error?.fix && typeof error.code === 'string') {
+    // A NAMED file-input refusal (src/file-input.mjs): the message already
+    // carries the subject, the path and the code; `fix` is the repair the
+    // operator can run. It travels on the channel the classifier set —
+    // exit 2 when nothing ran (the path was wrong), exit 1 when the work ran
+    // and found the wrong bytes — so a script can tell "you pointed me at
+    // nothing" from "the work failed" without parsing prose.
+    console.error(JSON.stringify({ error: error.message, code: error.code, fix: error.fix }));
+    process.exitCode = Number.isInteger(error.exitCode) ? error.exitCode : 1;
   } else {
     console.error(JSON.stringify({ error: String(error?.message ?? error) }));
     process.exitCode = 1;

@@ -3637,3 +3637,113 @@ must keep a durable per-channel cursor, which this one-shot tool deliberately
 does not do (its cursors are throwaway, so a repeated harvest cannot advance
 a consumer's position). `tools/` is not part of the published package files,
 so npm `sememe` stays at 0.4.30 — this lands on `main` only.
+
+## Working now: a path you named is answered in the product's voice, not the kernel's (2026-11-16)
+
+**The defect.** A caller names a FILE — the interface to adopt (`sememe
+adopt`), the transaction to check (`sememe conform`), the lock to verify
+against (`sememe verify --lock`), the file to write the lock to (`sememe lock
+--out`). When that path was wrong, the product answered with the KERNEL's
+error, verbatim:
+
+```
+sememe conform /tmp/nope.json --store ./store
+  -> {"error":"ENOENT: no such file or directory, open '/tmp/nope.json'"}   exit 1
+```
+
+Measured on the **published `sememe@0.4.30`**, installed into an empty app
+(the channel a stranger who copies `npm install sememe` gets), 2026-11-16.
+
+Three faults in that one answer, each independently measurable:
+
+1. **No name.** A syscall's prose. No code for a script to branch on, no
+   repair to act on. Every other refusal the product makes is named — flags
+   (`src/cli-surface.mjs`), stores and receipts (`src/store-read.mjs`), lock
+   documents (`src/lock.mjs`).
+2. **No subject.** `conform` did not even say WHICH argument was bad. A
+   missing transaction file and a missing `--lock` produced the same shape of
+   sentence.
+3. **The wrong channel.** A mistyped path shared exit 1 with a real refusal
+   (a drifted store, a tampered receipt). The usage/IO channel the product
+   already reserves went unused, so a CI script could not tell "you pointed
+   me at nothing" from "your store drifted".
+
+This was the last input class speaking raw kernel, and the first thing a new
+user gets wrong.
+
+**The faces.** Twelve caller-named paths, ten of them IO (nothing ran) and
+two of them content (the work ran and found the wrong bytes):
+
+| face | pre-fix | now |
+|---|---|---|
+| `adopt` — file missing / directory / unreadable | `ENOENT` / `EISDIR` / `EACCES`, exit 1 | `adopt-file-missing` / `_not_a_file` / `_unreadable`, exit 2 |
+| `adopt` — file there, not JSON | `"<path> is not JSON: Unexpected token …"`, exit 1 | `adopt-file-not_json`, exit 1 |
+| `conform` — file missing / directory / unreadable | bare errno, exit 1 | `conform-file-missing` / `_not_a_file` / `_unreadable`, exit 2 |
+| `conform` — file there, not JSON | bare `Unexpected token …`, exit 1 | `conform-file-not_json`, exit 1 |
+| `lock --out` — a directory in place of the file | `EISDIR: illegal operation on a directory`, exit 1 | `lock-file-not_a_file`, exit 2 |
+| `verify --lock` — missing / directory / unreadable | `ENOENT` / `EISDIR` / `EACCES`, exit 1 | `lock-file-missing` / `_not_a_file` / `_unreadable`, exit 2 |
+
+**The fix.** `src/file-input.mjs` is the ONE classifier, used by
+`src/adopt.mjs`, `src/lock.mjs` (both the read and the write) and
+`bin/sememe.mjs` (the `conform` read). Every refusal carries:
+
+- a **code** naming the subject and the reason (`<command>-file-<reason>`) —
+  a script can branch on it;
+- the **subject** ("the transaction file", "the lock file", "the output
+  file") and the path it was given;
+- a **repair** the operator can run;
+- **no kernel prose**: the errno is input, never output.
+
+The **channel** is the part that was wrong beyond wording. An IO failure
+means nothing ran — no file read, no store touched, no work done — so it
+travels on the usage/IO channel, **exit 2**. A file that IS there but holds
+the wrong bytes keeps the work channel, **exit 1**: the work ran and found
+wrong bytes, which is a different fact from "there was no file". The
+flag-usage channel is untouched: a typo'd flag is still plain text on stderr
+with exit 2, as `bin/sememe.mjs` has always done.
+
+**Evidence.**
+
+- `tools/measure-file-input-voice.mjs` →
+  `research/file-input-voice-2026-11-16.json`, verdict
+  `file-input-voice-closed`: the same probe re-run across the fix (pre-fix
+  tree `3ef9ca8` extracted by `git archive`, so the baseline is stable
+  forever) — **10 of 12 faces leaked a raw errno before, 0 after**; 0
+  unnamed, 0 repairless, 0 on the wrong channel, 0 control regressions, 0
+  host paths in the artifact.
+- `test/file-input-voice.test.mjs` (17 tests) — the twelve faces, the
+  subject, the content channel, the controls (adopt / conform / lock still
+  work), the library path, the classifier's own contract, and the flag
+  channel as a guard.
+- `tools/mutation-ladder-file-input-voice.sh` — **8/8 mutations caught**,
+  control green, tree byte-identical after the run.
+
+**Own errors, caught by the repo's own gates.**
+
+- The first probe run reported the FIXED tree as leaking: the repair line
+  "pass a file path, not a directory" contains the kernel's own strerror
+  text ("not a directory"), and the leak scan read the whole answer. Two
+  corrections: the repair was reworded ("pass the path of a regular file"),
+  and the scan now reads the ERROR FIELD ONLY — a refusal and its repair
+  share one line, and our own wording must not have to be special-cased by
+  a detector.
+- The first ladder run reported 7/8: M4's perl pattern did not match the
+  line it meant to change, so the mutation never happened and the face
+  stayed green — a VACUUM case. The pattern now targets the classifier's
+  default channel (the thing every IO face inherits), and the run is 8/8.
+- A syntax error in the new pin test (an apostrophe inside a single-quoted
+  test title) and an `assert.doesNotMatch` called with a string instead of a
+  regexp — both caught before the pin was counted, not after.
+
+**Honest remainder.** The classification covers the paths a caller NAMES. It
+does not cover what the product finds on its own — a store whose `receipts/`
+is missing is still reported by the store reader, and a receipt whose object
+no longer re-hashes is still the reader's refusal. Those were already named
+and are unchanged. The two content faces (`adopt`/`conform` on a file that is
+there but holds no JSON) keep exit 1 and carry the parser's detail as the
+cause, because the work ran. The classifier does not check the TYPE or MODE
+of a file before reading it — it reads, and classifies what the read
+produced; a file that is readable but is a symlink to another file is read
+through, as it always was. Nothing here changes the decode path, the
+fingerprint store, or the acquisition channels: 0 external users so far, one
+machine, no audit, and PUBLISH != CONSUMPTION — this lands on `main` first.

@@ -53,6 +53,7 @@
 import { writeFile, readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
+import { readInputFile, writeInputFile } from './file-input.mjs';
 import { readVerified } from './store-read.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
@@ -173,18 +174,24 @@ export async function writeLock(storeDir, outPath) {
   }
   const bytes = Buffer.from(`${canonicalJson(doc)}\n`);
   if (outPath !== undefined && outPath !== null) {
-    await writeFile(outPath, bytes);
+    // The OUTPUT path is also a path the CALLER chose, so it gets the same
+    // named refusal: `--out <directory>` was reported as a bare
+    // "EISDIR: illegal operation on a directory, open 'adir'" with exit 1
+    // (measured on the published 0.4.30, 2026-11-16).
+    await writeInputFile(outPath, bytes, { label: 'lock', subject: 'output file' });
   }
   return doc;
 }
 
-/** Parse and shape-check a lock document. Every failure names its reason. */
+/** Parse and shape-check a lock document. Every failure names its reason.
+ *
+ *  The READ goes through the shared file classifier: a lock path that does
+ *  not exist, is a directory or is unreadable is refused by NAME with a
+ *  repair (measured 2026-11-16 on the published 0.4.30: "sememe lock file
+ *  X is unreadable: ENOENT: ..." with exit 1). The CONTENT checks below are
+ *  unchanged — they are the work's own reasons (lock-v1-*). */
 export async function readLock(lockPath) {
-  let raw;
-  try { raw = await readFile(lockPath, 'utf8'); }
-  catch (error) {
-    throw Error(`sememe lock file ${lockPath} is unreadable: ${String(error?.message ?? error).slice(0, 140)}`);
-  }
+  const raw = (await readInputFile(lockPath, { label: 'lock', subject: 'lock file' })).toString('utf8');
   let doc;
   try { doc = JSON.parse(raw); }
   catch {

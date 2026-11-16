@@ -1,0 +1,328 @@
+{
+  "tool": "tools/measure-file-input-voice.mjs",
+  "measuredAt": "2026-11-16T23:18:24Z",
+  "prefix": "3ef9ca8",
+  "question": "does a caller-named path that cannot be used get the product's own named refusal, or the kernel's errno?",
+  "faces": [
+    "adoptMissing",
+    "adoptDirectory",
+    "adoptUnreadable",
+    "conformMissing",
+    "conformDirectory",
+    "conformUnreadable",
+    "lockOutDirectory",
+    "verifyMissing",
+    "verifyDirectory",
+    "verifyUnreadable",
+    "adoptNotJson",
+    "conformNotJson"
+  ],
+  "controls": [
+    "lockOutOk",
+    "conformOk",
+    "adoptOk"
+  ],
+  "preFix": {
+    "leakedErrnoFaces": [
+      "adoptMissing",
+      "adoptDirectory",
+      "adoptUnreadable",
+      "conformMissing",
+      "conformDirectory",
+      "conformUnreadable",
+      "lockOutDirectory",
+      "verifyMissing",
+      "verifyDirectory",
+      "verifyUnreadable"
+    ],
+    "unnamedFaces": [
+      "adoptMissing",
+      "adoptDirectory",
+      "adoptUnreadable",
+      "conformMissing",
+      "conformDirectory",
+      "conformUnreadable",
+      "lockOutDirectory",
+      "verifyMissing",
+      "verifyDirectory",
+      "verifyUnreadable",
+      "adoptNotJson",
+      "conformNotJson"
+    ],
+    "repairlessFaces": [
+      "adoptMissing",
+      "adoptDirectory",
+      "adoptUnreadable",
+      "conformMissing",
+      "conformDirectory",
+      "conformUnreadable",
+      "lockOutDirectory",
+      "verifyMissing",
+      "verifyDirectory",
+      "verifyUnreadable",
+      "adoptNotJson",
+      "conformNotJson"
+    ],
+    "wrongChannelFaces": [
+      "adoptMissing",
+      "adoptDirectory",
+      "adoptUnreadable",
+      "conformMissing",
+      "conformDirectory",
+      "conformUnreadable",
+      "lockOutDirectory",
+      "verifyMissing",
+      "verifyDirectory",
+      "verifyUnreadable"
+    ],
+    "detail": {
+      "adoptMissing": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOENT",
+          "no such file or directory"
+        ],
+        "fix": null
+      },
+      "adoptDirectory": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EISDIR",
+          "illegal operation on a directory"
+        ],
+        "fix": null
+      },
+      "adoptUnreadable": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ],
+        "fix": null
+      },
+      "conformMissing": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOENT",
+          "no such file or directory"
+        ],
+        "fix": null
+      },
+      "conformDirectory": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EISDIR",
+          "illegal operation on a directory"
+        ],
+        "fix": null
+      },
+      "conformUnreadable": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ],
+        "fix": null
+      },
+      "lockOutDirectory": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EISDIR",
+          "illegal operation on a directory"
+        ],
+        "fix": null
+      },
+      "verifyMissing": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOENT",
+          "no such file or directory"
+        ],
+        "fix": null
+      },
+      "verifyDirectory": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EISDIR",
+          "illegal operation on a directory"
+        ],
+        "fix": null
+      },
+      "verifyUnreadable": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ],
+        "fix": null
+      },
+      "adoptNotJson": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [],
+        "fix": null
+      },
+      "conformNotJson": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [],
+        "fix": null
+      }
+    },
+    "controls": {
+      "lockOutOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "lockWrote": true,
+        "verifyExit": 0,
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi\": {\n      \"fingerprint\": \"sha256:945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94\",\n      \"source\": \"anchor\",\n      \"slot\": 465104983,\n      \"receipt\": \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi-465104983-anchor-945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94.json\",\n      \"in"
+      },
+      "conformOk": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "answered": true,
+        "text": "{\"note\":\"account-list disagreement(s) found\",\"kinds\":[\"undeclared-signing-account:1\"]}\n{\n  \"rows\": [\n    {\n      \"program\": \"ComputeBudget111111111111111111111111111111\",\n      \"instruction\": null,\n      \"executed\": true,\n      \"depth\": 0,\n      \"verdict\": \"no-stored-interface\",\n      \"violations\": [],\n      \"extras\": [],\n      \"notes\": [],\n      \"unknownSigner\": [],\n      \"positions\": {\n        \""
+      },
+      "adoptOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "stored": true,
+        "text": "{\n  \"program\": \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\",\n  \"source\": \"published\",\n  \"origin\": \"whirlpool-idl.json\",\n  \"originStatus\": \"declared\",\n  \"originNote\": \"declared origin, not verified: sememe did not check that this repository, commit or file exists, and the bytes were not proven to come from it — provenance of bytes, not proof they describe the deployed program\",\n  \"originDigest\": \""
+      }
+    }
+  },
+  "fixed": {
+    "leakedErrnoFaces": [],
+    "unnamedFaces": [],
+    "repairlessFaces": [],
+    "wrongChannelFaces": [],
+    "detail": {
+      "adoptMissing": {
+        "exit": 2,
+        "code": "adopt-file-missing",
+        "leakedErrno": [],
+        "fix": "fix: pass the path of a file that exists"
+      },
+      "adoptDirectory": {
+        "exit": 2,
+        "code": "adopt-file-not_a_file",
+        "leakedErrno": [],
+        "fix": "fix: pass the path of a regular file"
+      },
+      "adoptUnreadable": {
+        "exit": 2,
+        "code": "adopt-file-unreadable",
+        "leakedErrno": [],
+        "fix": "fix: make the file readable (chmod) and pass its path"
+      },
+      "conformMissing": {
+        "exit": 2,
+        "code": "conform-file-missing",
+        "leakedErrno": [],
+        "fix": "fix: pass the path of a file that exists"
+      },
+      "conformDirectory": {
+        "exit": 2,
+        "code": "conform-file-not_a_file",
+        "leakedErrno": [],
+        "fix": "fix: pass the path of a regular file"
+      },
+      "conformUnreadable": {
+        "exit": 2,
+        "code": "conform-file-unreadable",
+        "leakedErrno": [],
+        "fix": "fix: make the file readable (chmod) and pass its path"
+      },
+      "lockOutDirectory": {
+        "exit": 2,
+        "code": "lock-file-not_a_file",
+        "leakedErrno": [],
+        "fix": "fix: pass the path of a regular file"
+      },
+      "verifyMissing": {
+        "exit": 2,
+        "code": "lock-file-missing",
+        "leakedErrno": [],
+        "fix": "fix: pass the path of a file that exists"
+      },
+      "verifyDirectory": {
+        "exit": 2,
+        "code": "lock-file-not_a_file",
+        "leakedErrno": [],
+        "fix": "fix: pass the path of a regular file"
+      },
+      "verifyUnreadable": {
+        "exit": 2,
+        "code": "lock-file-unreadable",
+        "leakedErrno": [],
+        "fix": "fix: make the file readable (chmod) and pass its path"
+      },
+      "adoptNotJson": {
+        "exit": 1,
+        "code": "adopt-file-not_json",
+        "leakedErrno": [],
+        "fix": "fix: the file must contain a JSON document"
+      },
+      "conformNotJson": {
+        "exit": 1,
+        "code": "conform-file-not_json",
+        "leakedErrno": [],
+        "fix": "fix: the file must contain a JSON document"
+      }
+    },
+    "controls": {
+      "lockOutOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "lockWrote": true,
+        "verifyExit": 0,
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi\": {\n      \"fingerprint\": \"sha256:945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94\",\n      \"source\": \"anchor\",\n      \"slot\": 465104983,\n      \"receipt\": \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi-465104983-anchor-945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94.json\",\n      \"in"
+      },
+      "conformOk": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "answered": true,
+        "text": "{\"note\":\"account-list disagreement(s) found\",\"kinds\":[\"undeclared-signing-account:1\"]}\n{\n  \"rows\": [\n    {\n      \"program\": \"ComputeBudget111111111111111111111111111111\",\n      \"instruction\": null,\n      \"executed\": true,\n      \"depth\": 0,\n      \"verdict\": \"no-stored-interface\",\n      \"violations\": [],\n      \"extras\": [],\n      \"notes\": [],\n      \"unknownSigner\": [],\n      \"positions\": {\n        \""
+      },
+      "adoptOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "stored": true,
+        "text": "{\n  \"program\": \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\",\n  \"source\": \"published\",\n  \"origin\": \"whirlpool-idl.json\",\n  \"originStatus\": \"declared\",\n  \"originNote\": \"declared origin, not verified: sememe did not check that this repository, commit or file exists, and the bytes were not proven to come from it — provenance of bytes, not proof they describe the deployed program\",\n  \"originDigest\": \""
+      }
+    }
+  },
+  "controlRegression": [],
+  "verdict": {
+    "preFixLeakedErrno": 10,
+    "fixedLeakedErrno": 0,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "file-input-voice-closed",
+  "hostPathLeak": 0
+}
