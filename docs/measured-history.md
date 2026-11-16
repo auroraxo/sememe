@@ -409,7 +409,7 @@ Pointed at a program that publishes nothing at either address (for example `L2TE
 }
 ```
 
-The five possible verdicts, all mutually exclusive:
+The five chain-side verdicts, all mutually exclusive (the local `stored` verdict is added on top of them below — a verdict the chain cannot produce, because it comes from the store):
 - `pullable`: an on-chain interface exists that your local store does not have yet -> `sememe pull` is the fix.
 - `no-interface-published`: neither address answers -> pulling it forever will never help. Use `sememe adopt` with a first-party published copy, or a pinned upstream derivation.
 - `present-undecodable`: an account exists at one of the addresses, but its schema cannot be decoded (malformed, or declares another program).

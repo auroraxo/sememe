@@ -321,9 +321,9 @@ export function nextStep(row, program) {
   }
   if (row.verdict === 'unknown') {
     const held = store?.state === 'held'
-      ? ` your store already holds this program (${describeReceipts(store)}), so you can decode it offline right now`
+      ? ` Your store already holds this program (${describeReceipts(store)}), so you can decode it offline right now.`
       : '';
-    return 'the RPC did not answer — absence is NOT established; retry before believing anything about the chain'
+    return 'the RPC did not answer — absence is NOT established; retry before believing anything about the chain.'
       + held;
   }
   switch (row.verdict) {
