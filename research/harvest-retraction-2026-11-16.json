@@ -1,0 +1,130 @@
+{
+  "verdict": "reader-honours-retraction",
+  "measuredAt": "2026-11-16T16:04:22.136Z",
+  "tool": "tools/harvest-reeflog.mjs",
+  "method": "real reeflog binary plants 1 finalized + 1 reverted enriched row; the repository harvest tool reads it with its zero-RPC guard; prefix = the same tool with the seal gate removed",
+  "reeflogBinary": "reeflog",
+  "zeroRpcGuard": "the tool imports tools/lib/network-guard.mjs first and exits 1 on any attempt (pinned by test/harvest-reeflog.test.mjs)",
+  "faces": [
+    {
+      "face": "P1_pinned_signatures_names_the_retracted_event",
+      "claim": "the reader must not pin a signature the chain unmade",
+      "prefix": true,
+      "fixed": false,
+      "detail": "prefix pinnedContainsRetracted=true, fixed=false"
+    },
+    {
+      "face": "P2_retracted_row_is_never_a_transaction",
+      "claim": "no payload may be derived from a retracted event",
+      "prefix": true,
+      "fixed": false,
+      "detail": "prefix transactionContainsRetracted=true, fixed=false"
+    },
+    {
+      "face": "P3_the_retraction_is_named_in_the_document",
+      "claim": "the withdrawn rows are reported, not silently dropped",
+      "prefix": true,
+      "fixed": false,
+      "detail": "prefix rowsReverted=0 named=false; fixed rowsReverted=1 named=true"
+    },
+    {
+      "face": "P4_live_rows_are_still_harvested",
+      "claim": "failure = the fix dropped a live event too — the finalized row's own signature must stay a payload source",
+      "prefix": false,
+      "fixed": false,
+      "detail": "prefix signatures=ValidSig1111111111111111111111111111111111111111,RevertedSig11111111111111111111111111111111111111; fixed=ValidSig1111111111111111111111111111111111111111"
+    },
+    {
+      "face": "P5_the_retraction_is_not_an_open_envelope_debt",
+      "claim": "failure = a row the chain forgot is counted as debt hydrate could ever close",
+      "prefix": false,
+      "fixed": false,
+      "detail": "prefix rowsWithoutEnvelope=0, fixed=0"
+    }
+  ],
+  "prefix": {
+    "tag": "prefix",
+    "exitCode": 0,
+    "documentWritten": true,
+    "stderr": "",
+    "pinnedSignatures": 2,
+    "pinnedContainsRetracted": true,
+    "transactionContainsRetracted": true,
+    "rowsReverted": 0,
+    "revertedSignaturesNamed": false,
+    "sealFieldPresent": false,
+    "rowsWithoutEnvelope": 0,
+    "networkAttempts": null,
+    "_raw": {
+      "counts": {
+        "requested": 2,
+        "journalRows": 2,
+        "pinnedSignatures": 2,
+        "fetched": 2,
+        "missing": 0,
+        "transactionsWithTargetPayloads": 2,
+        "payloads": 2,
+        "failedOnChain": 0,
+        "transactionsWithoutTarget": 0,
+        "rowsWithoutEnvelope": 0,
+        "rowsWithoutInstructions": 0,
+        "rowsReverted": 0,
+        "revertedSignatures": []
+      },
+      "signatures": [
+        {
+          "signature": "ValidSig1111111111111111111111111111111111111111",
+          "slot": 100000
+        },
+        {
+          "signature": "RevertedSig11111111111111111111111111111111111111",
+          "slot": 100001
+        }
+      ]
+    }
+  },
+  "fixed": {
+    "tag": "fixed",
+    "exitCode": 0,
+    "documentWritten": true,
+    "stderr": "",
+    "pinnedSignatures": 1,
+    "pinnedContainsRetracted": false,
+    "transactionContainsRetracted": false,
+    "rowsReverted": 1,
+    "revertedSignaturesNamed": true,
+    "sealFieldPresent": false,
+    "rowsWithoutEnvelope": 0,
+    "networkAttempts": null,
+    "_raw": {
+      "counts": {
+        "requested": 2,
+        "journalRows": 2,
+        "pinnedSignatures": 1,
+        "fetched": 1,
+        "missing": 0,
+        "transactionsWithTargetPayloads": 1,
+        "payloads": 1,
+        "failedOnChain": 0,
+        "transactionsWithoutTarget": 0,
+        "rowsWithoutEnvelope": 0,
+        "rowsWithoutInstructions": 0,
+        "rowsReverted": 1,
+        "revertedSignatures": [
+          "RevertedSig11111111111111111111111111111111111111"
+        ]
+      },
+      "signatures": [
+        {
+          "signature": "ValidSig1111111111111111111111111111111111111111",
+          "slot": 100000
+        }
+      ]
+    }
+  },
+  "limits": [
+    "the probe is synthetic: a planted journal, not a fork observed on mainnet",
+    "the seal gate is the reader side only — the reorg CHANNEL (reorg tail) is a separate cursor reeflog already provides and this tool does not poll",
+    "one reverted row with a full envelope; other seal states covered by test/harvest-reeflog-retraction.test.mjs"
+  ]
+}

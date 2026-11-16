@@ -100,8 +100,23 @@ const transactions = [];
 let rowsWithoutEnvelope = 0;
 let rowsWithoutInstructions = 0;
 let rowsWithoutTargetPayloads = 0;
+// Retracted rows: named, never harvested. reeflog prints each row's CURRENT
+// seal on `tail` and carries the retraction itself on `reorg tail`; dropping
+// that signal here is what reeflog issue #1 called the retracted claim. The
+// counter is a debt like the others — the row is reported, not swallowed.
+let rowsReverted = 0;
+const revertedSignatures = [];
 
 for (const row of rows) {
+  // The seal decides first: a row the chain unmade is not a payload source,
+  // and it is not an envelope debt `hydrate --accounts` could ever close
+  // either (the chain no longer knows the transaction). It gets its own
+  // bucket, ahead of both.
+  if (row.seal === 'reverted') {
+    rowsReverted++;
+    if (row.signature) revertedSignatures.push(row.signature);
+    continue;
+  }
   const envelope = row.accounts && typeof row.accounts === 'object' ? row.accounts : null;
   if (!envelope) { rowsWithoutEnvelope++; continue; }
   if (!Array.isArray(envelope.instructions)) { rowsWithoutInstructions++; continue; }
@@ -120,6 +135,13 @@ for (const row of rows) {
 // A harvest that yielded nothing must not be written as a success.
 const payloadCount = transactions.reduce((sum, t) => sum + t.payloads.length, 0);
 if (!transactions.length) {
+  // Nothing to harvest for two different reasons, and only one of them is
+  // answered by "start the daemon": a journal of only retracted rows has run
+  // correctly and told us the events are gone.
+  if (rowsReverted > 0) {
+    console.error(`no live rows to harvest — all ${rowsReverted} candidate row(s) were RETRACTED by the chain (see counts.revertedSignatures); nothing was written`);
+    process.exit(1);
+  }
   console.error('no enriched rows in the journal — run `reeflog start` and `reeflog hydrate --accounts` first');
   process.exit(1);
 }
@@ -152,6 +174,10 @@ const document = {
     // `hydrate --accounts` with the current binary is what closes it.
     rowsWithoutEnvelope,
     rowsWithoutInstructions,
+    // Retracted by the chain: never a payload source, never an open debt —
+    // named so the reader can see what the mailbox withdrew.
+    rowsReverted,
+    revertedSignatures,
   },
   slotRange: slotRange(slots),
   transactions,

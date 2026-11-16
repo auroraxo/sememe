@@ -3480,3 +3480,82 @@ byte-exact 17,652, 93.1% of decoded)** — this release is a publishing-surface
 fix, not a decoding change. The defect class is not fully closed: the gate
 covers the README of THIS package, and the same order-of-operations gap could
 still exist in a channel the gate does not pack.
+
+## 2026-11-16 — THE MAILBOX READER DROPPED THE RETRACTION: a chain-unmade event became a payload source
+
+**The claim under test** is reeflog issue #1's, on the reader's side. reeflog
+keeps its half already: `reeflog tail` prints the row's CURRENT seal on every
+row (including `"seal":"reverted"`), `reeflog reorg tail` carries the
+retraction itself on its own cursor, and its README states the boundary — *"it
+marks and delivers the retraction instead"*.
+
+The reader did not honor it. `tools/harvest-reeflog.mjs` read the rows, pulled
+`accounts.instructions[]` out of them, and wrote a document — without ever
+looking at the one field that says the event no longer exists on chain.
+
+**Measured** (real `reeflog` binary, journal with one `finalized` and one
+`reverted` row, both carrying a full account envelope; the repository's own
+harvest tool; the zero-RPC guard still enforced):
+
+| | pre-fix | fixed |
+|---|---|---|
+| `counts.pinnedSignatures` | **2** | 1 |
+| retracted signature in `signatures[]` | **yes** | no |
+| retracted signature in `transactions[]` | **yes** | no |
+| `"seal"` anywhere in the document | **no** | no |
+| `counts.rowsReverted` | absent | **1** |
+| `counts.revertedSignatures` | absent | `["RevertedSig…"]` |
+
+Pre-fix the document did not merely omit the seal — it did not even carry the
+word. A reader downstream could not have known, because there was nothing to
+know from: the retracted event was presented exactly like a live one.
+
+**The fix.** The seal decides before anything else: a row whose seal is
+`reverted` is never a transaction, never a signature, never a payload. It gets
+its own debt bucket (`rowsReverted` + `revertedSignatures`) rather than being
+folded into `rowsWithoutEnvelope` — a retraction is not debt that
+`hydrate --accounts` could ever close, because the chain no longer knows the
+transaction. A journal of only retracted rows exits 1 with a refusal that says
+*why* nothing was harvestable, instead of writing a zero-payload success
+document.
+
+**The other direction.** Only `reverted` is a retraction. `finalized`,
+`confirmed`, `error`, `missing`, `null` and an absent seal all still harvest:
+an event that is merely not final yet is a real event, and treating "no seal"
+as "retracted" would be the same lie pointed the other way.
+
+**Evidence.**
+
+- `test/harvest-reeflog-retraction.test.mjs` (7 faces) — **5 red / 2 green on
+  the pre-fix tree** (measured by stashing the tool alone: C1, D1, D2, D3, D4
+  red; G1, G2 green), 7/7 green here. The two green faces pre-fix are the
+  guards: they assert the reader never *invents* a retraction and never drops a
+  not-yet-final event.
+- `tools/mutation-ladder-harvest-retraction.sh` — **8/8 mutations caught**,
+  control green, tree byte-identical after every run. M5 (a missing seal
+  counted as a revert) and M6 (every non-final seal dropped) are the
+  over-correction faces.
+- `tools/measure-harvest-retraction.mjs` → `research/harvest-retraction-2026-11-16.json`,
+  verdict `reader-honours-retraction`: the same probe re-run across the fix
+  (the tool with the seal gate removed, then with it) — 3 defect faces present
+  before / absent after, 2 guard faces absent on both trees.
+  Pinned by `test/harvest-retraction-measurement.test.mjs` (8 faces).
+
+**Honest remainder.** This closes the reader's half of ONE seam only. The
+reorg *channel* (`reeflog reorg tail`) is a separate cursor with its own
+retraction records, and this tool still does not poll it — a consumer that
+wants the retraction as an event arriving late (rather than as a seal read off
+a row it happens to be reading now) has to ask for it, and this tool does not.
+The probe is synthetic: a planted journal, not a fork observed on mainnet.
+
+On the other consumer, checked rather than assumed:
+[whirlpool-watcher](https://github.com/auroraxo/whirlpool-watcher) does **not**
+gate on `seal === 'reverted'` either — `rowToFills` only copies `seal` through
+to the fill. What it does instead is consume the reorg channel: `retract` mode
+joins `reeflog reorg tail` against the fill ledger, so a retracted fill is
+removed by a *later* retraction delivery rather than skipped at read time. So
+the two out-of-tree consumers fail differently: sememe ignored both signals on
+a row it read; whirlpool-watcher reads rows regardless of seal and recovers
+afterwards through the channel. Neither is the reader contract reeflog issue
+#1 asks for, and the gap this pulse closed is the one sememe had on the rows
+it already reads.
