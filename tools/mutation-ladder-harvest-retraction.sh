@@ -16,8 +16,8 @@
 #   M6 every seal but 'finalized' is dropped   -> G2 red
 #   M7 the all-retracted refusal is softened   -> D3 red
 #      (exit 0 + a document)
-#   M8 the retracted row lands in the envelope -> D2 red
-#      debt bucket instead of its own
+#   M8 neither signal gates the retraction     -> D1/D2/D4 red
+#      (the row falls through to the envelope path)
 #   CONTROL no mutation                        -> green
 #
 # Usage: bash tools/mutation-ladder-harvest-retraction.sh
@@ -78,10 +78,10 @@ fi
 echo "CONTROL green"
 
 # M1: the seal check never fires.
-mutate "s/if \(row\.seal === 'reverted'\) \{/if (false) {/" && check "M1-no-seal-check"
+mutate "s/const revertedBySeal = row\.seal === 'reverted';/const revertedBySeal = false;/" && check "M1-no-seal-check"
 
 # M2: the check looks for a value reeflog never prints.
-mutate "s/if \(row\.seal === 'reverted'\) \{/if (row.seal === 'reverted-not-a-value') {/" && check "M2-wrong-seal-value"
+mutate "s/const revertedBySeal = row\.seal === 'reverted';/const revertedBySeal = row.seal === 'reverted-not-a-value';/" && check "M2-wrong-seal-value"
 
 # M3: the row is dropped instead of named.
 mutate "s/    rowsReverted\+\+;\n    if \(row\.signature\) revertedSignatures\.push\(row\.signature\);/    rowsReverted++;/" && check "M3-retracted-not-named"
@@ -91,16 +91,17 @@ mutate "s/    rowsReverted,\n    revertedSignatures,/    ...(rowsReverted > 0 ? 
 
 # M5: a row that says nothing about its seal is treated as retracted — the
 # lie in the other direction (a reader inventing a revert).
-mutate "s/if \(row\.seal === 'reverted'\) \{/if (row.seal === 'reverted' || row.seal === undefined || row.seal === null) {/" && check "M5-missing-seal-is-revert"
+mutate "s/const revertedBySeal = row\.seal === 'reverted';/const revertedBySeal = row.seal === 'reverted' || row.seal === undefined || row.seal === null;/" && check "M5-missing-seal-is-revert"
 
 # M6: the fix over-corrects and drops every row that is not finalized yet.
-mutate "s/if \(row\.seal === 'reverted'\) \{/if (row.seal === 'reverted' || (row.seal !== undefined \&\& row.seal !== null \&\& row.seal !== 'finalized')) {/" && check "M6-non-final-dropped"
+mutate "s/const revertedBySeal = row\.seal === 'reverted';/const revertedBySeal = row.seal === 'reverted' || (row.seal !== undefined \&\& row.seal !== null \&\& row.seal !== 'finalized');/" && check "M6-non-final-dropped"
 
 # M7: a journal of only retracted rows reports success.
 mutate "s/    process\.exit\(1\);\n  \}\n  console\.error\('no enriched rows/    process.exit(0);\n  }\n  console.error('no enriched rows/" && check "M7-all-retracted-success"
 
-# M8: the retraction lands in the envelope-debt bucket (before the seal gate).
-mutate "s/  if \(row\.seal === 'reverted'\) \{/  if (row.seal === 'reverted' \&\& false) {\n    \/\/ unreachable in the mutated body\n  }\n  if (false) {/" && check "M8-retraction-not-gated" || true
+# M8: neither signal gates the retraction — the row falls through to the
+# envelope path and becomes a payload source again.
+mutate "s/if \(revertedBySeal \|\| revertedByChannel\) \{/if (false) {/" && check "M8-retraction-not-gated" || true
 
 control_after="$(snapshot)"
 TOTAL=$((TOTAL + 1))

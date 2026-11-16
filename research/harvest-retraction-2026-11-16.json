@@ -1,8 +1,8 @@
 {
   "verdict": "reader-honours-retraction",
-  "measuredAt": "2026-11-16T16:04:22.136Z",
+  "measuredAt": "2026-11-16T16:33:35.512Z",
   "tool": "tools/harvest-reeflog.mjs",
-  "method": "real reeflog binary plants 1 finalized + 1 reverted enriched row; the repository harvest tool reads it with its zero-RPC guard; prefix = the same tool with the seal gate removed",
+  "method": "real reeflog binary plants 1 finalized + 1 reverted enriched row; the repository harvest tool reads it with its zero-RPC guard; prefix = the same tool with both retraction gates (seal + reorg channel) removed",
   "reeflogBinary": "reeflog",
   "zeroRpcGuard": "the tool imports tools/lib/network-guard.mjs first and exits 1 on any attempt (pinned by test/harvest-reeflog.test.mjs)",
   "faces": [
@@ -69,7 +69,9 @@
         "rowsWithoutEnvelope": 0,
         "rowsWithoutInstructions": 0,
         "rowsReverted": 0,
-        "revertedSignatures": []
+        "revertedSignatures": [],
+        "reorgRetractions": 1,
+        "reorgOnlySignatures": []
       },
       "signatures": [
         {
@@ -112,7 +114,9 @@
         "rowsReverted": 1,
         "revertedSignatures": [
           "RevertedSig11111111111111111111111111111111111111"
-        ]
+        ],
+        "reorgRetractions": 1,
+        "reorgOnlySignatures": []
       },
       "signatures": [
         {
@@ -124,7 +128,7 @@
   },
   "limits": [
     "the probe is synthetic: a planted journal, not a fork observed on mainnet",
-    "the seal gate is the reader side only — the reorg CHANNEL (reorg tail) is a separate cursor reeflog already provides and this tool does not poll",
+    "this artifact measures the SEAL half of the reader contract; the reorg CHANNEL (reorg tail, a separate cursor reeflog already provides) is polled by the same tool and measured separately in research/harvest-reorg-channel-2026-11-16.json",
     "one reverted row with a full envelope; other seal states covered by test/harvest-reeflog-retraction.test.mjs"
   ]
 }

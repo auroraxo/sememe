@@ -26,6 +26,11 @@
 // Honesty rules (same as the network harvester):
 //   - a row the journal has not enriched (no account envelope yet) is COUNTED
 //     as debt, never dropped from the document's accounting;
+//   - BOTH retraction signals are read: the row's CURRENT seal on `tail`, and
+//     the retraction itself on `reorg tail` (its own channel, its own cursor).
+//     The seal alone is a snapshot taken when the row is read — a retraction
+//     recorded after that read is invisible to it, which is exactly why
+//     reeflog delivers retractions on a separate channel in the first place.
 //   - an envelope that carries no `instructions` (an older binary hydrated
 //     it) is debt too — it cannot yield payloads;
 //   - a transaction whose payloads cannot be extracted for the target
@@ -69,52 +74,81 @@ if (!fs.existsSync(reeflogBin)) {
   process.exit(2);
 }
 
-// One-shot read: a FRESH cursor in a throwaway file, so a repeated harvest
-// sees the whole journal (including rows enriched after the last run) and
-// this tool can never advance the consumer's real cursor.
-const cursorPath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'reeflog-harvest-')), 'cursor.txt');
+// One-shot read: FRESH cursors in a throwaway directory, so a repeated
+// harvest sees the whole journal (including rows enriched after the last run)
+// and this tool can never advance a consumer's real cursor. The two channels
+// get SEPARATE files on purpose: reeflog refuses a cursor written by the other
+// channel (an event seq and a reorg id are different number lines), and a
+// reader that handed one file to both would get a refusal, not a harvest.
+const cursorDir = fs.mkdtempSync(path.join(os.tmpdir(), 'reeflog-harvest-'));
+const cursorPath = path.join(cursorDir, 'events-cursor.txt');
+const reorgCursorPath = path.join(cursorDir, 'reorgs-cursor.txt');
 
-function tailJournal() {
+function runReeflog(args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(reeflogBin, ['tail', '--db', dbPath, '--cursor', cursorPath, '--limit', String(tailLimit)], {
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    const child = spawn(reeflogBin, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     let out = '', err = '';
     child.stdout.on('data', (d) => { out += d; });
     child.stderr.on('data', (d) => { err += d; });
     // 'close', not 'exit': stdout may still be unread at 'exit'.
-    child.on('close', (code) => {
-      if (code !== 0) return reject(new Error(`reeflog tail exited ${code}: ${err.trim().slice(-400)}`));
-      resolve({ out, err });
-    });
+    child.on('close', (code) => resolve({ code, out, err }));
     child.on('error', reject);
   });
 }
 
-const { out, err: tailStderr } = await tailJournal();
+const tailRun = await runReeflog(['tail', '--db', dbPath, '--cursor', cursorPath, '--limit', String(tailLimit)]);
+if (tailRun.code !== 0) {
+  console.error(`reeflog tail exited ${tailRun.code}: ${tailRun.err.trim().slice(-400)}`);
+  process.exit(1);
+}
+const { out, err: tailStderr } = tailRun;
 const rows = out.split('\n').filter(Boolean).map((line) => {
   try { return JSON.parse(line); } catch { return null; }
 }).filter(Boolean);
+
+// The retraction channel, read AFTER the rows so that every retraction
+// recorded up to this point is in scope: a retraction that lands between the
+// row read and this read would be missed by the seal on the row but is still
+// delivered here. A channel we cannot read must fail the run — writing a
+// document that claims the retraction was honoured while the channel was
+// never asked is the same defect in a second shape.
+const reorgRun = await runReeflog(['reorg', 'tail', '--db', dbPath, '--cursor', reorgCursorPath, '--limit', String(tailLimit)]);
+if (reorgRun.code !== 0) {
+  console.error(`the retraction channel could not be read: reeflog reorg tail exited ${reorgRun.code}: ${reorgRun.err.trim().slice(-400)}`);
+  console.error('refusing to write a harvest document that claims a retraction was honoured without reading the channel that carries it');
+  process.exit(1);
+}
+const reorgRetractions = reorgRun.out.split('\n').filter(Boolean).map((line) => {
+  try { return JSON.parse(line); } catch { return null; }
+}).filter((r) => r && typeof r.reorg_id === 'number' && typeof r.signature === 'string');
+const reorgSignatures = new Set(reorgRetractions.map((r) => r.signature));
 
 const transactions = [];
 let rowsWithoutEnvelope = 0;
 let rowsWithoutInstructions = 0;
 let rowsWithoutTargetPayloads = 0;
 // Retracted rows: named, never harvested. reeflog prints each row's CURRENT
-// seal on `tail` and carries the retraction itself on `reorg tail`; dropping
-// that signal here is what reeflog issue #1 called the retracted claim. The
+// seal on `tail` AND carries the retraction itself on `reorg tail`; dropping
+// either signal is what reeflog issue #1 called the retracted claim. The
 // counter is a debt like the others — the row is reported, not swallowed.
+// `rowsReverted` counts rows of THIS journal; `reorgOnlySignatures` names
+// retractions the channel delivered that the row read did not show as
+// reverted (a retraction that arrived after the row was read).
 let rowsReverted = 0;
 const revertedSignatures = [];
+const reorgOnlySignatures = [];
 
 for (const row of rows) {
-  // The seal decides first: a row the chain unmade is not a payload source,
-  // and it is not an envelope debt `hydrate --accounts` could ever close
-  // either (the chain no longer knows the transaction). It gets its own
+  // Both signals decide first: a row the chain unmade is not a payload
+  // source, and it is not an envelope debt `hydrate --accounts` could ever
+  // close either (the chain no longer knows the transaction). It gets its own
   // bucket, ahead of both.
-  if (row.seal === 'reverted') {
+  const revertedBySeal = row.seal === 'reverted';
+  const revertedByChannel = typeof row.signature === 'string' && reorgSignatures.has(row.signature);
+  if (revertedBySeal || revertedByChannel) {
     rowsReverted++;
     if (row.signature) revertedSignatures.push(row.signature);
+    if (revertedByChannel && !revertedBySeal) reorgOnlySignatures.push(row.signature);
     continue;
   }
   const envelope = row.accounts && typeof row.accounts === 'object' ? row.accounts : null;
@@ -152,7 +186,7 @@ const document = {
   program,
   rpc: 'none (local reeflog journal)',
   harvestedAt: new Date().toISOString(),
-  method: 'reeflog tail --cursor <fresh> over the local journal (envelope instructions, byte-verbatim)',
+  method: 'reeflog tail --cursor <fresh> over the local journal (envelope instructions, byte-verbatim) + reeflog reorg tail --cursor <fresh> (retraction channel)',
   blocksUsed: [],
   slotsRejected: {},
   tipAtHarvest: slots.length ? Math.max(...slots) : null,
@@ -178,6 +212,10 @@ const document = {
     // named so the reader can see what the mailbox withdrew.
     rowsReverted,
     revertedSignatures,
+    // The retraction channel's own account: how many records it delivered and
+    // which signatures it withdrew that the row's seal had not (yet) shown.
+    reorgRetractions: reorgRetractions.length,
+    reorgOnlySignatures,
   },
   slotRange: slotRange(slots),
   transactions,

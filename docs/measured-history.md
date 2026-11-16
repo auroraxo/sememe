@@ -3541,12 +3541,13 @@ as "retracted" would be the same lie pointed the other way.
   before / absent after, 2 guard faces absent on both trees.
   Pinned by `test/harvest-retraction-measurement.test.mjs` (8 faces).
 
-**Honest remainder.** This closes the reader's half of ONE seam only. The
-reorg *channel* (`reeflog reorg tail`) is a separate cursor with its own
-retraction records, and this tool still does not poll it — a consumer that
-wants the retraction as an event arriving late (rather than as a seal read off
-a row it happens to be reading now) has to ask for it, and this tool does not.
-The probe is synthetic: a planted journal, not a fork observed on mainnet.
+**Honest remainder (state at that pulse).** This closed the reader's half of
+ONE seam. The reorg *channel* (`reeflog reorg tail`) is a separate cursor with
+its own retraction records, and at that point this tool did not poll it — a
+consumer that wants the retraction as an event arriving late (rather than as a
+seal read off a row it happens to be reading now) has to ask for it. **Closed
+the same day** by the section below. The probe is synthetic: a planted journal,
+not a fork observed on mainnet.
 
 On the other consumer, checked rather than assumed:
 [whirlpool-watcher](https://github.com/auroraxo/whirlpool-watcher) does **not**
@@ -3559,3 +3560,80 @@ a row it read; whirlpool-watcher reads rows regardless of seal and recovers
 afterwards through the channel. Neither is the reader contract reeflog issue
 #1 asks for, and the gap this pulse closed is the one sememe had on the rows
 it already reads.
+
+## 2026-11-16 — THE READER ASKED THE ROW, NOT THE CHANNEL: a retraction that arrived after the read was invisible
+
+**The seam this closes.** The pulse above gated on the row's CURRENT seal.
+But a seal is a **snapshot taken when the row is read**: a retraction the
+chain records *after* that read never appears in it. reeflog delivers exactly
+those retractions on a second channel with its own cursor — `reeflog reorg
+tail` — and says why in its own source (`run_reorg_tail`): *"a consumer that
+already read an event cannot learn about its retraction from the event
+stream: the event keeps its seq and is delivered exactly once."* The reader
+polled only the first channel, so a retraction that landed between the row
+read and the end of the harvest was invisible to it — the seal said
+`finalized`, and the reader believed it.
+
+**Measured** (real `reeflog` binary; one journal with three enriched rows:
+live, seal-retracted, and one whose seal STILL says `finalized` while the
+retraction channel carries its record; the repository's own harvest tool; the
+zero-RPC guard still enforced):
+
+| | pre-fix (seal gate only) | fixed |
+|---|---|---|
+| `counts.pinnedSignatures` | **2** | 1 |
+| channel-only retracted signature in `signatures[]` | **yes** | no |
+| channel-only retracted signature in `transactions[]` | **yes** | no |
+| `counts.reorgRetractions` | absent | **2** |
+| `counts.reorgOnlySignatures` | absent | `["LateSig…"]` |
+| `counts.rowsReverted` | 1 | **2** |
+
+Pre-fix the document did not merely omit the retraction — it did not even
+carry the word `reorg`, and the channel's own delivery was never counted.
+
+**The fix.** The reader now asks BOTH channels, each with its own fresh
+cursor file (reeflog refuses a cursor written by the other channel — an event
+seq and a reorg id are different number lines, and one shared file would have
+been a refusal, not a harvest). A signature the channel names is never a
+transaction, never a signature, never a payload — whatever the row's seal
+says. Two buckets keep the two signals apart: `revertedSignatures` names every
+retracted row, and `reorgOnlySignatures` names the ones the channel knew
+about and the row's seal did not (yet) — so a reader can tell "the row said
+so" from "the channel said so after the fact". `reorgRetractions` counts the
+channel's own delivery.
+
+**A channel that cannot be read fails the run.** A document that claims a
+retraction was honoured while the channel was never asked is the same defect
+in a second shape, so an unreadable `reorg tail` exits 1 and writes nothing —
+the refusal names the channel.
+
+**Evidence.**
+
+- `test/harvest-reeflog-reorg-channel.test.mjs` (11 faces) — **8 red / 3 green
+  on the pre-channel tree** (measured by swapping the tool alone: D1–D6, C1,
+  F1 red; G1–G3 green), 11/11 green here. The three green faces pre-fix are
+  the guards: the reader must never *invent* a retraction (G1, G2) and the
+  seal gate must keep working when the channel is silent (G3).
+- `tools/mutation-ladder-harvest-reorg-channel.sh` — **9/9 mutations
+  caught**, control green, tree byte-identical after the run. M4 (an
+  unreadable channel ignored) is the face that keeps the refusal honest.
+- `tools/measure-harvest-reorg-channel.mjs` →
+  `research/harvest-reorg-channel-2026-11-16.json`, verdict
+  `reader-honours-the-retraction-channel`: the same probe re-run across the
+  fix (the tool with the channel read removed, then with it) — 3 defect faces
+  present before / absent after, 3 guard faces absent on both trees.
+  Pinned by `test/harvest-reorg-channel-measurement.test.mjs` (9 faces).
+- The seal half's own ladder was re-cut for the new source shape and still
+  bites: `tools/mutation-ladder-harvest-retraction.sh` **9/9 caught** (its
+  first run after the restructure reported 4/9 — five VACUUMs, because the
+  old perl patterns no longer matched the moved line; a ladder whose patterns
+  no longer match measures nothing).
+
+**Honest remainder.** The probe is synthetic: a planted journal, not a fork
+observed on mainnet. This tool reads a LOCAL journal — it never held a cursor
+across runs, so it re-reads the whole journal each time and the channel is
+re-read whole with it; a *consumer* that wants each retraction exactly once
+must keep a durable per-channel cursor, which this one-shot tool deliberately
+does not do (its cursors are throwaway, so a repeated harvest cannot advance
+a consumer's position). `tools/` is not part of the published package files,
+so npm `sememe` stays at 0.4.30 — this lands on `main` only.

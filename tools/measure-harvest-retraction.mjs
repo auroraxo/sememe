@@ -148,11 +148,12 @@ const TOOL_ORIG = fs.readFileSync(TOOL, 'utf8');
 const STASH = `${TOOL}.measure-bak`;
 
 function prefixTool() {
-  // Remove exactly the seal gate — the measurement must be re-derivable
-  // without relying on git state.
+  // Remove BOTH retraction gates — the measurement must be re-derivable
+  // without relying on git state, and "pre-fix" here means the reader that
+  // honoured neither signal: not the row's seal, not the channel.
   const mutated = TOOL_ORIG.replace(
-    "  if (row.seal === 'reverted') {",
-    '  if (false) {',
+    "  const revertedBySeal = row.seal === 'reverted';\n  const revertedByChannel = typeof row.signature === 'string' && reorgSignatures.has(row.signature);\n  if (revertedBySeal || revertedByChannel) {",
+    '  const revertedBySeal = false;\n  const revertedByChannel = false;\n  if (revertedBySeal || revertedByChannel) {',
   );
   if (mutated === TOOL_ORIG) throw new Error('could not derive the pre-fix tool (gate not found)');
   fs.writeFileSync(STASH, TOOL_ORIG);
@@ -231,7 +232,7 @@ const artifact = {
   verdict,
   measuredAt: new Date().toISOString(),
   tool: 'tools/harvest-reeflog.mjs',
-  method: 'real reeflog binary plants 1 finalized + 1 reverted enriched row; the repository harvest tool reads it with its zero-RPC guard; prefix = the same tool with the seal gate removed',
+  method: 'real reeflog binary plants 1 finalized + 1 reverted enriched row; the repository harvest tool reads it with its zero-RPC guard; prefix = the same tool with both retraction gates (seal + reorg channel) removed',
   reeflogBinary: path.basename(REEFLOG_BIN),
   zeroRpcGuard: 'the tool imports tools/lib/network-guard.mjs first and exits 1 on any attempt (pinned by test/harvest-reeflog.test.mjs)',
   faces,
@@ -239,7 +240,7 @@ const artifact = {
   fixed,
   limits: [
     'the probe is synthetic: a planted journal, not a fork observed on mainnet',
-    'the seal gate is the reader side only — the reorg CHANNEL (reorg tail) is a separate cursor reeflog already provides and this tool does not poll',
+    'this artifact measures the SEAL half of the reader contract; the reorg CHANNEL (reorg tail, a separate cursor reeflog already provides) is polled by the same tool and measured separately in research/harvest-reorg-channel-2026-11-16.json',
     'one reverted row with a full envelope; other seal states covered by test/harvest-reeflog-retraction.test.mjs',
   ],
 };

@@ -1,0 +1,150 @@
+{
+  "verdict": "reader-honours-the-retraction-channel",
+  "measuredAt": "2026-11-16T16:33:34.955Z",
+  "tool": "tools/harvest-reeflog.mjs",
+  "method": "real reeflog binary plants 3 enriched rows (live, seal-reverted, channel-only-retracted with seal still finalized); the repository harvest tool reads both channels with its zero-RPC guard; prefix = the same tool with the reorg-channel read removed",
+  "reeflogBinary": "reeflog",
+  "zeroRpcGuard": "the tool imports tools/lib/network-guard.mjs first and exits 1 on any attempt (pinned by test/harvest-reeflog.test.mjs)",
+  "faces": [
+    {
+      "face": "P1_the_channel_only_retraction_is_not_pinned",
+      "claim": "a signature only the retraction channel knows about must not be pinned (prefix/fixed = leak present)",
+      "prefix": true,
+      "fixed": false,
+      "detail": "prefix latePinned=true, fixed=false"
+    },
+    {
+      "face": "P2_the_channel_only_retraction_is_never_a_transaction",
+      "claim": "no payload may be derived from a row whose seal looked live but the channel retracted",
+      "prefix": true,
+      "fixed": false,
+      "detail": "prefix lateTransaction=true, fixed=false"
+    },
+    {
+      "face": "P3_the_channel_only_retraction_is_named",
+      "claim": "failure = the document does not name the channel-only retraction",
+      "prefix": true,
+      "fixed": false,
+      "detail": "prefix rowsReverted=1 lateNamed=false; fixed rowsReverted=2 lateNamed=true"
+    },
+    {
+      "face": "P4_the_live_row_survives_on_both_trees",
+      "claim": "failure = the fix dropped a live event too — the finalized row with no reorg record stays a payload source",
+      "prefix": false,
+      "fixed": false,
+      "detail": "prefix livePinned=true, fixed=true"
+    },
+    {
+      "face": "P5_the_seal_gate_still_works_on_both_trees",
+      "claim": "failure = the seal-retracted row leaks (the seal gate must not be weakened by the channel work)",
+      "prefix": false,
+      "fixed": false,
+      "detail": "prefix sealPinned=false, fixed=false"
+    },
+    {
+      "face": "P6_a_retraction_is_not_an_open_envelope_debt",
+      "claim": "failure = a row the chain forgot is counted as debt hydrate could ever close",
+      "prefix": false,
+      "fixed": false,
+      "detail": "prefix rowsWithoutEnvelope=0, fixed rowsWithoutEnvelope=0"
+    }
+  ],
+  "prefix": {
+    "tag": "prefix",
+    "exitCode": 0,
+    "documentWritten": true,
+    "stderr": "",
+    "pinnedSignatures": 2,
+    "latePinned": true,
+    "lateTransaction": true,
+    "sealPinned": false,
+    "livePinned": true,
+    "rowsReverted": 1,
+    "lateNamed": false,
+    "reorgRetractions": 0,
+    "rowsWithoutEnvelope": 0,
+    "method": "reeflog tail --cursor <fresh> over the local journal (envelope instructions, byte-verbatim) + reeflog reorg tail --cursor <fresh> (retraction channel)",
+    "_raw": {
+      "counts": {
+        "requested": 3,
+        "journalRows": 3,
+        "pinnedSignatures": 2,
+        "fetched": 2,
+        "missing": 0,
+        "transactionsWithTargetPayloads": 2,
+        "payloads": 2,
+        "failedOnChain": 0,
+        "transactionsWithoutTarget": 0,
+        "rowsWithoutEnvelope": 0,
+        "rowsWithoutInstructions": 0,
+        "rowsReverted": 1,
+        "revertedSignatures": [
+          "SealSig111111111111111111111111111111111111111"
+        ],
+        "reorgRetractions": 0,
+        "reorgOnlySignatures": []
+      },
+      "signatures": [
+        {
+          "signature": "ValidSig1111111111111111111111111111111111111111",
+          "slot": 100000
+        },
+        {
+          "signature": "LateSig1111111111111111111111111111111111111111",
+          "slot": 100002
+        }
+      ]
+    }
+  },
+  "fixed": {
+    "tag": "fixed",
+    "exitCode": 0,
+    "documentWritten": true,
+    "stderr": "",
+    "pinnedSignatures": 1,
+    "latePinned": false,
+    "lateTransaction": false,
+    "sealPinned": false,
+    "livePinned": true,
+    "rowsReverted": 2,
+    "lateNamed": true,
+    "reorgRetractions": 2,
+    "rowsWithoutEnvelope": 0,
+    "method": "reeflog tail --cursor <fresh> over the local journal (envelope instructions, byte-verbatim) + reeflog reorg tail --cursor <fresh> (retraction channel)",
+    "_raw": {
+      "counts": {
+        "requested": 3,
+        "journalRows": 3,
+        "pinnedSignatures": 1,
+        "fetched": 1,
+        "missing": 0,
+        "transactionsWithTargetPayloads": 1,
+        "payloads": 1,
+        "failedOnChain": 0,
+        "transactionsWithoutTarget": 0,
+        "rowsWithoutEnvelope": 0,
+        "rowsWithoutInstructions": 0,
+        "rowsReverted": 2,
+        "revertedSignatures": [
+          "SealSig111111111111111111111111111111111111111",
+          "LateSig1111111111111111111111111111111111111111"
+        ],
+        "reorgRetractions": 2,
+        "reorgOnlySignatures": [
+          "LateSig1111111111111111111111111111111111111111"
+        ]
+      },
+      "signatures": [
+        {
+          "signature": "ValidSig1111111111111111111111111111111111111111",
+          "slot": 100000
+        }
+      ]
+    }
+  },
+  "limits": [
+    "the probe is synthetic: a planted journal, not a fork observed on mainnet",
+    "this artifact measures the CHANNEL half of the reader contract; the row SEAL half is measured in research/harvest-retraction-2026-11-16.json",
+    "one channel-only retraction; retractions for rows outside this read are covered by G1 in test/harvest-reeflog-reorg-channel.test.mjs"
+  ]
+}
