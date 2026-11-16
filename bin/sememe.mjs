@@ -41,8 +41,12 @@ const usage = `usage:
         present-undecodable   an account exists but its schema is unusable
         vendored              answered by sememe's pinned wire table, no IDL
         unknown               the RPC failed — deliberately NOT an absence
+        stored                your own store already holds this program ->
+                              decode it, do not acquire it again
       Never reports an RPC failure as an absence, and never tells you to pull
-      a program that publishes nothing (the fix would never arrive).
+      a program that publishes nothing (the fix would never arrive) — nor one
+      your store already holds. The store is read FIRST, so a store the reader
+      refuses costs no request; the chain half stays named as chainVerdict.
   sememe adopt <program-id> <file> [--store <directory>] [--source <label>]
       store a first-party PUBLISHED interface copy next to the on-chain pull, so
       union decode has a second verified source. The receipt says "published":
