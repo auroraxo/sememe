@@ -21,6 +21,11 @@
 import { gunzipSync, inflateSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { PublicKey } from './peer.mjs';
+// The acquisition classifier (src/acquire-voice.mjs) is the ONE mint place
+// for this surface's refusals; acquire.mjs only supplies it with STRUCTURED
+// input (which transport refused, which HTTP status, which JSON-RPC error)
+// and never mints a sentence of its own.
+import { transportCause } from './acquire-voice.mjs';
 
 export const METADATA_PROGRAM = new PublicKey('ProgM6JCCvbYkfKqJYHePx4xxSUSqJp7rh8Lyv7nk7S');
 const ANCHOR_DISCRIMINATOR = Buffer.from([24, 70, 98, 191, 58, 144, 123, 158]);
@@ -77,7 +82,87 @@ export function decodeAccount(account, source, programId) {
   return idl;
 }
 
-/** Batched `getMultipleAccounts` with bounded retry; never throws — returns {error} instead. */
+/** Batched `getMultipleAccounts` with bounded retry; never throws — returns
+ *  {error} instead.
+ *
+ *  2026-11-17: the failure is now STRUCTURED as well as a sentence. The
+ *  sentence (`error`) is what `sememe gap` has always reported, and the
+ *  gap contract pinned by test/acquisition-gap.test.mjs T4 (an RPC failure
+ *  is `unknown`, never an absence) reads it — so the sentence stays. The
+ *  structured `failure` is what the acquisition classifier mints a named
+ *  refusal from (src/acquire-voice.mjs): one flat sentence cannot tell a
+ *  rate limit from an outage from a garbage body, and it cannot carry the
+ *  endpoint's own JSON-RPC message without quoting a parser's words. */
+export async function rpcAccounts(url, keys, fetcher = fetch, tries = 3) {
+  const payload = { jsonrpc: '2.0', id: 1, method: 'getMultipleAccounts',
+    params: [keys, { encoding: 'base64', commitment: 'finalized' }] };
+  for (let attempt = 0; attempt < tries; attempt++) {
+    let response;
+    try {
+      response = await fetcher(url, { method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });
+    } catch (error) {
+      // The transport itself refused: DNS, TLS, connection refused, timeout.
+      // The errno code / short transport words are INPUT — the product's
+      // sentence is minted from them in src/acquire-voice.mjs, so the
+      // structured record keeps the RAW code, not a sentence (V4).
+      const cause = transportCause(error);
+      const failure = { kind: 'transport', cause };
+      if (attempt === tries - 1) {
+        return { error: `the endpoint could not be reached (${cause})`, failure };
+      }
+      await sleep((attempt + 1) * 1500);
+      continue;
+    }
+    try {
+      if (!response.ok) {
+        if (response.status === 429 || response.status >= 500) {
+          const retry = Number(response.headers.get('retry-after'));
+          if (attempt < tries - 1) { await sleep(Number.isFinite(retry) && retry > 0 ? Math.min(retry * 1000, 10000) : (attempt + 1) * 1500); continue; }
+        }
+        const retryAfter = response.headers.get('retry-after');
+        const failure = { kind: 'http', status: response.status, retryAfter: retryAfter ?? null };
+        if (attempt === tries - 1) {
+          return { error: `HTTP ${response.status}`, failure };
+        }
+        throw Error(`HTTP ${response.status}`);
+      }
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        // HTTP 200 with a body that is not JSON: the endpoint answered, but it
+        // is not a JSON-RPC endpoint. The parser's own words are input.
+        const failure = { kind: 'body' };
+        if (attempt === tries - 1) return { error: 'the endpoint answered with a body that is not JSON', failure };
+        await sleep((attempt + 1) * 1500);
+        continue;
+      }
+      if (data.error) {
+        const failure = { kind: 'rpc-error', rpcCode: data.error.code ?? null, rpcMessage: data.error.message ?? null };
+        if (attempt === tries - 1) {
+          return { error: `RPC error ${data.error.code ?? 'unknown'}`, failure };
+        }
+        throw Error(`RPC error ${data.error.code ?? 'unknown'}`);
+      }
+      if (!Array.isArray(data.result?.value) || data.result.value.length !== keys.length) {
+        const failure = { kind: 'shape', detail: 'answered JSON without the account entries sememe asked for' };
+        if (attempt === tries - 1) return { error: 'malformed RPC response', failure };
+        throw Error('malformed RPC response');
+      }
+      return { slot: data.result.context?.slot ?? null, accounts: data.result.value };
+    } catch (error) {
+      if (attempt === tries - 1) {
+        // The thrown error was already classified above (HTTP / RPC error /
+        // shape); anything else is a transport failure that slipped past.
+        const cause = error?.cause?.code ?? error?.name ?? 'unknown';
+        return { error: String(error?.message ?? error).slice(0, 150), failure: { kind: 'transport', cause } };
+      }
+      await sleep((attempt + 1) * 1500);
+    }
+  }
+  return { error: 'exhausted retries', failure: { kind: 'transport', cause: 'exhausted retries' } };
+}
 /**
  * Classify ONE IDL account: is there a usable schema behind it?
  *
@@ -116,30 +201,4 @@ export function inspect(account, source, programId) {
   } catch (error) {
     return { state: 'undecodable', error: String(error?.message ?? error).slice(0, 150) };
   }
-}
-
-export async function rpcAccounts(url, keys, fetcher = fetch, tries = 3) {
-  const payload = { jsonrpc: '2.0', id: 1, method: 'getMultipleAccounts',
-    params: [keys, { encoding: 'base64', commitment: 'finalized' }] };
-  for (let attempt = 0; attempt < tries; attempt++) {
-    try {
-      const response = await fetcher(url, { method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });
-      if (!response.ok) {
-        if (response.status === 429 || response.status >= 500) {
-          const retry = Number(response.headers.get('retry-after'));
-          if (attempt < tries - 1) { await sleep(Number.isFinite(retry) && retry > 0 ? Math.min(retry * 1000, 10000) : (attempt + 1) * 1500); continue; }
-        }
-        throw Error(`HTTP ${response.status}`);
-      }
-      const data = await response.json();
-      if (data.error) throw Error(`RPC error ${data.error.code ?? 'unknown'}`);
-      if (!Array.isArray(data.result?.value) || data.result.value.length !== keys.length) throw Error('malformed RPC response');
-      return { slot: data.result.context?.slot ?? null, accounts: data.result.value };
-    } catch (error) {
-      if (attempt === tries - 1) return { error: String(error?.message ?? error).slice(0, 150) };
-      await sleep((attempt + 1) * 1500);
-    }
-  }
-  return { error: 'exhausted retries' };
 }

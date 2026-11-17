@@ -4317,3 +4317,102 @@ a future pulse).
   `sememe@0.4.35` and older still answer unnamed (tags immutable).
 - `answer: true` is a CLI-channel addition: scripts that parsed the prose
   still get the same prose.
+
+## Working now: the endpoint you name is answered in the product's voice too (2026-11-18)
+
+Every other input sememe touches had learned to refuse by name: the file you point at
+(`file-input` v0.4.31), the store directory (`store-input` v0.4.32), the damage inside it
+(`store-damage` v0.4.33), the lock gate (`lock-voice` v0.4.35), the answers themselves
+(`answer-voice` v0.4.36). **The network was the one left.** `sememe pull <program> --rpc <url>`
+names an endpoint; when that endpoint failed, the operator met undici's words, the JSON
+parser's words and web3.js's words — every one of the nine failure faces as the same bare
+sentence, no `code`, no repair, exit 1:
+
+    {"error":"RPC unavailable: HTTP 429"}                       <- rate limit
+    {"error":"RPC unavailable: HTTP 500"}                       <- outage
+    {"error":"RPC unavailable: fetch failed"}                   <- undici's words
+    {"error":"RPC unavailable: Unexpected token 'o', …"}        <- the parser's words
+    {"error":"RPC unavailable: RPC error -32005"}               <- the endpoint's own
+                                                                   message DROPPED
+    {"error":"RPC unavailable: malformed RPC response"}         <- nothing named
+    {"error":"RPC unavailable: HTTP 403"}                       <- refusal
+    {"error":"HTTPS RPC URL required"}                          <- no code
+    {"error":"Non-base58 character"}                            <- web3.js's words
+
+Three faults, the same three the other classifiers ended:
+
+1. **NO NAME** — a script cannot branch: "retry later" (429/500/unreachable), "your flag is
+   wrong" (`http://` URL, non-base58 program id) and "this is not a JSON-RPC endpoint"
+   (garbage body) all arrived as one shapeless string.
+2. **NO SUBJECT** — nothing said *which* endpoint failed, and the JSON-RPC error object's
+   own `message` (`node is behind, please try a healthy node`) was thrown away; only its
+   numeric code survived.
+3. **THE WRONG VOCABULARY** — the kernel's errno, the parser's words and the library's
+   words quoted verbatim, exactly the defect class `file-input` ended for caller-named
+   paths: the third party speaks for the product.
+
+**THE FIX (`src/acquire-voice.mjs` is the ONE mint place):**
+
+- C1 every refusal carries a product code: `rpc-*` for the endpoint, the URL and the
+  transport; `program-id-*` for the caller's argument. The nine faces map to
+  `rpc-rate-limited` (429, with retry-after), `rpc-endpoint-failed` (5xx), `rpc-forbidden`
+  (401/403), `rpc-http-error` (any other status), `rpc-error-response` (JSON-RPC error —
+  the endpoint's own message is now the subject, quoted, not dropped), `rpc-bad-body`
+  (HTTP 200, non-JSON body), `rpc-malformed-response` (JSON without the account entries
+  or the slot), `rpc-unreachable` (transport: DNS, refused, TLS, timeout), `rpc-not-https`
+  (the caller named a non-https URL), `program-id-invalid` (the argument is not a base58
+  program address).
+- C2 every refusal carries a repair — "wait for the rate-limit window to pass", "check the
+  --rpc URL", "pass --rpc <another https endpoint>", "pass the program's canonical base58
+  address".
+- C3 the channel follows what actually ran: **exit 2** when NO request was made
+  (non-https URL, bad program id — the caller's mistake, the usage/IO channel exactly like
+  store-input's path faces); **exit 1** when sememe DID dispatch the request and the answer
+  failed. The dispatch faces keep the channel they always answered on; only the name is
+  added.
+- C4 the kernel's and third parties' words are INPUT, never output: the raw errno travels
+  as the structured `cause` field (for scripts), never inside the sentence.
+- C5 `answer: true` never rides on a refusal; a repair never rides on an answer. The
+  "no verified on-chain IDL" refusal keeps its own sentence (its surface is the chain's
+  absence, not the endpoint's failure, and the README quotes it).
+
+**MEASUREMENT** (`tools/acquire-voice-probe.mjs` + `tools/measure-acquire-voice.mjs`,
+`research/acquire-voice-2026-11-17.json`, verdict `acquire-voice-closed`): 9 of 9 faces
+unnamed and repairless on pre-fix tree `af0a8d2` (the tip `sememe@0.4.36` carries the
+defect — the newest release is the carrier); 0/0/0 here (unnamed/repairless/wrong-channel),
+0 control regressions, 0 host paths. The probe runs a LOCAL self-signed-TLS mock RPC (no
+real network; `NODE_EXTRA_CA_CERTS`-independent: the probe passes the CA explicitly), serves
+nine failure faces and four controls (`pullOk` exit 0 with a real Anchor-format account
+built from `test/fixtures/whirlpool-idl.json`, `gapUnknownHolds` exit 3 with verdict
+`unknown`, `storeAnswerVoice` exit 1 code `no-sememe-store`, `flagVoice` exit 2). Pin
+`test/acquire-voice.test.mjs` (9) plus the end-to-end wiring pins in `test/pull.test.mjs` —
+M8 of the ladder reverts `src/pull.mjs` to the shipped `RPC unavailable: …` prose and the
+e2e pin is what goes red. `tools/mutation-ladder-acquire-voice.sh`: **9/9 caught, control
+green, tree byte-identical.**
+
+**THE MEASUREMENT'S OWN FALSE STARTS** (kept because they are the lesson):
+
+- The first quick harness used `spawnSync`; the mock server never answered — all early
+  "fetch failed" rows were HARNESS fault, not product fault. Rewritten async with `spawn`.
+- The first `pullOk` control served `[null, null]` — that measures the "no verified
+  on-chain IDL" refusal, not a successful pull; fixed by serving a real anchor-format
+  account (44-byte header, discriminator `24 70 98 191 58 144 123 158`, LE u32 deflate
+  length at offset 40, slot `424242`).
+- `test/pull.test.mjs` pinned web3.js's own words
+  (`/Non-base58 character|Invalid public key input/`) — a pin that FORCED the operator to
+  meet the library's vocabulary. Updated, not deleted: the pin now holds the product
+  contract (code `program-id-invalid`, exit 2, repair, sentence) and asserts the third
+  parties' phrases ABSENT.
+
+**WHAT STAYED UNCHANGED ON PURPOSE:** `sememe gap`'s unknown-verdict contract
+(test/acquisition-gap.test.mjs T4 — an RPC failure is NEVER recorded as publishes-nothing,
+exit 3, the crates.io-403 lesson); the CLI's answer branch and every other classifier; the
+work channel for the dispatch faces; the sentences other tools quote.
+
+### LIMITS
+
+- 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
+- Shipped: the fix lands in the NEXT release pulse; `sememe@0.4.36` and older still answer
+  unnamed (tags immutable).
+- The structured `cause` field is a CLI-channel addition: scripts that parsed the prose
+  still get the same prose, now with a product code on it.

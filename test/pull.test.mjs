@@ -72,7 +72,45 @@ test('missing or wrong-owner accounts never create an object', async () => tempo
   await assert.rejects(readdir(path.join(store, 'objects')), { code: 'ENOENT' });
 }));
 test('input ID and RPC transport are validated before writing', async () => temporary(async (store) => {
-  await assert.rejects(pull('invalid', store, 'https://mock.invalid'), /Non-base58 character|Invalid public key input/);
-  await assert.rejects(pull(program, store, 'http://mock.invalid'), /HTTPS RPC URL/);
+  // 2026-11-17 acquire-voice pulse: this pair used to pin the THIRD-PARTY
+  // words (web3.js's /Non-base58 character|Invalid public key input/), which
+  // forced the operator to meet the library's vocabulary. The classifier in
+  // src/acquire-voice.mjs is now the ONE mint place for this surface, so the
+  // pin moves to the product contract: a NAMED refusal with a repair, on the
+  // usage channel (exit 2 — no request was made). Both pre-fix phrases are
+  // asserted ABSENT: they are input to the classifier, never output.
+  await assert.rejects(pull('invalid', store, 'https://mock.invalid'), (error) => {
+    assert.equal(error.code, 'program-id-invalid');
+    assert.equal(error.exitCode, 2);
+    assert.match(error.fix, /^fix: /);
+    assert.match(error.message, /program id "invalid" is not a base58 program address/);
+    return true;
+  });
+  await assert.rejects(pull(program, store, 'http://mock.invalid'), (error) => {
+    assert.equal(error.code, 'rpc-not-https');
+    assert.equal(error.exitCode, 2);
+    assert.match(error.fix, /^fix: /);
+    assert.match(error.message, /HTTPS RPC URL required/);
+    assert.doesNotMatch(error.message, /Non-base58 character|Invalid public key input|fetch failed|Unexpected token/);
+    return true;
+  });
+  await assert.rejects(readdir(path.join(store, 'objects')), { code: 'ENOENT' });
+}));
+test('a failing endpoint is refused in sememe\'s named voice, not bare prose', async () => temporary(async (store) => {
+  // 2026-11-17 acquire-voice pulse, end-to-end pin: on the pre-fix tree
+  // (af0a8d2, published 0.4.36) this exact fetcher answered
+  // {"error": "RPC unavailable: HTTP 403"} — no code, no repair, the HTTP
+  // vocabulary of the transport. M8 in
+  // tools/mutation-ladder-acquire-voice.sh reverts src/pull.mjs to that
+  // sentence and THIS pin is what must go red.
+  const failing = async () => ({ ok: false, status: 403, headers: { get: () => null } });
+  await assert.rejects(pull(program, store, 'https://mock.invalid/rpc', failing), (error) => {
+    assert.equal(error.code, 'rpc-forbidden');
+    assert.equal(error.exitCode, 1);
+    assert.match(error.fix, /^fix: /);
+    assert.match(error.message, /https:\/\/mock\.invalid\/rpc/);
+    assert.doesNotMatch(error.message, /RPC unavailable|fetch failed|Unexpected token/);
+    return true;
+  });
   await assert.rejects(readdir(path.join(store, 'objects')), { code: 'ENOENT' });
 }));

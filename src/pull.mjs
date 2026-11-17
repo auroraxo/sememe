@@ -11,6 +11,12 @@ import { PublicKey } from './peer.mjs';
 // `../tools/measure.mjs`, which broke any consumer installing this package —
 // the file simply would not exist inside node_modules/sememe/src.
 import { addresses, decodeAccount, rpcAccounts } from './acquire.mjs';
+// The ONE mint place for this surface's refusals (src/acquire-voice.mjs):
+// a named code, a subject, a repair and the channel the refusal travels on.
+// Measured 2026-11-17 on pre-fix af0a8d2: all nine failure faces of `pull`
+// reached the operator as bare prose (no code, no repair), with undici's,
+// the JSON parser's and web3.js's words quoted verbatim.
+import { httpsRefusal, programIdRefusal, rpcRefusal } from './acquire-voice.mjs';
 
 // Re-exported from its own module so a consumer can verify a fingerprint
 // without importing this file (and therefore without @solana/web3.js).
@@ -24,9 +30,16 @@ import { ensureStoreDirs } from './store-input.mjs';
 
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
 const validId = (input) => {
-  if (typeof input !== 'string') throw Error('program id must be a string');
-  const pk = new PublicKey(input);
-  if (pk.toBase58() !== input) throw Error('noncanonical program id');
+  if (typeof input !== 'string') throw programIdRefusal(input, 'must be a string');
+  let pk;
+  try {
+    pk = new PublicKey(input);
+  } catch (error) {
+    // web3.js's own words ("Non-base58 character", "Invalid public key input")
+    // are INPUT: the refusal says what a program id is and how to pass one.
+    throw programIdRefusal(input, 'is not a base58 program address');
+  }
+  if (pk.toBase58() !== input) throw programIdRefusal(input, 'is not the canonical spelling of a program address');
   return pk.toBase58();
 };
 
@@ -103,10 +116,10 @@ export async function installIdl(idl, { program, source, address, slot }, storeD
 export async function pull(programInput, storeDir, rpcUrl = 'https://api.mainnet-beta.solana.com', fetcher = fetch) {
   const program = validId(programInput);
   if (typeof storeDir !== 'string' || !storeDir.trim()) throw Error('explicit --store path required');
-  if (!/^https:\/\//.test(rpcUrl)) throw Error('HTTPS RPC URL required');
+  if (!/^https:\/\//.test(rpcUrl)) throw httpsRefusal(rpcUrl);
   const { metadata, anchor } = await addresses(program);
   const response = await rpcAccounts(rpcUrl, [metadata, anchor], fetcher, 3);
-  if (response.error) throw Error(`RPC unavailable: ${response.error}`);
+  if (response.error) throw rpcRefusal(rpcUrl, response.failure);
   let selected, idl;
   const errors = [];
   for (const [source, address, account] of [

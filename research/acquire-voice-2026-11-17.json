@@ -1,0 +1,93 @@
+{
+  "tool": "measure-acquire-voice",
+  "measuredAt": "2026-11-17T23:32:06.775Z",
+  "question": "does the acquisition surface (--rpc) answer a failing endpoint in the product's named voice?",
+  "preFix": {
+    "prefix": "af0a8d2"
+  },
+  "faces": 9,
+  "controlCount": 4,
+  "preFixUnnamedFaces": 9,
+  "fixedUnnamedFaces": 0,
+  "preFixRepairlessFaces": 9,
+  "fixedRepairlessFaces": 0,
+  "preFixWrongChannelFaces": 2,
+  "fixedWrongChannelFaces": 0,
+  "controlRegression": 0,
+  "controlRegressionNames": [],
+  "hostPathLeak": false,
+  "fixedCodes": {
+    "rpcHttp403": "rpc-forbidden",
+    "rpcHttp429": "rpc-rate-limited",
+    "rpcHttp500": "rpc-endpoint-failed",
+    "rpcGarbageBody": "rpc-bad-body",
+    "rpcJsonError": "rpc-error-response",
+    "rpcShortResult": "rpc-malformed-response",
+    "rpcUnreachable": "rpc-unreachable",
+    "rpcNotHttps": "rpc-not-https",
+    "rpcBadProgramId": "program-id-invalid"
+  },
+  "fixedExits": {
+    "rpcNotHttps": 2,
+    "rpcBadProgramId": 2,
+    "rpcHttp403": 1,
+    "rpcHttp429": 1,
+    "rpcHttp500": 1,
+    "rpcGarbageBody": 1,
+    "rpcJsonError": 1,
+    "rpcShortResult": 1,
+    "rpcUnreachable": 1,
+    "pullOk": 0,
+    "gapUnknownHolds": 3,
+    "storeAnswerVoice": 1,
+    "flagVoice": 2
+  },
+  "fixedRepairs": {
+    "rpcHttp403": "fix: use an endpoint that serves getMultipleAccounts without credentials, e.g. --rpc https://api.mainnet-beta.solana.com",
+    "rpcHttp429": "fix: wait for the rate-limit window to pass, or pass --rpc <another https endpoint> and run the pull again",
+    "rpcHttp500": "fix: retry later, or pass --rpc <another https endpoint> and run the pull again",
+    "rpcGarbageBody": "fix: check the --rpc URL — this does not look like a JSON-RPC endpoint",
+    "rpcJsonError": "fix: retry later, or pass --rpc <another https endpoint> — this endpoint refused the request itself",
+    "rpcShortResult": "fix: retry, or pass --rpc <another https endpoint> — this one speaks JSON but not getMultipleAccounts",
+    "rpcUnreachable": "fix: check the --rpc URL and your network, or pass --rpc <another https endpoint>",
+    "rpcNotHttps": "fix: pass an https:// endpoint with --rpc, e.g. --rpc https://api.mainnet-beta.solana.com",
+    "rpcBadProgramId": "fix: pass the program's canonical base58 address (32 bytes), e.g. sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store <dir>"
+  },
+  "preFixSamples": {
+    "rpcHttp403": "RPC unavailable: HTTP 403",
+    "rpcHttp429": "RPC unavailable: HTTP 429",
+    "rpcHttp500": "RPC unavailable: HTTP 500"
+  },
+  "fixedSamples": {
+    "rpcHttp403": "sememe pull: the endpoint \"https://127.0.0.1:34525/rpc\" answered HTTP 403 and refuses this client (rpc-forbidden)",
+    "rpcHttp429": "sememe pull: the endpoint \"https://127.0.0.1:34961/rpc\" answered HTTP 429 and is rate limiting sememe (retry-after 30s) (rpc-rate-limited)",
+    "rpcHttp500": "sememe pull: the endpoint \"https://127.0.0.1:33105/rpc\" answered HTTP 500 — the endpoint itself failed (rpc-endpoint-failed)"
+  },
+  "controls": {
+    "pullOk": {
+      "exit": 0,
+      "code": null,
+      "exitPre": 0,
+      "codePre": null
+    },
+    "gapUnknownHolds": {
+      "exit": 3,
+      "code": null,
+      "exitPre": 3,
+      "codePre": null
+    },
+    "storeAnswerVoice": {
+      "exit": 1,
+      "code": "no-sememe-store",
+      "exitPre": 1,
+      "codePre": "no-sememe-store"
+    },
+    "flagVoice": {
+      "exit": 2,
+      "code": null,
+      "exitPre": 2,
+      "codePre": null
+    }
+  },
+  "verdict": "acquire-voice-closed"
+}
