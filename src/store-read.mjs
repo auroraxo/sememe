@@ -34,6 +34,13 @@ import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
 import { receiptIntegrity } from './receipt-digest.mjs';
 import { assertIdlShape, assertReadableDialect, declaredProgram } from './dialect.mjs';
+// The store's own ANSWERS (the store is not there yet, or it simply holds no
+// receipt for this program) are minted in ONE place, so every reader names
+// them the same way. An answer carries a code and `answer: true` — ACQUIRE,
+// never repair — and no `fix`, so the CLI can print its code without
+// dressing it as a refusal (measured 2026-11-17: the codes were minted here
+// and then dropped by the CLI, which prints code+fix only when both exist).
+import { noStoreAnswer, noStoredIdlAnswer } from './store-answer.mjs';
 // The store DIRECTORY is a path the CALLER chose, so it is refused in the
 // product's voice like every other caller-named path (src/store-input.mjs;
 // measured 2026-11-17 on the published 0.4.31: "ENOTDIR: not a directory,
@@ -228,10 +235,10 @@ async function receiptNames(storeDir, program) {
       // WITHOUT parsing prose — src/conformance.mjs needs exactly that
       // (measured 2026-11-10: it swallowed both and reported a green gate).
       // The message is unchanged: it is quoted by bin/sememe.mjs, the README
-      // and several tests.
-      const missing = Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
-      missing.code = 'no-sememe-store';
-      throw missing;
+      // and several tests. The mint lives in ONE place (src/store-answer.mjs),
+      // which also marks the error `answer: true` so the CLI prints its code
+      // without dressing it as a refusal.
+      throw noStoreAnswer(storeDir);
     }
     throw error;
   }
@@ -239,10 +246,9 @@ async function receiptNames(storeDir, program) {
   if (!candidates.length) {
     // The store EXISTS and simply holds no receipt for this program: an
     // acquisition gap, never damage. Callers must be able to report it as
-    // such instead of mistaking it for a reader refusal.
-    const absent = Error(`no stored IDL for program ${program} in ${storeDir}`);
-    absent.code = 'no-stored-idl';
-    throw absent;
+    // such instead of mistaking it for a reader refusal. Minted in ONE place
+    // (src/store-answer.mjs), `answer: true`, never a repair.
+    throw noStoredIdlAnswer(program, storeDir);
   }
   // Numeric slot order, NOT byte order: the slot in the filename is a decimal
   // NUMBER, and "99999999" sorts after "123456789" as a string — so a plain

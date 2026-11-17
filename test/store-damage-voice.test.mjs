@@ -103,6 +103,9 @@ function refusal(result) {
     exit: result.exit,
     code: parsed?.code ?? null,
     fix: parsed?.fix ?? null,
+    // An ANSWER (src/store-answer.mjs) carries `answer: true` — acquire, do
+    // not repair. It is never a refusal and never carries a repair.
+    answer: parsed?.answer === true,
     // The errno scan looks at the ERROR FIELD ONLY: refusal and repair share
     // one line, and a repair that happens to read like strerror must not
     // count as a leak.
@@ -242,18 +245,25 @@ test('C7 — the controls are untouched: an intact store still decodes', () => {
   assert.match(face.out, /"instruction": "swap_v2"/, 'and it must decode the real payload');
 });
 
-test('C7 — a store that does not exist is an ANSWER, not a damage refusal', () => {
+test('C7 — a store that does not exist is an ANSWER: named, but never a damage refusal', () => {
   const face = refusal(run(decodeOf(path.join(tmp, 'no-such-store'))));
   assert.match(face.out, /no sememe store at/,
     `the read paths keep their own sentence: ${face.out.slice(0, 300)}`);
-  assert.equal(face.code, null, 'the missing-store answer is not a damage refusal');
+  // Since 2026-11-17 the answer carries its own code and its own semantics
+  // (src/store-answer.mjs): `answer: true` means ACQUIRE, do not repair. It
+  // is still NOT a damage refusal — it must never acquire a repair.
+  assert.equal(face.code, 'no-sememe-store', 'the answer is named');
+  assert.equal(face.fix, null, 'but it carries no repair');
+  assert.equal(face.answer, true, 'and it says so');
 });
 
-test('C7 — a program the store simply lacks is an acquisition gap, not a refusal', () => {
+test('C7 — a program the store simply lacks is an acquisition gap: named, but never a refusal', () => {
   const face = refusal(run(['decode', OTHER_PROGRAM, swap.dataHex, '--store', stores.intact]));
   assert.match(face.out, /no stored IDL for program/,
     `an honest gap keeps its own sentence: ${face.out.slice(0, 300)}`);
-  assert.equal(face.code, null, 'and it must not be dressed up as damage');
+  assert.equal(face.code, 'no-stored-idl', 'the gap is named');
+  assert.equal(face.fix, null, 'and it must not be dressed up as damage');
+  assert.equal(face.answer, true, 'it is an answer: acquire, do not repair');
 });
 
 test('C4 — the CALLER-NAMED path class keeps its own voice and its own channel', () => {

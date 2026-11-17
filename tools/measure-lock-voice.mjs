@@ -151,7 +151,18 @@ function tallyLibrary(libraryFaces) {
 }
 
 /** Controls answer the SAME way in both trees: same exit, same code, same
- *  answered verdict. */
+ *  answered verdict.
+ *
+ *  The one documented exception is the ANSWER controls' `code`: pre-fix the
+ *  CLI dropped the minted code (null), post-fix it prints it
+ *  (no-sememe-store) — that transition is the CLAIM of
+ *  research/answer-voice-2026-11-17.json, measured by its own tool, not a
+ *  regression of this one. The allowance is one-directional and exact: only
+ *  null → the control's own answer code. Everything else here still fails —
+ *  a repair appearing, the sentence disappearing, the channel moving, or a
+ *  DIFFERENT code arriving. */
+const ANSWER_CONTROL_CODES = { noStoreAnswer: 'no-sememe-store' };
+
 function controlRegression(pre, post) {
   const changed = [];
   for (const name of CONTROLS) {
@@ -159,7 +170,14 @@ function controlRegression(pre, post) {
     const b = post[name];
     if (!a || !b) { changed.push(name); continue; }
     if (a.exit !== b.exit) changed.push(name);
-    if ((a.code ?? null) !== (b.code ?? null)) changed.push(name);
+    if ((a.code ?? null) !== (b.code ?? null)) {
+      const expected = ANSWER_CONTROL_CODES[name];
+      const documented = expected !== undefined
+        && (a.code ?? null) === null && b.code === expected
+        && (a.fix ?? null) === null && (b.fix ?? null) === null;
+      if (!documented) changed.push(name);
+    }
+    if ((a.fix ?? null) !== (b.fix ?? null)) changed.push(name);
     if (a.answered !== b.answered) changed.push(name);
   }
   return [...new Set(changed)];

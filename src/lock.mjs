@@ -59,6 +59,12 @@ import { readInputFile, writeInputFile } from './file-input.mjs';
 // the published 0.4.31: "sememe lock --store /tmp/store-file" answered
 // "ENOTDIR: not a directory, scandir '…/receipts'" with exit 1).
 import { readStoreReceipts } from './store-input.mjs';
+// The store's own ANSWERS are minted in ONE place (src/store-answer.mjs), so
+// the lock surface names them like every other surface: a code, `answer:
+// true` (acquire, do not repair) and NO repair. Measured 2026-11-17: these
+// two call sites threw the sentence as a plain Error, so the answer reached
+// the operator with no branchable name at all.
+import { noStoreAnswer } from './store-answer.mjs';
 import { readVerified } from './store-read.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
@@ -143,7 +149,7 @@ export async function writeLock(storeDir, outPath) {
   try { names = await readStoreReceipts(storeDir); }
   catch (error) {
     if (error?.code === 'ENOENT') {
-      throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
+      throw noStoreAnswer(storeDir);
     }
     throw error;
   }
@@ -294,7 +300,7 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
   try { receiptNames = await readStoreReceipts(storeDir); }
   catch (error) {
     if (error?.code === 'ENOENT') {
-      throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
+      throw noStoreAnswer(storeDir);
     }
     throw error;
   }

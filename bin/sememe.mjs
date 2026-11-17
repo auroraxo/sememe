@@ -599,6 +599,19 @@ try {
     // readable JSON error channel stays for errors the work itself produced.
     console.error(error.message);
     process.exitCode = 2;
+  } else if (error?.answer === true && typeof error.code === 'string') {
+    // A NAMED ANSWER (src/store-answer.mjs): the state of the world, not a
+    // fault — the store was never pulled, or it holds no receipt for that
+    // program. It prints `code` WITHOUT `fix`: there is nothing to repair
+    // (the verbatim sentence already says what to run), and `answer: true`
+    // is what tells a script "acquire" apart from "repair" without parsing
+    // prose. Same channel as before it was named: exit 1, stderr, JSON.
+    console.error(JSON.stringify({
+      error: error.message,
+      code: error.code,
+      answer: true,
+    }));
+    process.exitCode = Number.isInteger(error.exitCode) ? error.exitCode : 1;
   } else if (error?.fix && typeof error.code === 'string') {
     // A NAMED refusal (src/file-input.mjs, src/store-input.mjs,
     // src/store-damage.mjs, src/lock-voice.mjs): the message already carries

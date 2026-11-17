@@ -82,6 +82,9 @@ function refusal(result) {
     exit: result.exit,
     code: parsed?.code ?? null,
     fix: parsed?.fix ?? null,
+    // An ANSWER (src/store-answer.mjs) carries `answer: true` — acquire, do
+    // not repair. It is never a refusal and never carries a repair.
+    answer: parsed?.answer === true,
     // The errno scan looks at the ERROR FIELD ONLY: refusal and repair share
     // one line, and a repair that reads like strerror must not count.
     leakedErrno: ERRNO_STRINGS.filter((n) => String(parsed?.error ?? result.out).includes(n)),
@@ -173,11 +176,16 @@ test('C4 — the conformance gate passes the store refusal through instead of wr
   assert.deepEqual(face.leakedErrno, [], 'and the wrapper must not quote the kernel either');
 });
 
-test('C5 — a store that does not exist is an ANSWER, not a refusal', () => {
+test('C5 — a store that does not exist is an ANSWER: named, but never a refusal', () => {
   const read = refusal(run(['decode', PROGRAM, 'AAAA', '--store', path.join(tmp, 'no-such-store')]));
   assert.ok(read.out.includes('no sememe store at'),
     `the read paths keep their own sentence: ${read.out.slice(0, 300)}`);
-  assert.equal(read.code, null, 'the missing-store answer is not a store-input refusal');
+  // Since 2026-11-17 the answer carries its own code and its own semantics
+  // (src/store-answer.mjs): `answer: true` means ACQUIRE, do not repair. It
+  // is still NOT a store-input refusal — it must never acquire a repair.
+  assert.equal(read.code, 'no-sememe-store', 'the answer is named');
+  assert.equal(read.fix, null, 'but it is never dressed up as a refusal');
+  assert.equal(read.answer, true, 'and it says so');
 
   // The WRITE path CREATES the store: that is how a user makes one.
   const created = path.join(tmp, 'created-by-adopt');

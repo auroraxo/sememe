@@ -90,7 +90,7 @@ test('every file the package ships imports only node: builtins or relative files
     // The shipped mailbox reader (2026-11-17): it spawns nothing and imports
     // no package — the transport is the caller's — so it must hold the same
     // zero-dependency rule as the rest of the decoder core.
-    'src/mailbox.mjs'];
+    'src/mailbox.mjs', 'src/store-answer.mjs'];
   const files = zeroDependency.map((name) => path.join(ROOT, name));
   assert.ok(files.length >= 13, `expected the shipped sources, found ${files.length}`);
   const violations = [];

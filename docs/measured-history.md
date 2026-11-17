@@ -4223,8 +4223,9 @@ in parentheses.
 
 **WHAT IS NOT A REFUSAL HERE.** A store that does not exist
 (`no sememe store at …: run "sememe pull" first`) and a program the store
-simply lacks are ANSWERS: they must not acquire a code or a repair
-(`test/store-damage-voice.test.mjs`, C6/C7).
+simply lacks are ANSWERS: they must not acquire a REPAIR
+(`test/store-damage-voice.test.mjs`, C6/C7). They acquired a CODE and their
+own semantics on 2026-11-17, later that same day — see the next section.
 
 **FALSIFICATION** (`research/lock-voice-2026-11-17.json`, verdict
 `lock-voice-closed`): pre-fix `c356ab4` = 13 unnamed, 13 repairless, 2 silent
@@ -4245,3 +4246,74 @@ pins were strengthened rather than the ladder relaxed.
   immutable: the defect is measured on them, not erased from them.
 - `violations` is a CLI-channel addition: a script that parsed the prose
   before still gets the same prose.
+
+## Working now: the answers themselves get a name and their own semantics (2026-11-17, later)
+
+The lock-voice pulse closed with "the answer surfaces get a code but no
+repair; an answer with a code needs its own semantics" left OPEN on the
+card. This pulse closed it.
+
+**THE DEFECT (measured 2026-11-17, this host, pre-fix tree `dc2317d`, and
+reproduced against the PUBLISHED `sememe@0.4.35` installed into an empty
+app):** the store reader MINTED `no-sememe-store` and `no-stored-idl`
+(src/store-read.mjs), but the CLI prints `code` only together with `fix` —
+and an answer has no fix — so both codes were minted and DROPPED. The two
+`sememe lock` / `sememe verify` call sites did not even mint them: they
+threw the sentence as a plain Error. All six answer faces (`decode`/
+`account`/`lock`/`verify` × missing store; `decode`/`account` × program
+absent) reached the operator as bare prose on exit 1:
+
+    {"error":"no sememe store at …: run \\"sememe pull\\" first"} exit 1
+    {"error":"no stored IDL for program … in …"} exit 1
+
+A pipeline could not tell "the store was never pulled" (acquire) from "the
+work failed" (repair) without reading English — the same minted-and-dropped
+fault class the lock surface carried (L4), and the last un-named voice on
+the store surface.
+
+**THE CONTRACT (`src/store-answer.mjs` is the ONE mint place):**
+
+- A1 every answer carries a PRODUCT CODE: `no-sememe-store` /
+  `no-stored-idl` — two different states a script can branch on.
+- A2 every answer carries `answer: true` — its own semantics: ACQUIRE, do
+  not repair. That is what separates an answer from a refusal WITHOUT
+  parsing prose; `answer: true` never rides on a refusal, `fix` never rides
+  on an answer.
+- A3 an answer carries NO `fix`: nothing is broken; the verbatim sentence
+  already says what to run (`run "sememe pull" first`).
+- A4 the sentences stay VERBATIM: quoted by bin/sememe.mjs, the README and
+  several tests.
+- A5 the CHANNEL does not move: exit 1, stderr, JSON.
+- A6 the refusal classes are untouched: the caller-named wrong path keeps
+  the store-input voice (exit 2), damage keeps the store-damage voice
+  (exit 1), the gate stays green.
+
+**MEASUREMENT (`research/answer-voice-2026-11-17.json`, verdict
+`answer-voice-closed`, tool `tools/measure-answer-voice.mjs`, byte-identical
+probe `tools/answer-voice-probe.mjs` copied into the `git archive`-extracted
+pre-fix tree `dc2317d`):** 6 of 6 answer faces unnamed pre-fix → 0/0/0/0/0
+here (unnamed, unmarked, repaired, wrong-channel, wrong-sentence), 0 control
+regressions (green gate, caller-path refusal, damage refusal), 0 host paths,
+0 temp paths. The pin `test/answer-voice.test.mjs` (15) is red on the
+pre-fix tree (4 pass / 11 fail — the passes are the guards that must hold on
+both trees). Mutation ladder `tools/mutation-ladder-answer-voice.sh`: 8/8
+CAUGHT, control green, tree byte-identical. The three superseded pins that
+asserted the answers must stay code-less were UPDATED, not deleted
+(test/lock-voice.test.mjs C6, test/store-damage-voice.test.mjs C7 ×2,
+test/store-input-voice.test.mjs C5): each now pins the code, the mark and
+the repairlessness.
+
+**WHAT STAYED UNCHANGED ON PURPOSE:** the sentences, the exit codes, the
+channel; `sememe gap` still reports `state: no-store` as its own verdict
+shape; conformance still wraps a missing store as `no-sememe-store` with its
+own repair sentence; the vendored-program hint stays a plain sentence (it
+answers "this program cannot be pulled at all" — a DIFFERENT class, left for
+a future pulse).
+
+### LIMITS
+
+- 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
+- Not yet shipped: the fix lives on main until the next release pulse;
+  `sememe@0.4.35` and older still answer unnamed (tags immutable).
+- `answer: true` is a CLI-channel addition: scripts that parsed the prose
+  still get the same prose.

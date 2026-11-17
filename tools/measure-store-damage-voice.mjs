@@ -135,7 +135,21 @@ function tally(cases) {
 }
 
 /** The controls must answer the SAME way in both trees: same exit, same
- *  errno, and (for the CLI-channel controls) the same named code. */
+ *  errno, same answer mark — and (for the CLI-channel controls) the same
+ *  named code.
+ *
+ *  The one documented exception is the ANSWER controls' `code`: pre-fix the
+ *  CLI dropped the minted code (null), post-fix it prints it — that
+ *  transition is the CLAIM of research/answer-voice-2026-11-17.json,
+ *  measured by its own tool, not a regression of this one. The allowance is
+ *  one-directional and exact: only null → the control's own answer code,
+ *  with no repair on either side. Everything else still fails — a repair
+ *  appearing, the sentence or channel moving, a different code arriving. */
+const ANSWER_CONTROL_CODES = {
+  noStoreAnswer: 'no-sememe-store',
+  noStoredIdlAnswer: 'no-stored-idl',
+};
+
 function controlRegression(pre, post) {
   const changed = [];
   for (const name of CONTROLS) {
@@ -144,7 +158,13 @@ function controlRegression(pre, post) {
     if (!a || !b) { changed.push(name); continue; }
     if (a.exit !== b.exit) changed.push(name);
     if ((a.leakedErrno?.length ?? 0) !== (b.leakedErrno?.length ?? 0)) changed.push(name);
-    if ((a.code ?? null) !== (b.code ?? null)) changed.push(name);
+    if ((a.code ?? null) !== (b.code ?? null)) {
+      const expected = ANSWER_CONTROL_CODES[name];
+      const documented = expected !== undefined
+        && (a.code ?? null) === null && b.code === expected
+        && (a.fix ?? null) === null && (b.fix ?? null) === null;
+      if (!documented) changed.push(name);
+    }
     if ((a.answered !== undefined || b.answered !== undefined) && a.answered !== b.answered) changed.push(name);
   }
   return [...new Set(changed)];

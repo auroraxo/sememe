@@ -99,6 +99,7 @@ function refusal(result) {
     exit: result.exit,
     code: parsed?.code ?? null,
     fix: parsed?.fix ?? null,
+    answer: parsed?.answer === true,
     violations: parsed?.violations ?? null,
     error: String(parsed?.error ?? `${result.stdout}${result.stderr}`),
     out: `${result.stdout}${result.stderr}`,
@@ -305,12 +306,16 @@ test('C6 — an intact store still verifies green', () => {
   assert.match(verified.stdout, /"violations": 0/);
 });
 
-test('C6 — a store that does not exist is an ANSWER, not a refusal', () => {
+test('C6 — a store that does not exist is an ANSWER: named, but never a refusal', () => {
   const parsed = refusal(run(['verify', '--store', path.join(tmp, 'no-such-store'), '--lock', path.join(tmp, 'green.lock')]));
   assert.match(parsed.error, /no sememe store at/,
     `the missing-store answer keeps its own sentence: ${parsed.out.slice(0, 300)}`);
-  assert.equal(parsed.code, null, 'the missing-store answer must not acquire a code');
-  assert.equal(parsed.fix, null, 'nor a repair');
+  // Since 2026-11-17 the answer carries its own code and its own semantics
+  // (src/store-answer.mjs): `answer: true` means ACQUIRE, do not repair. It
+  // is still NOT a refusal — it must never acquire a repair.
+  assert.equal(parsed.code, 'no-sememe-store', 'the answer is named');
+  assert.equal(parsed.fix, null, 'but it is never dressed up as a refusal');
+  assert.equal(parsed.answer, true, 'and it says so');
 });
 
 // --- the classifier is the ONE place ----------------------------------------
