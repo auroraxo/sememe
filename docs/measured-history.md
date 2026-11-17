@@ -3936,3 +3936,47 @@ LIMITS (what this does NOT cover):
 - A store the CALLER named wrongly is still a different class with a different channel; this
   change does not merge them.
 - 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
+
+## 2026-11-17 — THE DAMAGE VOICE, ASKED AT THE CHANNEL A STRANGER INSTALLS (published 0.4.32 vs 0.4.33)
+
+The measurement above (tools/measure-store-damage-voice.mjs) compares two COMMITS inside this
+repository: the pre-fix tree 9fe90e5 against the fixed tree. It cannot say what a stranger
+receives. This repo's most-repeated defect class is exactly that gap — "main fixed, the pin
+pointing behind it" — so the question was moved to the channel:
+
+tools/measure-store-damage-voice-published.mjs installs TWO PUBLISHED npm versions into two empty
+apps and runs the SAME byte-identical probe (tools/store-damage-voice-probe.mjs) inside each
+installed package. Only the package under test differs between the two runs.
+
+research/store-damage-voice-published-2026-11-17.json, verdict
+`store-damage-voice-held-on-the-published-channel`:
+
+- sememe@0.4.32 (the version the README pinned until v0.4.33) — CARRIES THE DEFECT:
+  4 of 11 damage faces leak the kernel's errno, and ALL 11 refusals are unnamed and repairless.
+- sememe@0.4.33 — REFUSES IN THE PRODUCT'S VOICE: 0 leaked, 0 unnamed, 0 repairless,
+  0 on the wrong channel, 0 control regressions, 0 host paths in the artifact.
+- The 11 codes: store-receipt-not_a_file / -unreadable / -not_json / -foreign_program /
+  -malformed; store-object-not_a_file / -unreadable / -not_json / -not_an_idl / -missing /
+  -rehash_mismatch. Every damage refusal keeps exit 1 (the store path was usable and the product
+  found broken bytes in it); the caller-path control keeps exit 2 with `store-not_a_directory`.
+- The 4 controls did not move between the two published versions: an intact store still decodes,
+  a store that does not exist still answers with its own "no sememe store" sentence, a program the
+  store lacks is still an acquisition gap, and a wrongly named store path is still the path class.
+
+BELEGE:
+
+- test/store-damage-voice-published-measurement.test.mjs (6 cases) pins the artifact and FAILS
+  when any of its claims is rewritten — a carrier with no defect, a fixed version that leaks,
+  an unnamed face, a repairless face, a face on the wrong channel, a changed control, a host path,
+  or an "installed" version that is not the requested one.
+- tools/mutation-ladder-store-damage-voice-published.sh: 11/11 CAUGHT, control green, tree
+  byte-identical afterwards.
+- The tool FAILS on a comparison of a version with itself: with carrier == fixed the baseline
+  carries no defect, so the verdict is `store-damage-voice-not-held` and the exit code is 1.
+  A baseline without a defect makes the fix unprovable.
+
+LIMITS:
+
+- Only the store READER is measured, and only through the eleven damage faces the probe builds.
+- The two published versions are measured on THIS host, with THIS npm, at THIS moment.
+- 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.

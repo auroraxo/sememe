@@ -1,0 +1,90 @@
+{
+  "tool": "measure-store-damage-voice-published",
+  "measuredAt": "2026-11-17T03:38:48.045Z",
+  "question": "does damage the reader finds itself get the product's named refusal on the channel a stranger installs?",
+  "carrier": {
+    "version": "0.4.32",
+    "installedVersion": "0.4.32"
+  },
+  "fixed": {
+    "version": "0.4.33",
+    "installedVersion": "0.4.33"
+  },
+  "damageFaces": 11,
+  "preFixLeakedErrnoFaces": 4,
+  "fixedLeakedErrnoFaces": 0,
+  "preFixUnnamedFaces": 11,
+  "fixedUnnamedFaces": 0,
+  "preFixRepairlessFaces": 11,
+  "fixedRepairlessFaces": 0,
+  "fixedWrongChannelFaces": 0,
+  "controlRegression": 0,
+  "controlRegressionNames": [],
+  "hostPathLeak": false,
+  "fixedCodes": {
+    "receiptIsFile": "store-receipt-not_a_file",
+    "receiptUnreadable": "store-receipt-unreadable",
+    "receiptNotJson": "store-receipt-not_json",
+    "receiptForeign": "store-receipt-foreign_program",
+    "receiptMalformed": "store-receipt-malformed",
+    "objectIsFile": "store-object-not_a_file",
+    "objectUnreadable": "store-object-unreadable",
+    "objectNotJson": "store-object-not_json",
+    "objectNoInstructions": "store-object-not_an_idl",
+    "objectMissing": "store-object-missing",
+    "objectRehash": "store-object-rehash_mismatch"
+  },
+  "fixedExits": {
+    "receiptIsFile": 1,
+    "receiptUnreadable": 1,
+    "receiptNotJson": 1,
+    "receiptForeign": 1,
+    "receiptMalformed": 1,
+    "objectIsFile": 1,
+    "objectUnreadable": 1,
+    "objectNotJson": 1,
+    "objectNoInstructions": 1,
+    "objectMissing": 1,
+    "objectRehash": 1
+  },
+  "fixedRepairs": {
+    "receiptIsFile": "fix: remove the file that stands where a receipt or object belongs, then re-run \"sememe pull <program-id>\"",
+    "receiptUnreadable": "fix: make the file readable (chmod) and re-run \"sememe pull <program-id>\"",
+    "receiptNotJson": "fix: re-run \"sememe pull <program-id>\"; a receipt or object that is not JSON was never written by sememe",
+    "receiptForeign": "fix: re-run \"sememe pull <program-id>\" so the store holds a receipt for this program again",
+    "receiptMalformed": "fix: re-run \"sememe pull <program-id>\"; a receipt without a usable fingerprint cannot be verified",
+    "objectIsFile": "fix: remove the file that stands where a receipt or object belongs, then re-run \"sememe pull <program-id>\"",
+    "objectUnreadable": "fix: make the file readable (chmod) and re-run \"sememe pull <program-id>\"",
+    "objectNotJson": "fix: re-run \"sememe pull <program-id>\"; a receipt or object that is not JSON was never written by sememe",
+    "objectNoInstructions": "fix: re-run \"sememe pull <program-id>\"; an object without an instruction list is not an interface",
+    "objectMissing": "fix: re-run \"sememe pull <program-id>\" so the store holds the receipt and its object again",
+    "objectRehash": "fix: re-run \"sememe pull <program-id>\"; the object in the store is not the one the receipt pins"
+  },
+  "controls": {
+    "decodeOk": {
+      "exit": 0,
+      "code": null
+    },
+    "noStoreAnswer": {
+      "exit": 1,
+      "code": null
+    },
+    "noStoredIdlAnswer": {
+      "exit": 1,
+      "code": null
+    },
+    "callerPathVoice": {
+      "exit": 2,
+      "code": "store-not_a_directory"
+    }
+  },
+  "carrierSamples": {
+    "receiptIsFile": "store receipt whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc-462039125-metadata-0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f.json is unreadable: EISDIR: illegal operation on a directory, read",
+    "receiptUnreadable": "store receipt whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc-462039125-metadata-0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f.json is unreadable: EACCES: permission denied, open '<TMP>/receiptUnreadable/receipts/whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyC"
+  },
+  "fixedSamples": {
+    "receiptIsFile": "store receipt whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc-462039125-metadata-0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f.json is unreadable (store-receipt-not_a_file)",
+    "receiptUnreadable": "store receipt whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc-462039125-metadata-0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f.json is unreadable (store-receipt-unreadable)"
+  },
+  "verdict": "store-damage-voice-held-on-the-published-channel"
+}
