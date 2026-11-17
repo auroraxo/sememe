@@ -1,0 +1,268 @@
+{
+  "tool": "tools/measure-lock-voice-published.mjs",
+  "measuredAt": "2026-11-17T14:57:37Z",
+  "question": "does the lock surface — the product's own CI gate — name its refusals on the channel a stranger installs?",
+  "method": "npm install <version> into an empty app -> byte-identical probe run inside the installed package",
+  "carrier": {
+    "requested": "0.4.34",
+    "installed": "0.4.34"
+  },
+  "fixed": {
+    "requested": "0.4.35",
+    "installed": "0.4.35"
+  },
+  "faces": [
+    "lockDocNotJson",
+    "lockDocNotADocument",
+    "lockDocBadVersion",
+    "lockDocNoPrograms",
+    "lockPinsNothing",
+    "lockEntryNotObject",
+    "lockBadFingerprint",
+    "lockBadOrigin",
+    "storeMismatch",
+    "storeMissingProgram",
+    "storeUnverified",
+    "lockTamperedReceipt",
+    "lockRelabelledReceipt"
+  ],
+  "controls": [
+    "greenGate",
+    "lockWrites",
+    "noStoreAnswer"
+  ],
+  "detail": {
+    "lockDocNotJson": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-v1-parse",
+        "fix": "fix: the lock file must contain a JSON document — re-create it with \"sememe lock\" over the store it should pin"
+      }
+    },
+    "lockDocNotADocument": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      }
+    },
+    "lockDocBadVersion": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      }
+    },
+    "lockDocNoPrograms": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      }
+    },
+    "lockPinsNothing": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-pins-nothing",
+        "fix": "fix: re-create the lock with \"sememe lock\" over a store that holds at least one receipt"
+      }
+    },
+    "lockEntryNotObject": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      }
+    },
+    "lockBadFingerprint": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-v1-fingerprint",
+        "fix": "fix: every pinned fingerprint must be sha256:<64 hex> — re-create the lock with \"sememe lock\""
+      }
+    },
+    "lockBadOrigin": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-v1-origin",
+        "fix": "fix: a pinned origin must be a string — re-create the lock with \"sememe lock\""
+      }
+    },
+    "storeMismatch": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-mismatch",
+        "fix": "fix: the store answers with different bytes than the lock pins — re-pull those programs, or re-run \"sememe lock\" if the store holds the newer answers"
+      }
+    },
+    "storeMissingProgram": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-mismatch",
+        "fix": "fix: the store holds no receipt for a pinned program — re-run \"sememe pull <program-id>\" for it"
+      }
+    },
+    "storeUnverified": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "lock-mismatch",
+        "fix": "fix: an object in the store fails the reader's own re-hash check — re-run \"sememe pull <program-id>\" for it"
+      }
+    },
+    "lockTamperedReceipt": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "receipt-tampered",
+        "fix": "fix: the receipt file was edited after sememe wrote it — re-run \"sememe pull <program-id>\" (or \"sememe adopt …\") so the store holds a receipt whose own digest matches again"
+      }
+    },
+    "lockRelabelledReceipt": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "receipt-relabelled",
+        "fix": "fix: the receipt file was edited after sememe wrote it — re-run \"sememe pull <program-id>\" (or \"sememe adopt …\") so the store holds a receipt whose own digest matches again"
+      }
+    }
+  },
+  "controlsDetail": {
+    "greenGate": {
+      "carrier": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lock\": \"<tmp>/green.lock\",\n  \"store\": \"<tmp>/store\",\n  \"mode\": \"error\",\n  \"pinned\": 1,\n  \"verified\": [\n    \"whirLbMiicVdio4qvUfM5KAg6Ct"
+      },
+      "fixed": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lock\": \"<tmp>/green.lock\",\n  \"store\": \"<tmp>/store\",\n  \"mode\": \"error\",\n  \"pinned\": 1,\n  \"verified\": [\n    \"whirLbMiicVdio4qvUfM5KAg6Ct"
+      }
+    },
+    "lockWrites": {
+      "carrier": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\": {\n      \"fingerprint\": \"sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f\",\n      \"source"
+      },
+      "fixed": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\": {\n      \"fingerprint\": \"sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f\",\n      \"source"
+      }
+    },
+    "noStoreAnswer": {
+      "carrier": {
+        "exit": 1,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no sememe store at <tmp>/no-such-store: run \"sememe pull\" first"
+      },
+      "fixed": {
+        "exit": 1,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no sememe store at <tmp>/no-such-store: run \"sememe pull\" first"
+      }
+    }
+  },
+  "silentCode": {
+    "carrier": [
+      "tamperedReceipt",
+      "relabelledReceipt"
+    ],
+    "fixed": []
+  },
+  "verdict": {
+    "carrierUnnamedFaces": 13,
+    "carrierRepairlessFaces": 13,
+    "carrierSilentCodeFaces": 2,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "fixedSilentCodeFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "lock-voice-held-on-the-published-channel",
+  "hostPathLeak": 0,
+  "tempPathLeak": 0
+}
