@@ -50,10 +50,15 @@
 // binds the bytes, the origin pins the label the store answered with, and
 // neither may change silently.
 
-import { writeFile, readFile, readdir } from 'node:fs/promises';
+import { writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { readInputFile, writeInputFile } from './file-input.mjs';
+// The store DIRECTORY is a path the CALLER chose, so it is refused in the
+// product's voice like every other caller-named path (measured 2026-11-17 on
+// the published 0.4.31: "sememe lock --store /tmp/store-file" answered
+// "ENOTDIR: not a directory, scandir '…/receipts'" with exit 1).
+import { readStoreReceipts } from './store-input.mjs';
 import { readVerified } from './store-read.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
@@ -73,8 +78,7 @@ function programOfReceiptName(name) {
  * string sort here would pin "99999999" over "123456789" — two answers from
  * one store, measured 2026-11-07 (test/slot-order-store.test.mjs O2). */
 async function newestReceipt(storeDir, program) {
-  const receipts = path.join(storeDir, 'receipts');
-  const names = (await readdir(receipts)).filter((name) => name.startsWith(`${program}-`) && isReceiptFile(name));
+  const names = (await readStoreReceipts(storeDir)).filter((name) => name.startsWith(`${program}-`) && isReceiptFile(name));
   if (!names.length) return null;
   names.sort(compareReceiptNames);
   return readVerified(storeDir, program, names[names.length - 1]);
@@ -119,9 +123,10 @@ async function verifyEveryReceipt(storeDir, program, names) {
 /** Snapshot every verified receipt of `storeDir` into a lock document.
  * Returns the document; `outPath` receives exactly its canonical bytes. */
 export async function writeLock(storeDir, outPath) {
-  const receipts = path.join(storeDir, 'receipts');
   let names;
-  try { names = await readdir(receipts); }
+  // The ONE read of the receipt directory: a store the caller pointed at
+  // wrongly is refused BY NAME with a repair, never as the kernel's errno.
+  try { names = await readStoreReceipts(storeDir); }
   catch (error) {
     if (error?.code === 'ENOENT') {
       throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);
@@ -243,7 +248,7 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
   const pinnedPrograms = Object.keys(doc.programs).sort();
 
   let receiptNames = [];
-  try { receiptNames = (await readdir(path.join(storeDir, 'receipts'))); }
+  try { receiptNames = await readStoreReceipts(storeDir); }
   catch (error) {
     if (error?.code === 'ENOENT') {
       throw Error(`no sememe store at ${storeDir}: run "sememe pull" first`);

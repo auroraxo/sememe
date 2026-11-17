@@ -35,6 +35,7 @@
 import { checkAccountList, instructionByDiscriminator, declaredAccounts, summarizeConformance } from './account-list.mjs';
 import { withDerivedDiscriminators } from './discriminators.mjs';
 import { findStoredIdls } from './store-read.mjs';
+import { isStoreInputCode } from './store-input.mjs';
 import { isProgramId } from './program-id.mjs';
 
 export class ConformanceRefusal extends Error {
@@ -364,6 +365,12 @@ export async function checkTransaction(transaction, storeDir, options = {}) {
         // (`no-sememe-store`) and every reader refusal are REFUSED by name,
         // carrying the reader's own message and the repair.
         const code = error?.code ?? null;
+        // A store the CALLER pointed at wrongly is not a verdict about the
+        // transaction and not damage in the store either: nothing ran. The
+        // store refusal keeps its own name, its repair and its channel
+        // (exit 2, measured 2026-11-17 on the published 0.4.31: this wrap
+        // used to swallow the code and quote the kernel's ENOTDIR instead).
+        if (isStoreInputCode(code)) throw error;
         if (code !== 'no-stored-idl') {
           const reason = code === 'no-sememe-store' ? 'no-sememe-store' : 'store-reader-refused';
           throw new ConformanceRefusal(

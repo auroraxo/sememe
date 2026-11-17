@@ -27,13 +27,18 @@
 // An unreadable or tampered store must never become another source's names.
 
 import { createHash } from 'node:crypto';
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
 import { receiptIntegrity } from './receipt-digest.mjs';
 import { assertIdlShape, assertReadableDialect, declaredProgram } from './dialect.mjs';
+// The store DIRECTORY is a path the CALLER chose, so it is refused in the
+// product's voice like every other caller-named path (src/store-input.mjs;
+// measured 2026-11-17 on the published 0.4.31: "ENOTDIR: not a directory,
+// scandir '/tmp/store-file/receipts'" with exit 1).
+import { readStoreReceipts } from './store-input.mjs';
 
 export { canonicalJson } from './canonical.mjs';
 
@@ -115,7 +120,12 @@ export async function readVerified(storeDir, program, receiptName) {
 async function receiptNames(storeDir, program) {
   const receipts = path.join(storeDir, 'receipts');
   let names;
-  try { names = await readdir(receipts); }
+  // The ONE read of the receipt directory: a store the caller pointed at
+  // wrongly is refused BY NAME (store-receipts-not_a_directory,
+  // store-receipts-unreadable) with a repair, and the errno never reaches
+  // the operator. A store that simply does NOT EXIST keeps its own errno
+  // here, so the "no sememe store at X" sentence below stays unchanged.
+  try { names = await readStoreReceipts(storeDir); }
   catch (error) {
     if (error?.code === 'ENOENT') {
       // `code` names the KIND of failure so a caller can distinguish "this

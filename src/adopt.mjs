@@ -34,10 +34,15 @@
 // from; the filename segment only orders it before every real slot.
 
 import { createHash } from 'node:crypto';
-import { mkdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import { readInputFile, fileInputRefusal } from './file-input.mjs';
+// The store DIRECTORY is a path the CALLER chose: a store that cannot be
+// written is refused BY NAME (src/store-input.mjs; measured 2026-11-17 on the
+// published 0.4.31: "ENOTDIR: not a directory, mkdir '/tmp/store-file/objects'"
+// with exit 1).
+import { ensureStoreDirs } from './store-input.mjs';
 import { writeOnce } from './store-write.mjs';
 import { originDigestOf, receiptDigestOf } from './receipt-digest.mjs';
 import { assertIdlShape, assertReadableDialect, declaredProgram } from './dialect.mjs';
@@ -137,8 +142,10 @@ export async function adopt(programInput, filePath, storeDir, { source = 'publis
   const directory = path.resolve(storeDir);
   const objects = path.join(directory, 'objects');
   const receipts = path.join(directory, 'receipts');
-  await mkdir(objects, { recursive: true, mode: 0o700 });
-  await mkdir(receipts, { recursive: true, mode: 0o700 });
+  // The ONE write of the store's directories: a store path that cannot be
+  // used is refused by name, never as the kernel's errno. A store that does
+  // not exist yet is CREATED here — that is how a user makes one.
+  await ensureStoreDirs(directory);
   await writeOnce(path.join(objects, `${fingerprint}.json`), json);
 
   const receipt = {

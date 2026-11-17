@@ -1,0 +1,390 @@
+{
+  "tool": "tools/measure-store-input-voice.mjs",
+  "measuredAt": "2026-11-17T00:28:48Z",
+  "prefix": "a722b55",
+  "question": "does a caller-named store path that cannot be used get the product's own named refusal, or the kernel's errno?",
+  "faces": [
+    "decodeStoreIsFile",
+    "accountStoreIsFile",
+    "lockStoreIsFile",
+    "verifyStoreIsFile",
+    "conformStoreIsFile",
+    "decodeReceiptsIsFile",
+    "lockReceiptsIsFile",
+    "decodeReceiptsUnreadable",
+    "lockReceiptsUnreadable",
+    "adoptStoreIsFile",
+    "adoptStoreReceiptsIsFile",
+    "adoptStoreObjectsIsFile",
+    "adoptObjectsUnwritable"
+  ],
+  "controls": [
+    "decodeStoreOk",
+    "lockStoreOk",
+    "adoptStoreOk",
+    "adoptStoreCreated",
+    "decodeStoreMissing"
+  ],
+  "preFix": {
+    "leakedErrnoFaces": [
+      "decodeStoreIsFile",
+      "accountStoreIsFile",
+      "lockStoreIsFile",
+      "verifyStoreIsFile",
+      "conformStoreIsFile",
+      "decodeReceiptsIsFile",
+      "lockReceiptsIsFile",
+      "decodeReceiptsUnreadable",
+      "lockReceiptsUnreadable",
+      "adoptStoreIsFile",
+      "adoptStoreReceiptsIsFile",
+      "adoptStoreObjectsIsFile",
+      "adoptObjectsUnwritable"
+    ],
+    "unnamedFaces": [
+      "decodeStoreIsFile",
+      "accountStoreIsFile",
+      "lockStoreIsFile",
+      "verifyStoreIsFile",
+      "conformStoreIsFile",
+      "decodeReceiptsIsFile",
+      "lockReceiptsIsFile",
+      "decodeReceiptsUnreadable",
+      "lockReceiptsUnreadable",
+      "adoptStoreIsFile",
+      "adoptStoreReceiptsIsFile",
+      "adoptStoreObjectsIsFile",
+      "adoptObjectsUnwritable"
+    ],
+    "repairlessFaces": [
+      "decodeStoreIsFile",
+      "accountStoreIsFile",
+      "lockStoreIsFile",
+      "verifyStoreIsFile",
+      "conformStoreIsFile",
+      "decodeReceiptsIsFile",
+      "lockReceiptsIsFile",
+      "decodeReceiptsUnreadable",
+      "lockReceiptsUnreadable",
+      "adoptStoreIsFile",
+      "adoptStoreReceiptsIsFile",
+      "adoptStoreObjectsIsFile",
+      "adoptObjectsUnwritable"
+    ],
+    "wrongChannelFaces": [
+      "decodeStoreIsFile",
+      "accountStoreIsFile",
+      "lockStoreIsFile",
+      "verifyStoreIsFile",
+      "conformStoreIsFile",
+      "decodeReceiptsIsFile",
+      "lockReceiptsIsFile",
+      "decodeReceiptsUnreadable",
+      "lockReceiptsUnreadable",
+      "adoptStoreIsFile",
+      "adoptStoreReceiptsIsFile",
+      "adoptStoreObjectsIsFile",
+      "adoptObjectsUnwritable"
+    ],
+    "detail": {
+      "decodeStoreIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "accountStoreIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "lockStoreIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "verifyStoreIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "conformStoreIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "decodeReceiptsIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "lockReceiptsIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "decodeReceiptsUnreadable": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ],
+        "fix": null
+      },
+      "lockReceiptsUnreadable": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ],
+        "fix": null
+      },
+      "adoptStoreIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "ENOTDIR",
+          "not a directory"
+        ],
+        "fix": null
+      },
+      "adoptStoreReceiptsIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EEXIST",
+          "file already exists"
+        ],
+        "fix": null
+      },
+      "adoptStoreObjectsIsFile": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EEXIST",
+          "file already exists"
+        ],
+        "fix": null
+      },
+      "adoptObjectsUnwritable": {
+        "exit": 1,
+        "code": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ],
+        "fix": null
+      }
+    },
+    "controls": {
+      "decodeStoreOk": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\"error\":\"unknown instruction discriminator 1b43bf (66 known, e.g. 2924d8f51b556743, 7b86510031446262, 01b6873b9b1963df)\"}\n",
+        "answered": false
+      },
+      "lockStoreOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi\": {\n      \"fingerprint\": \"sha256:945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94\",\n      \"source\": \"anchor\",\n      \"slot\": 465104983,\n      \"receipt\": \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi-465104983-anchor-945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94.json\",\n      \"in",
+        "lockWrote": true
+      },
+      "adoptStoreOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"program\": \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\",\n  \"source\": \"published\",\n  \"origin\": \"whirlpool-idl.json\",\n  \"originStatus\": \"declared\",\n  \"originNote\": \"declared origin, not verified: sememe did not check that this repository, commit or file exists, and the bytes were not proven to come from it — provenance of bytes, not proof they describe the deployed program\",\n  \"originDigest\": \"",
+        "stored": true
+      },
+      "adoptStoreCreated": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"program\": \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\",\n  \"source\": \"published\",\n  \"origin\": \"whirlpool-idl.json\",\n  \"originStatus\": \"declared\",\n  \"originNote\": \"declared origin, not verified: sememe did not check that this repository, commit or file exists, and the bytes were not proven to come from it — provenance of bytes, not proof they describe the deployed program\",\n  \"originDigest\": \"",
+        "stored": true
+      },
+      "decodeStoreMissing": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\"error\":\"no sememe store at /tmp/sememe-store-voice-probe-qS0Zv9/no-such-store: run \\\"sememe pull\\\" first\"}\n",
+        "namedByProduct": true
+      }
+    }
+  },
+  "fixed": {
+    "leakedErrnoFaces": [],
+    "unnamedFaces": [],
+    "repairlessFaces": [],
+    "wrongChannelFaces": [],
+    "detail": {
+      "decodeStoreIsFile": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "accountStoreIsFile": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "lockStoreIsFile": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "verifyStoreIsFile": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "conformStoreIsFile": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "decodeReceiptsIsFile": {
+        "exit": 2,
+        "code": "store-receipts-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "lockReceiptsIsFile": {
+        "exit": 2,
+        "code": "store-receipts-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "decodeReceiptsUnreadable": {
+        "exit": 2,
+        "code": "store-receipts-unreadable",
+        "leakedErrno": [],
+        "fix": "fix: make the path readable and writable (chmod) and point --store at it"
+      },
+      "lockReceiptsUnreadable": {
+        "exit": 2,
+        "code": "store-receipts-unreadable",
+        "leakedErrno": [],
+        "fix": "fix: make the path readable and writable (chmod) and point --store at it"
+      },
+      "adoptStoreIsFile": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "adoptStoreReceiptsIsFile": {
+        "exit": 2,
+        "code": "store-receipts-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "adoptStoreObjectsIsFile": {
+        "exit": 2,
+        "code": "store-objects-not_a_directory",
+        "leakedErrno": [],
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)"
+      },
+      "adoptObjectsUnwritable": {
+        "exit": 2,
+        "code": "store-objects-unreadable",
+        "leakedErrno": [],
+        "fix": "fix: make the path readable and writable (chmod) and point --store at it"
+      }
+    },
+    "controls": {
+      "decodeStoreOk": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\"error\":\"unknown instruction discriminator 1b43bf (66 known, e.g. 2924d8f51b556743, 7b86510031446262, 01b6873b9b1963df)\"}\n",
+        "answered": false
+      },
+      "lockStoreOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi\": {\n      \"fingerprint\": \"sha256:945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94\",\n      \"source\": \"anchor\",\n      \"slot\": 465104983,\n      \"receipt\": \"24Uqj9JCLxUeoC3hGfh5W3s9FM9uCHDS2SG3LYwBpyTi-465104983-anchor-945b541c0a3f2d81d049016ec21c8afd49329de78d76453c99dd42dbc41a5e94.json\",\n      \"in",
+        "lockWrote": true
+      },
+      "adoptStoreOk": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"program\": \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\",\n  \"source\": \"published\",\n  \"origin\": \"whirlpool-idl.json\",\n  \"originStatus\": \"declared\",\n  \"originNote\": \"declared origin, not verified: sememe did not check that this repository, commit or file exists, and the bytes were not proven to come from it — provenance of bytes, not proof they describe the deployed program\",\n  \"originDigest\": \"",
+        "stored": true
+      },
+      "adoptStoreCreated": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"program\": \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\",\n  \"source\": \"published\",\n  \"origin\": \"whirlpool-idl.json\",\n  \"originStatus\": \"declared\",\n  \"originNote\": \"declared origin, not verified: sememe did not check that this repository, commit or file exists, and the bytes were not proven to come from it — provenance of bytes, not proof they describe the deployed program\",\n  \"originDigest\": \"",
+        "stored": true
+      },
+      "decodeStoreMissing": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\"error\":\"no sememe store at /tmp/sememe-store-voice-probe-kfUhBF/no-such-store: run \\\"sememe pull\\\" first\"}\n",
+        "namedByProduct": true
+      }
+    }
+  },
+  "controlRegression": [],
+  "verdict": {
+    "preFixLeakedErrno": 13,
+    "fixedLeakedErrno": 0,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "store-input-voice-closed",
+  "hostPathLeak": 0
+}

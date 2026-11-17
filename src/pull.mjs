@@ -1,7 +1,7 @@
 // First sememe capability: pull a Solana program IDL into a local content-addressed store.
 // No decoding of transactions yet; no network call after the pull is stored.
 import { createHash } from 'node:crypto';
-import { link, lstat, mkdir, open, readFile, rm } from 'node:fs/promises';
+import { link, lstat, open, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 // The optional peer, loaded so its ABSENCE is sememe's sentence instead of a
 // Node loader stack trace (src/peer.mjs; measured 2026-11-06 from a bare
@@ -16,6 +16,11 @@ import { addresses, decodeAccount, rpcAccounts } from './acquire.mjs';
 // without importing this file (and therefore without @solana/web3.js).
 export { canonicalJson } from './canonical.mjs';
 import { canonicalJson } from './canonical.mjs';
+// The store DIRECTORY is a path the CALLER chose: a store that cannot be
+// written is refused BY NAME (src/store-input.mjs; measured 2026-11-17 on the
+// published 0.4.31: "ENOTDIR: not a directory, mkdir '/tmp/store-file/objects'"
+// with exit 1).
+import { ensureStoreDirs } from './store-input.mjs';
 
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
 const validId = (input) => {
@@ -80,8 +85,10 @@ export async function installIdl(idl, { program, source, address, slot }, storeD
   const directory = path.resolve(storeDir);
   const objects = path.join(directory, 'objects');
   const receipts = path.join(directory, 'receipts');
-  await mkdir(objects, { recursive: true, mode: 0o700 });
-  await mkdir(receipts, { recursive: true, mode: 0o700 });
+  // The ONE write of the store's directories: a store path that cannot be
+  // used is refused by name, never as the kernel's errno. A store that does
+  // not exist yet is CREATED here — that is how a user makes one.
+  await ensureStoreDirs(directory);
   const file = path.join(objects, `${fingerprint}.json`);
   await writeOnce(file, json);
   const receipt = {

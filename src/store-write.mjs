@@ -11,8 +11,40 @@
 // would break every receipt that points at it.
 
 import { link, lstat, open, readFile, rm } from 'node:fs/promises';
+import path from 'node:path';
+// A write INTO the store used to answer with the kernel's errno verbatim
+// (measured 2026-11-17 on this host: "EACCES: permission denied, open
+// '/tmp/nowrite/objects/…json.tmp-…'" with exit 1). The directory is part
+// of a path the CALLER chose, so it gets the same named refusal as every
+// other caller-named path. A failure that is NOT a filesystem error — a
+// digest collision, a non-regular store entry — keeps its own voice: that
+// is the work failing, not the path.
+import { classifyStoreErrno, storeRefusal } from './store-input.mjs';
+
+/** Which part of the store a path lives in: the subject a refusal names
+ *  (the root itself answers as "store"). */
+function storePartOf(filePath) {
+  const parent = path.basename(path.dirname(filePath));
+  return parent === 'objects' || parent === 'receipts' ? parent : null;
+}
 
 export async function writeOnce(destination, content) {
+  try {
+    await writeOnceInner(destination, content);
+  } catch (error) {
+    const kind = classifyStoreErrno(error);
+    const part = storePartOf(destination);
+    if (!kind || !part) throw error;
+    throw storeRefusal({
+      code: `store-${part}-${kind === 'missing' ? 'unreadable' : kind}`,
+      subject: `${part} directory`,
+      storePath: path.dirname(destination),
+      kind: kind === 'missing' ? 'unreadable' : kind,
+    });
+  }
+}
+
+async function writeOnceInner(destination, content) {
   try {
     const entry = await lstat(destination);
     if (!entry.isFile() || entry.isSymbolicLink()) throw Error(`non-regular store entry: ${destination}`);

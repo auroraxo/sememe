@@ -7,7 +7,7 @@
 // reproducible: same store + same payload => same result, no network call.
 
 import { createHash } from 'node:crypto';
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { canonicalJson } from './canonical.mjs';
 import {

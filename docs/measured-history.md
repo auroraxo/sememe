@@ -3747,3 +3747,108 @@ produced; a file that is readable but is a symlink to another file is read
 through, as it always was. Nothing here changes the decode path, the
 fingerprint store, or the acquisition channels: 0 external users so far, one
 machine, no audit, and PUBLISH != CONSUMPTION — this lands on `main` first.
+
+## Working now: the store you point at is answered in the product's voice too (2026-11-17)
+
+**The defect.** The caller names a STORE DIRECTORY — `--store <dir>` — and
+sememe keeps two directories inside it (`receipts/`, `objects/`). When that
+path was wrong, the product answered with the KERNEL's error, verbatim:
+
+```
+sememe decode <program> <payload> --store /tmp/store-file
+  -> {"error":"ENOTDIR: not a directory, scandir '/tmp/store-file/receipts'"}   exit 1
+
+sememe adopt <program> <file> --store /tmp/store-file
+  -> {"error":"ENOTDIR: not a directory, mkdir '/tmp/store-file/objects'"}        exit 1
+```
+
+Measured on the **published `sememe@0.4.31`**, installed into an empty app
+(the channel a stranger who copies `npm install sememe` gets), 2026-11-17 —
+the very release that closed the caller-named FILE.
+
+Three faults in that one answer, each independently measurable:
+
+1. **No name.** A syscall's prose. No code for a script to branch on, no
+   repair to act on.
+2. **No subject.** The refusal did not say WHICH path was wrong. The store
+   root, its `receipts/` and its `objects/` are three different faults with
+   three different repairs, and the errno text named none of them for the
+   operator who has to choose.
+3. **The wrong channel.** A mistyped path is not "the work failed". It
+   shared exit 1 with a real refusal (a drifted store, a tampered receipt),
+   so a CI script could not tell "you pointed me at nothing" from "your
+   store drifted" — the usage/IO channel the product already reserves (exit
+   2) went unused.
+
+**The fix.** `src/store-input.mjs` is the ONE classifier for the store
+path, wired into every path that touches it:
+
+- `readStoreReceipts(storeDir)` — the single read of `<store>/receipts`,
+  used by `src/store-read.mjs` (decode, account, union) and `src/lock.mjs`
+  (lock, verify). It checks the store ROOT first, so a `--store` that names
+  a regular file is refused before any syscall reaches the kernel.
+- `ensureStoreDirs(storeDir)` — the single write of `<store>/objects` and
+  `<store>/receipts`, used by `src/adopt.mjs` and `src/pull.mjs`. A store
+  that does not exist yet is still CREATED here: making a store is how a
+  user makes one, and the README says so.
+- `src/store-write.mjs` — the atomic writer maps its own filesystem
+  failures (an unwritable `objects/` used to answer `EACCES: permission
+  denied, open '…/objects/….tmp-…'`, straight out of the writer).
+- `src/conformance.mjs` — the conformance gate no longer wraps a store
+  refusal into `store-reader-refused`; the store refusal keeps its own
+  code, its repair and its channel.
+
+The codes are per path, because the paths are different faults:
+`store-not_a_directory`, `store-unreadable`, `store-receipts-not_a_directory`,
+`store-receipts-unreadable`, `store-objects-not_a_directory`,
+`store-objects-unreadable`. Every one travels on the usage/IO channel
+(exit 2) — nothing ran.
+
+**What must NOT change.** A store path that does not exist is an ANSWER,
+not a refusal: the read paths keep their own sentence (`no sememe store at
+X: run "sememe pull" first` — quoted by the README, the CLI and several
+tests), and the write paths create the store. A missing store is not a
+broken store. The classifier therefore re-throws the original `ENOENT` for
+that one case and classifies everything else.
+
+**Evidence.**
+
+- `tools/measure-store-input-voice.mjs` → `research/store-input-voice-2026-11-17.json`,
+  verdict `store-input-voice-closed`: the same probe re-run across the fix
+  (pre-fix tree `a722b55` extracted by `git archive`, so the baseline is
+  stable forever) — **13 of 13 faces leaked a raw errno before, 0 after**;
+  0 unnamed, 0 repairless, 0 on the wrong channel, 0 control regressions,
+  0 host paths in the artifact.
+- `test/store-input-voice.test.mjs` (21 tests) — the thirteen faces, the
+  subject, the product's own wording (not strerror's), the conformance
+  gate's pass-through, the missing-store answer, the controls (decode /
+  lock / adopt still work), the library path, and the classifier's own
+  contract. Red on the pre-fix tree (16 of 21 fail), green here.
+- `tools/mutation-ladder-store-input-voice.sh` — **9/9 mutations caught**,
+  control green, tree byte-identical after the run.
+- Full suite: 1,162 tests, 1,157 pass, 0 fail, 5 skip — the same fail count
+  as the 1,141-test baseline before the fix.
+
+**Own errors, caught by the repo's own gates.**
+
+- The first probe run reported the FIXED tree as leaking: the reason text
+  "is not a directory" IS the kernel's strerror text, and the leak scan
+  reads the error field. The reason was reworded ("cannot be used as a
+  directory") — the same trap the file-input classifier documented a day
+  earlier, hit again by the same detector.
+- The first ladder run reported 8/9: M7's perl pattern targeted the wrong
+  file (the writer, not the classifier), so the mutation never happened —
+  a VACUUM case. Retargeted, then 9/9.
+- The README front page went to 201 lines with the new section (budget:
+  200, gated by `test/readme-history-move.test.mjs`); compressed to 199.
+
+**Honest remainder.** The classification covers the store path a caller
+NAMES. It does not change what the product finds on its own: a receipt whose
+object no longer re-hashes is still the store reader's refusal, a receipt
+that names another program is still refused by name, and the lock
+document's own reasons (`lock-v1-*`) are unchanged. The reason wording is
+the product's, but it is still a sentence a human reads — a script branches
+on the CODE. Nothing here changes the decode path, the fingerprint store,
+the coverage numbers or the acquisition channels: 0 external users so far,
+one machine, no audit, PUBLISH != CONSUMPTION — this lands on `main` first,
+and the published 0.4.31 still leaks the errno until the next release.
