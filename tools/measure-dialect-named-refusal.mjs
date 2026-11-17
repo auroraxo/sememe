@@ -303,7 +303,17 @@ async function main() {
     if (!ok) process.exit(3);
   } finally {
     rmSync(prefixTree, { recursive: true, force: true, retryDelay: 200, maxRetries: 3 });
-    try { rmSync(`${prefixTree}.tar` ?? '', { force: true }); } catch { /* the archive sits beside the temp dir */ }
+    // The archive was written BESIDE the temp dir as
+    // `dialect-prefix-<basename>.tar` (line above: `path.join(prefixTree,
+    // '..', ...)`), so the archive path is `${prefixTree}.tar` only by
+    // coincidence of the name pattern — the real name is what the archive
+    // step built. Measured 2026-11-17: the old cleanup removed
+    // `${prefixTree}.tar`, which NEVER existed, so every run leaked a 68 MB
+    // archive into /tmp — 87 archives / 5.6 GB since 2026-11-13 filled the
+    // disk to 100% and ENOSPC'd a full test suite. Compute the SAME path the
+    // archive step wrote and remove exactly that.
+    const archivePath = path.join(prefixTree, '..', `dialect-prefix-${path.basename(prefixTree)}.tar`);
+    try { rmSync(archivePath, { force: true }); } catch { /* already gone */ }
   }
 }
 
