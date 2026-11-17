@@ -109,15 +109,20 @@ async function verifyEveryReceipt(storeDir, program, names) {
     } catch (error) {
       // The failure KIND decides which bucket checkLock reports it in: a
       // rewritten declared origin is a relabel, not an unreadable object.
+      // The ORIGINAL error travels along: writeLock must rethrow it so the
+      // damage refusal keeps its code and its repair (a plain
+      // `throw Error(reason)` would hand the operator a sentence with no
+      // branchable name — measured 2026-11-17, this host).
       return {
         ok: false,
         receipt: name,
         reason: String(error?.message ?? error).slice(0, 300),
         code: error?.code ?? null,
+        error,
       };
     }
   }
-  return { ok: true, receipt: null, reason: null, code: null };
+  return { ok: true, receipt: null, reason: null, code: null, error: null };
 }
 
 /** Snapshot every verified receipt of `storeDir` into a lock document.
@@ -159,6 +164,10 @@ export async function writeLock(storeDir, outPath) {
     const verdict = await verifyEveryReceipt(storeDir, program, candidates);
     if (!verdict.ok) {
       // Refuse the lock: a store the reader refuses must produce NO lock.
+      // The reader's OWN error is rethrown — its code, its repair and its
+      // channel survive to the CLI, so `sememe lock` over damage answers
+      // exactly like `sememe decode` over the same store.
+      if (verdict.error) throw verdict.error;
       throw Error(verdict.reason);
     }
     const { idl, receipt, receiptName } = await newestReceipt(storeDir, program);
@@ -310,7 +319,7 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
         // and the PROVENANCE claim is not.
         report.relabelled.push({ program, receipt: verdict.receipt, reason: verdict.reason, scope: 'receipt' });
       } else {
-        report.unverified.push({ program, receipt: verdict.receipt, reason: verdict.reason });
+        report.unverified.push({ program, receipt: verdict.receipt, reason: verdict.reason, code: verdict.code });
       }
       continue;
     }
@@ -326,7 +335,12 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
           scope: 'receipt',
         });
       } else {
-        report.unverified.push({ program, receipt: newest, reason: String(error?.message ?? error).slice(0, 200) });
+        report.unverified.push({
+          program,
+          receipt: newest,
+          reason: String(error?.message ?? error).slice(0, 200),
+          code: error?.code ?? null,
+        });
       }
       continue;
     }
@@ -409,6 +423,7 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
       program,
       receipt: verdict.receipt,
       reason: verdict.reason,
+      code: verdict.code,
       scope: 'extra',
     };
     if (verdict.code === 'receipt-relabelled') {

@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-07T17:12:25.966Z",
+ "generatedAt": "2026-11-17T03:02:28.312Z",
  "tool": "tools/measure-multi-copy-store.mjs",
  "question": "does one store answer with one answer, whichever entry point asks?",
  "binary": {
@@ -27,7 +27,7 @@
   "s2": {
    "lockExit": 1,
    "lockFileWritten": false,
-   "error": "{\"error\":\"stored object for 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P re-hashes to sha256:90445b3b1f9d18ac8af32ab2b7888d226fa3eacb16a4d4af64f998d7e043ed8e but receipt 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-5a00cdb86fcd0e8efac99ffb2f8a51a9b0e9093008466f4666a1e5058513ec52.json claims sha256:5\"}"
+   "error": "{\"error\":\"stored object for 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P re-hashes to sha256:90445b3b1f9d18ac8af32ab2b7888d226fa3eacb16a4d4af64f998d7e043ed8e but receipt 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P-0-published-5a00cdb86fcd0e8efac99ffb2f8a51a9b0e9093008466f4666a1e5058513ec52.json claims sha256:5a00cdb86fcd0e8efac99ffb2f8a51a9b0e9093008466f4666a1e5058513ec52: object and receipt disagr"
   },
   "s3": {
    "lockOnCleanExit": 0,

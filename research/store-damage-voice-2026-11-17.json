@@ -1,0 +1,285 @@
+{
+  "tool": "tools/measure-store-damage-voice.mjs",
+  "measuredAt": "2026-11-17T02:50:01Z",
+  "prefix": "9fe90e5",
+  "question": "does damage the store reader finds in a correctly named store get the product's own named refusal, or the kernel's errno?",
+  "faces": [
+    "receiptIsFile",
+    "receiptUnreadable",
+    "receiptNotJson",
+    "receiptForeign",
+    "receiptMalformed",
+    "objectIsFile",
+    "objectUnreadable",
+    "objectNotJson",
+    "objectNoInstructions",
+    "objectMissing",
+    "objectRehash"
+  ],
+  "controls": [
+    "decodeOk",
+    "noStoreAnswer",
+    "noStoredIdlAnswer",
+    "callerPathVoice"
+  ],
+  "preFix": {
+    "leakedErrnoFaces": [
+      "receiptIsFile",
+      "receiptUnreadable",
+      "objectIsFile",
+      "objectUnreadable"
+    ],
+    "unnamedFaces": [
+      "receiptIsFile",
+      "receiptUnreadable",
+      "receiptNotJson",
+      "receiptForeign",
+      "receiptMalformed",
+      "objectIsFile",
+      "objectUnreadable",
+      "objectNotJson",
+      "objectNoInstructions",
+      "objectMissing",
+      "objectRehash"
+    ],
+    "repairlessFaces": [
+      "receiptIsFile",
+      "receiptUnreadable",
+      "receiptNotJson",
+      "receiptForeign",
+      "receiptMalformed",
+      "objectIsFile",
+      "objectUnreadable",
+      "objectNotJson",
+      "objectNoInstructions",
+      "objectMissing",
+      "objectRehash"
+    ],
+    "wrongChannelFaces": [],
+    "detail": {
+      "receiptIsFile": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [
+          "EISDIR",
+          "illegal operation on a directory"
+        ]
+      },
+      "receiptUnreadable": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ]
+      },
+      "receiptNotJson": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": []
+      },
+      "receiptForeign": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": []
+      },
+      "receiptMalformed": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": []
+      },
+      "objectIsFile": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [
+          "EISDIR",
+          "illegal operation on a directory"
+        ]
+      },
+      "objectUnreadable": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [
+          "EACCES",
+          "permission denied"
+        ]
+      },
+      "objectNotJson": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": []
+      },
+      "objectNoInstructions": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": []
+      },
+      "objectMissing": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": []
+      },
+      "objectRehash": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": []
+      }
+    },
+    "controls": {
+      "decodeOk": {
+        "exit": 0,
+        "answered": true,
+        "leakedErrno": [],
+        "named": false
+      },
+      "noStoreAnswer": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no sememe store at <tmp>/no-such-store: run \"sememe pull\" first"
+      },
+      "noStoredIdlAnswer": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no stored IDL for program JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4 in <tmp>/decodeOk"
+      },
+      "callerPathVoice": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)",
+        "leakedErrno": [],
+        "text": "sememe store: the store <tmp>/a-regular-file cannot be used as a directory (store-not_a_directory)"
+      }
+    }
+  },
+  "fixed": {
+    "leakedErrnoFaces": [],
+    "unnamedFaces": [],
+    "repairlessFaces": [],
+    "wrongChannelFaces": [],
+    "detail": {
+      "receiptIsFile": {
+        "exit": 1,
+        "code": "store-receipt-not_a_file",
+        "fix": "fix: remove the file that stands where a receipt or object belongs, then re-run \"sememe pull <program-id>\"",
+        "leakedErrno": []
+      },
+      "receiptUnreadable": {
+        "exit": 1,
+        "code": "store-receipt-unreadable",
+        "fix": "fix: make the file readable (chmod) and re-run \"sememe pull <program-id>\"",
+        "leakedErrno": []
+      },
+      "receiptNotJson": {
+        "exit": 1,
+        "code": "store-receipt-not_json",
+        "fix": "fix: re-run \"sememe pull <program-id>\"; a receipt or object that is not JSON was never written by sememe",
+        "leakedErrno": []
+      },
+      "receiptForeign": {
+        "exit": 1,
+        "code": "store-receipt-foreign_program",
+        "fix": "fix: re-run \"sememe pull <program-id>\" so the store holds a receipt for this program again",
+        "leakedErrno": []
+      },
+      "receiptMalformed": {
+        "exit": 1,
+        "code": "store-receipt-malformed",
+        "fix": "fix: re-run \"sememe pull <program-id>\"; a receipt without a usable fingerprint cannot be verified",
+        "leakedErrno": []
+      },
+      "objectIsFile": {
+        "exit": 1,
+        "code": "store-object-not_a_file",
+        "fix": "fix: remove the file that stands where a receipt or object belongs, then re-run \"sememe pull <program-id>\"",
+        "leakedErrno": []
+      },
+      "objectUnreadable": {
+        "exit": 1,
+        "code": "store-object-unreadable",
+        "fix": "fix: make the file readable (chmod) and re-run \"sememe pull <program-id>\"",
+        "leakedErrno": []
+      },
+      "objectNotJson": {
+        "exit": 1,
+        "code": "store-object-not_json",
+        "fix": "fix: re-run \"sememe pull <program-id>\"; a receipt or object that is not JSON was never written by sememe",
+        "leakedErrno": []
+      },
+      "objectNoInstructions": {
+        "exit": 1,
+        "code": "store-object-not_an_idl",
+        "fix": "fix: re-run \"sememe pull <program-id>\"; an object without an instruction list is not an interface",
+        "leakedErrno": []
+      },
+      "objectMissing": {
+        "exit": 1,
+        "code": "store-object-missing",
+        "fix": "fix: re-run \"sememe pull <program-id>\" so the store holds the receipt and its object again",
+        "leakedErrno": []
+      },
+      "objectRehash": {
+        "exit": 1,
+        "code": "store-object-rehash_mismatch",
+        "fix": "fix: re-run \"sememe pull <program-id>\"; the object in the store is not the one the receipt pins",
+        "leakedErrno": []
+      }
+    },
+    "controls": {
+      "decodeOk": {
+        "exit": 0,
+        "answered": true,
+        "leakedErrno": [],
+        "named": false
+      },
+      "noStoreAnswer": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no sememe store at <tmp>/no-such-store: run \"sememe pull\" first"
+      },
+      "noStoredIdlAnswer": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no stored IDL for program JUP6LkbZbjS1jKKwapdHNy74zcZ3tLUZoi5QNyVTaV4 in <tmp>/decodeOk"
+      },
+      "callerPathVoice": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)",
+        "leakedErrno": [],
+        "text": "sememe store: the store <tmp>/a-regular-file cannot be used as a directory (store-not_a_directory)"
+      }
+    }
+  },
+  "controlRegression": [],
+  "verdict": {
+    "preFixLeakedErrno": 4,
+    "fixedLeakedErrno": 0,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "store-damage-voice-closed",
+  "hostPathLeak": 0,
+  "tempPathLeak": 0,
+  "scrubbedTempPaths": 6
+}

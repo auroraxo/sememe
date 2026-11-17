@@ -39,8 +39,24 @@ import { assertIdlShape, assertReadableDialect, declaredProgram } from './dialec
 // measured 2026-11-17 on the published 0.4.31: "ENOTDIR: not a directory,
 // scandir '/tmp/store-file/receipts'" with exit 1).
 import { readStoreReceipts } from './store-input.mjs';
+// DAMAGE the reader finds in a store the caller pointed at CORRECTLY. The
+// caller-named PATH was closed on 2026-11-17 (src/store-input.mjs); what
+// stayed behind spoke the kernel's errno verbatim, with no code and no
+// repair ("store receipt <name> is unreadable: EACCES: permission denied,
+// open '/home/<user>/…'" — measured 2026-11-17, this host). This is the
+// ONE place the store's own damage is classified, so every reader (decode,
+// account, union, lock, verify, gap, conform) refuses in the product's
+// voice with a code, a repair and NO errno.
+import {
+  classifyDamageErrno, storeDamageRefusal,
+} from './store-damage.mjs';
 
 export { canonicalJson } from './canonical.mjs';
+
+// NOTE: every path quoted below is STORE-RELATIVE (receipts/<name>,
+// objects/<hash>.json) on purpose — a refusal must never quote an absolute
+// path, because the store lives in the operator's home directory and a
+// refusal that prints it prints that home into a CI log.
 
 /** Read and verify one receipt+object pair. Throws with a named reason.
  *
@@ -49,13 +65,41 @@ export { canonicalJson } from './canonical.mjs';
  * store, two strengths" failure the header warns about. */
 export async function readVerified(storeDir, program, receiptName) {
   let receipt;
+  const receiptRelative = path.join('receipts', receiptName);
   try {
     receipt = JSON.parse(await readFile(path.join(storeDir, 'receipts', receiptName), 'utf8'));
   } catch (error) {
-    throw Error(`store receipt ${receiptName} is unreadable: ${String(error?.message ?? error).slice(0, 140)}`);
+    // A receipt that cannot be READ is IO damage; one that can be read but
+    // does not parse is CONTENT damage. Both are named now (measured
+    // 2026-11-17: the raw errno — "EACCES: permission denied, open
+    // '/home/<user>/…'" or "Unexpected token 'o'" — reached the operator).
+    const kind = classifyDamageErrno(error);
+    if (kind === null) {
+      // Not a filesystem error: the bytes are there but are not JSON. The
+      // parser's own prose is kept as the DETAIL (it says where the parse
+      // stopped), and the errno never reaches the operator.
+      throw storeDamageRefusal({
+        code: 'store-receipt-not_json',
+        kind: 'not_json',
+        message: `store receipt ${receiptName} is not JSON`,
+        path: receiptRelative,
+        detail: String(error?.message ?? error).slice(0, 120),
+      });
+    }
+    throw storeDamageRefusal({
+      code: `store-receipt-${kind}`,
+      kind,
+      message: `store receipt ${receiptName} is unreadable`,
+      path: receiptRelative,
+    });
   }
   if (receipt?.program !== program) {
-    throw Error(`store receipt ${receiptName} names program ${receipt?.program} — it is not a receipt for ${program}`);
+    throw storeDamageRefusal({
+      code: 'store-receipt-foreign_program',
+      kind: 'foreign_program',
+      message: `store receipt ${receiptName} names program ${receipt?.program} — it is not a receipt for ${program}`,
+      path: receiptRelative,
+    });
   }
   // The receipt's OWN integrity, before it is allowed to name anything. A
   // rewritten declared origin is refused HERE, on every read — decode, union
@@ -68,22 +112,54 @@ export async function readVerified(storeDir, program, receiptName) {
     throw error;
   }
   const fingerprint = String(receipt.fingerprint).replace(/^sha256:/, '');
-  if (!/^[a-f0-9]{64}$/.test(fingerprint)) throw Error(`store receipt has a malformed fingerprint: ${receipt.fingerprint}`);
+  if (!/^[a-f0-9]{64}$/.test(fingerprint)) {
+    throw storeDamageRefusal({
+      code: 'store-receipt-malformed',
+      kind: 'malformed',
+      message: `store receipt has a malformed fingerprint: ${receipt.fingerprint}`,
+      path: receiptRelative,
+    });
+  }
   const objectPath = path.join(storeDir, 'objects', `${fingerprint}.json`);
+  const objectRelative = path.join('objects', `${fingerprint}.json`);
   let raw;
   try { raw = await readFile(objectPath); }
   catch (error) {
     if (error?.code === 'ENOENT') {
-      throw Error(`store receipt ${receiptName} claims object ${fingerprint} but the store object is missing`);
+      throw storeDamageRefusal({
+        code: 'store-object-missing',
+        kind: 'missing',
+        message: `store receipt ${receiptName} claims object ${fingerprint} but the store object is missing`,
+        path: objectRelative,
+      });
     }
-    throw Error(`store object ${fingerprint}.json is unreadable: ${String(error?.message ?? error).slice(0, 140)}`);
+    const kind = classifyDamageErrno(error) ?? 'unreadable';
+    throw storeDamageRefusal({
+      code: `store-object-${kind}`,
+      kind,
+      message: `store object ${fingerprint}.json is unreadable`,
+      path: objectRelative,
+    });
   }
   let idl;
   try { idl = JSON.parse(raw); }
   catch (error) {
-    throw Error(`store object ${fingerprint}.json is not JSON: ${String(error?.message ?? error).slice(0, 140)}`);
+    throw storeDamageRefusal({
+      code: 'store-object-not_json',
+      kind: 'not_json',
+      message: `store object ${fingerprint}.json is not JSON`,
+      path: objectRelative,
+      detail: String(error?.message ?? error).slice(0, 120),
+    });
   }
-  if (!Array.isArray(idl.instructions)) throw Error(`stored object for ${program} has no instructions`);
+  if (!Array.isArray(idl.instructions)) {
+    throw storeDamageRefusal({
+      code: 'store-object-not_an_idl',
+      kind: 'not_an_idl',
+      message: `stored object for ${program} has no instructions`,
+      path: objectRelative,
+    });
+  }
   // Same two checks as the write path (src/adopt.mjs), applied on every
   // read: a dialect NO engine of the product can read is refused by NAME
   // before any decode can crash unnamed, and a declared program that
@@ -99,20 +175,34 @@ export async function readVerified(storeDir, program, receiptName) {
   });
   const declared = declaredProgram(idl);
   if (declared && declared !== program) {
-    throw Error(`stored object ${fingerprint} declares program ${declared}, not the receipt's ${program}`);
+    throw storeDamageRefusal({
+      code: 'store-object-program_mismatch',
+      kind: 'program_mismatch',
+      message: `stored object ${fingerprint} declares program ${declared}, not the receipt's ${program}`,
+      path: objectRelative,
+    });
   }
   if (idl.address && idl.address !== program) {
-    throw Error(`stored object ${fingerprint} declares program ${idl.address}, not the receipt's ${program}`);
+    throw storeDamageRefusal({
+      code: 'store-object-program_mismatch',
+      kind: 'program_mismatch',
+      message: `stored object ${fingerprint} declares program ${idl.address}, not the receipt's ${program}`,
+      path: objectRelative,
+    });
   }
   // `pull` writes sha256(canonicalJson(idl) + '\n'), so verify with the same
   // canonicalizer rather than with JSON.stringify, whose key order is not the
   // stored order. A receipt without this check is a filename, not provenance.
   const actual = createHash('sha256').update(`${canonicalJson(idl)}\n`).digest('hex');
   if (actual !== fingerprint) {
-    throw Error(
-      `stored object for ${program} re-hashes to sha256:${actual} but receipt ${receiptName} `
-      + `claims sha256:${fingerprint}: object and receipt disagree, refusing to decode`,
-    );
+    throw storeDamageRefusal({
+      code: 'store-object-rehash_mismatch',
+      kind: 'rehash_mismatch',
+      message:
+        `stored object for ${program} re-hashes to sha256:${actual} but receipt ${receiptName} `
+        + `claims sha256:${fingerprint}: object and receipt disagree, refusing to decode`,
+      path: objectRelative,
+    });
   }
   return { idl, receipt, receiptName, objectPath };
 }

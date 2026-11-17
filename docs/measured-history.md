@@ -3852,3 +3852,87 @@ on the CODE. Nothing here changes the decode path, the fingerprint store,
 the coverage numbers or the acquisition channels: 0 external users so far,
 one machine, no audit, PUBLISH != CONSUMPTION — this lands on `main` first,
 and the published 0.4.31 still leaks the errno until the next release.
+
+## 2026-11-17 — PULS AT: DAMAGE THE READER FINDS WAS STILL SPEAKING THE KERNEL (src/store-damage.mjs)
+
+The two input classes the previous pulses closed were the ones the CALLER names: the file
+(src/file-input.mjs, v0.4.31) and the store directory (src/store-input.mjs, v0.4.32). Both were
+right: a path you mistype is a usage mistake, and it now answers in the product's voice with a
+code, a subject and a repair on the usage/IO channel (exit 2).
+
+What was left was the input the product finds ITSELF. The store path was RIGHT — and the store
+turned out to be damaged. The reader refused it, but in the kernel's voice, with no code, no
+repair, and the operator's home directory in the message:
+
+    sememe decode <program> <payload> --store <store>
+      -> {"error":"store receipt <name>.json is unreadable: EACCES: permission denied,
+          open '/home/<user>/…/receipts/<name>.json'"}
+         exit 1
+      -> {"error":"store object <hash>.json is unreadable: EISDIR: illegal operation on a
+          directory, read"}
+         exit 1
+
+Three faults, the same three the path classifiers ended:
+
+1. NO NAME — a syscall's prose. No code for a script to branch on, no repair to act on, while
+   the SAME product names its refusals everywhere else ("no sememe store at X", "lock-v1-parse",
+   "adopt-file-not_json").
+2. NO SUBJECT — receipt damage and object damage are told apart only by prose, though they have
+   DIFFERENT repairs: a receipt is re-pulled, an object is restored from its fingerprint.
+3. THE WRONG VOCABULARY — the kernel's errno strings, quoted verbatim, plus an absolute host
+   path in a CI log.
+
+MEASUREMENT (tools/measure-store-damage-voice.mjs + tools/store-damage-voice-probe.mjs, one
+byte-identical probe in two trees, pre-fix tree 9fe90e5 extracted with `git archive`):
+research/store-damage-voice-2026-11-17.json, verdict `store-damage-voice-closed`:
+
+- pre-fix: 4 of 11 faces leaked a raw errno; ALL 11 were unnamed and ALL 11 repairless.
+- fixed:   0 leaked, 0 unnamed, 0 repairless, 0 on the wrong channel, 0 control regressions.
+- 11 faces: receipt is-a-file / unreadable / not-JSON / foreign-program / malformed-fingerprint;
+  object is-a-file / unreadable / not-JSON / no-instructions / missing / rehash-mismatch.
+- 4 controls (must not move): an intact store still decodes; a store that does not exist still
+  answers with its own "no sememe store" sentence; a program the store simply lacks is still an
+  acquisition gap (`no-stored-idl`), not a refusal; a caller-named store path still answers in
+  the PATH class (`store-not_a_directory`, exit 2).
+
+FIX (src/store-damage.mjs — one classifier, one place):
+
+- Every damage refusal carries a code (`store-receipt-<reason>` / `store-object-<reason>`), the
+  subject it is about, a repair, and NO errno. The wording is deliberately not strerror's own
+  ("cannot be read", not "permission denied") — the same trap the two path classifiers
+  documented: the refusal and its repair travel on one channel, and a repair that reads like the
+  kernel must not be counted as one.
+- The CHANNEL does not move. Damage is the WORK channel (exit 1): the store path was usable and
+  the product found broken bytes in it. A wrong path stays exit 2. The two classes must not
+  collapse into one — that is why this is a separate file and not a reuse of src/store-input.mjs.
+- No refusal quotes an ABSOLUTE path any more: the store lives in the operator's home directory,
+  and a refusal that prints it prints that home into a CI log. The paths are store-relative.
+- The sentences other tools quote keep their place AT THE FRONT of the message — "… is not a
+  receipt for …", "… claims object <hash> but the store object is missing", "… is not JSON …",
+  "… re-hashes to sha256:<hash> … disagree, refusing to decode". The code is appended in
+  parentheses, so the README, docs/measured-history.md, the lock report and the existing test
+  regexes still match.
+- `sememe lock` re-checks every receipt through the reader and used to REWRAP the reader's
+  message in a plain `Error` — dropping the code and the repair. It now rethrows the reader's own
+  error, so `lock` and `decode` answer the same damaged store in the same voice.
+
+BELEGE (falsification-first):
+
+- test/store-damage-voice.test.mjs (22 cases): RED on the pre-fix tree (15 of 21 failed; the 6
+  passes are exactly the guards, which must be green on both trees), GREEN on the fixed tree.
+- tools/mutation-ladder-store-damage-voice.sh: 8/8 CAUGHT, control green, tree byte-identical
+  afterwards. The mutations: strerror wording back into the repair, no code, no repair, exit 2
+  instead of 1, an absolute path in the message, the reader stops classifying, the code moved to
+  the front (pushing the quoted sentence out of position), and the damage class swallowing the
+  caller-path class.
+
+LIMITS (what this does NOT cover):
+
+- Only the store READER is classified. A store that is damaged in a way the reader never reaches
+  (a receipt that is never selected because another receipt of the same program sorts first) is
+  still reported through the lock's `unverified` bucket, which now carries the reader's code.
+- The classification is per-file. It does not diagnose WHY the file is damaged (a crashed
+  write, a manual edit, a foreign tool) — it names the fault and the repair, nothing more.
+- A store the CALLER named wrongly is still a different class with a different channel; this
+  change does not merge them.
+- 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
