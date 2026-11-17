@@ -600,13 +600,21 @@ try {
     console.error(error.message);
     process.exitCode = 2;
   } else if (error?.fix && typeof error.code === 'string') {
-    // A NAMED file-input refusal (src/file-input.mjs): the message already
-    // carries the subject, the path and the code; `fix` is the repair the
+    // A NAMED refusal (src/file-input.mjs, src/store-input.mjs,
+    // src/store-damage.mjs, src/lock-voice.mjs): the message already carries
+    // the subject, the path or document and the code; `fix` is the repair the
     // operator can run. It travels on the channel the classifier set —
     // exit 2 when nothing ran (the path was wrong), exit 1 when the work ran
     // and found the wrong bytes — so a script can tell "you pointed me at
-    // nothing" from "the work failed" without parsing prose.
-    console.error(JSON.stringify({ error: error.message, code: error.code, fix: error.fix }));
+    // nothing" from "the work failed" without parsing prose. A lock GATE
+    // refusal also carries `violations` (the programs of every kind), so the
+    // CI answer says WHAT broke in machine-readable form.
+    console.error(JSON.stringify({
+      error: error.message,
+      code: error.code,
+      fix: error.fix,
+      ...(error.violations ? { violations: error.violations } : {}),
+    }));
     process.exitCode = Number.isInteger(error.exitCode) ? error.exitCode : 1;
   } else {
     console.error(JSON.stringify({ error: String(error?.message ?? error) }));

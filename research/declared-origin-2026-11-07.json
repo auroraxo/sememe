@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-07T17:12:39.364Z",
+  "generatedAt": "2026-11-17T14:41:58.962Z",
   "tool": "tools/measure-declared-origin.mjs",
   "question": "does a declared origin ever read as a verified provenance, and can it be rewritten without the gate noticing?",
   "binary": {
@@ -48,7 +48,7 @@
         }
       ],
       "verifyErrorExit": 1,
-      "verifyErrorHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 1 relabelled, 0 unbound) — relabelled (declared origin changed): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\"}"
+      "verifyErrorHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 1 relabelled, 0 unbound) — relabelled (declared origin changed): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P (lock-misma"
     }
   },
   "t3": {

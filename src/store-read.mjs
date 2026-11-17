@@ -109,6 +109,11 @@ export async function readVerified(storeDir, program, receiptName) {
   if (integrity) {
     const error = Error(`store receipt ${receiptName}: ${integrity.reason}`);
     error.code = integrity.code;
+    // The repair travels with the code, so the CLI's named channel actually
+    // prints BOTH: without `fix` the channel falls back to {error} alone and
+    // the code minted here is dropped (measured 2026-11-17, published 0.4.34).
+    error.fix = `fix: ${integrity.fix}`;
+    error.exitCode = 1; // the work ran and found a receipt that is not the one it wrote
     throw error;
   }
   const fingerprint = String(receipt.fingerprint).replace(/^sha256:/, '');

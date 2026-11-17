@@ -1,0 +1,302 @@
+{
+  "tool": "tools/measure-lock-voice.mjs",
+  "measuredAt": "2026-11-17T14:37:29Z",
+  "prefix": "c356ab4",
+  "question": "does the lock surface — the product's own CI gate — name its refusals with a code and a repair, like every other refusal class in the product?",
+  "faces": [
+    "lockDocNotJson",
+    "lockDocNotADocument",
+    "lockDocBadVersion",
+    "lockDocNoPrograms",
+    "lockPinsNothing",
+    "lockEntryNotObject",
+    "lockBadFingerprint",
+    "lockBadOrigin",
+    "storeMismatch",
+    "storeMissingProgram",
+    "storeUnverified",
+    "lockTamperedReceipt",
+    "lockRelabelledReceipt"
+  ],
+  "libraryFaces": [
+    "tamperedReceipt",
+    "relabelledReceipt"
+  ],
+  "controls": [
+    "greenGate",
+    "lockWrites",
+    "noStoreAnswer"
+  ],
+  "preFix": {
+    "unnamedFaces": [
+      "lockDocNotJson",
+      "lockDocNotADocument",
+      "lockDocBadVersion",
+      "lockDocNoPrograms",
+      "lockPinsNothing",
+      "lockEntryNotObject",
+      "lockBadFingerprint",
+      "lockBadOrigin",
+      "storeMismatch",
+      "storeMissingProgram",
+      "storeUnverified",
+      "lockTamperedReceipt",
+      "lockRelabelledReceipt"
+    ],
+    "repairlessFaces": [
+      "lockDocNotJson",
+      "lockDocNotADocument",
+      "lockDocBadVersion",
+      "lockDocNoPrograms",
+      "lockPinsNothing",
+      "lockEntryNotObject",
+      "lockBadFingerprint",
+      "lockBadOrigin",
+      "storeMismatch",
+      "storeMissingProgram",
+      "storeUnverified",
+      "lockTamperedReceipt",
+      "lockRelabelledReceipt"
+    ],
+    "wrongChannelFaces": [],
+    "silentCodeFaces": [
+      "tamperedReceipt",
+      "relabelledReceipt"
+    ],
+    "detail": {
+      "lockDocNotJson": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockDocNotADocument": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockDocBadVersion": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockDocNoPrograms": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockPinsNothing": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockEntryNotObject": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockBadFingerprint": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockBadOrigin": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "storeMismatch": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "storeMissingProgram": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "storeUnverified": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockTamperedReceipt": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      },
+      "lockRelabelledReceipt": {
+        "exit": 1,
+        "code": null,
+        "fix": null
+      }
+    },
+    "library": {
+      "tamperedReceipt": {
+        "refused": true,
+        "code": "receipt-tampered",
+        "fix": null,
+        "exitCode": null
+      },
+      "relabelledReceipt": {
+        "refused": true,
+        "code": "receipt-relabelled",
+        "fix": null,
+        "exitCode": null
+      }
+    },
+    "controls": {
+      "greenGate": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lock\": \"<tmp>/green.lock\",\n  \"store\": \"<tmp>/store\",\n  \"mode\": \"error\",\n  \"pinned\": 1,\n  \"verified\": [\n    \"whirLbMiicVdio4qvUfM5KAg6Ct"
+      },
+      "lockWrites": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\": {\n      \"fingerprint\": \"sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f\",\n      \"source"
+      },
+      "noStoreAnswer": {
+        "exit": 1,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no sememe store at <tmp>/no-such-store: run \"sememe pull\" first"
+      }
+    }
+  },
+  "fixed": {
+    "unnamedFaces": [],
+    "repairlessFaces": [],
+    "wrongChannelFaces": [],
+    "silentCodeFaces": [],
+    "detail": {
+      "lockDocNotJson": {
+        "exit": 1,
+        "code": "lock-v1-parse",
+        "fix": "fix: the lock file must contain a JSON document — re-create it with \"sememe lock\" over the store it should pin"
+      },
+      "lockDocNotADocument": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      },
+      "lockDocBadVersion": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      },
+      "lockDocNoPrograms": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      },
+      "lockPinsNothing": {
+        "exit": 1,
+        "code": "lock-pins-nothing",
+        "fix": "fix: re-create the lock with \"sememe lock\" over a store that holds at least one receipt"
+      },
+      "lockEntryNotObject": {
+        "exit": 1,
+        "code": "lock-v1-shape",
+        "fix": "fix: the lock file must be a v1 lock document — re-create it with \"sememe lock\" over the store it should pin"
+      },
+      "lockBadFingerprint": {
+        "exit": 1,
+        "code": "lock-v1-fingerprint",
+        "fix": "fix: every pinned fingerprint must be sha256:<64 hex> — re-create the lock with \"sememe lock\""
+      },
+      "lockBadOrigin": {
+        "exit": 1,
+        "code": "lock-v1-origin",
+        "fix": "fix: a pinned origin must be a string — re-create the lock with \"sememe lock\""
+      },
+      "storeMismatch": {
+        "exit": 1,
+        "code": "lock-mismatch",
+        "fix": "fix: the store answers with different bytes than the lock pins — re-pull those programs, or re-run \"sememe lock\" if the store holds the newer answers"
+      },
+      "storeMissingProgram": {
+        "exit": 1,
+        "code": "lock-mismatch",
+        "fix": "fix: the store holds no receipt for a pinned program — re-run \"sememe pull <program-id>\" for it"
+      },
+      "storeUnverified": {
+        "exit": 1,
+        "code": "lock-mismatch",
+        "fix": "fix: an object in the store fails the reader's own re-hash check — re-run \"sememe pull <program-id>\" for it"
+      },
+      "lockTamperedReceipt": {
+        "exit": 1,
+        "code": "receipt-tampered",
+        "fix": "fix: the receipt file was edited after sememe wrote it — re-run \"sememe pull <program-id>\" (or \"sememe adopt …\") so the store holds a receipt whose own digest matches again"
+      },
+      "lockRelabelledReceipt": {
+        "exit": 1,
+        "code": "receipt-relabelled",
+        "fix": "fix: the receipt file was edited after sememe wrote it — re-run \"sememe pull <program-id>\" (or \"sememe adopt …\") so the store holds a receipt whose own digest matches again"
+      }
+    },
+    "library": {
+      "tamperedReceipt": {
+        "refused": true,
+        "code": "receipt-tampered",
+        "fix": "fix: the receipt file was edited after sememe wrote it — re-run \"sememe pull <program-id>\" (or \"sememe adopt …\") so the store holds a receipt whose own digest matches again",
+        "exitCode": 1
+      },
+      "relabelledReceipt": {
+        "refused": true,
+        "code": "receipt-relabelled",
+        "fix": "fix: the receipt file was edited after sememe wrote it — re-run \"sememe pull <program-id>\" (or \"sememe adopt …\") so the store holds a receipt whose own digest matches again",
+        "exitCode": 1
+      }
+    },
+    "controls": {
+      "greenGate": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lock\": \"<tmp>/green.lock\",\n  \"store\": \"<tmp>/store\",\n  \"mode\": \"error\",\n  \"pinned\": 1,\n  \"verified\": [\n    \"whirLbMiicVdio4qvUfM5KAg6Ct"
+      },
+      "lockWrites": {
+        "exit": 0,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "{\n  \"lockVersion\": 1,\n  \"programs\": {\n    \"whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc\": {\n      \"fingerprint\": \"sha256:0b886e375b112206a846a061f076f7db02a4b01b25cd593cd03caa490d86660f\",\n      \"source"
+      },
+      "noStoreAnswer": {
+        "exit": 1,
+        "answered": true,
+        "code": null,
+        "fix": null,
+        "leakedErrno": [],
+        "text": "no sememe store at <tmp>/no-such-store: run \"sememe pull\" first"
+      }
+    }
+  },
+  "controlRegression": [],
+  "verdict": {
+    "preFixUnnamedFaces": 13,
+    "preFixRepairlessFaces": 13,
+    "preFixSilentCodeFaces": 2,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "fixedSilentCodeFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "lock-voice-closed",
+  "hostPathLeak": 0,
+  "tempPathLeak": 0,
+  "scrubbedTempPaths": 6
+}

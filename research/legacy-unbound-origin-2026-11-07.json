@@ -42,7 +42,7 @@
     "verified": [],
     "unbound": 1,
     "reason": "the store declares origin \"attacker-rewritten-origin\" for 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P, but sememe.lock does not pin it — this lock predates origin pinning, so a rewritten origin here cannot be detected; re-run \"sememe lock\" to bind it",
-    "stderrHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 0 relabelled, 1 unbound) — unbound (declared origin not pinned by the lock): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P — re-run \\\"sememe lock\\\"\"}\n"
+    "stderrHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 0 relabelled, 1 unbound) — unbound (declared origin not pinned by the lock): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P — re-run \\\"sememe lock\\\" (lock-mismatch)\",\"code\":\"lock-mismatch\",\"fix\":\"fix: the store declares an origin the lock does not pin — re-run \\\"sememe lock\\\" to bind it\",\"violations\":{\"drifted\":[],\"missin"
   },
   "t3": {
     "question": "what the one-command repair actually binds",
@@ -60,7 +60,7 @@
     "exit": 1,
     "relabelled": 1,
     "unbound": 0,
-    "stderrHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 1 relabelled, 0 unbound) — relabelled (declared origin changed): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P\"}\n",
+    "stderrHead": "{\"error\":\"store does not match sememe.lock (0 drifted, 0 missing, 0 unverified, 1 relabelled, 0 unbound) — relabelled (declared origin changed): 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P (lock-mismatch)\",\"code\":\"lock-mismatch\",\"fix\":\"fix: a declared origin changed after the fact — restore the orig",
     "note": "this is the case the 2026-11-07 fix already covered: the pinned origin makes it `relabelled`, not `unbound`"
   },
   "t5": {

@@ -62,6 +62,15 @@ import { readStoreReceipts } from './store-input.mjs';
 import { readVerified } from './store-read.mjs';
 import { compareReceiptNames } from './receipt-order.mjs';
 import { classifyReceiptFiles, isReceiptFile } from './receipt-name.mjs';
+// The LOCK SURFACE's own refusals — the document faults and the gate
+// failure — are classified in ONE place (src/lock-voice.mjs), so each of
+// them carries a code a script can branch on and a repair the operator can
+// run. The sentences below are UNCHANGED: they are quoted by the README,
+// docs/measured-history.md and several tests. Measured 2026-11-17 on the
+// PUBLISHED 0.4.34: `sememe verify --lock bad.lock` answered
+// {"error":"sememe lock file bad.lock is not JSON (lock-v1-parse)"} — the
+// reason was buried in the prose, with no `code` and no `fix` to read.
+import { lockRefusal, mismatchRepair, violationsOf } from './lock-voice.mjs';
 
 const LOCK_VERSION = 1;
 const HEX64 = /^[a-f0-9]{64}$/;
@@ -150,10 +159,12 @@ export async function writeLock(storeDir, outPath) {
   // over an empty store is REFUSED and no file is written: the repair is to
   // pull a program first, not to commit a lock that certifies nothing.
   if (programs.length === 0) {
-    throw Error(
-      `the store at ${storeDir} pins nothing: it holds no receipt, so a lock over it could never detect drift `
-      + `(lock-pins-nothing) — run "sememe pull <program-id> --store ${storeDir}" first, then lock again`,
-    );
+    throw lockRefusal({
+      code: 'lock-pins-nothing',
+      message:
+        `the store at ${storeDir} pins nothing: it holds no receipt, so a lock over it could never detect drift `
+        + `(lock-pins-nothing) — run "sememe pull <program-id> --store ${storeDir}" first, then lock again`,
+    });
   }
   const doc = { lockVersion: LOCK_VERSION, programs: {} };
   for (const program of programs) {
@@ -209,16 +220,28 @@ export async function readLock(lockPath) {
   let doc;
   try { doc = JSON.parse(raw); }
   catch {
-    throw Error(`sememe lock file ${lockPath} is not JSON (lock-v1-parse)`);
+    throw lockRefusal({
+      code: 'lock-v1-parse',
+      message: `sememe lock file ${lockPath} is not JSON (lock-v1-parse)`,
+    });
   }
   if (!doc || typeof doc !== 'object' || Array.isArray(doc)) {
-    throw Error(`sememe lock file ${lockPath} is not a lock document (lock-v1-shape)`);
+    throw lockRefusal({
+      code: 'lock-v1-shape',
+      message: `sememe lock file ${lockPath} is not a lock document (lock-v1-shape)`,
+    });
   }
   if (doc.lockVersion !== LOCK_VERSION) {
-    throw Error(`sememe lock file ${lockPath} has unsupported lockVersion ${JSON.stringify(doc.lockVersion)} — expected ${LOCK_VERSION} (lock-v1-shape)`);
+    throw lockRefusal({
+      code: 'lock-v1-shape',
+      message: `sememe lock file ${lockPath} has unsupported lockVersion ${JSON.stringify(doc.lockVersion)} — expected ${LOCK_VERSION} (lock-v1-shape)`,
+    });
   }
   if (!doc.programs || typeof doc.programs !== 'object' || Array.isArray(doc.programs)) {
-    throw Error(`sememe lock file ${lockPath} has no programs map (lock-v1-shape)`);
+    throw lockRefusal({
+      code: 'lock-v1-shape',
+      message: `sememe lock file ${lockPath} has no programs map (lock-v1-shape)`,
+    });
   }
   // A lock that pins ZERO programs certifies nothing: there is no pinned
   // answer a drifted store could contradict, so every store would pass it.
@@ -229,21 +252,32 @@ export async function readLock(lockPath) {
   // about the store, so it applies in `--mode warn` too: warn mode exists to
   // downgrade STORE violations, not to certify a lock that pins nothing.
   if (Object.keys(doc.programs).length === 0) {
-    throw Error(
-      `sememe lock file ${lockPath} pins no program (lock-pins-nothing): a lock over zero answers can never `
-      + `detect drift — re-create it with "sememe lock" over a store that holds at least one receipt`,
-    );
+    throw lockRefusal({
+      code: 'lock-pins-nothing',
+      message:
+        `sememe lock file ${lockPath} pins no program (lock-pins-nothing): a lock over zero answers can never `
+        + `detect drift — re-create it with "sememe lock" over a store that holds at least one receipt`,
+    });
   }
   for (const [program, entry] of Object.entries(doc.programs)) {
     if (!entry || typeof entry !== 'object') {
-      throw Error(`sememe lock file ${lockPath} pins ${program} with a non-object entry (lock-v1-shape)`);
+      throw lockRefusal({
+        code: 'lock-v1-shape',
+        message: `sememe lock file ${lockPath} pins ${program} with a non-object entry (lock-v1-shape)`,
+      });
     }
     const fingerprint = typeof entry.fingerprint === 'string' ? entry.fingerprint.replace(/^sha256:/, '') : '';
     if (!HEX64.test(fingerprint)) {
-      throw Error(`sememe lock file ${lockPath} pins ${program} with a malformed fingerprint ${JSON.stringify(entry.fingerprint)} (lock-v1-fingerprint)`);
+      throw lockRefusal({
+        code: 'lock-v1-fingerprint',
+        message: `sememe lock file ${lockPath} pins ${program} with a malformed fingerprint ${JSON.stringify(entry.fingerprint)} (lock-v1-fingerprint)`,
+      });
     }
     if (entry.origin !== undefined && typeof entry.origin !== 'string') {
-      throw Error(`sememe lock file ${lockPath} pins ${program} with a malformed origin ${JSON.stringify(entry.origin)} (lock-v1-origin)`);
+      throw lockRefusal({
+        code: 'lock-v1-origin',
+        message: `sememe lock file ${lockPath} pins ${program} with a malformed origin ${JSON.stringify(entry.origin)} (lock-v1-origin)`,
+      });
     }
   }
   return doc;
@@ -461,7 +495,25 @@ export async function checkLock(storeDir, lockPath, { mode = 'error' } = {}) {
     if (report.unbound.length) {
       parts.push(`unbound (declared origin not pinned by the lock): ${report.unbound.map((r) => r.program).join(', ')} — re-run "sememe lock"`);
     }
-    throw Error(`store does not match sememe.lock (${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled, ${report.unbound.length} unbound) — ${parts.join(' | ')}`);
+    const kinds = [
+      ...(report.drifted.length ? ['drifted'] : []),
+      ...(report.missing.length ? ['missing'] : []),
+      ...(report.unverified.length ? ['unverified'] : []),
+      ...(report.relabelled.length ? ['relabelled'] : []),
+      ...(report.unbound.length ? ['unbound'] : []),
+    ];
+    // The GATE's refusal: the one answer a CI pipeline reads to decide what
+    // broke. It carries a code a script can branch on, the per-kind repair
+    // of the kinds it actually found, and the programs of every kind — so no
+    // pipeline has to parse the sentence to tell "the store drifted" from
+    // "a receipt is damaged". The sentence itself is unchanged: tests and
+    // the README quote it.
+    throw lockRefusal({
+      code: 'lock-mismatch',
+      message: `store does not match sememe.lock (${report.drifted.length} drifted, ${report.missing.length} missing, ${report.unverified.length} unverified, ${report.relabelled.length} relabelled, ${report.unbound.length} unbound) — ${parts.join(' | ')}`,
+      fix: mismatchRepair(kinds),
+      violations: violationsOf(report),
+    });
   }
   return report;
 }

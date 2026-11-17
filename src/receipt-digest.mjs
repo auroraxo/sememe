@@ -56,7 +56,15 @@ export function originDigestOf(origin) {
  * Returns null when the receipt is consistent, or a named reason when it is
  * not. `relabelled` distinguishes "the declared origin was rewritten" from
  * "some other field of the receipt was rewritten" — the lock reports the two
- * differently, because they are different failures. */
+ * differently, because they are different failures.
+ *
+ *  The REPAIR travels with the reason. Measured 2026-11-17, this host, on
+ *  the PUBLISHED 0.4.34: the refusal carried `code: receipt-tampered` but no
+ *  `fix`, and the CLI's named channel prints code+fix ONLY when both are
+ *  present — so the code was minted and then dropped on the floor, and the
+ *  operator got {"error":"the receipt was modified after it was written …"}
+ *  with no branchable name and no repair. A refusal that names itself but
+ *  cannot be acted on is half a refusal. */
 export function receiptIntegrity(receipt) {
   const origin = receipt?.origin;
   if (typeof receipt?.originDigest === 'string' && origin !== undefined && origin !== null) {
@@ -66,6 +74,7 @@ export function receiptIntegrity(receipt) {
         reason: `the declared origin was rewritten after the receipt was written `
           + `(the receipt still binds "${originDigestOf(origin)}" but the receipt claims `
           + `${receipt.originDigest}) — refusing to read it as provenance`,
+        fix: 'the receipt file was edited after sememe wrote it — re-run "sememe pull <program-id>" (or "sememe adopt …") so the store holds a receipt whose own digest matches again',
       };
     }
   }
@@ -77,6 +86,7 @@ export function receiptIntegrity(receipt) {
         reason: `the receipt was modified after it was written `
           + `(body digest ${actual}, receipt claims ${receipt.receiptDigest}) — `
           + `refusing to read it as provenance`,
+        fix: 'the receipt file was edited after sememe wrote it — re-run "sememe pull <program-id>" (or "sememe adopt …") so the store holds a receipt whose own digest matches again',
       };
     }
   }

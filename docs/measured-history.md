@@ -4153,3 +4153,95 @@ kind worth having.
 - The reader half of the contract only — reeflog marks and delivers the
   retraction, sememe refuses to source payloads from it, neither heals history.
 - 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
+
+## Working now: the lock surface (the CI gate) names its own refusals (2026-11-17)
+
+Three classifier families already spoke the product's voice — the file the
+CALLER names (`src/file-input.mjs`, v0.4.31), the store directory the CALLER
+names (`src/store-input.mjs`, v0.4.32), and the damage the reader FINDS
+ITSELF (`src/store-damage.mjs`, v0.4.33). The LOCK surface did not, and it is
+the product's own CI gate: the README tells a stranger to run
+`npx sememe verify` after checkout.
+
+**BEFORE (measured 2026-11-17, this host, the published `sememe@0.4.34`
+installed into an empty app, and the pre-fix tree `c356ab4`):**
+
+```
+sememe verify --store store --lock bad.lock
+  -> {"error":"sememe lock file bad.lock is not JSON (lock-v1-parse)"}   exit 1
+sememe verify --store store --lock drift.lock
+  -> {"error":"store does not match sememe.lock (1 drifted, 0 missing,
+     0 unverified, 0 relabelled, 0 unbound) — drifted: <program> pinned
+     sha256:… vs store sha256:…"}                                        exit 1
+```
+
+Four faults, all counted by `tools/measure-lock-voice.mjs` against one
+byte-identical probe run in both trees:
+
+1. **NO BRANCHABLE NAME.** The reason sat INSIDE the prose
+   (`"(lock-v1-parse)"`), so `error.code` was `undefined` and a script had to
+   read English to branch. The gate failure — the answer a pipeline reads to
+   decide what broke — carried NO reason at all. **13 of 13 faces unnamed.**
+2. **NO REPAIR.** Not one of these refusals named what the operator can run.
+   **13 of 13 repairless.**
+3. **NO STRUCTURED DETAIL on the gate answer:** to tell "the store drifted"
+   from "a receipt is damaged" a pipeline had to parse the sentence.
+4. **A CODE MINTED AND DROPPED.** The receipt-integrity refusals carried
+   `code: receipt-tampered` but no `fix` — and the CLI prints `code`+`fix`
+   only when BOTH are present, so the code was minted and then dropped on the
+   floor: the operator got `{"error":"the receipt was modified after it was
+   written …"}`. **2 faces.**
+
+**AFTER (`src/lock-voice.mjs`, the ONE classifier for this class):**
+
+Every lock refusal now carries a code, a repair and the work channel:
+
+| code | face |
+|---|---|
+| `lock-v1-parse` | the lock file holds no JSON document |
+| `lock-v1-shape` | not a v1 lock document (bad version, no programs map, non-object entry) |
+| `lock-v1-fingerprint` | a pinned fingerprint is not `sha256:<64 hex>` |
+| `lock-v1-origin` | a pinned origin is not a string |
+| `lock-pins-nothing` | nothing is pinned (empty programs map, or a store with no receipt) |
+| `lock-mismatch` | the gate failed: the store does not match the lock |
+| `receipt-tampered` / `receipt-relabelled` | the receipt was edited after it was written |
+
+The gate refusal additionally carries `violations` — the programs of every
+kind, on the same line as the error — so a pipeline branches instead of
+reading: `{"error":"store does not match sememe.lock (1 drifted, …)","code":
+"lock-mismatch","fix":"fix: the store answers with different bytes than the
+lock pins — re-pull those programs, or re-run \"sememe lock\" if the store
+holds the newer answers","violations":{"drifted":["whirLb…"],"missing":[],
+"unverified":[],"relabelled":[],"unbound":[]}}`.
+
+**THE CHANNEL DOES NOT MOVE.** A document fault and a gate failure keep the
+work channel (exit 1) — the file WAS read and the work ran, the bytes were
+wrong. A lock path the CALLER named keeps the usage/IO channel (exit 2), and
+the two classes must not collapse into one. The sentences other tools quote
+stay byte-for-byte as they were, at the front of the message; the code rides
+in parentheses.
+
+**WHAT IS NOT A REFUSAL HERE.** A store that does not exist
+(`no sememe store at …: run "sememe pull" first`) and a program the store
+simply lacks are ANSWERS: they must not acquire a code or a repair
+(`test/store-damage-voice.test.mjs`, C6/C7).
+
+**FALSIFICATION** (`research/lock-voice-2026-11-17.json`, verdict
+`lock-voice-closed`): pre-fix `c356ab4` = 13 unnamed, 13 repairless, 2 silent
+codes → here 0/0/0, 0 wrong channel, 0 control regressions, 0 host paths. The
+probe is COPIED into the `git archive`-extracted pre-fix tree, so both trees
+run byte-identical probe code. The pin `test/lock-voice.test.mjs` (19) is red
+on the pre-fix tree (15 of 19; the 4 passes are the guards that must hold on
+both trees). Mutation ladder `tools/mutation-ladder-lock-voice.sh`: 8/8
+CAUGHT, control green, tree byte-identical — the ladder caught three pins of
+mine that were too weak to notice a repair for the WRONG kind, a code pushed
+to the front of the sentence, and an answer dressed as a refusal, and those
+pins were strengthened rather than the ladder relaxed.
+
+### LIMITS
+
+- 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
+- The two published versions carrying these refusals (0.4.34 and earlier) are
+  immutable: the defect is measured on them, not erased from them.
+- `violations` is a CLI-channel addition: a script that parsed the prose
+  before still gets the same prose.
