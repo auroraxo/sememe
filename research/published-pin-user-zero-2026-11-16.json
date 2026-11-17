@@ -1,21 +1,21 @@
 {
   "tool": "tools/measure-published-pin-user-zero.mjs",
-  "measuredAt": "2026-11-17T15:01:18.760Z",
+  "measuredAt": "2026-11-17T17:15:44.130Z",
   "package": "sememe",
-  "pin": "v0.4.35",
+  "pin": "v0.4.36",
   "checks": [
     {
       "name": "channel",
       "pass": true,
-      "detail": "README pins v0.4.35; registry dist-tags.latest serves 0.4.35",
-      "readmePin": "v0.4.35",
-      "registryLatest": "0.4.35"
+      "detail": "README pins v0.4.36; registry dist-tags.latest serves 0.4.36",
+      "readmePin": "v0.4.36",
+      "registryLatest": "0.4.36"
     },
     {
       "name": "install",
       "pass": true,
-      "detail": "npm install sememe@0.4.35 into an empty app: exit 0, node_modules holds exactly ['sememe'] (zero runtime deps)",
-      "installedVersion": "0.4.35"
+      "detail": "npm install sememe@0.4.36 into an empty app: exit 0, node_modules holds exactly ['sememe'] (zero runtime deps)",
+      "installedVersion": "0.4.36"
     },
     {
       "name": "readme-example",
@@ -77,7 +77,7 @@
     {
       "name": "readme-pin-unique",
       "pass": true,
-      "detail": "README pins exactly one tag: v0.4.35"
+      "detail": "README pins exactly one tag: v0.4.36"
     }
   ],
   "verdict": "measured",

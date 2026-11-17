@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-17T14:53:34.800Z",
+  "measuredAt": "2026-11-17T17:17:31.609Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.36",
+        "body": "The store answers name themselves: `no-sememe-store` / `no-stored-idl` with `answer: true` — acquire, do not repair.\n\n## Install\n\n```bash\nnpm install sememe\n# or, from the tagged release:\nnpm install github:auroraxo/sememe#v0.4.36\n```\n\n## What changed\n\nThe product's answers used to arrive as bare prose on the machine channel — the library minted `no-sememe-store` and `no-stored-idl`, but the CLI printed `code` only together with `fix`, and an answer has no fix. The `sememe lock` / `sememe verify` call sites did not even mint them. All six answer faces now answer:\n\n```json\n{\"error\":\"no sememe store at ./store: run \\\"sememe pull\\\" first\",\"code\":\"no-sememe-store\",\"answer\":true}\n```\n\n- `answer: true` is the answer's own semantics: a script branches on *acquire* vs. *repair* without parsing prose — it never rides on a refusal, and `fix` never rides on an answer.\n- An answer carries **no** `fix`: the verbatim sentence already says what to run.\n- The channel does not move: exit 1, stderr, JSON; the sentences stay byte-for-byte what the README and tests quote.\n- The refusal classes are untouched: a caller-named wrong path keeps `store-not_a_directory` (exit 2), damage keeps its own voice (exit 1).\n\nMeasured two-tree (`research/answer-voice-2026-11-17.json`, verdict `answer-voice-closed`): 6 of 6 answers unnamed on pre-fix `dc2317d`, 0 of 6 here, 0 control regressions. Pin `test/answer-voice.test.mjs` red on the pre-fix tree; mutation ladder 8/8 caught, control green, tree byte-identical.\n\nThis also fixes a harness leak: the dialect measurement wrote a 68 MB `git archive` into `/tmp` every run and cleaned up a path it had never written — 87 archives / 5.6 GB filled the disk. The cleanup now removes the archive it actually created.\n\n## Honest limits\n\nZero external users; one machine; no audit. PUBLISH != CONSUMPTION. The\npublished 0.4.35 and earlier are immutable: they answer unnamed, and that is\nmeasured on them rather than erased from them. `answer: true` is a new JSON\nfield — scripts that parsed the prose before still get the same prose.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-17T17:09:16Z",
+        "createdAt": "2026-11-17T17:08:57Z"
+      },
       {
         "tag": "v0.4.35",
         "body": "The lock surface — the product's own CI gate — now names its refusals.\n\n## Install\n\n```bash\nnpm install sememe\n# or, from the tagged release:\nnpm install github:auroraxo/sememe#v0.4.35\n```\n\n## What changed\n\nEvery refusal on the lock surface answers the machine channel the rest of the\nproduct answers — `{\"error\": …, \"code\": …, \"fix\": …}` — so a pipeline branches\ninstead of reading prose:\n\n- `lock-v1-parse` — the lock file holds no JSON document\n- `lock-v1-shape` — not a v1 lock document\n- `lock-v1-fingerprint` — a pinned fingerprint is not `sha256:<64 hex>`\n- `lock-v1-origin` — a pinned origin is not a string\n- `lock-pins-nothing` — nothing is pinned, so the gate could never detect drift\n- `lock-mismatch` — the gate failed: the store does not match the lock\n\nThe gate refusal additionally carries `violations` — the programs of every kind\n— because a pipeline that has to parse a sentence to tell \"the store drifted\"\nfrom \"a receipt is damaged\" is not a pipeline. The receipt-integrity refusals\n(`receipt-tampered`, `receipt-relabelled`) no longer mint a code the CLI then\ndrops.\n\nThe channel does not move: a document fault and a gate failure keep exit 1 (the\nwork ran, the bytes were wrong); a lock path the caller named keeps exit 2. A\nstore that does not exist is an ANSWER, not a refusal, and keeps its own\nsentence.\n\n## Measured\n\n`research/lock-voice-2026-11-17.json` (verdict `lock-voice-closed`): 13 of 13\nlock-surface refusals were unnamed and repairless on the pre-fix tree, and 2\nrefusals minted a code the CLI dropped — 0/0/0 here, 0 control regressions.\nThe pin is `test/lock-voice.test.mjs` (19 faces); the mutation ladder is 8/8\nCAUGHT with the control green and the tree byte-identical.\n\n## Honest limits\n\nZero external users; one machine; no audit. PUBLISH != CONSUMPTION. The\npublished 0.4.34 and earlier are immutable: they carry the defect, and it is\nmeasured on them rather than erased from them.\n",
@@ -329,6 +337,7 @@
       "v0.4.33",
       "v0.4.34",
       "v0.4.35",
+      "v0.4.36",
       "v0.4.4",
       "v0.4.5",
       "v0.4.6",
@@ -338,7 +347,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.35"
+        "v0.4.36"
       ],
       "documentedCommands": [
         "pull",
@@ -372,6 +381,116 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.36": {
+        "manifest": {
+          "version": "0.4.36",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-hadron",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "hadron",
+          "gap",
+          "mailbox"
+        ],
+        "entryExports": [
+          "COUNT_FROM_HEADER",
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "countFromHeader",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.36"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "lock",
+            "verify",
+            "adopt-hadron"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "mailbox",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.35": {
         "manifest": {
           "version": "0.4.35",
@@ -4055,13 +4174,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.35",
-    "latestTag": "v0.4.35",
+    "newestTag": "v0.4.36",
+    "latestTag": "v0.4.36",
     "pinnedTags": [
-      "v0.4.35"
+      "v0.4.36"
     ]
   },
   "perRelease": {
+    "v0.4.36": {
+      "defects": []
+    },
     "v0.4.35": {
       "defects": []
     },

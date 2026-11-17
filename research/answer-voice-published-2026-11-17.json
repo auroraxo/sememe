@@ -1,0 +1,203 @@
+{
+  "tool": "tools/measure-answer-voice-published.mjs",
+  "measuredAt": "2026-11-17T17:14:57Z",
+  "question": "do the store answers reach a stranger with a branchable code and their own answer semantics, or as bare prose indistinguishable from a refusal?",
+  "carrier": {
+    "requested": "0.4.35",
+    "installed": "0.4.35"
+  },
+  "fixed": {
+    "requested": "0.4.36",
+    "installed": "0.4.36"
+  },
+  "faces": [
+    "decodeNoStore",
+    "accountNoStore",
+    "lockNoStore",
+    "verifyNoStore",
+    "decodeNoStoredIdl",
+    "accountNoStoredIdl"
+  ],
+  "answerFaces": [
+    "decodeNoStore",
+    "accountNoStore",
+    "lockNoStore",
+    "verifyNoStore",
+    "decodeNoStoredIdl",
+    "accountNoStoredIdl"
+  ],
+  "controls": [
+    "greenGate",
+    "refusalVoice",
+    "damageVoice"
+  ],
+  "detail": {
+    "decodeNoStore": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "answer": false,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "no-sememe-store",
+        "answer": true,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      }
+    },
+    "accountNoStore": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "answer": false,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "no-sememe-store",
+        "answer": true,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      }
+    },
+    "lockNoStore": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "answer": false,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "no-sememe-store",
+        "answer": true,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      }
+    },
+    "verifyNoStore": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "answer": false,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "no-sememe-store",
+        "answer": true,
+        "fix": null,
+        "error": "no sememe store at <TMP>/no-such-store: run \"sememe pull\" first"
+      }
+    },
+    "decodeNoStoredIdl": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "answer": false,
+        "fix": null,
+        "error": "no stored IDL for program 4bCbe9vJAbtpajLfgHyLbEYWcAvAhXXLbQ6kZ1QwqVvT in <TMP>/store"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "no-stored-idl",
+        "answer": true,
+        "fix": null,
+        "error": "no stored IDL for program 4bCbe9vJAbtpajLfgHyLbEYWcAvAhXXLbQ6kZ1QwqVvT in <TMP>/store"
+      }
+    },
+    "accountNoStoredIdl": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "answer": false,
+        "fix": null,
+        "error": "no stored IDL for program 4bCbe9vJAbtpajLfgHyLbEYWcAvAhXXLbQ6kZ1QwqVvT in <TMP>/store"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "no-stored-idl",
+        "answer": true,
+        "fix": null,
+        "error": "no stored IDL for program 4bCbe9vJAbtpajLfgHyLbEYWcAvAhXXLbQ6kZ1QwqVvT in <TMP>/store"
+      }
+    }
+  },
+  "controlsDetail": {
+    "greenGate": {
+      "carrier": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "answer": false,
+        "green": true
+      },
+      "fixed": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "answer": false,
+        "green": true
+      }
+    },
+    "refusalVoice": {
+      "carrier": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)",
+        "answer": false
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "store-not_a_directory",
+        "fix": "fix: point --store at a directory sememe can use (it holds receipts/ and objects/)",
+        "answer": false
+      }
+    },
+    "damageVoice": {
+      "carrier": {
+        "exit": 1,
+        "code": "store-object-missing",
+        "fix": "fix: re-run \"sememe pull <program-id>\" so the store holds the receipt and its object again",
+        "answer": false
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "store-object-missing",
+        "fix": "fix: re-run \"sememe pull <program-id>\" so the store holds the receipt and its object again",
+        "answer": false
+      }
+    }
+  },
+  "carrierUnnamedFaces": [
+    "decodeNoStore",
+    "accountNoStore",
+    "lockNoStore",
+    "verifyNoStore",
+    "decodeNoStoredIdl",
+    "accountNoStoredIdl"
+  ],
+  "fixedUnnamedFaces": [],
+  "fixedUnmarkedFaces": [],
+  "fixedRepairedFaces": [],
+  "fixedWrongChannelFaces": [],
+  "fixedWrongSentenceFaces": [],
+  "controlRegression": [],
+  "hostPathLeak": false,
+  "verdict": {
+    "carrierUnnamedFaces": 6,
+    "fixedUnnamedFaces": 0,
+    "fixedUnmarkedFaces": 0,
+    "fixedRepairedFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "fixedWrongSentenceFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "answer-voice-held-on-the-published-channel"
+}
