@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-17T03:22:42.696Z",
+  "measuredAt": "2026-11-17T06:58:37.755Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.34",
+        "body": "The published package could not consume a reeflog mailbox. Now it can.\n\n## What was broken\n\n`sememe@0.4.33` shipped ZERO reeflog capability:\n\n```\nimport('sememe/mailbox')  -> ERR_PACKAGE_PATH_NOT_EXPORTED\nimport('sememe')          -> no mailbox/reeflog/harvest export at all\n```\n\nThe reader that honours reeflog's retraction contract lived only in\n`tools/harvest-reeflog.mjs`, and the package's `files` allowlist excludes\n`tools/` on purpose (the qualification harness is not a consumer's business).\nSo the contract that took two pulses to close on this side — *a row the chain\nunmade is never a payload source* — was unreachable from the channel consumers\ninstall. A consumer holding **both** published packages (`reeflog-client` for\nthe mailbox, `sememe` for the decoder) had no way to join them without cloning\nthe repository.\n\n## The integration was never the problem\n\nMeasured 2026-11-17 with `reeflog-client@0.7.32` and `sememe@0.4.33` both\ninstalled from npm into an empty app, against a real 2,417-event mainnet-beta\njournal: 63 events delivered, 1,307 instructions, 71 for the pinned program —\n**71/71 decoded and 71/71 byte-exact round trip**. Every line of it ran from\ncode in `tools/`. Nothing shipped.\n\n## What ships now\n\n`sememe/mailbox` — `mailboxTransactions({ rows, retractions, program, channelRead })`\nand `payloadsFromEnvelope(envelope, program)`. The module is **pure**: it spawns\nnothing, reads no file, touches no network. The transport is the caller's\n(`reeflog-client`'s typed API, the binary, a fixture).\n\n`tools/harvest-reeflog.mjs` now calls **it** rather than keeping a second copy\nof the classification loop, and `tools/lib/payloads.mjs` re-exports the shipped\nfunctions. Two copies of the retraction rule is exactly how a harness and a\nconsumer drift apart — and the consumer's copy is the one that did not exist.\n\n### The retraction contract, in the module and not in a comment\n\nreeflog delivers two independent signals that the chain unmade an event: `tail`\nprints each row's CURRENT seal, `reorg tail` prints the retraction on its own\ncursor. The seal is a snapshot taken while the row is read, so a retraction\nrecorded afterwards never appears in it — that is why the second channel exists.\n\n`mailboxTransactions` refuses **both**: a row whose `seal` is `reverted`, and\nany signature the channel names — whatever that row's seal says. Both are\ncounted (`rowsReverted`, `revertedSignatures`), the channel-only case is\nseparable (`reorgOnlySignatures`), the channel's delivery is counted\n(`reorgRetractions`), and `counts.channelRead` is true **only** when the caller\nsays it read the channel. A reader that never asked must not be able to claim it\nhonoured a retraction.\n\n## Measured on the published channel\n\n`sememe@0.4.33` (the version the README pinned until now) **refuses** the\nsubpath; this version **resolves** it, answers the same real journal rows with\nthe same counts, and decodes every payload byte-exactly\n(`research/mailbox-shipped-2026-11-17.json`, verdict\n`closed-on-the-published-channel`, 6/6 checks).\n\nEnd to end on the published channel, no checkout: **191/191 payloads decoded,\n191/191 byte-exact, 0 refusals.**\n\n## Gates\n\n- `test/mailbox-subpath.test.mjs` (7 faces): 7/7 RED on the pre-fix tree — the surface did not exist, which *is* the defect — 7/7 green after.\n- `tools/mutation-ladder-mailbox-subpath.sh`: 8/8 mutations caught, control green, tree byte-identical.\n- Suite 1203: 1198 pass / 0 fail / 5 skip.\n\n## Limits\n\n`channelRead` is a caller **assertion**, not a proof. This is the reader half of\nthe contract only — reeflog marks and delivers the retraction, sememe refuses to\nsource payloads from it, and neither heals history. 0 external users; one\nmachine; no audit. PUBLISH != CONSUMPTION.\n\n## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.34\n```\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-17T06:54:09Z",
+        "createdAt": "2026-11-17T06:48:39Z"
+      },
       {
         "tag": "v0.4.33",
         "body": "The path you name was closed in v0.4.31, the store directory you name in v0.4.32. What was left was the input sememe finds **itself**: the store path was right, and the store turned out to be damaged — then the reader refused it in the kernel's voice, with no code, no repair, and your home directory in the message.\n\n```\nsememe decode <program> <payload> --store ~/.sememe/store\n  -> {\"error\":\"store receipt <name>.json is unreadable: EACCES: permission denied, open '/home/you/…'\"}   exit 1\n```\n\nMeasured on the published `sememe@0.4.32`: **4 of 11** damage faces leaked a raw errno, **all 11** were unnamed and repairless — no code, no subject, no way to know what to repair.\n\n**v0.4.33**: `src/store-damage.mjs` is the one classifier for that class. Every damage refusal carries a code (`store-receipt-unreadable`, `store-receipt-not_json`, `store-object-program_mismatch`, `store-object-rehash_mismatch`, …), the subject it is about, a repair, and no errno; no refusal quotes an absolute path. The channel does not move: damage is the work channel (exit 1) — the path was usable and the product found broken bytes in it — while a path you named wrong keeps the usage/IO channel (exit 2).\n\n- Measured: 4/11 leaked before → **0/11 after** (`research/store-damage-voice-2026-11-17.json`, verdict `store-damage-voice-closed`)\n- Pin: 22 tests, red on the pre-fix tree (15 fail), green here\n- Mutation ladder: 8/8 caught, control green, tree byte-identical\n- Suite: 1,184 tests — 1,179 pass / 0 fail / 5 skip\n\n## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.33\n```\n\nHonest: 0 external users, one machine, no audit, PUBLISH != CONSUMPTION.\n",
@@ -311,6 +319,7 @@
       "v0.4.31",
       "v0.4.32",
       "v0.4.33",
+      "v0.4.34",
       "v0.4.4",
       "v0.4.5",
       "v0.4.6",
@@ -320,7 +329,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.33"
+        "v0.4.34"
       ],
       "documentedCommands": [
         "pull",
@@ -337,6 +346,7 @@
         "lighthouse",
         "store",
         "pull",
+        "mailbox",
         "codec",
         "canonical",
         "discriminators",
@@ -353,6 +363,116 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.34": {
+        "manifest": {
+          "version": "0.4.34",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-hadron",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "hadron",
+          "gap",
+          "mailbox"
+        ],
+        "entryExports": [
+          "COUNT_FROM_HEADER",
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "countFromHeader",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.34"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "lock",
+            "verify",
+            "adopt-hadron"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "mailbox",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.33": {
         "manifest": {
           "version": "0.4.33",
@@ -3816,13 +3936,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.33",
-    "latestTag": "v0.4.33",
+    "newestTag": "v0.4.34",
+    "latestTag": "v0.4.34",
     "pinnedTags": [
-      "v0.4.33"
+      "v0.4.34"
     ]
   },
   "perRelease": {
+    "v0.4.34": {
+      "defects": []
+    },
     "v0.4.33": {
       "defects": []
     },

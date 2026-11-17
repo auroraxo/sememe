@@ -4080,3 +4080,76 @@ it honoured a retraction.
   is my own daemon's.
 - 0 external users; one machine; no audit. PUBLISH != CONSUMPTION. The next
   release has to carry this before any of it can be claimed as shipped.
+
+---
+
+## 2026-11-17 — v0.4.34 PUBLISHED: the mailbox reader ships, and the channel agrees
+
+The previous entry measured the fix on THIS tree. This entry measures it on
+the CHANNEL a consumer installs — after the tag, after the npm publish, after
+the GitHub Release.
+
+### THE GAP THAT WAS MEASURED
+
+`sememe@0.4.33` — the version the README pinned until this release — refuses
+the subpath outright:
+
+```
+import('sememe/mailbox')  ->  ERR_PACKAGE_PATH_NOT_EXPORTED
+```
+
+Nothing in the published tarball could consume a reeflog mailbox. The reader
+lived in `tools/`, and `files` excludes `tools/` on purpose.
+
+### MEASURED ON THE PUBLISHED CHANNEL, 2026-11-17
+
+Two empty apps, two npm packages, no checkout of any kind:
+
+| | carrier | fixed |
+|---|---|---|
+| package | `sememe@0.4.33` | `sememe@0.4.34` |
+| `import('sememe/mailbox')` | **refused** | **resolved** |
+| payloads decoded | — | 191 |
+| byte-exact round trip | — | 191 |
+| refusals | — | 0 |
+
+End-to-end on the published channel, `reeflog-client@0.7.32` (npm) reading
+the mailbox and `sememe@0.4.34` (npm) decoding the payloads, against the real
+2,417-event journal:
+
+```
+events 2417 · pinnedSignatures 251 · missing 0 · payloads 191
+transactionsWithTargetPayloads 131 · failedOnChain 136
+rowsWithoutEnvelope 2166 · rowsReverted 0 · channelRead true
+decoded 191 · roundTrip 191 · refusals 0
+verdict: PUBLISHED-INTEGRATION-HOLDS
+```
+
+### THE RELEASE GATES, RE-MEASURED AGAINST THE PUBLISHED v0.4.34
+
+All three pin-lag gates that were RED after the version bump went GREEN once
+the tag, the npm publish and the GitHub Release existed:
+
+- `tools/measure-shipped-readme-pin.mjs` → `this tree would ship:
+  {"version":"0.4.34","pins":["v0.4.34"],"verdict":"clean"}` (the immutable
+  history stays measured as defective: 0.4.23 and 0.4.28 still carry two pins).
+- `tools/measure-channel-parity.mjs` → `0.4.34 parity gitHead=cc1e241d
+  tag=cc1e241d same` — the published tarball's `gitHead` IS the tag.
+- `tools/measure-release-surface.mjs` → `{"verdict":"clean","defects":[],
+  "newestTag":"v0.4.34","latestTag":"v0.4.34","pinnedTags":["v0.4.34"]}`.
+
+The release-surface gate first answered `defective:v0.4.34:body-no-install-command`
+— the release notes I wrote carried no install command. The gate was right and
+the body was wrong; the body was amended and the re-measurement answered
+`clean`. A gate that can still say no about a release I just wrote is the only
+kind worth having.
+
+### LIMITS
+
+- The channel measurement ran on THIS host with THIS npm minutes after the
+  publish. Registry propagation was observed, not assumed: the first attempt
+  after `npm publish` still answered `latest: 0.4.33`.
+- `channelRead` is a caller ASSERTION, not a proof.
+- The reader half of the contract only — reeflog marks and delivers the
+  retraction, sememe refuses to source payloads from it, neither heals history.
+- 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
