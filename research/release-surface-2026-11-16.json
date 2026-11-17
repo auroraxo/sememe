@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-16T23:41:53.521Z",
+  "measuredAt": "2026-11-17T01:02:16.346Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.32",
+        "body": "The file you name was closed in v0.4.31; the **directory** you name was not. `--store <dir>` is a path you chose, and when it was wrong the answer was still the kernel's:\n\n```\nsememe decode <program> <payload> --store /tmp/store-file\n  -> {\"error\":\"ENOTDIR: not a directory, scandir '/tmp/store-file/receipts'\"}   exit 1\n```\n\nMeasured on the published `sememe@0.4.31`: **13 of 13** caller-named store faces leaked a raw errno — no name, no subject (the store root, its `receipts/` and its `objects/` are three faults with three repairs), and the wrong channel (a mistyped path shared exit 1 with a real refusal).\n\n**v0.4.32**: `src/store-input.mjs` is the one classifier for the store path. Every refusal names a code (`store-not_a_directory`, `store-receipts-unreadable`, `store-objects-not_a_directory`, …), the exact path and a repair, on the usage/IO channel (exit 2) — nothing ran. A store that does not exist is still an answer, not a refusal.\n\n- Measured: 13/13 leaked before → **0/13 after** (`research/store-input-voice-2026-11-17.json`, verdict `store-input-voice-closed`)\n- Pin: 21 tests, red on the pre-fix tree (16 fail), green here\n- Mutation ladder: 9/9 caught, control green, tree byte-identical\n- Suite: 1,162 tests — 1,157 pass / 0 fail / 5 skip\n\nHonest: 0 external users, one machine, no audit, PUBLISH != CONSUMPTION.\n\n## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.32\n```\n\n```bash\nnpm install sememe\n```\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-17T00:56:52Z",
+        "createdAt": "2026-11-17T00:56:28Z"
+      },
       {
         "tag": "v0.4.31",
         "body": "The caller-named file was the last input class `sememe` answered with a raw kernel errno.\n\n**Measured on the published `sememe@0.4.30`** (installed into an empty app, 2026-11-16): a caller points at a file — the interface to adopt, the transaction to check, the lock to verify against, the file to write the lock to — and when that path was wrong, the answer was the kernel's, verbatim:\n\n```\nsememe conform /tmp/nope.json --store ./store\n  -> {\"error\":\"ENOENT: no such file or directory, open '/tmp/nope.json'\"}   exit 1\n```\n\nThree faults in that one line: **no name** (a syscall's prose — nothing for a script to branch on), **no subject** (`conform` never said *which* argument was wrong), and **the wrong channel** — a mistyped path shared exit 1 with a real refusal (a drifted store, a tampered receipt), so a CI script could not tell \"you pointed me at nothing\" from \"your store drifted\".\n\n**10 of 12** caller-named faces leaked a raw errno before. **0 of 12** now, every refusal naming a code, a subject, a reason and a repair:\n\n```\nsememe conform /tmp/nope.json --store ./store\n  -> {\"error\":\"sememe conform: the transaction file /tmp/nope.json does not exist (conform-file-missing)\",\n      \"code\":\"conform-file-missing\",\"fix\":\"fix: pass the path of a file that exists\"}   exit 2\n```\n\nThe IO faces (missing / directory / unreadable) travel on the **usage/IO channel (exit 2)** — nothing ran, so nothing was read and no store was touched. A file that *is* there but holds the wrong bytes keeps **exit 1**: the work ran and found wrong bytes, which is a different fact. `src/file-input.mjs` is the one classifier; the errno is input, never output.\n\n**Evidence**\n- `research/file-input-voice-2026-11-16.json` — verdict `file-input-voice-closed`: the same probe across the fix (pre-fix tree `3ef9ca8` extracted by `git archive`, so the baseline is stable forever) — 10 leaked → 0, 0 unnamed, 0 repairless, 0 on the wrong channel, 0 control regressions, 0 host paths.\n- `test/file-input-voice.test.mjs` — the twelve faces, the subject, the content channel, the controls (adopt / conform / lock still work), the library path, the classifier's contract, the flag channel as a guard.\n- `tools/mutation-ladder-file-input-voice.sh` — 8/8 mutations caught, control green, tree byte-identical.\n- Suite 1141: 1136 pass / 0 fail / 5 skip (baseline was 1119/0/5).\n\n**Install**\n\n```bash\nnpm install sememe\nnpm install github:auroraxo/sememe#v0.4.31\n```\n\n**Honest limits.** No external users — publish is not consumption; one machine, no audit, not an audit. The ecosystem coverage headline does not move: 88.8% (18,967/21,350 payloads). This release changes how a wrong path is refused, not what decodes: nothing on the decode path, the fingerprint store, or the acquisition channels changed.\n",
@@ -293,6 +301,7 @@
       "v0.4.3",
       "v0.4.30",
       "v0.4.31",
+      "v0.4.32",
       "v0.4.4",
       "v0.4.5",
       "v0.4.6",
@@ -302,7 +311,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.31"
+        "v0.4.32"
       ],
       "documentedCommands": [
         "pull",
@@ -335,6 +344,114 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.32": {
+        "manifest": {
+          "version": "0.4.32",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-hadron",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "hadron",
+          "gap"
+        ],
+        "entryExports": [
+          "COUNT_FROM_HEADER",
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "countFromHeader",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.32"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "lock",
+            "verify",
+            "adopt-hadron"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.31": {
         "manifest": {
           "version": "0.4.31",
@@ -3582,13 +3699,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.31",
-    "latestTag": "v0.4.31",
+    "newestTag": "v0.4.32",
+    "latestTag": "v0.4.32",
     "pinnedTags": [
-      "v0.4.31"
+      "v0.4.32"
     ]
   },
   "perRelease": {
+    "v0.4.32": {
+      "defects": []
+    },
     "v0.4.31": {
       "defects": []
     },
