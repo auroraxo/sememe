@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-17T01:02:16.346Z",
+  "measuredAt": "2026-11-17T03:22:42.696Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.33",
+        "body": "The path you name was closed in v0.4.31, the store directory you name in v0.4.32. What was left was the input sememe finds **itself**: the store path was right, and the store turned out to be damaged — then the reader refused it in the kernel's voice, with no code, no repair, and your home directory in the message.\n\n```\nsememe decode <program> <payload> --store ~/.sememe/store\n  -> {\"error\":\"store receipt <name>.json is unreadable: EACCES: permission denied, open '/home/you/…'\"}   exit 1\n```\n\nMeasured on the published `sememe@0.4.32`: **4 of 11** damage faces leaked a raw errno, **all 11** were unnamed and repairless — no code, no subject, no way to know what to repair.\n\n**v0.4.33**: `src/store-damage.mjs` is the one classifier for that class. Every damage refusal carries a code (`store-receipt-unreadable`, `store-receipt-not_json`, `store-object-program_mismatch`, `store-object-rehash_mismatch`, …), the subject it is about, a repair, and no errno; no refusal quotes an absolute path. The channel does not move: damage is the work channel (exit 1) — the path was usable and the product found broken bytes in it — while a path you named wrong keeps the usage/IO channel (exit 2).\n\n- Measured: 4/11 leaked before → **0/11 after** (`research/store-damage-voice-2026-11-17.json`, verdict `store-damage-voice-closed`)\n- Pin: 22 tests, red on the pre-fix tree (15 fail), green here\n- Mutation ladder: 8/8 caught, control green, tree byte-identical\n- Suite: 1,184 tests — 1,179 pass / 0 fail / 5 skip\n\n## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.33\n```\n\nHonest: 0 external users, one machine, no audit, PUBLISH != CONSUMPTION.\n",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-17T03:21:55Z",
+        "createdAt": "2026-11-17T03:15:53Z"
+      },
       {
         "tag": "v0.4.32",
         "body": "The file you name was closed in v0.4.31; the **directory** you name was not. `--store <dir>` is a path you chose, and when it was wrong the answer was still the kernel's:\n\n```\nsememe decode <program> <payload> --store /tmp/store-file\n  -> {\"error\":\"ENOTDIR: not a directory, scandir '/tmp/store-file/receipts'\"}   exit 1\n```\n\nMeasured on the published `sememe@0.4.31`: **13 of 13** caller-named store faces leaked a raw errno — no name, no subject (the store root, its `receipts/` and its `objects/` are three faults with three repairs), and the wrong channel (a mistyped path shared exit 1 with a real refusal).\n\n**v0.4.32**: `src/store-input.mjs` is the one classifier for the store path. Every refusal names a code (`store-not_a_directory`, `store-receipts-unreadable`, `store-objects-not_a_directory`, …), the exact path and a repair, on the usage/IO channel (exit 2) — nothing ran. A store that does not exist is still an answer, not a refusal.\n\n- Measured: 13/13 leaked before → **0/13 after** (`research/store-input-voice-2026-11-17.json`, verdict `store-input-voice-closed`)\n- Pin: 21 tests, red on the pre-fix tree (16 fail), green here\n- Mutation ladder: 9/9 caught, control green, tree byte-identical\n- Suite: 1,162 tests — 1,157 pass / 0 fail / 5 skip\n\nHonest: 0 external users, one machine, no audit, PUBLISH != CONSUMPTION.\n\n## Install\n\n```bash\nnpm install github:auroraxo/sememe#v0.4.32\n```\n\n```bash\nnpm install sememe\n```\n",
@@ -302,6 +310,7 @@
       "v0.4.30",
       "v0.4.31",
       "v0.4.32",
+      "v0.4.33",
       "v0.4.4",
       "v0.4.5",
       "v0.4.6",
@@ -311,7 +320,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.32"
+        "v0.4.33"
       ],
       "documentedCommands": [
         "pull",
@@ -344,6 +353,114 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.33": {
+        "manifest": {
+          "version": "0.4.33",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-hadron",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "hadron",
+          "gap"
+        ],
+        "entryExports": [
+          "COUNT_FROM_HEADER",
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "countFromHeader",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.33"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "lock",
+            "verify",
+            "adopt-hadron"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.32": {
         "manifest": {
           "version": "0.4.32",
@@ -3699,13 +3816,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.32",
-    "latestTag": "v0.4.32",
+    "newestTag": "v0.4.33",
+    "latestTag": "v0.4.33",
     "pinnedTags": [
-      "v0.4.32"
+      "v0.4.33"
     ]
   },
   "perRelease": {
+    "v0.4.33": {
+      "defects": []
+    },
     "v0.4.32": {
       "defects": []
     },
