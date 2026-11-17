@@ -230,9 +230,17 @@ test('the tool installs the zero-RPC guard before anything else can fetch', () =
   const source = fs.readFileSync(TOOL, 'utf8');
   const guardImport = source.indexOf("from './lib/network-guard.mjs'");
   assert.ok(guardImport > 0, 'tool imports the guard');
-  for (const other of ["from 'node:child_process'", "from './lib/payloads.mjs'", "from './lib/slot-range.mjs'"]) {
+  // 2026-11-17: the reader moved from `./lib/payloads.mjs` to the SHIPPED
+  // `../src/mailbox.mjs` (the npm package excludes tools/, so the consumer's
+  // copy of the reader had to be the shipped one). The pin follows the move:
+  // the ORDER is the contract, not the module's path.
+  for (const other of ["from 'node:child_process'", "from '../src/mailbox.mjs'", "from './lib/slot-range.mjs'"]) {
     const at = source.indexOf(other);
     assert.ok(at > 0, `tool imports ${other}`);
     assert.ok(guardImport < at, 'the guard import comes first');
   }
+  // The reader must be the SHIPPED one — a second copy in tools/ is exactly
+  // how the harness and a consumer drift apart.
+  assert.ok(!source.includes("from './lib/payloads.mjs'"),
+    'the tool must not keep a private copy of the reader');
 });

@@ -47,7 +47,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { payloadsFromEnvelope } from './lib/payloads.mjs';
+import { mailboxTransactions, payloadsFromEnvelope } from '../src/mailbox.mjs';
 import { slotRange } from './lib/slot-range.mjs';
 
 const args = process.argv.slice(2);
@@ -121,50 +121,28 @@ if (reorgRun.code !== 0) {
 const reorgRetractions = reorgRun.out.split('\n').filter(Boolean).map((line) => {
   try { return JSON.parse(line); } catch { return null; }
 }).filter((r) => r && typeof r.reorg_id === 'number' && typeof r.signature === 'string');
-const reorgSignatures = new Set(reorgRetractions.map((r) => r.signature));
 
-const transactions = [];
-let rowsWithoutEnvelope = 0;
-let rowsWithoutInstructions = 0;
-let rowsWithoutTargetPayloads = 0;
-// Retracted rows: named, never harvested. reeflog prints each row's CURRENT
-// seal on `tail` AND carries the retraction itself on `reorg tail`; dropping
-// either signal is what reeflog issue #1 called the retracted claim. The
-// counter is a debt like the others — the row is reported, not swallowed.
-// `rowsReverted` counts rows of THIS journal; `reorgOnlySignatures` names
-// retractions the channel delivered that the row read did not show as
-// reverted (a retraction that arrived after the row was read).
-let rowsReverted = 0;
-const revertedSignatures = [];
-const reorgOnlySignatures = [];
-
-for (const row of rows) {
-  // Both signals decide first: a row the chain unmade is not a payload
-  // source, and it is not an envelope debt `hydrate --accounts` could ever
-  // close either (the chain no longer knows the transaction). It gets its own
-  // bucket, ahead of both.
-  const revertedBySeal = row.seal === 'reverted';
-  const revertedByChannel = typeof row.signature === 'string' && reorgSignatures.has(row.signature);
-  if (revertedBySeal || revertedByChannel) {
-    rowsReverted++;
-    if (row.signature) revertedSignatures.push(row.signature);
-    if (revertedByChannel && !revertedBySeal) reorgOnlySignatures.push(row.signature);
-    continue;
-  }
-  const envelope = row.accounts && typeof row.accounts === 'object' ? row.accounts : null;
-  if (!envelope) { rowsWithoutEnvelope++; continue; }
-  if (!Array.isArray(envelope.instructions)) { rowsWithoutInstructions++; continue; }
-  const payloads = payloadsFromEnvelope(envelope, program);
-  if (!payloads.length) rowsWithoutTargetPayloads++;
-  transactions.push({
-    signature: row.signature,
-    slot: Number.isSafeInteger(row.slot) ? row.slot : null,
-    position: null, // the journal does not know a block position; not needed to compare payloads
-    txErr: envelope.err !== undefined ? envelope.err : (row.err ?? null),
-    missing: false,
-    payloads,
-  });
-}
+// The READER is `src/mailbox.mjs` — the module the npm package ships. This
+// tool used to keep its own copy of the classification loop; a second copy is
+// exactly how the harness and a consumer drift apart, and the consumer's copy
+// was the one that did not exist at all (measured 2026-11-17: the published
+// `sememe@0.4.33` exports no mailbox surface). One function, one contract.
+// `channelRead: true` because both channels were just read above, each with
+// its own fresh cursor.
+const { transactions, counts } = mailboxTransactions({
+  rows,
+  retractions: reorgRetractions,
+  program,
+  channelRead: true,
+});
+const {
+  rowsWithoutEnvelope,
+  rowsWithoutInstructions,
+  rowsWithoutTargetPayloads,
+  rowsReverted,
+  revertedSignatures,
+  reorgOnlySignatures,
+} = counts;
 
 // A harvest that yielded nothing must not be written as a success.
 const payloadCount = transactions.reduce((sum, t) => sum + t.payloads.length, 0);
@@ -216,6 +194,10 @@ const document = {
     // which signatures it withdrew that the row's seal had not (yet) shown.
     reorgRetractions: reorgRetractions.length,
     reorgOnlySignatures,
+    // True because BOTH channels were read above, each with its own fresh
+    // cursor. A consumer that skips `reorg tail` gets false from the same
+    // function instead of a claim it cannot back.
+    channelRead: true,
   },
   slotRange: slotRange(slots),
   transactions,

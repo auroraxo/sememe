@@ -86,7 +86,11 @@ test('every file the package ships imports only node: builtins or relative files
     'src/native.mjs', 'src/short-forms.mjs', 'src/store-read.mjs', 'src/store-write.mjs',
     'src/token-interface.mjs',
     'src/token.mjs', 'src/raydium-interface.mjs',
-    'src/raydium.mjs', 'src/union.mjs', 'src/wire-layout.mjs'];
+    'src/raydium.mjs', 'src/union.mjs', 'src/wire-layout.mjs',
+    // The shipped mailbox reader (2026-11-17): it spawns nothing and imports
+    // no package — the transport is the caller's — so it must hold the same
+    // zero-dependency rule as the rest of the decoder core.
+    'src/mailbox.mjs'];
   const files = zeroDependency.map((name) => path.join(ROOT, name));
   assert.ok(files.length >= 13, `expected the shipped sources, found ${files.length}`);
   const violations = [];
@@ -140,7 +144,7 @@ test('the package does not ship the qualification harness', async () => {
 });
 
 test('the documented subpaths resolve through the exports map', async () => {
-  for (const sub of ['./native', './token', './raydium', './store', './pull', './codec', './canonical', './discriminators', './native-corpus', './native-audit', './lighthouse', './package.json']) {
+  for (const sub of ['./native', './token', './raydium', './store', './pull', './codec', './canonical', './discriminators', './native-corpus', './native-audit', './lighthouse', './mailbox', './package.json']) {
     assert.ok(pkg.exports[sub], `exports must declare "${sub}"`);
     // The map must point at a file that exists, otherwise the install succeeds
     // and the first import fails.

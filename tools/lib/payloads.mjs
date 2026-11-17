@@ -14,17 +14,11 @@
 // Ignoring either case would silently produce an EMPTY payload list and a
 // fixture that measures nothing while looking successful.
 
-import { decodeBase58 } from '../../src/base58.mjs';
-
-/**
- * RPC `encoding: 'json'` yields instruction data as base58; the fixtures and
- * the codec speak hex, so convert once at the edge with the repo's own
- * decoder (same bytes, no third-party import).
- */
-export function toHex(data) {
-  if (typeof data !== 'string' || !data.length) return '';
-  return Buffer.from(decodeBase58(data)).toString('hex');
-}
+// One implementation of the base58->hex edge conversion, shared with the
+// SHIPPED reader (2026-11-17): the harness must not carry a second copy of
+// anything the consumer gets.
+export { toHex } from '../../src/mailbox.mjs';
+import { toHex } from '../../src/mailbox.mjs';
 
 /**
  * All account keys of one transaction, in the order the indices refer to:
@@ -127,29 +121,13 @@ export function extractPayloads(transaction, target) {
  * @param {string} target program id to collect
  * @returns {object[]} payload records identical in shape to extractPayloads
  */
-export function payloadsFromEnvelope(envelope, target) {
-  const payloads = [];
-  const instructions = envelope?.instructions;
-  if (!Array.isArray(instructions)) return payloads;
-  for (const instruction of instructions) {
-    if (!instruction || instruction.program_id !== target) continue;
-    const data = typeof instruction.data === 'string' ? instruction.data : '';
-    if (instruction.inner === true) {
-      payloads.push({
-        ix: Number.isSafeInteger(instruction.outer) ? instruction.outer : 0,
-        depth: 1,
-        innerIndex: Number.isSafeInteger(instruction.inner_index) ? instruction.inner_index : 0,
-        dataBase58: data,
-        dataHex: toHex(data),
-      });
-    } else {
-      payloads.push({
-        ix: Number.isSafeInteger(instruction.outer) ? instruction.outer : 0,
-        depth: 0,
-        dataBase58: data,
-        dataHex: toHex(data),
-      });
-    }
-  }
-  return payloads;
-}
+//
+// 2026-11-17: the BODY of this function moved to `src/mailbox.mjs` — the
+// module the npm package ships — and what remains here is a RE-EXPORT. The
+// reason is measured, not stylistic: `tools/` is excluded from the package's
+// `files` allowlist, so the published `sememe@0.4.33` shipped NO reader at
+// all (`import('sememe/mailbox')` -> ERR_PACKAGE_PATH_NOT_EXPORTED). A
+// second copy of the reader in the harness is exactly how the two drift
+// apart, so there is now ONE implementation and both callers import it.
+export { payloadsFromEnvelope } from '../../src/mailbox.mjs';
+

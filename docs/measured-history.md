@@ -3980,3 +3980,103 @@ LIMITS:
 - Only the store READER is measured, and only through the eleven damage faces the probe builds.
 - The two published versions are measured on THIS host, with THIS npm, at THIS moment.
 - 0 external users; one machine; no audit. PUBLISH != CONSUMPTION.
+
+## 2026-11-17 — THE PUBLISHED PACKAGE COULD NOT CONSUME A MAILBOX: the reader existed only where consumers never look
+
+### The defect, measured on the channel a stranger installs
+
+`sememe@0.4.33` ships ZERO reeflog capability. Measured from an empty app
+with the published package installed from the npm registry:
+
+```
+import('sememe/mailbox')  -> ERR_PACKAGE_PATH_NOT_EXPORTED
+import('sememe')          -> no mailbox/reeflog/harvest export at all
+find node_modules/sememe -name '*.mjs' -> no file reads a mailbox row
+```
+
+The reader that honours reeflog's retraction contract existed ONLY in
+`tools/harvest-reeflog.mjs`, and `package.json`'s `files` allowlist excludes
+`tools/` on purpose (the qualification harness is not a consumer's business).
+So the contract that took two pulses to close on this side — "a row the chain
+unmade is never a payload source" — was unreachable from the channel consumers
+actually install. A consumer holding BOTH published packages had no way to
+join them without cloning this repository.
+
+### The integration was never the problem
+
+Measured 2026-11-17 with `reeflog-client@0.7.32` AND `sememe@0.4.33` both
+installed from npm into an empty app, against a REAL 2,417-event mainnet-beta
+journal (own daemon, `hydrate --accounts`, 180 rows with envelopes):
+
+- 63 events delivered through the published client's exit-code contract;
+- 1,307 instructions in their envelopes;
+- 71 of them for the pinned program (Whirlpool);
+- **71/71 decoded and 71/71 byte-exact round trip** through the published
+  `sememe` decoder.
+
+Every line of that ran from code in `tools/`. Nothing shipped.
+
+### The fix: one implementation, in the package
+
+`src/mailbox.mjs` is now the reader, and it is what the package ships
+(`sememe/mailbox`). `tools/harvest-reeflog.mjs` calls IT — the harness no
+longer keeps a second copy of the classification loop, and
+`tools/lib/payloads.mjs` re-exports the shipped `payloadsFromEnvelope` and
+`toHex` instead of carrying its own bodies. Two copies of the retraction rule
+is exactly how the harness and a consumer drift apart, and the consumer's copy
+is the one that did not exist at all.
+
+The module is PURE: it spawns nothing, reads no file, touches no network. The
+transport is the caller's (`reeflog-client`'s typed API, the binary, a
+fixture); the module is the part that must not differ between the harness and
+the consumer.
+
+### The retraction contract, in the module and not in a comment
+
+reeflog delivers two independent signals that the chain unmade an event:
+`tail` prints each row's CURRENT seal, `reorg tail` prints the retraction on
+its own cursor. The seal is a snapshot taken while the row is read, so a
+retraction recorded afterwards never appears in it — that is why the second
+channel exists.
+
+`mailboxTransactions({ rows, retractions, program, channelRead })` therefore
+refuses BOTH: a row whose `seal` is `reverted`, and any signature the channel
+names — whatever that row's seal says. Both are counted (`rowsReverted`,
+`revertedSignatures`), the channel-only case is separable
+(`reorgOnlySignatures`), the channel's delivery is counted
+(`reorgRetractions`), and `counts.channelRead` is true ONLY when the caller
+says it read the channel. A reader that never asked must not be able to claim
+it honoured a retraction.
+
+### Gates
+
+- `test/mailbox-subpath.test.mjs` (7 faces): **7/7 RED on the pre-fix tree**
+  — not because the logic was wrong there, but because the surface did not
+  exist: the module could not be imported at all, which IS the defect. 7/7
+  green after the module and the exports entry landed. The guards (an ordinary
+  enriched row still yields its payloads; a missing envelope is DEBT, not a
+  silent drop; a foreign program yields none) are green on both trees.
+- `tools/mutation-ladder-mailbox-subpath.sh`: **8/8 CAUGHT**, control green,
+  tree byte-identical. The mutations are the contract itself: drop the seal
+  check, drop the channel check, stop naming the channel-only retraction,
+  force `channelRead` true, stop counting the retraction, remove the exports
+  entry, let a retracted row fall through to the envelope path, and make the
+  envelope debt silent.
+- `tools/measure-mailbox-shipped.mjs` asks the question at the CHANNEL: it
+  installs the published version AND a fresh `npm pack` of this tree into two
+  empty apps and runs the same byte-identical probe against the same real
+  journal rows in each. A two-COMMIT measurement would have said "fixed"
+  while the published tarball still refused — which is exactly how this defect
+  survived.
+
+### LIMITS
+
+- `channelRead` is a caller ASSERTION, not a proof: a caller can pass `true`
+  without reading the channel, and nothing in the module can tell.
+- This is the reader half of the contract only. reeflog marks and delivers the
+  retraction, `sememe` refuses to source payloads from it, and NEITHER heals
+  history.
+- The measurement is on THIS host, with THIS npm, at THIS moment; the journal
+  is my own daemon's.
+- 0 external users; one machine; no audit. PUBLISH != CONSUMPTION. The next
+  release has to carry this before any of it can be claimed as shipped.
