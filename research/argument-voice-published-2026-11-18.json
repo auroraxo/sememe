@@ -1,0 +1,499 @@
+{
+  "tool": "tools/measure-argument-voice-published.mjs",
+  "measuredAt": "2026-11-18T14:24:52Z",
+  "question": "does a forgotten or wrong argument get the product's own named refusal on the usage channel, on the package a stranger installs?",
+  "method": "npm install <version> into an empty app -> byte-identical probe run inside the installed package",
+  "carrier": {
+    "requested": "0.4.37",
+    "installed": "0.4.37"
+  },
+  "fixed": {
+    "requested": "0.4.38",
+    "installed": "0.4.38"
+  },
+  "faces": [
+    "pullMissingId",
+    "gapMissingId",
+    "adoptMissingId",
+    "adoptMissingFile",
+    "decodeMissingId",
+    "decodeMissingPayload",
+    "decodeTrailingBadValue",
+    "decodeAbsentBadValue",
+    "conformMissingFile",
+    "decodeNativeTrailingBadValue",
+    "decodeTokenTrailingBadValue",
+    "decodeRaydiumTrailingBadValue",
+    "decodeAtaTrailingBadValue",
+    "decodeNativeMissingId",
+    "decodeNativeMissingPayload",
+    "decodeTokenMissingId",
+    "decodeTokenMissingPayload",
+    "decodeRaydiumMissingId",
+    "decodeRaydiumMissingPayload",
+    "decodeAtaMissingId",
+    "decodeAtaMissingPayload",
+    "decodeAtaBothPayloads",
+    "accountMissingId",
+    "accountMissingData",
+    "accountTrailingBadValue",
+    "verifyModeBadValue"
+  ],
+  "controls": [
+    "absentHelpOk",
+    "nativeProvenanceOk",
+    "ataEmptyOk",
+    "conformOnlyValid",
+    "conformOnlyMissingValue"
+  ],
+  "detail": {
+    "pullMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"pull needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"pull needs a program id (pull-program-id-missing)\",\"code\":\"pull-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe pull <program-id>\"}"
+      }
+    },
+    "gapMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"gap needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"gap needs a program id (gap-program-id-missing)\",\"code\":\"gap-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe gap <program-id>\"}"
+      }
+    },
+    "adoptMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"adopt needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"adopt needs a program id (adopt-program-id-missing)\",\"code\":\"adopt-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe adopt <program-id> <interface-file>\"}"
+      }
+    },
+    "adoptMissingFile": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"adopt needs the interface file to store\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"adopt needs the interface file to store (adopt-interface-file-missing)\",\"code\":\"adopt-interface-file-missing\",\"fix\":\"fix: pass the interface file as the second argument: sememe adopt <program-id> <interface-file>\"}"
+      }
+    },
+    "decodeMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode needs a program id (decode-program-id-missing)\",\"code\":\"decode-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe decode <program-id> <payload>\"}"
+      }
+    },
+    "decodeMissingPayload": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode needs an instruction payload\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode needs an instruction payload (decode-payload-missing)\",\"code\":\"decode-payload-missing\",\"fix\":\"fix: pass the instruction payload as the second argument: sememe decode <program-id> <payload>\"}"
+      }
+    },
+    "decodeTrailingBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\" (decode-trailing-invalid)\",\"code\":\"decode-trailing-invalid\",\"fix\":\"fix: pass --trailing report or --trailing error\"}"
+      }
+    },
+    "decodeAbsentBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--absent must be \\\"error\\\", \\\"report\\\" or \\\"verified\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--absent must be \\\"error\\\", \\\"report\\\" or \\\"verified\\\" (decode-absent-invalid)\",\"code\":\"decode-absent-invalid\",\"fix\":\"fix: pass --absent error, --absent report or --absent verified\"}"
+      }
+    },
+    "conformMissingFile": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"conform needs a transaction JSON file\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"conform needs a transaction JSON file (conform-transaction-file-missing)\",\"code\":\"conform-transaction-file-missing\",\"fix\":\"fix: pass the transaction JSON file as the first argument: sememe conform <transaction-file>\"}"
+      }
+    },
+    "decodeNativeTrailingBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\" (decode-native-trailing-invalid)\",\"code\":\"decode-native-trailing-invalid\",\"fix\":\"fix: pass --trailing report or --trailing error\"}"
+      }
+    },
+    "decodeTokenTrailingBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\" (decode-token-trailing-invalid)\",\"code\":\"decode-token-trailing-invalid\",\"fix\":\"fix: pass --trailing report or --trailing error\"}"
+      }
+    },
+    "decodeRaydiumTrailingBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\" (decode-raydium-trailing-invalid)\",\"code\":\"decode-raydium-trailing-invalid\",\"fix\":\"fix: pass --trailing report or --trailing error\"}"
+      }
+    },
+    "decodeAtaTrailingBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\" (decode-ata-trailing-invalid)\",\"code\":\"decode-ata-trailing-invalid\",\"fix\":\"fix: pass --trailing report or --trailing error\"}"
+      }
+    },
+    "decodeNativeMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-native needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-native needs a program id (decode-native-program-id-missing)\",\"code\":\"decode-native-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe decode-native <program-id> <payload>\"}"
+      }
+    },
+    "decodeNativeMissingPayload": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-native needs an instruction payload\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-native needs an instruction payload (decode-native-payload-missing)\",\"code\":\"decode-native-payload-missing\",\"fix\":\"fix: pass the instruction payload as the second argument: sememe decode-native <program-id> <payload>\"}"
+      }
+    },
+    "decodeTokenMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-token needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-token needs a program id (decode-token-program-id-missing)\",\"code\":\"decode-token-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe decode-token <program-id> <payload>\"}"
+      }
+    },
+    "decodeTokenMissingPayload": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-token needs an instruction payload\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-token needs an instruction payload (decode-token-payload-missing)\",\"code\":\"decode-token-payload-missing\",\"fix\":\"fix: pass the instruction payload as the second argument: sememe decode-token <program-id> <payload>\"}"
+      }
+    },
+    "decodeRaydiumMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-raydium needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-raydium needs a program id (decode-raydium-program-id-missing)\",\"code\":\"decode-raydium-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe decode-raydium <program-id> <payload>\"}"
+      }
+    },
+    "decodeRaydiumMissingPayload": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-raydium needs an instruction payload\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-raydium needs an instruction payload (decode-raydium-payload-missing)\",\"code\":\"decode-raydium-payload-missing\",\"fix\":\"fix: pass the instruction payload as the second argument: sememe decode-raydium <program-id> <payload>\"}"
+      }
+    },
+    "decodeAtaMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-ata needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-ata needs a program id (decode-ata-program-id-missing)\",\"code\":\"decode-ata-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe decode-ata <program-id> <payload>\"}"
+      }
+    },
+    "decodeAtaMissingPayload": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-ata needs an instruction payload (use --empty for the empty-input Create fallback)\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-ata needs an instruction payload (decode-ata-payload-missing)\",\"code\":\"decode-ata-payload-missing\",\"fix\":\"fix: pass the instruction payload as the second argument, or --empty for the empty-input Create fallback: sememe decode-ata <program-id> <payload>\"}"
+      }
+    },
+    "decodeAtaBothPayloads": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"decode-ata: give a payload or --empty, not both\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"decode-ata: give a payload or --empty, not both (decode-ata-payload-conflict)\",\"code\":\"decode-ata-payload-conflict\",\"fix\":\"fix: pass the payload OR --empty, not both\"}"
+      }
+    },
+    "accountMissingId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"account needs a program id\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"account needs a program id (account-program-id-missing)\",\"code\":\"account-program-id-missing\",\"fix\":\"fix: pass the program id as the first argument: sememe account <program-id> <account-data>\"}"
+      }
+    },
+    "accountMissingData": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"account needs the account data (base64 or hex)\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"account needs the account data (base64 or hex) (account-account-data-missing)\",\"code\":\"account-account-data-missing\",\"fix\":\"fix: pass the account data as the second argument: sememe account <program-id> <account-data>\"}"
+      }
+    },
+    "accountTrailingBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--trailing must be \\\"report\\\" or \\\"error\\\" (account-trailing-invalid)\",\"code\":\"account-trailing-invalid\",\"fix\":\"fix: pass --trailing report or --trailing error\"}"
+      }
+    },
+    "verifyModeBadValue": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "{\"error\":\"--mode must be \\\"error\\\" or \\\"warn\\\"\"}"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "present",
+        "fix": "present",
+        "error": "{\"error\":\"--mode must be \\\"error\\\" or \\\"warn\\\" (verify-mode-invalid)\",\"code\":\"verify-mode-invalid\",\"fix\":\"fix: pass --mode error or --mode warn\"}"
+      }
+    }
+  },
+  "controlsDetail": {
+    "absentHelpOk": {
+      "carrier": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "fixed": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      }
+    },
+    "nativeProvenanceOk": {
+      "carrier": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "fixed": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      }
+    },
+    "ataEmptyOk": {
+      "carrier": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "fixed": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      }
+    },
+    "conformOnlyValid": {
+      "carrier": {
+        "exit": 1,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "{\"error\":\"conformance refused: no-sememe-store — 11111111111111111111111111111111: no sememe store at ./arg-voice-store: run \\\"sememe pull\\\" first — the conformance gate cannot read this program from the store, so it cannot say the transaction conforms; repair: restore the receipt (re-run \\\"sememe pull\\\") or point --store at a verified store\"}"
+      },
+      "fixed": {
+        "exit": 1,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "{\"error\":\"conformance refused: no-sememe-store — 11111111111111111111111111111111: no sememe store at ./arg-voice-store: run \\\"sememe pull\\\" first — the conformance gate cannot read this program from the store, so it cannot say the transaction conforms; repair: restore the receipt (re-run \\\"sememe pull\\\") or point --store at a verified store\"}"
+      }
+    },
+    "conformOnlyMissingValue": {
+      "carrier": {
+        "exit": 2,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "sememe conform: missing value for --only"
+      },
+      "fixed": {
+        "exit": 2,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "sememe conform: missing value for --only"
+      }
+    }
+  },
+  "verdict": {
+    "carrierUnnamedFaces": 26,
+    "carrierRepairlessFaces": 26,
+    "carrierWrongChannelFaces": 26,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "argument-voice-held-on-the-published-channel",
+  "hostPathLeak": 0,
+  "tempPathLeak": 0
+}

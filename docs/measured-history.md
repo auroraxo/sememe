@@ -4519,6 +4519,18 @@ included in the instrument). And the first version of the probe leaked this host
 path (`~/.sememe` in a control's answer) — caught by the tool's own `hostPathLeak`
 guard before the artifact was committed; the control now passes a relative `--store`.
 
+**AT THE CHANNEL A STRANGER INSTALLS (2026-11-18, after the release):** publish is not
+consumption, so the claim was asked at the channel: two published npm versions into two
+empty apps, the same byte-identical probe run inside each installed package
+(`tools/measure-argument-voice-published.mjs`). `sememe@0.4.37` — the version the README
+pinned until this release — answers **26 of 26** faces unnamed, repairless and on exit 1;
+`sememe@0.4.38` answers **0 unnamed, 0 repairless, 0 wrong-channel**, the five controls
+keep their channels in both versions (`research/argument-voice-published-2026-11-18.json`,
+verdict `argument-voice-held-on-the-published-channel`; gate
+`test/argument-voice-published-measurement.test.mjs`, which re-installs both packages and
+must reproduce the committed counts; ladder
+`tools/mutation-ladder-argument-voice-published.sh` **8/8 caught**, control green).
+
 **HONEST LIMITS:** 0 external users — publish is not consumption; one machine; no audit.
 `v0.4.37` and older still answer all 26 faces as bare prose on exit 1 (tags immutable);
 the exit-1 → exit-2 move is a behaviour change for any script that branched on exit 1

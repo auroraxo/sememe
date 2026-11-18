@@ -63,9 +63,10 @@ let parseReadme, derive, binCommandsOf, normalizeExportsKeys, readTreeForTest;
 // The after-artifact moves WITH the release: release-surface-2026-11-14b.json
 // is the v0.4.27-era record (newest = latest = pinned = v0.4.27, verdict
 // clean). The 2026-11-14.json record is the v0.4.26 one — its body is the
-// frozen input L3 reads.
+// frozen input L3 reads. The current record (release-surface-2026-11-18.json)
+// carries the v0.4.38 body the live README now pins.
 const ARTIFACT = path.join(ROOT, 'research', 'release-surface-2026-11-14.json');
-const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-16.json');
+const AFTER = path.join(ROOT, 'research', 'release-surface-2026-11-18.json');
 
 test.before(async () => {
   const mod = await import(new URL(`file://${TOOL}`).href);
