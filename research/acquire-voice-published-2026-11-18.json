@@ -1,0 +1,263 @@
+{
+  "tool": "tools/measure-acquire-voice-published.mjs",
+  "measuredAt": "2026-11-17T23:56:20Z",
+  "question": "does the acquisition surface (--rpc) reach a stranger with named refusals — code, subject, repair, right channel — or in undici's/the parser's/web3.js's voice?",
+  "carrier": {
+    "requested": "0.4.36",
+    "installed": "0.4.36"
+  },
+  "fixed": {
+    "requested": "0.4.37",
+    "installed": "0.4.37"
+  },
+  "faces": [
+    "rpcHttp403",
+    "rpcHttp429",
+    "rpcHttp500",
+    "rpcGarbageBody",
+    "rpcJsonError",
+    "rpcShortResult",
+    "rpcUnreachable",
+    "rpcNotHttps",
+    "rpcBadProgramId"
+  ],
+  "refusalFaces": [
+    "rpcHttp403",
+    "rpcHttp429",
+    "rpcHttp500",
+    "rpcGarbageBody",
+    "rpcJsonError",
+    "rpcShortResult",
+    "rpcUnreachable",
+    "rpcNotHttps",
+    "rpcBadProgramId"
+  ],
+  "controls": [
+    "pullOk",
+    "gapUnknownHolds",
+    "storeAnswerVoice",
+    "flagVoice"
+  ],
+  "detail": {
+    "rpcHttp403": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "RPC unavailable: HTTP 403"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "rpc-forbidden",
+        "fix": "fix: use an endpoint that serves getMultipleAccounts without credentials, e.g. --rpc https://api.mainnet-beta.solana.com",
+        "error": "sememe pull: the endpoint \"https://127.0.0.1:35543/rpc\" answered HTTP 403 and refuses this client (rpc-forbidden)"
+      }
+    },
+    "rpcHttp429": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "RPC unavailable: HTTP 429"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "rpc-rate-limited",
+        "fix": "fix: wait for the rate-limit window to pass, or pass --rpc <another https endpoint> and run the pull again",
+        "error": "sememe pull: the endpoint \"https://127.0.0.1:37071/rpc\" answered HTTP 429 and is rate limiting sememe (retry-after 30s) (rpc-rate-limited)"
+      }
+    },
+    "rpcHttp500": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "RPC unavailable: HTTP 500"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "rpc-endpoint-failed",
+        "fix": "fix: retry later, or pass --rpc <another https endpoint> and run the pull again",
+        "error": "sememe pull: the endpoint \"https://127.0.0.1:40235/rpc\" answered HTTP 500 — the endpoint itself failed (rpc-endpoint-failed)"
+      }
+    },
+    "rpcGarbageBody": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "RPC unavailable: Unexpected token 'o', \"not json at all\n\" is not valid JSON"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "rpc-bad-body",
+        "fix": "fix: check the --rpc URL — this does not look like a JSON-RPC endpoint",
+        "error": "sememe pull: the endpoint \"https://127.0.0.1:44317/rpc\" answered HTTP 200 with a body that is not JSON (rpc-bad-body)"
+      }
+    },
+    "rpcJsonError": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "RPC unavailable: RPC error -32005"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "rpc-error-response",
+        "fix": "fix: retry later, or pass --rpc <another https endpoint> — this endpoint refused the request itself",
+        "error": "sememe pull: the endpoint \"https://127.0.0.1:33889/rpc\" answered a JSON-RPC error instead of accounts (code -32005): node is behind, please try a healthy node (rpc-error-response)"
+      }
+    },
+    "rpcShortResult": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "RPC unavailable: malformed RPC response"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "rpc-malformed-response",
+        "fix": "fix: retry, or pass --rpc <another https endpoint> — this one speaks JSON but not getMultipleAccounts",
+        "error": "sememe pull: the endpoint \"https://127.0.0.1:38761/rpc\" answered JSON without the account entries sememe asked for (rpc-malformed-response)"
+      }
+    },
+    "rpcUnreachable": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "RPC unavailable: fetch failed"
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "rpc-unreachable",
+        "fix": "fix: check the --rpc URL and your network, or pass --rpc <another https endpoint>",
+        "error": "sememe pull: the endpoint \"https://127.0.0.1:1/rpc\" could not be reached (rpc-unreachable)"
+      }
+    },
+    "rpcNotHttps": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "HTTPS RPC URL required"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "rpc-not-https",
+        "fix": "fix: pass an https:// endpoint with --rpc, e.g. --rpc https://api.mainnet-beta.solana.com",
+        "error": "sememe pull: HTTPS RPC URL required: \"http://127.0.0.1:1/rpc\" is not an https endpoint (rpc-not-https)"
+      }
+    },
+    "rpcBadProgramId": {
+      "carrier": {
+        "exit": 1,
+        "code": null,
+        "fix": null,
+        "error": "Non-base58 character"
+      },
+      "fixed": {
+        "exit": 2,
+        "code": "program-id-invalid",
+        "fix": "fix: pass the program's canonical base58 address (32 bytes), e.g. sememe pull whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc --store <dir>",
+        "error": "sememe pull: program id \"not-a-program-id\" is not a base58 program address (program-id-invalid)"
+      }
+    }
+  },
+  "controlsDetail": {
+    "pullOk": {
+      "carrier": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "answer": false
+      },
+      "fixed": {
+        "exit": 0,
+        "code": null,
+        "fix": null,
+        "answer": false
+      }
+    },
+    "gapUnknownHolds": {
+      "carrier": {
+        "exit": 3,
+        "code": null,
+        "fix": null,
+        "answer": false
+      },
+      "fixed": {
+        "exit": 3,
+        "code": null,
+        "fix": null,
+        "answer": false
+      }
+    },
+    "storeAnswerVoice": {
+      "carrier": {
+        "exit": 1,
+        "code": "no-sememe-store",
+        "fix": null,
+        "answer": true
+      },
+      "fixed": {
+        "exit": 1,
+        "code": "no-sememe-store",
+        "fix": null,
+        "answer": true
+      }
+    },
+    "flagVoice": {
+      "carrier": {
+        "exit": 2,
+        "code": null,
+        "fix": null,
+        "answer": false
+      },
+      "fixed": {
+        "exit": 2,
+        "code": null,
+        "fix": null,
+        "answer": false
+      }
+    }
+  },
+  "carrierUnnamedFaces": [
+    "rpcHttp403",
+    "rpcHttp429",
+    "rpcHttp500",
+    "rpcGarbageBody",
+    "rpcJsonError",
+    "rpcShortResult",
+    "rpcUnreachable",
+    "rpcNotHttps",
+    "rpcBadProgramId"
+  ],
+  "carrierRepairlessFaces": [
+    "rpcHttp403",
+    "rpcHttp429",
+    "rpcHttp500",
+    "rpcGarbageBody",
+    "rpcJsonError",
+    "rpcShortResult",
+    "rpcUnreachable",
+    "rpcNotHttps",
+    "rpcBadProgramId"
+  ],
+  "fixedUnnamedFaces": [],
+  "fixedRepairlessFaces": [],
+  "fixedWrongChannelFaces": [],
+  "controlRegression": [],
+  "hostPathLeak": false,
+  "verdict": {
+    "carrierUnnamedFaces": 9,
+    "carrierRepairlessFaces": 9,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "acquire-voice-held-on-the-published-channel"
+}

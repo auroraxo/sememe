@@ -4390,6 +4390,28 @@ M8 of the ladder reverts `src/pull.mjs` to the shipped `RPC unavailable: …` pr
 e2e pin is what goes red. `tools/mutation-ladder-acquire-voice.sh`: **9/9 caught, control
 green, tree byte-identical.**
 
+**THE CLAIM, THEN ASKED AT THE CHANNEL A STRANGER INSTALLS.** The two-tree
+measurement compares two COMMITS in this repository; it cannot say what a
+stranger receives — the most-repeated defect class here is exactly that gap
+("main fixed, the pin pointing behind it"). `tools/measure-acquire-voice-published.mjs`
+installs two PUBLISHED npm versions into two empty apps (with the optional peer
+`@solana/web3.js`, which the pull path needs) and runs the SAME byte-identical
+probe inside each installed package:
+
+    sememe@0.4.36 (the version the README pinned until v0.4.37):
+      9 of 9 faces refuse WITHOUT a code and WITHOUT a repair
+      {"error":"RPC unavailable: HTTP 429"}  … exit 1
+    sememe@0.4.37:
+      0 unnamed, 0 repairless, 0 wrong-channel, 0 control regressions
+      exit 2 where nothing was dispatched, exit 1 where it was
+
+`research/acquire-voice-published-2026-11-18.json`, verdict
+`acquire-voice-held-on-the-published-channel`. Pin
+`test/acquire-voice-published-measurement.test.mjs` (9, including the leg
+that re-derives the artifact from a FRESH measurement); ladder
+`tools/mutation-ladder-acquire-voice-published.sh` 8/8 CAUGHT, control green,
+tree byte-identical.
+
 **THE MEASUREMENT'S OWN FALSE STARTS** (kept because they are the lesson):
 
 - The first quick harness used `spawnSync`; the mock server never answered — all early

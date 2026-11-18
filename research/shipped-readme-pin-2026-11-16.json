@@ -1,13 +1,13 @@
 {
   "tool": "tools/measure-shipped-readme-pin.mjs",
-  "measuredAt": "2026-11-17T17:14:25.545Z",
+  "measuredAt": "2026-11-17T23:50:53.177Z",
   "question": "does the README a stranger receives pin exactly one install tag — and is that tag the version it ships with?",
   "registry": "registry.npmjs.org",
   "method": "npm pack <version> from the registry -> tarball README -> pin set; npm view <version> readme -> the page README; pins compared with the version itself",
   "verdict": "shipped-readme-pin-defective",
   "counts": {
-    "measured": 16,
-    "clean": 14,
+    "measured": 17,
+    "clean": 15,
     "twoPins": 2,
     "wrongTag": 0,
     "noPin": 0,
@@ -24,7 +24,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -38,7 +38,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -53,7 +53,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -67,7 +67,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -81,7 +81,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -95,7 +95,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -109,7 +109,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -124,7 +124,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -138,7 +138,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -152,7 +152,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -166,7 +166,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -180,7 +180,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -194,7 +194,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -208,7 +208,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -222,7 +222,7 @@
       "pageAgreesWithTarball": null,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     },
@@ -233,10 +233,24 @@
       ],
       "verdict": "clean",
       "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.37"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.37",
+      "pins": [
+        "v0.4.37"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
       "pageAgreesWithTarball": true,
       "pinnedTagExists": true,
       "npmPackageLevelReadmePins": [
-        "v0.4.36"
+        "v0.4.37"
       ],
       "pageIsPackageLevel": true
     }
@@ -244,15 +258,15 @@
   "packageLevelPageReadme": {
     "note": "npm keeps ONE package-level readme and serves it for every version; this is what the npm page shows for the package, compared with the newest tarball",
     "pins": [
-      "v0.4.36"
+      "v0.4.37"
     ],
     "agreesWithNewestTarball": true,
-    "newestVersion": "0.4.36"
+    "newestVersion": "0.4.37"
   },
   "thisTree": {
-    "version": "0.4.36",
+    "version": "0.4.37",
     "pins": [
-      "v0.4.36"
+      "v0.4.37"
     ],
     "verdict": "clean"
   },
