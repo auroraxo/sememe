@@ -32,6 +32,12 @@ import { VERIFIED_SHORT_FORMS, SHORT_FORM_SOURCE } from '../src/short-forms.mjs'
 // positionals it consumes). Imported statically: it has no imports of its
 // own, so it stays inside the decode core's zero-dependency guarantee.
 import { parseCommandArgs, UsageError } from '../src/cli-surface.mjs';
+// The ARGUMENTS a caller forgets or gets wrong. Imported statically: this
+// module has no imports of its own, so the decode core keeps its zero-
+// dependency guarantee. Every face it mints is a caller mistake about the
+// INVOCATION, so it travels on the usage channel (exit 2) — the channel the
+// product already reserves for a call that cannot be what the caller meant.
+import { argumentRefusal, isArgumentCode, ArgumentRefusal } from '../src/argument-voice.mjs';
 
 const usage = `usage:
   sememe absent-help
@@ -193,7 +199,7 @@ try {
       forms: VERIFIED_SHORT_FORMS,
     }, null, 2));
   } else if (command === 'pull') {
-    if (!program) throw Error('pull needs a program id');
+    if (!program) throw argumentRefusal('pull:program-id');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const rpc = option('--rpc', 'https://api.mainnet-beta.solana.com');
     let pull;
@@ -209,7 +215,7 @@ try {
     }
     console.log(JSON.stringify(await pull(program, store, rpc), null, 2));
   } else if (command === 'gap') {
-    if (!program) throw Error('gap needs a program id');
+    if (!program) throw argumentRefusal('gap:program-id');
     const rpc = option('--rpc', 'https://api.mainnet-beta.solana.com');
     // The LOCAL store first, exactly like pull/lock/verify: gap answers "what
     // is missing", and what is missing is relative to what THIS machine holds.
@@ -250,7 +256,7 @@ try {
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const lockFile = option('--lock', 'sememe.lock');
     const mode = option('--mode', 'error');
-    if (mode !== 'error' && mode !== 'warn') throw Error('--mode must be "error" or "warn"');
+    if (mode !== 'error' && mode !== 'warn') throw argumentRefusal('verify:mode');
     if (program) throw Error(`verify takes no program id — it checks the whole lock; got "${program}"`);
     const { checkLock } = await import('../src/lock.mjs');
     const report = await checkLock(store, lockFile, { mode });
@@ -272,9 +278,9 @@ try {
       // build is not a warning.
     }
   } else if (command === 'adopt') {
-    if (!program) throw Error('adopt needs a program id');
+    if (!program) throw argumentRefusal('adopt:program-id');
     const file = args.shift();
-    if (!file) throw Error('adopt needs the interface file to store');
+    if (!file) throw argumentRefusal('adopt:interface-file');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const source = option('--source', 'published');
     const origin = option('--origin', undefined);
@@ -326,17 +332,17 @@ try {
       note: 'the on-chain receipt still answers plain "sememe decode"; use "sememe decode --union" to let the two sources arbitrate by bytes',
     }, null, 2));
   } else if (command === 'decode') {
-    if (!program) throw Error('decode needs a program id');
+    if (!program) throw argumentRefusal('decode:program-id');
     const payload = args.shift();
-    if (!payload) throw Error('decode needs an instruction payload');
+    if (!payload) throw argumentRefusal('decode:payload');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const trailing = option('--trailing', undefined);
     if (trailing !== undefined && trailing !== 'report' && trailing !== 'error') {
-      throw Error('--trailing must be "report" or "error"');
+      throw argumentRefusal('decode:trailing');
     }
     const absent = option('--absent', undefined);
     if (absent !== undefined && !['error', 'report', 'verified'].includes(absent)) {
-      throw Error('--absent must be "error", "report" or "verified"');
+      throw argumentRefusal('decode:absent');
     }
     const union = unionRequested;
     const extra = { ...(trailing === undefined ? {} : { trailing }), ...(absent === undefined ? {} : { absent }) };
@@ -395,7 +401,7 @@ try {
     // The first positional after `conform` is the file (it lands in `program`
     // like every other command's first argument).
     const file = program ?? args.shift();
-    if (!file) throw Error('conform needs a transaction JSON file');
+    if (!file) throw argumentRefusal('conform:transaction-file');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const only = option('--only', undefined);
     // Accept either a bare transaction entry or the full RPC envelope. A
@@ -416,12 +422,12 @@ try {
       process.exitCode = 1;
     }
   } else if (command === 'decode-native') {
-    if (!program) throw Error('decode-native needs a program id');
+    if (!program) throw argumentRefusal('decode-native:program-id');
     const payload = args.shift();
-    if (!payload) throw Error('decode-native needs an instruction payload');
+    if (!payload) throw argumentRefusal('decode-native:payload');
     const trailing = option('--trailing', 'report');
     if (trailing !== 'report' && trailing !== 'error') {
-      throw Error('--trailing must be "report" or "error"');
+      throw argumentRefusal('decode-native:trailing');
     }
     const decoded = decodeNativeInstruction(program, parsePayload(payload), { trailing });
     console.log(JSON.stringify({
@@ -447,12 +453,12 @@ try {
       console.log(JSON.stringify(nativePrograms().map((id) => nativeProvenance(id)), null, 2));
     }
   } else if (command === 'decode-token') {
-    if (!program) throw Error('decode-token needs a program id');
+    if (!program) throw argumentRefusal('decode-token:program-id');
     const payload = args.shift();
-    if (!payload) throw Error('decode-token needs an instruction payload');
+    if (!payload) throw argumentRefusal('decode-token:payload');
     const trailing = option('--trailing', 'report');
     if (trailing !== 'report' && trailing !== 'error') {
-      throw Error('--trailing must be "report" or "error"');
+      throw argumentRefusal('decode-token:trailing');
     }
     const decoded = decodeTokenInstruction(program, parsePayload(payload), { trailing });
     if (decoded.refused === 'not-token') {
@@ -491,12 +497,12 @@ try {
       console.log(JSON.stringify(raydiumPrograms().map((id) => raydiumProvenance(id)), null, 2));
     }
   } else if (command === 'decode-raydium') {
-    if (!program) throw Error('decode-raydium needs a program id');
+    if (!program) throw argumentRefusal('decode-raydium:program-id');
     const payload = args.shift();
-    if (!payload) throw Error('decode-raydium needs an instruction payload');
+    if (!payload) throw argumentRefusal('decode-raydium:payload');
     const trailing = option('--trailing', 'report');
     if (trailing !== 'report' && trailing !== 'error') {
-      throw Error('--trailing must be "report" or "error"');
+      throw argumentRefusal('decode-raydium:trailing');
     }
     const decoded = decodeRaydiumInstruction(program, parsePayload(payload), { trailing });
     if (decoded.refused === 'not-raydium') {
@@ -517,10 +523,10 @@ try {
       interface: raydiumProvenance(program),
     }, null, 2));
   } else if (command === 'decode-ata') {
-    if (!program) throw Error('decode-ata needs a program id');
+    if (!program) throw argumentRefusal('decode-ata:program-id');
     const trailing = option('--trailing', 'report');
     if (trailing !== 'report' && trailing !== 'error') {
-      throw Error('--trailing must be "report" or "error"');
+      throw argumentRefusal('decode-ata:trailing');
     }
     // The empty payload is a REAL instruction for this program: the pin's
     // processor executes empty input as Create. It therefore needs a way to
@@ -529,10 +535,10 @@ try {
     const empty = flags['--empty'] === true;
     const payloadArg = args.shift();
     if (!payloadArg && !empty) {
-      throw Error('decode-ata needs an instruction payload (use --empty for the empty-input Create fallback)');
+      throw argumentRefusal('decode-ata:payload');
     }
     if (payloadArg && empty) {
-      throw Error('decode-ata: give a payload or --empty, not both');
+      throw argumentRefusal('decode-ata:payload-conflict');
     }
     const decoded = decodeAtaInstruction(program, empty ? Buffer.alloc(0) : parsePayload(payloadArg), { trailing });
     if (decoded.refused === 'not-ata') {
@@ -559,14 +565,14 @@ try {
     }
     console.log(JSON.stringify(provenance ?? ataPrograms().map((id) => ataProvenance(id)), null, 2));
   } else if (command === 'account') {
-    if (!program) throw Error('account needs a program id');
+    if (!program) throw argumentRefusal('account:program-id');
     const data = args.shift();
-    if (!data) throw Error('account needs the account data (base64 or hex)');
+    if (!data) throw argumentRefusal('account:account-data');
     const store = option('--store', path.join(os.homedir(), '.sememe'));
     const name = option('--name', undefined);
     const trailing = option('--trailing', undefined);
     if (trailing !== undefined && trailing !== 'report' && trailing !== 'error') {
-      throw Error('--trailing must be "report" or "error"');
+      throw argumentRefusal('account:trailing');
     }
     // The union path reads BOTH verified store sources for the program (the
     // on-chain pull and the adopted published copy) and arbitrates by byte
@@ -612,6 +618,21 @@ try {
       answer: true,
     }));
     process.exitCode = Number.isInteger(error.exitCode) ? error.exitCode : 1;
+  } else if (error instanceof ArgumentRefusal || (error?.fix && typeof error.code === 'string' && isArgumentCode(error.code))) {
+    // A NAMED ARGUMENT refusal (src/argument-voice.mjs): the caller forgot
+    // an argument or gave it a value the command does not accept. Nothing
+    // ran, so the sentence keeps the command's own wording with the code
+    // appended, and the channel is the usage channel (exit 2) — the same
+    // channel src/cli-surface.mjs already uses for an unknown flag, a flag
+    // given twice or a flag without a value. A script tells "you called me
+    // wrong" (exit 2) from "the work failed" (exit 1) without parsing
+    // prose.
+    console.error(JSON.stringify({
+      error: error.message,
+      code: error.code,
+      fix: error.fix,
+    }));
+    process.exitCode = Number.isInteger(error.exitCode) ? error.exitCode : 2;
   } else if (error?.fix && typeof error.code === 'string') {
     // A NAMED refusal (src/file-input.mjs, src/store-input.mjs,
     // src/store-damage.mjs, src/lock-voice.mjs): the message already carries

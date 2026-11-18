@@ -366,7 +366,7 @@ node bin/sememe.mjs decode whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc 2b04ed0b�
 sememe decode: flag "--store" given more than once — pass it once
 ```
 
-What is refused, by name: a flag this command does not accept (including a flag belonging to another command, and a flag that is actually a subcommand), a flag given twice — the first value won and the second was silently discarded — a flag with no value, and more positional arguments than the command consumes. What is *not* refused: too few positional arguments, which each command already refuses in its own words (`decode needs a program id`, `pull needs a program id`), so those messages are unchanged.
+What is refused, by name: a flag this command does not accept (including a flag belonging to another command, and a flag that is actually a subcommand), a flag given twice — the first value won and the second was silently discarded — a flag with no value, and more positional arguments than the command consumes. What was *not* refused by this table at the time: too few positional arguments, which each command refused in its own words (`decode needs a program id`, `pull needs a program id`). Those sentences are still the command's own and still verbatim — but since 2026-11-18 they no longer travel as bare prose on exit 1: the argument face has its own classifier and its own named refusal, see *the argument you forgot is answered in the product's voice too* at the end of this file.
 
 The rule is the one the repository already applies to stores, receipts and locks: an unrecognized input is refused by name, never tolerated. `src/cli-surface.mjs` is that table — data, not scattered `if`s — so a flag cannot be added to a command without appearing in one place, and `test/flag-surface.test.mjs` (29 tests) pins the refusals and the repair text, while `test/flag-tag-journey.test.mjs` pins the SAME properties on the bytes a stranger installs — the flag level of the pinned tag, which no instrument measured until 2026-11-07 (measured then on the published `v0.4.7` install: for a flag with no close match the supported list printed **twice in one line**, and a command that takes no flags printed `accepts: (none) supported flags: (none)`; the fix was already on main and the pin pointed behind it — the same class as every pinned-tag defect above, now covered by a journey instead of by luck). Honest limit: this is a behavioural change to argument handling on a package with no external users yet, so nothing downstream has been shown to depend on the old silent acceptance. It shipped the same day it was measured and `v0.4.8` carries both the strict surface and the once-only message: `v0.4.6` still accepts the silent typos above and `v0.4.7` still prints the list twice (tags are immutable), so a pin behind either keeps the old behaviour.
 
@@ -4438,3 +4438,89 @@ work channel for the dispatch faces; the sentences other tools quote.
   unnamed (tags immutable).
 - The structured `cause` field is a CLI-channel addition: scripts that parsed the prose
   still get the same prose, now with a product code on it.
+
+
+## Working now: the argument you forgot is answered in the product's voice too (2026-11-18)
+
+Every other input sememe touches had learned to refuse by name: the flag you typed
+(`cli-surface` v0.4.8), the file you point at (`file-input` v0.4.31), the store directory
+(`store-input` v0.4.32), the damage inside it (`store-damage` v0.4.33), the lock gate
+(`lock-voice` v0.4.35), the answers themselves (`answer-voice` v0.4.36), the endpoint you
+name (`acquire-voice` v0.4.37). **The arguments you forgot were the last input class
+answering as bare prose:**
+
+    sememe decode
+      -> {"error":"decode needs a program id"} exit 1
+    sememe decode <program>
+      -> {"error":"decode needs an instruction payload"} exit 1
+    sememe decode --trailing bogus <program> <payload>
+      -> {"error":"--trailing must be \"report\" or \"error\""} exit 1
+    sememe pull
+      -> {"error":"pull needs a program id"} exit 1
+
+Three faults, the same three the other classifiers ended:
+
+1. **NO NAME** — no `code` a script can branch on: "you called me wrong" was
+   indistinguishable from any other failure without parsing prose.
+2. **NO REPAIR** — the sentence said what was missing but never what to run; every other
+   classifier carries a `fix:` line.
+3. **THE WRONG CHANNEL** — exit 1 is the channel this README documents for *disagreement*
+   (the store drifted, the receipt is tampered). A forgotten argument is not a failed
+   work: nothing was read, nothing was written, no RPC was contacted. It shared the
+   channel with real refusals, so a CI script could not tell "you called me wrong" from
+   "the store drifted".
+
+**THE FIX (`src/argument-voice.mjs` is the ONE mint place):** every face is a row in the
+`ARGUMENT_FACES` table — `missing` (the required argument was not given), `invalid` (the
+value is not one the command accepts) or `conflict` (the arguments contradict each
+other). The sentence keeps the command's OWN words verbatim with the code appended in
+parentheses (the sentences quoted above still match), the repair names the command to
+run, and the channel is **exit 2 — the usage channel the product already reserves** for
+a call that cannot be what the caller meant (an unknown flag, a flag given twice and a
+flag without a value already exit 2).
+
+Measured with `tools/measure-argument-voice.mjs` (two-tree, byte-identical probe copied
+into the pre-fix tree `55a5114` = published `sememe@0.4.37`), artifact
+`research/argument-voice-2026-11-18.json`, verdict **`argument-voice-closed`**:
+
+| | pre-fix (55a5114) | fixed |
+|---|---|---|
+| faces without a product code | **26 / 26** | 0 |
+| faces without a repair | **26 / 26** | 0 |
+| faces on the wrong channel (exit 1) | **26 / 26** | 0 |
+| control regressions | — | 0 |
+
+The 26 faces cover every row of the table, and `test/argument-voice.test.mjs` (39 tests)
+pins that the two sets are identical — a declared face nobody probes is a face that can
+silently collapse into its neighbour (found by the ladder, not by review: M6 first
+escaped the gate because the gate only enumerated the probed subset).
+
+**GUARDS (the false-positive check):** an unknown flag keeps the flag surface's voice
+(plain text, exit 2, closest-flag suggestion); an unknown command still dumps the usage
+text with exit 2; a flag without a value keeps `cli-surface`'s message; an **answer**
+keeps exit 1 + `answer: true` (the argument fix does not move the answer channel); and
+`conform --only <not-a-program-id>` keeps the conformance gate's own channel (exit 1,
+`filter-is-not-a-program-id`) — pinned by `test/conformance-filter-domain.test.mjs`, and
+deliberately NOT moved here: it is a statement about the filter, raised by the gate,
+not about the invocation shape.
+
+**EVIDENCE:** red-first — the gate run against the extracted pre-fix tree: **28 red, 6
+guards green** (on both trees); post-fix **39/39 green**. Mutation ladder
+`tools/mutation-ladder-argument-voice.sh`: **8/8 CAUGHT**, control green, tree
+byte-identical (the ladder refuses a pattern that matches nothing, and compares against
+a pre-ladder snapshot rather than `git HEAD`).
+
+**OWN ERRORS during this pulse, both caught by the ladder/gate rather than shipped:**
+the first ladder run caught **M6 not caught** — the gate enumerated the 22 probed faces
+instead of the whole `ARGUMENT_FACES` table, so a code collapse between two
+`--trailing` faces was invisible; the gate now iterates the table and asserts exact
+coverage with the probe (26 faces both ways, the four vendored `--trailing` faces
+included in the instrument). And the first version of the probe leaked this host's home
+path (`~/.sememe` in a control's answer) — caught by the tool's own `hostPathLeak`
+guard before the artifact was committed; the control now passes a relative `--store`.
+
+**HONEST LIMITS:** 0 external users — publish is not consumption; one machine; no audit.
+`v0.4.37` and older still answer all 26 faces as bare prose on exit 1 (tags immutable);
+the exit-1 → exit-2 move is a behaviour change for any script that branched on exit 1
+for a forgotten argument — such a script was reading prose to distinguish cases, which
+is exactly what the fix removes.

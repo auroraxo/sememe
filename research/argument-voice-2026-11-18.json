@@ -1,0 +1,472 @@
+{
+  "tool": "tools/measure-argument-voice.mjs",
+  "measuredAt": "2026-11-18T14:11:54Z",
+  "prefix": "55a5114",
+  "question": "does a forgotten or wrong argument get the product's own named refusal on the usage channel, or a codeless prose on the work channel?",
+  "faces": [
+    "pullMissingId",
+    "gapMissingId",
+    "adoptMissingId",
+    "adoptMissingFile",
+    "decodeMissingId",
+    "decodeMissingPayload",
+    "decodeTrailingBadValue",
+    "decodeAbsentBadValue",
+    "conformMissingFile",
+    "decodeNativeTrailingBadValue",
+    "decodeTokenTrailingBadValue",
+    "decodeRaydiumTrailingBadValue",
+    "decodeAtaTrailingBadValue",
+    "decodeNativeMissingId",
+    "decodeNativeMissingPayload",
+    "decodeTokenMissingId",
+    "decodeTokenMissingPayload",
+    "decodeRaydiumMissingId",
+    "decodeRaydiumMissingPayload",
+    "decodeAtaMissingId",
+    "decodeAtaMissingPayload",
+    "decodeAtaBothPayloads",
+    "accountMissingId",
+    "accountMissingData",
+    "accountTrailingBadValue",
+    "verifyModeBadValue"
+  ],
+  "controls": [
+    "absentHelpOk",
+    "nativeProvenanceOk",
+    "ataEmptyOk",
+    "conformOnlyValid",
+    "conformOnlyMissingValue"
+  ],
+  "preFix": {
+    "unnamedFaces": [
+      "pullMissingId",
+      "gapMissingId",
+      "adoptMissingId",
+      "adoptMissingFile",
+      "decodeMissingId",
+      "decodeMissingPayload",
+      "decodeTrailingBadValue",
+      "decodeAbsentBadValue",
+      "conformMissingFile",
+      "decodeNativeTrailingBadValue",
+      "decodeTokenTrailingBadValue",
+      "decodeRaydiumTrailingBadValue",
+      "decodeAtaTrailingBadValue",
+      "decodeNativeMissingId",
+      "decodeNativeMissingPayload",
+      "decodeTokenMissingId",
+      "decodeTokenMissingPayload",
+      "decodeRaydiumMissingId",
+      "decodeRaydiumMissingPayload",
+      "decodeAtaMissingId",
+      "decodeAtaMissingPayload",
+      "decodeAtaBothPayloads",
+      "accountMissingId",
+      "accountMissingData",
+      "accountTrailingBadValue",
+      "verifyModeBadValue"
+    ],
+    "repairlessFaces": [
+      "pullMissingId",
+      "gapMissingId",
+      "adoptMissingId",
+      "adoptMissingFile",
+      "decodeMissingId",
+      "decodeMissingPayload",
+      "decodeTrailingBadValue",
+      "decodeAbsentBadValue",
+      "conformMissingFile",
+      "decodeNativeTrailingBadValue",
+      "decodeTokenTrailingBadValue",
+      "decodeRaydiumTrailingBadValue",
+      "decodeAtaTrailingBadValue",
+      "decodeNativeMissingId",
+      "decodeNativeMissingPayload",
+      "decodeTokenMissingId",
+      "decodeTokenMissingPayload",
+      "decodeRaydiumMissingId",
+      "decodeRaydiumMissingPayload",
+      "decodeAtaMissingId",
+      "decodeAtaMissingPayload",
+      "decodeAtaBothPayloads",
+      "accountMissingId",
+      "accountMissingData",
+      "accountTrailingBadValue",
+      "verifyModeBadValue"
+    ],
+    "wrongChannelFaces": [
+      "pullMissingId",
+      "gapMissingId",
+      "adoptMissingId",
+      "adoptMissingFile",
+      "decodeMissingId",
+      "decodeMissingPayload",
+      "decodeTrailingBadValue",
+      "decodeAbsentBadValue",
+      "conformMissingFile",
+      "decodeNativeTrailingBadValue",
+      "decodeTokenTrailingBadValue",
+      "decodeRaydiumTrailingBadValue",
+      "decodeAtaTrailingBadValue",
+      "decodeNativeMissingId",
+      "decodeNativeMissingPayload",
+      "decodeTokenMissingId",
+      "decodeTokenMissingPayload",
+      "decodeRaydiumMissingId",
+      "decodeRaydiumMissingPayload",
+      "decodeAtaMissingId",
+      "decodeAtaMissingPayload",
+      "decodeAtaBothPayloads",
+      "accountMissingId",
+      "accountMissingData",
+      "accountTrailingBadValue",
+      "verifyModeBadValue"
+    ],
+    "detail": {
+      "pullMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "gapMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "adoptMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "adoptMissingFile": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeMissingPayload": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeTrailingBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeAbsentBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "conformMissingFile": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeNativeTrailingBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeTokenTrailingBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeRaydiumTrailingBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeAtaTrailingBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeNativeMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeNativeMissingPayload": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeTokenMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeTokenMissingPayload": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeRaydiumMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeRaydiumMissingPayload": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeAtaMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeAtaMissingPayload": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "decodeAtaBothPayloads": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "accountMissingId": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "accountMissingData": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "accountTrailingBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      },
+      "verifyModeBadValue": {
+        "exit": 1,
+        "code": false,
+        "fix": false
+      }
+    },
+    "controls": {
+      "absentHelpOk": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "nativeProvenanceOk": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "ataEmptyOk": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "conformOnlyValid": {
+        "exit": 1,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "{\"error\":\"conformance refused: no-sememe-store — 11111111111111111111111111111111: no sememe store at ./arg-voice-store: run \\\"sememe pull\\\" first — the conformance gate cannot read this program from the store, so it cannot say the transaction conforms; repair: restore the receipt (re-run \\\"sememe pull\\\") or point --store at a verified store\"}"
+      },
+      "conformOnlyMissingValue": {
+        "exit": 2,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "sememe conform: missing value for --only"
+      }
+    }
+  },
+  "fixed": {
+    "unnamedFaces": [],
+    "repairlessFaces": [],
+    "wrongChannelFaces": [],
+    "detail": {
+      "pullMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "gapMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "adoptMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "adoptMissingFile": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeMissingPayload": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeTrailingBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeAbsentBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "conformMissingFile": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeNativeTrailingBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeTokenTrailingBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeRaydiumTrailingBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeAtaTrailingBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeNativeMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeNativeMissingPayload": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeTokenMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeTokenMissingPayload": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeRaydiumMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeRaydiumMissingPayload": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeAtaMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeAtaMissingPayload": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "decodeAtaBothPayloads": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "accountMissingId": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "accountMissingData": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "accountTrailingBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      },
+      "verifyModeBadValue": {
+        "exit": 2,
+        "code": true,
+        "fix": true
+      }
+    },
+    "controls": {
+      "absentHelpOk": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "nativeProvenanceOk": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "ataEmptyOk": {
+        "exit": 0,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": ""
+      },
+      "conformOnlyValid": {
+        "exit": 1,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "{\"error\":\"conformance refused: no-sememe-store — 11111111111111111111111111111111: no sememe store at ./arg-voice-store: run \\\"sememe pull\\\" first — the conformance gate cannot read this program from the store, so it cannot say the transaction conforms; repair: restore the receipt (re-run \\\"sememe pull\\\") or point --store at a verified store\"}"
+      },
+      "conformOnlyMissingValue": {
+        "exit": 2,
+        "hasCode": false,
+        "hasFix": false,
+        "stderr": "sememe conform: missing value for --only"
+      }
+    }
+  },
+  "controlRegression": [],
+  "verdict": {
+    "preFixUnnamedFaces": 26,
+    "preFixRepairlessFaces": 26,
+    "preFixWrongChannelFaces": 26,
+    "fixedUnnamedFaces": 0,
+    "fixedRepairlessFaces": 0,
+    "fixedWrongChannelFaces": 0,
+    "controlRegression": 0
+  },
+  "verdictName": "argument-voice-closed",
+  "hostPathLeak": 0
+}
