@@ -73,7 +73,7 @@
 //
 // Exit codes: 0 the probe ran; 3 NO VERDICT (the tree could not run).
 
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
 import { deflateSync } from 'node:zlib';
@@ -104,15 +104,41 @@ const FACES = [
 const CONTROLS = ['pullOk', 'gapUnknownHolds', 'storeAnswerVoice', 'flagVoice'];
 
 if (!existsSync(BIN)) { console.error('no bin/sememe.mjs in this tree'); process.exit(3); }
-if (!MOCK_CA_CERT || !MOCK_CA_KEY || !existsSync(MOCK_CA_CERT) || !existsSync(MOCK_CA_KEY)) {
-  console.error('missing SEMEME_PROBE_CA_CERT / SEMEME_PROBE_CA_KEY');
-  process.exit(3);
+
+// The mock RPC is LOCAL and throwaway: the pair may be supplied by the
+// measurement tool (SEMEME_PROBE_CA_CERT / SEMEME_PROBE_CA_KEY) or — when
+// nobody supplied one (the published pin re-derives the artifact inside a
+// plain `npm test`, CI included) — generated here with openssl into a temp
+// directory that dies with this process. No key or cert is committed, and a
+// caller without the env vars still gets the same measurement.
+const caWork = mkdtempSync(path.join(os.tmpdir(), 'sememe-probe-ca-'));
+const GENERATED_CA_CERT = path.join(caWork, 'cert.pem');
+const GENERATED_CA_KEY = path.join(caWork, 'key.pem');
+process.on('exit', () => { try { rmSync(caWork, { recursive: true, force: true }); } catch { /* temp */ } });
+
+function resolveCa() {
+  if (MOCK_CA_CERT && MOCK_CA_KEY && existsSync(MOCK_CA_CERT) && existsSync(MOCK_CA_KEY)) {
+    return { cert: MOCK_CA_CERT, key: MOCK_CA_KEY };
+  }
+  const res = spawnSync('openssl', [
+    'req', '-x509', '-newkey', 'rsa:2048', '-nodes',
+    '-keyout', GENERATED_CA_KEY, '-out', GENERATED_CA_CERT,
+    '-days', '3650', '-subj', '/CN=sememe-local-mock',
+    '-addext', 'subjectAltName=IP:127.0.0.1',
+  ], { encoding: 'utf8' });
+  if (res.status !== 0 || !existsSync(GENERATED_CA_CERT) || !existsSync(GENERATED_CA_KEY)) {
+    console.error('no SEMEME_PROBE_CA_CERT / SEMEME_PROBE_CA_KEY and openssl could not generate one'
+      + (res.stderr ? `: ${String(res.stderr).slice(-200)}` : ''));
+    process.exit(3);
+  }
+  return { cert: GENERATED_CA_CERT, key: GENERATED_CA_KEY };
 }
+const ca = resolveCa();
 if (!existsSync(IDL_FIXTURE)) { console.error('missing test/fixtures/whirlpool-idl.json'); process.exit(3); }
 
 const storeRoot = mkdtempSync(path.join(os.tmpdir(), 'sememe-acquire-probe-'));
 const caFile = path.join(storeRoot, 'mock-ca.pem');
-writeFileSync(caFile, readFileSync(MOCK_CA_CERT));
+writeFileSync(caFile, readFileSync(ca.cert));
 
 // The HEALTHY endpoint must answer with a REAL anchor-format account, or the
 // pullOk control would measure the "no verified on-chain IDL" refusal instead
@@ -150,7 +176,7 @@ const mockRpc = (mode) => {
     }
   };
   return new Promise((resolve) => {
-    const srv = https.createServer({ key: readFileSync(MOCK_CA_KEY), cert: readFileSync(MOCK_CA_CERT) }, responder);
+    const srv = https.createServer({ key: readFileSync(ca.key), cert: readFileSync(ca.cert) }, responder);
     srv.listen(0, '127.0.0.1', () => resolve(srv));
   });
 };

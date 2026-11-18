@@ -86,12 +86,12 @@ const PROBE = path.join(HERE, 'acquire-voice-probe.mjs');
 const CA_CERT = process.env.SEMEME_PROBE_CA_CERT;
 const CA_KEY = process.env.SEMEME_PROBE_CA_KEY;
 if (!existsSync(PROBE)) { console.error('probe missing'); process.exit(2); }
-if (!CA_CERT || !CA_KEY || !existsSync(CA_CERT) || !existsSync(CA_KEY)) {
-  console.error('SEMEME_PROBE_CA_CERT / SEMEME_PROBE_CA_KEY must point at a throwaway self-signed pair for the local mock RPC');
-  process.exit(2);
-}
-
-const env = { ...process.env, SEMEME_PROBE_CA_CERT: CA_CERT, SEMEME_PROBE_CA_KEY: CA_KEY };
+// The probe generates its own throwaway TLS pair when none is supplied —
+// the env vars are an OVERRIDE for callers that want to pin the pair (a
+// long-validity fixture cert, for example), not a requirement.
+const env = (CA_CERT && CA_KEY && existsSync(CA_CERT) && existsSync(CA_KEY))
+  ? { ...process.env, SEMEME_PROBE_CA_CERT: CA_CERT, SEMEME_PROBE_CA_KEY: CA_KEY }
+  : { ...process.env, SEMEME_PROBE_CA_CERT: undefined, SEMEME_PROBE_CA_KEY: undefined };
 
 function runProbe(root) {
   const run = spawnSync(process.execPath, [path.join(root, 'tools', 'acquire-voice-probe.mjs')], {

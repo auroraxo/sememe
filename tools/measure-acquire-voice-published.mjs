@@ -61,15 +61,11 @@ const OUT = arg('--out', path.join(ROOT, 'research', 'acquire-voice-published-20
 if (!fs.existsSync(PROBE)) { console.error('probe missing'); process.exit(3); }
 
 const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'sememe-published-acquire-'));
-// Every exit path removes the two npm apps this tool creates — including the
-// failure paths (an unmeasurable baseline must not leave a tree behind).
+// The probe generates its own throwaway TLS pair when no one supplies one,
+// so this tool runs inside a plain `npm test` (CI included) without env
+// setup. SEMEME_PROBE_CA_CERT / SEMEME_PROBE_CA_KEY remain optional overrides.
 const cleanup = () => { try { fs.rmSync(tmpRoot, { recursive: true, force: true }); } catch { /* temp */ } };
 process.on('exit', cleanup);
-if (!process.env.SEMEME_PROBE_CA_CERT || !process.env.SEMEME_PROBE_CA_KEY
-  || !fs.existsSync(process.env.SEMEME_PROBE_CA_CERT) || !fs.existsSync(process.env.SEMEME_PROBE_CA_KEY)) {
-  console.error('SEMEME_PROBE_CA_CERT / SEMEME_PROBE_CA_KEY must point at a throwaway self-signed pair for the local mock RPC');
-  process.exit(2);
-}
 
 function installAndProbe(version) {
   const appDir = path.join(tmpRoot, `v${version.replace(/\./g, '-')}`);
