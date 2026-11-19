@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // tools/gate-shipped-readme-pin.mjs — the README that SHIPS must pin exactly
-// one tag, and it must be the version being published.
+// one tag, and it must be the version being published. The landing Status
+// line must name the same version (R5).
 //
 // WHY THIS TOOL EXISTS (measured 2026-11-15)
 //
@@ -31,6 +32,14 @@
 //   R3 the shipped package.json version equals the version being published
 //   R4 README.md is actually in the tarball (a missing README would make
 //      R1 vacuously "clean" on an empty string)
+//   R5 the shipped README's Status line (README line 5, the first sentence a
+//      stranger reads on the npm page) names `v<package.json version>`.
+//      Measured 2026-11-19 on the published 0.4.38: the tarball shipped
+//      "Status: v0.4.37" next to install pins v0.4.38 — the landing line
+//      advertised a release the package was not. Prose is invisible to
+//      R1-R4 (it is not a pin), so no gate caught it; every release commit
+//      bumped package.json and the pins, and the Status line was the one
+//      version mention nobody bumped.
 //
 // HOOK: `prepublishOnly`. npm runs it before `npm publish` and NOT before
 // `npm pack`, so the channel-parity tool (`tools/measure-channel-parity.mjs`
@@ -54,6 +63,35 @@ const ROOT = path.resolve(HERE, '..');
 
 export function pinsOf(readme) {
   return [...new Set((readme.match(/github:auroraxo\/sememe#(v[\d.]+\.[\d.]+[-\w.]*)/g) || []).map((s) => s.split('#')[1]))];
+}
+
+// The Status line of a README: the first line carrying `Status:`, and the
+// version token it names. The landing-page convention since the front-page
+// rewrite (2026-11-13): the package page opens with "Status: vX.Y.Z — …".
+// Exported so the measurement tool (tools/measure-shipped-status-line.mjs)
+// and the publish gate judge the SAME line with the SAME extraction — two
+// extractions would be two answers.
+export function statusOf(readme) {
+  const line = String(readme).split('\n').find((l) => l.includes('Status:'));
+  if (!line) return null;
+  const match = /Status:\s*(v[0-9]+\.[0-9]+\.[0-9]+(?:[-\w.]*)?)/.exec(line);
+  return match ? match[1] : null;
+}
+
+/** R5: the Status line names the version being shipped. */
+export function judgeStatus({ readme, version }) {
+  const status = statusOf(readme);
+  if (status === null) {
+    return { ok: false, status, problems: ['R5 the shipped README carries no Status line — the landing page must name the version it ships or the gate cannot tell'] };
+  }
+  if (status !== `v${version}`) {
+    return {
+      ok: false,
+      status,
+      problems: [`R5 the shipped README's Status line says ${status} but package.json says ${version} — the first sentence a stranger reads names a release this package is not`],
+    };
+  }
+  return { ok: true, status, problems: [] };
 }
 
 // The judgement, as a pure function so the test can aim it at any README.
@@ -105,8 +143,10 @@ function main() {
     const shippedVersion = JSON.parse(pkgExtract.stdout).version;
 
     const verdict = judgeShipped({ readme: extract.stdout, version: shippedVersion });
-    if (!verdict.ok) refuse(verdict.problems.join('; '));
-    console.error(`shipped-readme-pin: PUBLISHED-README pins exactly one tag: ${verdict.pins[0]} (package ${shippedVersion})`);
+    const status = judgeStatus({ readme: extract.stdout, version: shippedVersion });
+    const problems = [...verdict.problems, ...status.problems];
+    if (problems.length > 0) refuse(problems.join('; '));
+    console.error(`shipped-readme-pin: PUBLISHED-README pins exactly one tag: ${verdict.pins[0]} (package ${shippedVersion}); Status line ${status.status}`);
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }
