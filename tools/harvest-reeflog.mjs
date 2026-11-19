@@ -140,6 +140,8 @@ const {
   rowsWithoutInstructions,
   rowsWithoutTargetPayloads,
   rowsReverted,
+  rowsRecordedOutcome,
+  recordedOutcomes,
   revertedSignatures,
   reorgOnlySignatures,
 } = counts;
@@ -147,14 +149,29 @@ const {
 // A harvest that yielded nothing must not be written as a success.
 const payloadCount = transactions.reduce((sum, t) => sum + t.payloads.length, 0);
 if (!transactions.length) {
-  // Nothing to harvest for two different reasons, and only one of them is
-  // answered by "start the daemon": a journal of only retracted rows has run
-  // correctly and told us the events are gone.
+  // Nothing to harvest for three different reasons, and "start the daemon"
+  // answers only one of them: a journal of only retracted rows has run
+  // correctly and told us the events are gone; a journal of rows carrying a
+  // RECORDED outcome has run correctly too — the chain no longer knows those
+  // transactions and no hydrate can ever fill them; only genuinely OWED debt
+  // is named as what it is: a repair that will actually work. Each part is
+  // joined only when it is true, so a hydrate promise never rides along on a
+  // journal where nothing can be hydrated.
   if (rowsReverted > 0) {
     console.error(`no live rows to harvest — all ${rowsReverted} candidate row(s) were RETRACTED by the chain (see counts.revertedSignatures); nothing was written`);
     process.exit(1);
   }
-  console.error('no enriched rows in the journal — run `reeflog start` and `reeflog hydrate --accounts` first');
+  const parts = [];
+  if (rowsRecordedOutcome > 0) {
+    const named = recordedOutcomes
+      .map((o) => `${o.signature ?? 'unnamed'}=${o.payloadState ?? o.accountState}`)
+      .join(', ');
+    parts.push(`${rowsRecordedOutcome} row(s) carry a RECORDED outcome the chain can never fill (${named}) — see counts.recordedOutcomes`);
+  }
+  if (rowsWithoutEnvelope + rowsWithoutInstructions > 0) {
+    parts.push('run `reeflog start` and `reeflog hydrate --accounts` first');
+  }
+  console.error(`no enriched rows in the journal — ${parts.length ? parts.join('; ') : 'the journal holds no rows for this program'}`);
   process.exit(1);
 }
 
@@ -183,9 +200,13 @@ const document = {
     transactionsWithoutTarget: rowsWithoutTargetPayloads,
     // Debt the network harvester does not have: rows the journal has not
     // enriched (or enriched with an older binary). Reported, never hidden —
-    // `hydrate --accounts` with the current binary is what closes it.
+    // `hydrate --accounts` with the current binary is what closes it. A row
+    // with a RECORDED outcome is NOT here: no hydrate can fill it, so it is
+    // counted separately, with the outcome named.
     rowsWithoutEnvelope,
     rowsWithoutInstructions,
+    rowsRecordedOutcome,
+    recordedOutcomes,
     // Retracted by the chain: never a payload source, never an open debt —
     // named so the reader can see what the mailbox withdrew.
     rowsReverted,

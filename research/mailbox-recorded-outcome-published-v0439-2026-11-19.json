@@ -1,0 +1,145 @@
+{
+  "tool": "tools/measure-mailbox-recorded-outcome.mjs",
+  "verdict": "mailbox-recorded-outcomes-name-themselves",
+  "carrier": "0.4.39",
+  "reeflogRows": [
+    {
+      "signature": "LiveSig111111111111111111111111111111111111111",
+      "payload_state": "held",
+      "account_state": "held",
+      "logs": "present",
+      "accounts": "present"
+    },
+    {
+      "signature": "OwedSig111111111111111111111111111111111111111",
+      "payload_state": "held",
+      "account_state": null,
+      "logs": "present",
+      "accounts": null
+    },
+    {
+      "signature": "LostSig111111111111111111111111111111111111111",
+      "payload_state": "unavailable",
+      "account_state": null,
+      "logs": null,
+      "accounts": null
+    },
+    {
+      "signature": "EnvSig1111111111111111111111111111111111111111",
+      "payload_state": "held",
+      "account_state": "no_metadata",
+      "logs": "present",
+      "accounts": null
+    },
+    {
+      "signature": "InvalSig111111111111111111111111111111111111111",
+      "payload_state": "invalid",
+      "account_state": null,
+      "logs": null,
+      "accounts": null
+    }
+  ],
+  "prefix": {
+    "tag": "prefix",
+    "exitCode": 0,
+    "documentWritten": true,
+    "rowsWithoutEnvelope": 4,
+    "rowsWithoutInstructions": 0,
+    "rowsRecordedOutcome": null,
+    "recordedOutcomes": null,
+    "rowsReverted": 0,
+    "payloads": 1,
+    "pinnedSignatures": 1,
+    "namesHydrateRepair": false,
+    "stderr": ""
+  },
+  "fixed": {
+    "tag": "fixed",
+    "exitCode": 0,
+    "documentWritten": true,
+    "rowsWithoutEnvelope": 1,
+    "rowsWithoutInstructions": 0,
+    "rowsRecordedOutcome": 3,
+    "recordedOutcomes": [
+      {
+        "signature": "LostSig111111111111111111111111111111111111111",
+        "slot": 200002,
+        "payloadState": "unavailable",
+        "accountState": null
+      },
+      {
+        "signature": "EnvSig1111111111111111111111111111111111111111",
+        "slot": 200003,
+        "payloadState": null,
+        "accountState": "no_metadata"
+      },
+      {
+        "signature": "InvalSig111111111111111111111111111111111111111",
+        "slot": 200004,
+        "payloadState": "invalid",
+        "accountState": null
+      }
+    ],
+    "rowsReverted": 0,
+    "payloads": 1,
+    "pinnedSignatures": 1,
+    "namesHydrateRepair": false,
+    "stderr": ""
+  },
+  "published": {
+    "tag": "published@0.4.39",
+    "rowsWithoutEnvelope": 4,
+    "rowsWithoutInstructions": 0,
+    "rowsRecordedOutcome": null,
+    "recordedOutcomes": null,
+    "rowsReverted": 0,
+    "payloads": 1,
+    "pinnedSignatures": 1,
+    "namesHydrateRepair": null,
+    "stderr": ""
+  },
+  "advicePrefix": {
+    "tag": "advice-prefix",
+    "exitCode": 1,
+    "documentWritten": false,
+    "rowsWithoutEnvelope": null,
+    "rowsWithoutInstructions": null,
+    "rowsRecordedOutcome": null,
+    "recordedOutcomes": null,
+    "rowsReverted": null,
+    "payloads": null,
+    "pinnedSignatures": null,
+    "namesHydrateRepair": true,
+    "stderr": "no enriched rows in the journal — run `reeflog start` and `reeflog hydrate --accounts` first"
+  },
+  "adviceFixed": {
+    "tag": "advice-fixed",
+    "exitCode": 1,
+    "documentWritten": false,
+    "rowsWithoutEnvelope": null,
+    "rowsWithoutInstructions": null,
+    "rowsRecordedOutcome": null,
+    "recordedOutcomes": null,
+    "rowsReverted": null,
+    "payloads": null,
+    "pinnedSignatures": null,
+    "namesHydrateRepair": false,
+    "stderr": "no enriched rows in the journal — 3 row(s) carry a RECORDED outcome the chain can never fill (Lost2Sig111111111111111111111111111111111111111=unavailable, Env2Sig1111111111111111111111111111111111111111=no_metadata, Inval2Sig11111111111111111111111111111111111111=invalid) — see counts.recordedOutcomes"
+  },
+  "guards": {
+    "liveRowHarvested": {
+      "green": true,
+      "mustBeGreenOn": "both trees"
+    },
+    "retractedStillZero": {
+      "green": true,
+      "mustBeGreenOn": "both trees"
+    },
+    "owedStillCounted": {
+      "green": true,
+      "mustBeGreenOn": "both trees"
+    }
+  },
+  "observedAt": "2026-11-19T10:07:17.686Z",
+  "detail": "prefix 4-in-one-bucket + hydrate advice -> fixed owed=1 recorded=3 (unavailable/no_metadata/invalid); advice fixed: no enriched rows in the journal — 3 row(s) carry a RECORDED outcome the chain can never fill (Lost2Sig111111111111111111111111111111111111111=unavailable, Env2Sig11111111111111111111111111111111111111"
+}

@@ -41,6 +41,29 @@
 //     `error`, `missing`) still harvests: reading `reverted` where the row
 //     says nothing would be the same lie in the other direction.
 //
+// A RECORDED OUTCOME is not debt (added 2026-11-19)
+// --------------------------------------------------
+// reeflog's rows say why content is absent once that is a known fact
+// (journal.rs, the fields' own doc comments):
+//
+//   payload_state / account_state   null = still OWED — "hydrate will fill
+//                                          it later" (unknown, not empty)
+//                            'unavailable' = the chain does not know the
+//                                          transaction (fork-out)
+//                            'invalid'     = the endpoint refuses the key
+//                            'no_metadata' = the response carried no usable
+//                                          account metadata
+//
+// A named outcome can NEVER be filled. reeflog's own surfaces act on that:
+// `status` refuses to alarm on it ("a RECORDED outcome … Alarming on them
+// would alarm forever") and `tail --with-accounts` skips and consumes such a
+// row instead of holding delivery at it. The reader keeps the same
+// distinction: a permanently lost transaction reported as debt
+// (`rowsWithoutEnvelope`) promises the operator a fill that can never
+// arrive. It is counted and named, but in its OWN bucket:
+// `rowsRecordedOutcome`, each entry carrying the outcome the journal
+// recorded.
+//
 // Everything else is debt, not silence: a row the mailbox has not enriched,
 // an envelope carrying no instructions, a transaction with no payload for the
 // program — each gets its own counter so a shortfall can never pass as a
@@ -52,6 +75,13 @@
 // is why `tools/harvest-reeflog.mjs` calls it instead of keeping a copy.
 
 import { decodeBase58 } from './base58.mjs';
+
+/**
+ * The vocabulary reeflog uses for a content absence it has RECORDED as final
+ * (journal.rs). `null` is deliberately absent from this set: null means the
+ * content is still owed, not lost.
+ */
+const RECORDED_OUTCOMES = new Set(['unavailable', 'invalid', 'no_metadata']);
 
 /**
  * Instruction data arrives as base58 from both sources (the RPC's `encoding:
@@ -146,6 +176,8 @@ export function mailboxTransactions({ rows, retractions = [], program, channelRe
   let rowsWithoutEnvelope = 0;
   let rowsWithoutInstructions = 0;
   let rowsWithoutTargetPayloads = 0;
+  let rowsRecordedOutcome = 0;
+  const recordedOutcomes = [];
 
   for (const row of list) {
     if (!row) continue;
@@ -158,6 +190,23 @@ export function mailboxTransactions({ rows, retractions = [], program, channelRe
       rowsReverted++;
       if (typeof row.signature === 'string') revertedSignatures.push(row.signature);
       if (revertedByChannel && !revertedBySeal) reorgOnlySignatures.push(row.signature);
+      continue;
+    }
+    // A RECORDED OUTCOME decides before the debt buckets: the journal says
+    // this content can never arrive, so it is neither a harvestable row nor
+    // a debt `hydrate` could close. It is named in its own bucket.
+    const payloadState = typeof row.payload_state === 'string' && RECORDED_OUTCOMES.has(row.payload_state)
+      ? row.payload_state : null;
+    const accountState = typeof row.account_state === 'string' && RECORDED_OUTCOMES.has(row.account_state)
+      ? row.account_state : null;
+    if (payloadState || accountState) {
+      rowsRecordedOutcome++;
+      recordedOutcomes.push({
+        signature: typeof row.signature === 'string' ? row.signature : null,
+        slot: Number.isSafeInteger(row.slot) ? row.slot : null,
+        payloadState,
+        accountState,
+      });
       continue;
     }
     const envelope = row.accounts && typeof row.accounts === 'object' ? row.accounts : null;
@@ -196,6 +245,12 @@ export function mailboxTransactions({ rows, retractions = [], program, channelRe
       rowsWithoutInstructions,
       rowsReverted,
       revertedSignatures,
+      // Content the journal has RECORDED as permanently absent. Not debt:
+      // no `hydrate` can fill it, so it must not sit in the debt bucket that
+      // promises a fill. Named per row, with the outcome the journal
+      // recorded ('unavailable' / 'invalid' / 'no_metadata').
+      rowsRecordedOutcome,
+      recordedOutcomes,
       // The retraction channel's own account: how many RECORDS it delivered,
       // and which signatures it withdrew that the row's seal had not. The
       // record count is the channel's delivery; the signature set is what
