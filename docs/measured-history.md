@@ -4536,3 +4536,73 @@ must reproduce the committed counts; ladder
 the exit-1 → exit-2 move is a behaviour change for any script that branched on exit 1
 for a forgotten argument — such a script was reading prose to distinguish cases, which
 is exactly what the fix removes.
+
+---
+
+## 19.11. PULS BA — DIE LANDUNGSZEILE SAGT, WELCHES PAKET DU HALTST (v0.4.39)
+
+**Defect (measured 2026-11-19 on the PUBLISHED `sememe@0.4.38` registry tarball,
+`research/shipped-status-line-2026-11-19.json`):** the npm package page's first
+sentence — `**Status: v0.4.37 — published on the npm registry AND as a git tag…**` —
+named a release the package was not. The install pins in the same README said
+`github:auroraxo/sememe#v0.4.38` and `package.json` said `0.4.38`.
+
+**Why no gate caught it:** the one-pin gate (`tools/gate-shipped-readme-pin.mjs`,
+R1–R4) counts `github:auroraxo/sememe#vX` occurrences. The Status line is prose, not a
+pin. Every release commit bumped `package.json` and the pins; the Status line was the
+only version mention on the landing page nobody bumped — and R1–R4 stayed green over
+13 releases because of it.
+
+**Measured across all 18 published releases** (0.4.25 … 0.4.38): 13 clean — each release
+named its own version (`0.4.25` … `0.4.37`); 4 no-status — releases before the front page
+existed (2026-11-13), absence, not a lie; 1 stale — `0.4.38`, the first and only.
+
+**Fix:** rule **R5** in `tools/gate-shipped-readme-pin.mjs`, beside the pin rule it
+refuses with: `judgeStatus({ readme, version })` demands the shipped README's Status
+line say `v<package.json version>` (or carry a Status line at all — the landing contract
+names a version or the gate cannot tell). Wired into `prepublishOnly`, so the refusal now
+stands in front of the publish, not behind it. The measurement tool
+(`tools/measure-shipped-status-line.mjs`) imports `judgeStatus`/`statusOf` from the gate:
+one judgement, not two.
+
+**Pin** `test/shipped-status-line.test.mjs` (7 faces): **D-tree** packs this tree and
+demands the Status line name its own version — **RED on the pre-fix tree** (README
+v0.4.37, package 0.4.38), the red-first proof; **G-wire** pins the gate's *exact*
+refusal sentence and its call on the shipped README; **G-agree** the gate's exported
+judge agrees with the rule on match/stale/missing; **D-hist** the committed artifact
+records 0.4.38 stale naming v0.4.37 with counts that agree with its own rows; **G-rule**
+the rule as a pure function inside the pin (a weakened implementation cannot weaken its
+own pin); **G-prep** the `prepublishOnly` wiring; **D-clean** no host path, limits stated.
+
+**Ladder** `tools/mutation-ladder-shipped-status-line.sh`: **9/9 CAUGHT**, control
+green, tree byte-identical against a **pre-ladder snapshot** (M1 verdict-softened →
+D-hist; M2 0.4.38 not stale → D-hist; M3 0.4.37 flipped → D-hist; M4 host path →
+D-clean; M5 limit dropped → D-clean; M6 hook removed → G-prep; M7 judge never called →
+G-wire; M8 refusal sentence rewritten → G-wire; M9 stale judge softened → G-agree).
+
+**OWN ERRORS during this pulse, all caught before shipping:**
+1. The **first ladder run** compared the tree to itself after each mutation —
+   "byte-identical" was void, mutations stacked, and the control was red for the wrong
+   reason (M4's `/home/aurora/...` residue, which the pin's own **D-clean** guard caught
+   before anything could be committed). Fixed: per-step restore, pre-ladder snapshot
+   comparison, and a mutator that exits non-zero is a **broken mutation**, never a catch.
+2. **M8 was a no-op** in the first honest run: it mutated the first `R5 the shipped
+   README` occurrence — a comment — while the pin checked the refusal sentence. G-wire
+   now pins the exact sentence, and M8 targets it. (The known VACUUM failure mode of
+   ladders; this time found by the ladder itself.)
+3. The first suite run packed the tree **mid-edit** (README v0.4.38 vs package 0.4.39)
+   and the D-tree face failed against my own race; rerun on the stable tree: 7/7 green.
+
+**Delivery:** release commit `cdf0618` (fix + bump + R5 + pin + ladder + artifact),
+tag `v0.4.39` on it, GH Release with install command + honest limits, `npm publish`
+(prepublish gate green: one pin **and** Status line v0.4.39). Verification commit
+`574fd2c`: `research/shipped-status-line-published-v0439-2026-11-19.json` —
+**published `0.4.39` = Status v0.4.39, verdict `shipped-status-line-clean`** over 19
+published releases (14 clean, 4 no-status, 1 stale = 0.4.38 immutable). Other three
+release gates re-measured on this release: release-surface **clean**
+(newest = latest = pinned = v0.4.39), channel-parity **0.4.39 = parity**
+(gitHead = tag = `cdf06189`), published-pin user-zero **6/6**.
+
+**HONEST LIMITS:** 0 external users — publish is not consumption; one machine; no audit.
+`v0.4.38` stays stale on the registry (immutable — named, not repaired). The R5 rule
+covers the Status line only; other prose is not version-pinned.
