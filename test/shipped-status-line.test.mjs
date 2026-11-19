@@ -24,8 +24,10 @@
 //        0.4.38) and is the red-first proof.
 //   G-wire  the gate's source actually WIRES the Status judgement into its
 //        refusal path (calls judgeStatus with the shipped README, and its
-//        problem text names R5). A mention without the call would be a
-//        softened gate. RED on the pre-fix tree.
+//        problem text names R5 in the exact sentence the product's own
+//        channel prints). A mention in a comment without the call, or a
+//        softened sentence, would be a weakened gate. RED on the pre-fix
+//        tree.
 //   G-agree the gate's EXPORTED judge agrees with the rule as written here,
 //        on all three sample classes (match / stale / missing). Two
 //        judgements must not be two answers. RED on the pre-fix tree (the
@@ -108,7 +110,9 @@ test('G-wire: the gate WIRES the Status judgement into its refusal path', () => 
   assert.ok(gateSource, 'the publishing gate is missing');
   assert.ok(gateSource.includes('function judgeStatus'), 'the gate no longer defines the Status judgement');
   assert.ok(gateSource.includes("judgeStatus({ readme: extract.stdout"), 'the gate defines the Status judgement but never CALLS it on the shipped README — a softened gate');
-  assert.ok(gateSource.includes('R5 the shipped README'), 'the gate\u2019s Status problem text no longer names R5');
+  // The exact sentence the channel prints: pinned so a mutation that only
+  // changes the COMMENT cannot pass this face (the ladder's M8).
+  assert.ok(gateSource.includes("R5 the shipped README's Status line says"), 'the gate\u2019s Status refusal sentence was rewritten — the operator\u2019s channel no longer says what the product says');
   assert.ok(gateSource.includes('export function statusOf'), 'the gate no longer exports the Status extraction (the measurement imports it)');
 });
 
@@ -147,8 +151,10 @@ test('D-hist: the artifact records the DEFECT with counts that agree with its ro
   assert.equal(found.verdict, 'stale-status', '0.4.38 must be recorded as carrying a stale Status line');
   assert.equal(found.statusVersion, 'v0.4.37', 'the artifact must name the version the stale line advertises');
   assert.equal(found.shippedVersion, '0.4.38', 'the artifact must record the version the package actually is');
-  // The line WAS right one release earlier — the classification is not a
-  // blanket rule misfiring, it is one missed bump.
+  // 0.4.37 named its OWN version — the line was right one release earlier,
+  // so this is one missed bump, not a rule misfiring. (This face holds on the
+  // PRE-FIX tree where the artifact was measured; after the fix the tree
+  // ships v0.4.39 and 0.4.38 becomes the newest clean line.)
   const previous = rows.find((r) => r.version === '0.4.37');
   assert.ok(previous, 'the artifact does not measure 0.4.37');
   assert.equal(previous.verdict, 'clean', '0.4.37 must be recorded as naming its own version');

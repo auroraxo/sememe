@@ -39,17 +39,20 @@ trap cleanup EXIT
 
 snapshot() {
   ( cd "$ROOT" && find research test tools src -type f \( -name '*.mjs' -o -name '*.json' -o -name '*.sh' \) -print0 \
-      | sort -z | xargs -0 sha256sum; sha256sum "$PKG" ) > "$WORK/tree.sha"
+      | sort -z | xargs -0 sha256sum; sha256sum "$PKG" ) > "$1"
 }
 verify_tree() {
-  snapshot
-  ( cd "$ROOT" && find research test tools src -type f \( -name '*.mjs' -o -name '*.json' -o -name '*.sh' \) -print0 \
-      | sort -z | xargs -0 sha256sum; sha256sum "$PKG" ) > "$WORK/tree.after.sha"
-  if cmp -s "$WORK/tree.sha" "$WORK/tree.after.sha"; then
+  # Compare against the PRE-LADDER snapshot: a ladder that compares the tree
+  # to itself after every mutation always reports "byte-identical", no matter
+  # what it left behind. This is exactly the mistake a previous ladder made;
+  # the restore must prove the tree is back to the state the control was
+  # measured in.
+  snapshot "$WORK/tree.after.sha"
+  if cmp -s "$WORK/tree.before.sha" "$WORK/tree.after.sha"; then
     echo "  tree byte-identical"
   else
     echo "  FAIL tree changed"
-    diff <(cat "$WORK/tree.sha") "$WORK/tree.after.sha" | head -5
+    diff "$WORK/tree.before.sha" "$WORK/tree.after.sha" | head -5
     FAILED=1
   fi
 }
@@ -59,8 +62,9 @@ run_pin() {
   node --test "$PIN" > "$WORK/out.log" 2>&1
   local code=$?
   if [ $code -eq 0 ]; then echo "  PIN GREEN"; return 1; fi
-  echo "  PIN RED (expected) — $(grep -cE '^not ok' "$WORK/out.log") failing test(s)"
-  grep -E '^not ok' "$WORK/out.log" | sed 's/^/    /' | head -6
+  local fails
+  fails=$(grep -E '^\s+✖|^\s+not ok' "$WORK/out.log" | sed 's/^\s*//' | head -4 | tr '\n' ';')
+  echo "  PIN RED (expected) — failing: $fails"
   return 0
 }
 
@@ -68,20 +72,30 @@ expect_red() {
   local label="$1" mutator="$2"
   TOTAL=$((TOTAL + 1))
   echo "== $label"
-  "$mutator"
+  # A mutator that cannot apply its own marker exits non-zero: that is a
+  # BROKEN mutation, never a catch. Counting it as caught is how a ladder
+  # lies about itself.
+  if ! "$mutator"; then
+    echo "  MUTATOR FAILED — the mutation did not apply; not a catch"
+    FAILED=1
+    restore_artifact
+    verify_tree
+    return
+  fi
   if run_pin; then
     CAUGHT=$((CAUGHT + 1))
   else
     echo "  NOT CAUGHT — the mutation survived"
     FAILED=1
   fi
+  restore_artifact
   verify_tree
 }
 
 restore_artifact() {
-  ( cd "$ROOT" && git show "HEAD:$ARTIFACT" > "/dev/null" 2>&1 ) || true
-  # Restore from the committed copy (the artifact is committed before laddering).
-  ( cd "$ROOT" && git checkout -- "$ARTIFACT" ) || true
+  # Every mutation is undone before the next one runs — a ladder that stacks
+  # mutations measures "the tree with M1..M9 applied", not M9.
+  ( cd "$ROOT" && git checkout -- "$ARTIFACT" "$GATE" "$PKG" )
 }
 
 mutate_verdict_clean() { node -e '
@@ -136,7 +150,9 @@ fs.writeFileSync(p,n);
 mutate_problem_text() { node -e '
 const fs=require("fs"); const p="tools/gate-shipped-readme-pin.mjs";
 const t=fs.readFileSync(p,"utf8");
-const n=t.replace(/R5 the shipped README/, "R5 the shipped readme");
+// The SENTENCE the channel prints, not a comment mentioning R5: mutating the
+// comment would be a no-op that the ladder could count as a catch.
+const n=t.replace("R5 the shipped README\u0027s Status line says", "R5 the shipped readme\u0027s status line says");
 if(n===t){ console.error("marker not found"); process.exit(1); }
 fs.writeFileSync(p,n);
 '; }
@@ -148,7 +164,7 @@ if(n===t){ console.error("marker not found"); process.exit(1); }
 fs.writeFileSync(p,n);
 '; }
 
-snapshot
+snapshot "$WORK/tree.before.sha"
 expect_red "M1 the artifact's verdict is softened to clean" mutate_verdict_clean
 expect_red "M2 the artifact stops naming 0.4.38 as stale" mutate_hide_038
 expect_red "M3 the artifact records 0.4.37 as stale" mutate_037_stale
