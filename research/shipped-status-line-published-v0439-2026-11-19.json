@@ -1,0 +1,166 @@
+{
+  "tool": "tools/measure-shipped-status-line.mjs",
+  "measuredAt": "2026-11-19T04:16:00.096Z",
+  "package": "sememe",
+  "question": "does the Status line the shipped README opens with name the version the package actually is?",
+  "verdict": "shipped-status-line-clean",
+  "counts": {
+    "measured": 19,
+    "clean": 14,
+    "staleStatus": 1,
+    "noStatus": 4,
+    "noVerdict": 0,
+    "thisTree": "clean"
+  },
+  "latestPublished": {
+    "version": "0.4.39",
+    "statusVersion": "v0.4.39",
+    "verdict": "clean"
+  },
+  "thisTree": {
+    "verdict": "clean",
+    "statusVersion": "v0.4.39",
+    "shippedVersion": "0.4.39",
+    "commit": "cdf0618978e0235ad1a2ab98da8a5ca5da2d14d5"
+  },
+  "versions": [
+    {
+      "version": "0.4.21",
+      "verdict": "no-status",
+      "statusVersion": null,
+      "shippedVersion": "0.4.21",
+      "publishedAt": "2026-11-12T16:57:26.027Z"
+    },
+    {
+      "version": "0.4.22",
+      "verdict": "no-status",
+      "statusVersion": null,
+      "shippedVersion": "0.4.22",
+      "publishedAt": "2026-11-12T19:27:59.957Z"
+    },
+    {
+      "version": "0.4.23",
+      "verdict": "no-status",
+      "statusVersion": null,
+      "shippedVersion": "0.4.23",
+      "publishedAt": "2026-11-13T00:50:51.589Z"
+    },
+    {
+      "version": "0.4.24",
+      "verdict": "no-status",
+      "statusVersion": null,
+      "shippedVersion": "0.4.24",
+      "publishedAt": "2026-11-13T01:02:46.365Z"
+    },
+    {
+      "version": "0.4.25",
+      "verdict": "clean",
+      "statusVersion": "v0.4.25",
+      "shippedVersion": "0.4.25",
+      "publishedAt": "2026-11-13T14:07:41.007Z"
+    },
+    {
+      "version": "0.4.26",
+      "verdict": "clean",
+      "statusVersion": "v0.4.26",
+      "shippedVersion": "0.4.26",
+      "publishedAt": "2026-11-14T12:01:32.738Z"
+    },
+    {
+      "version": "0.4.27",
+      "verdict": "clean",
+      "statusVersion": "v0.4.27",
+      "shippedVersion": "0.4.27",
+      "publishedAt": "2026-11-14T18:46:49.705Z"
+    },
+    {
+      "version": "0.4.28",
+      "verdict": "clean",
+      "statusVersion": "v0.4.28",
+      "shippedVersion": "0.4.28",
+      "publishedAt": "2026-11-15T17:36:45.934Z"
+    },
+    {
+      "version": "0.4.29",
+      "verdict": "clean",
+      "statusVersion": "v0.4.29",
+      "shippedVersion": "0.4.29",
+      "publishedAt": "2026-11-15T19:11:05.664Z"
+    },
+    {
+      "version": "0.4.30",
+      "verdict": "clean",
+      "statusVersion": "v0.4.30",
+      "shippedVersion": "0.4.30",
+      "publishedAt": "2026-11-16T10:24:02.665Z"
+    },
+    {
+      "version": "0.4.31",
+      "verdict": "clean",
+      "statusVersion": "v0.4.31",
+      "shippedVersion": "0.4.31",
+      "publishedAt": "2026-11-16T23:39:34.322Z"
+    },
+    {
+      "version": "0.4.32",
+      "verdict": "clean",
+      "statusVersion": "v0.4.32",
+      "shippedVersion": "0.4.32",
+      "publishedAt": "2026-11-17T00:59:14.976Z"
+    },
+    {
+      "version": "0.4.33",
+      "verdict": "clean",
+      "statusVersion": "v0.4.33",
+      "shippedVersion": "0.4.33",
+      "publishedAt": "2026-11-17T03:18:41.214Z"
+    },
+    {
+      "version": "0.4.34",
+      "verdict": "clean",
+      "statusVersion": "v0.4.34",
+      "shippedVersion": "0.4.34",
+      "publishedAt": "2026-11-17T06:50:31.405Z"
+    },
+    {
+      "version": "0.4.35",
+      "verdict": "clean",
+      "statusVersion": "v0.4.35",
+      "shippedVersion": "0.4.35",
+      "publishedAt": "2026-11-17T14:55:00.410Z"
+    },
+    {
+      "version": "0.4.36",
+      "verdict": "clean",
+      "statusVersion": "v0.4.36",
+      "shippedVersion": "0.4.36",
+      "publishedAt": "2026-11-17T17:13:35.481Z"
+    },
+    {
+      "version": "0.4.37",
+      "verdict": "clean",
+      "statusVersion": "v0.4.37",
+      "shippedVersion": "0.4.37",
+      "publishedAt": "2026-11-17T23:44:45.041Z"
+    },
+    {
+      "version": "0.4.38",
+      "verdict": "stale-status",
+      "statusVersion": "v0.4.37",
+      "shippedVersion": "0.4.38",
+      "publishedAt": "2026-11-18T14:23:15.612Z"
+    },
+    {
+      "version": "0.4.39",
+      "verdict": "clean",
+      "statusVersion": "v0.4.39",
+      "shippedVersion": "0.4.39",
+      "publishedAt": "2026-11-19T04:14:12.936Z"
+    }
+  ],
+  "limits": [
+    "measures README bytes a stranger RECEIVES (registry tarball), not whether any stranger read them — zero external users, one machine, no audit",
+    "an npm version is immutable: a published stale Status line cannot be repaired, only named",
+    "the Status line is judged only where it exists: versions shipped before the front page existed (2026-11-13) carry no Status line and are classified no-status, not defective"
+  ]
+}
