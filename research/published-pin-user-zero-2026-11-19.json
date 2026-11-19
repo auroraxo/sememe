@@ -1,21 +1,21 @@
 {
   "tool": "tools/measure-published-pin-user-zero.mjs",
-  "measuredAt": "2026-11-19T04:16:15.966Z",
+  "measuredAt": "2026-11-19T10:34:41.058Z",
   "package": "sememe",
-  "pin": "v0.4.39",
+  "pin": "v0.4.40",
   "checks": [
     {
       "name": "channel",
       "pass": true,
-      "detail": "README pins v0.4.39; registry dist-tags.latest serves 0.4.39",
-      "readmePin": "v0.4.39",
-      "registryLatest": "0.4.39"
+      "detail": "README pins v0.4.40; registry dist-tags.latest serves 0.4.40",
+      "readmePin": "v0.4.40",
+      "registryLatest": "0.4.40"
     },
     {
       "name": "install",
       "pass": true,
-      "detail": "npm install sememe@0.4.39 into an empty app: exit 0, node_modules holds exactly ['sememe'] (zero runtime deps)",
-      "installedVersion": "0.4.39"
+      "detail": "npm install sememe@0.4.40 into an empty app: exit 0, node_modules holds exactly ['sememe'] (zero runtime deps)",
+      "installedVersion": "0.4.40"
     },
     {
       "name": "readme-example",
@@ -77,13 +77,12 @@
     {
       "name": "readme-pin-unique",
       "pass": true,
-      "detail": "README pins exactly one tag: v0.4.39"
+      "detail": "README pins exactly one tag: v0.4.40"
     }
   ],
   "verdict": "measured",
   "limits": [
     "this is my own user-zero against the published channel, not a foreign user; zero external users, one machine, no audit",
     "the store, sample and witness bytes are LOCAL FIXTURE DATA from this checkout — the install channel is the registry, the evidence is committed"
-  ],
-  "note": "Run during PULS BA (2026-11-19 04:15Z) on the freshly published 0.4.39 channel. The user-zero faces hold on 0.4.39 too (install, readme example, count header, live witness, unique pin)."
+  ]
 }

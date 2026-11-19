@@ -79,7 +79,8 @@ test('D4: the guards are green', () => {
 });
 
 test('D5: the published channel carries the defect — it is what a stranger installs', () => {
-  assert.equal(publishedDoc.published.tag, 'published@0.4.39');
+  assert.equal(publishedDoc.published.tag, 'published@0.4.39',
+    'the v0439 artifact records what 0.4.39 shipped');
   assert.equal(publishedDoc.published.rowsWithoutEnvelope, 4,
     'the published reader still lumps the lost rows into the debt bucket');
   assert.equal(publishedDoc.published.rowsRecordedOutcome, null,

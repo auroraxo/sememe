@@ -4606,3 +4606,88 @@ release gates re-measured on this release: release-surface **clean**
 **HONEST LIMITS:** 0 external users — publish is not consumption; one machine; no audit.
 `v0.4.38` stays stale on the registry (immutable — named, not repaired). The R5 rule
 covers the Status line only; other prose is not version-pinned.
+
+## 19.11. PULS BB — EINE RECORDED OUTCOME IST KEINE SCHULD (v0.4.40)
+
+**Defect (measured 2026-11-19 through the REAL reeflog 0.7.37 binary,
+`research/mailbox-recorded-outcome-2026-11-19.json` + the published-channel face
+`research/mailbox-recorded-outcome-published-v0439-2026-11-19.json`):** reeflog rows
+say WHY content is absent once that is a known fact — `payload_state`/`account_state`
+`null` = still OWED ("hydrate will fill it later"; journal.rs: "None while still
+pending — unknown, not empty"), `'unavailable'` = the chain does not know the
+transaction, `'invalid'` = the endpoint refuses the key, `'no_metadata'` = the response
+carried no usable account metadata. reeflog's own surfaces act on that split: `status`
+refuses to alarm on a recorded outcome ("Alarming on them would alarm forever") and
+`tail --with-accounts` skips and consumes such a row instead of holding delivery at it.
+
+The shipped reader (`src/mailbox.mjs`, the `sememe/mailbox` subpath) had NO
+vocabulary for it: every row without a complete envelope landed in the single bucket
+`rowsWithoutEnvelope`, whose documented meaning is debt `hydrate --accounts` closes.
+Observed on a planted 5-row journal (live / owed / unavailable / no_metadata /
+invalid): prefix counted **4 rows in the one repairable bucket** with no
+recorded-outcome counter, and on a journal of only-lost rows the harvest tool printed
+`no enriched rows in the journal — run `reeflog start` and `reeflog hydrate --accounts`
+first` — a repair that can never succeed, on content the journal had already recorded
+as permanently absent. The same face was measured **on the published channel:
+`sememe@0.4.39` (the bytes a stranger installs today) = 4-in-one-bucket, no
+`rowsRecordedOutcome`.**
+
+**Fix (one classification place, `src/mailbox.mjs`):** the recorded-outcome check
+decides BEFORE the debt buckets — a named `payload_state`/`account_state` goes to the
+own counter `rowsRecordedOutcome`, each entry carrying
+`{signature, slot, payloadState, accountState}`; genuinely owed rows stay in
+`rowsWithoutEnvelope`; the retraction check still decides first (a retraction is a
+different fact — the chain unmade the event); `tools/harvest-reeflog.mjs` joins repair
+advice only to the part that is actually owed (recorded-only journals get the outcome
+named and NO hydrate promise).
+
+**Measurement:** `tools/measure-mailbox-recorded-outcome.mjs` (real binary, both
+journals planted through `reeflog init` + the journal's own columns, rows read back
+through `tail`): verdict `mailbox-recorded-outcomes-name-themselves` — prefix
+4-in-one-bucket + impossible hydrate advice → fixed owed=1, recorded=3
+(`unavailable`/`no_metadata`/`invalid`), advice names the outcome. Post-release channel
+face: `research/mailbox-recorded-outcome-published-v0440-2026-11-19.json` =
+`mailbox-recorded-outcomes-held-on-the-published-channel` (published@0.4.40: owed=1,
+recorded=3). Guards green on both trees: live payload survives (payloads=1), owed debt
+stays visible, retraction buckets disjoint, zero network.
+
+**Pin** `test/mailbox-recorded-outcome.test.mjs` (8 faces): D1/D2/D4 **RED on the
+pre-fix tree** (red-first proof), G1–G5 green on BOTH trees; measurement pin
+`test/mailbox-recorded-outcome-measurement.test.mjs` 9/9 (counts, verdict, advice face,
+published defect face, no host path).
+
+**Ladder** `tools/mutation-ladder-mailbox-recorded-outcome.sh`: **7/7 CAUGHT**,
+control green, tree byte-identical against the pre-ladder snapshot (M1 classification
+disabled; M2 outcome names → constant; M3 D1 loosened to the defect numbers; M4 verdict
+hand-edited; M5 fixed-face counts hand-edited; M6 advice-face rewritten to the
+impossible repair; M7 `'held'` joins the recorded vocabulary — the owed/lost boundary
+held from BOTH sides).
+
+**OWN ERROR during this pulse:** the first ladder's M7 loosened a *guard assertion*
+without a reader regression — the gate stayed green and the step could never be caught
+(the no-op vacuum in a new form). Replaced with the boundary mutation above (M7 now
+mutates the READER). Second: the first two-tree run used this tree as its own "prefix"
+(both faces identical, verdict `not-held-no-defect-found`) — the prefix must be
+`git archive HEAD` of the pre-fix commit, verified by grep that the new vocabulary is
+absent. Third: re-measuring shipped-status-line with `--tree` OVERWROTE the pinned
+BA defect record; restored from git, new channel records now go to dated
+`-published-v0440-` files.
+
+**Delivery:** release commit `f1bd5e1` (fix + bump + gate + pin + ladder +
+artifacts), tag `v0.4.40` on it, GH Release with install command + honest limits,
+`npm publish 0.4.40` (prepublish gate green: one pin + Status line v0.4.40; registry
+propagation observed at attempt 4 ≈ 100s — the documented ETARGET window). Four
+release gates re-measured on this release: release-surface **clean**
+(newest = latest = pinned = v0.4.40), channel-parity **0.4.40 = parity**
+(gitHead=1fb15c7, tag=f1bd5e1, ancestor), shipped-readme-pin **clean** (one pin
+v0.4.40), published-pin user-zero re-measured; shipped-status-line published face
+`research/shipped-status-line-published-v0440-2026-11-19.json` = clean
+(1/20 stale = 0.4.38 immutable).
+
+**HONEST LIMITS:** 0 external users — publish is not consumption; one machine; no
+audit. 0.4.39 and older are immutable: they lump recorded outcomes into the
+repairable bucket and name a hydrate that cannot succeed (measured, not repaired).
+The reader classifies from the row's OWN fields; a hand-edited journal in an
+inconsistent state (outcome recorded, envelope present) is read as delivered, not
+diagnosed. The classification covers reeflog's three recorded outcomes; a future
+vocabulary addition on the reeflog side would need the set widened here too.

@@ -1,8 +1,16 @@
 {
-  "measuredAt": "2026-11-19T04:13:38.513Z",
+  "measuredAt": "2026-11-19T10:35:58.066Z",
   "repo": "auroraxo/sememe",
   "surfaces": {
     "releases": [
+      {
+        "tag": "v0.4.40",
+        "body": "## Install\n\n```bash\nnpm install sememe@0.4.40        # registry\n# or\nnpm install github:auroraxo/sememe#v0.4.40   # tagged release; no npm account needed\n```\n\n## What changed\n\nA reeflog journal row says WHY content is absent once that is a known fact: `payload_state`/`account_state` are `null` while the row is still **owed** (\"hydrate will fill it later\" — unknown, not empty) and name an **outcome** once it can never be filled (`unavailable` = the chain no longer knows the transaction, `invalid` = the endpoint refuses the key, `no_metadata` = the response carried no usable account metadata).\n\nThe shipped reader (`sememe/mailbox`) had no vocabulary for that distinction. Every row without a complete envelope landed in one counter, `rowsWithoutEnvelope`, whose documented meaning is debt `hydrate --accounts` closes — so a transaction the chain has permanently forgotten was reported as an open repair task, and the harvest tool named a repair that can never succeed (\"run `reeflog start` and `reeflog hydrate --accounts` first\"). reeflog's own `status` refuses to alarm on a recorded outcome (\"Alarming on them would alarm forever\") and `tail --with-accounts` skips and consumes such a row; the reader now keeps the same distinction at the package boundary.\n\n- **Fix** (one classification place, `src/mailbox.mjs`): a recorded outcome decides before the debt buckets — own counter `rowsRecordedOutcome`, each entry carrying the outcome the journal recorded; owed debt stays in `rowsWithoutEnvelope`; the tool joins repair advice only to the part that is actually owed.\n- **Measurement** (`tools/measure-mailbox-recorded-outcome.mjs`, real reeflog binary, 5 planted rows): prefix 4-in-one-bucket + impossible hydrate advice → fixed owed=1, recorded=3 (`unavailable`/`no_metadata`/`invalid`), advice names the outcome. The published `sememe@0.4.39` measured the same defect (the bytes a stranger installs today).\n- **Pin** (`test/mailbox-recorded-outcome.test.mjs`): D1/D2/D4 red on the pre-fix tree, G1–G5 green on both trees. Measurement pin 9/9.\n- **Ladder** (`tools/mutation-ladder-mailbox-recorded-outcome.sh`): 7/7 caught, control green, tree byte-identical against the pre-ladder snapshot.\n\n## Honest limits\n\n- 0.4.39 and older are immutable: they lump recorded outcomes into the repairable debt bucket and name a hydrate that cannot succeed — measured, not repairable.\n- Zero external users so far — publish is not consumption; one machine; no audit.\n- The reader classifies from the row's own fields; a journal that was hand-edited into an inconsistent state (outcome recorded but envelope present) is read as delivered, not diagnosed.",
+        "draft": false,
+        "prerelease": false,
+        "publishedAt": "2026-11-19T10:28:48Z",
+        "createdAt": "2026-11-19T10:28:31Z"
+      },
       {
         "tag": "v0.4.39",
         "body": "## Install\n\n```bash\nnpm install sememe@0.4.39        # registry\n# or\nnpm install github:auroraxo/sememe#v0.4.39   # tagged release; no npm account needed\n```\n\n## What changed\n\nThe npm package page's first sentence — the Status line — now MUST name the version the package actually is. On 0.4.38 it said `Status: v0.4.37` while its install pins and package.json said 0.4.38: the first sentence a stranger read named a release the package was not.\n\nMeasured across all 18 published releases (`research/shipped-status-line-2026-11-19.json`): 0.4.25 … 0.4.37 each named their own version; 0.4.38 was the first and only stale one. The one-pin gate counts `github:...#vX` occurrences, so the prose Status line was invisible to every gate — every release commit bumped package.json and the pins, and the Status line was the one version mention nobody bumped.\n\n- **Gate R5** (`tools/gate-shipped-readme-pin.mjs`, wired as `prepublishOnly`): a publish whose shipped README's Status line does not name its own version is refused.\n- **Measurement** (`tools/measure-shipped-status-line.mjs`): judges the registry tarball a stranger downloads, importing the same `judgeStatus` the gate refuses with — one judgement, not two.\n- **Pin** (`test/shipped-status-line.test.mjs`): 7 faces; D-tree was red on the pre-fix tree with all guards green.\n- **Ladder** (`tools/mutation-ladder-shipped-status-line.sh`): 9/9 caught, control green, per-step restore against the pre-ladder snapshot.\n\n## Honest limits\n\n- 0.4.38 and older are immutable: the stale line on 0.4.38 cannot be repaired, only named.\n- Zero external users so far — publish is not consumption; one machine; no audit.\n- The Status rule covers the landing line only; no other prose is version-pinned.",
@@ -366,6 +374,7 @@
       "v0.4.38",
       "v0.4.39",
       "v0.4.4",
+      "v0.4.40",
       "v0.4.5",
       "v0.4.6",
       "v0.4.7",
@@ -374,7 +383,7 @@
     ],
     "readme": {
       "installTags": [
-        "v0.4.39"
+        "v0.4.40"
       ],
       "documentedCommands": [
         "pull",
@@ -408,6 +417,116 @@
       "hasQuickstart": true
     },
     "trees": {
+      "v0.4.40": {
+        "manifest": {
+          "version": "0.4.40",
+          "private": false
+        },
+        "binCommands": [
+          "absent-help",
+          "account",
+          "adopt",
+          "adopt-hadron",
+          "adopt-lighthouse",
+          "ata-provenance",
+          "conform",
+          "decode",
+          "decode-ata",
+          "decode-native",
+          "decode-raydium",
+          "decode-token",
+          "gap",
+          "lock",
+          "native-provenance",
+          "pull",
+          "raydium-provenance",
+          "token-provenance",
+          "verify"
+        ],
+        "peerNeeds": {
+          "commands": [
+            "gap",
+            "pull"
+          ],
+          "unknownCommands": []
+        },
+        "exports": [
+          ".",
+          "native",
+          "store",
+          "pull",
+          "codec",
+          "canonical",
+          "discriminators",
+          "native-corpus",
+          "native-audit",
+          "package.json",
+          "token",
+          "token-metadata",
+          "raydium",
+          "ata",
+          "lighthouse",
+          "hadron",
+          "gap",
+          "mailbox"
+        ],
+        "entryExports": [
+          "COUNT_FROM_HEADER",
+          "UnionRefusal",
+          "VERIFIED_SHORT_FORMS",
+          "adopt",
+          "canonicalJson",
+          "countFromHeader",
+          "decodeBase58",
+          "decodeHex",
+          "decodePayload",
+          "decodeStoredAccount",
+          "decodeUnionPayload",
+          "decodeUnionStoredAccount",
+          "encodeBase58",
+          "findStoredIdl",
+          "findStoredIdls",
+          "parsePayload",
+          "unionAccountDecode",
+          "unionDecode",
+          "verifiedShortForm"
+        ],
+        "readme": {
+          "installTags": [
+            "v0.4.40"
+          ],
+          "documentedCommands": [
+            "pull",
+            "decode",
+            "lock",
+            "verify",
+            "adopt-hadron"
+          ],
+          "documentedExports": [
+            "native",
+            "token",
+            "raydium",
+            "ata",
+            "lighthouse",
+            "store",
+            "pull",
+            "mailbox",
+            "codec",
+            "canonical",
+            "discriminators",
+            "native-corpus",
+            "native-audit",
+            "gap"
+          ],
+          "shippedAccountEvent": true,
+          "proposalInstructionOnly": false,
+          "peerRefusalCommands": [
+            "pull",
+            "gap"
+          ],
+          "hasQuickstart": true
+        }
+      },
       "v0.4.39": {
         "manifest": {
           "version": "0.4.39",
@@ -4531,13 +4650,16 @@
   "verdict": {
     "verdict": "clean",
     "defects": [],
-    "newestTag": "v0.4.39",
-    "latestTag": "v0.4.39",
+    "newestTag": "v0.4.40",
+    "latestTag": "v0.4.40",
     "pinnedTags": [
-      "v0.4.39"
+      "v0.4.40"
     ]
   },
   "perRelease": {
+    "v0.4.40": {
+      "defects": []
+    },
     "v0.4.39": {
       "defects": []
     },
