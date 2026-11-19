@@ -1,0 +1,306 @@
+{
+  "tool": "tools/measure-shipped-readme-pin.mjs",
+  "measuredAt": "2026-11-19T04:22:57.732Z",
+  "question": "does the README a stranger receives pin exactly one install tag — and is that tag the version it ships with?",
+  "registry": "registry.npmjs.org",
+  "method": "npm pack <version> from the registry -> tarball README -> pin set; npm view <version> readme -> the page README; pins compared with the version itself",
+  "verdict": "shipped-readme-pin-defective",
+  "counts": {
+    "measured": 19,
+    "clean": 17,
+    "twoPins": 2,
+    "wrongTag": 0,
+    "noPin": 0,
+    "noVerdict": 0
+  },
+  "versions": [
+    {
+      "version": "0.4.21",
+      "pins": [
+        "v0.4.21"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.22",
+      "pins": [
+        "v0.4.22"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.23",
+      "pins": [
+        "v0.4.23",
+        "v0.4.22"
+      ],
+      "verdict": "two-pins",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.24",
+      "pins": [
+        "v0.4.24"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.25",
+      "pins": [
+        "v0.4.25"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.26",
+      "pins": [
+        "v0.4.26"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.27",
+      "pins": [
+        "v0.4.27"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.28",
+      "pins": [
+        "v0.4.28",
+        "v0.4.27"
+      ],
+      "verdict": "two-pins",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.29",
+      "pins": [
+        "v0.4.29"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.30",
+      "pins": [
+        "v0.4.30"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.31",
+      "pins": [
+        "v0.4.31"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.32",
+      "pins": [
+        "v0.4.32"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.33",
+      "pins": [
+        "v0.4.33"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.34",
+      "pins": [
+        "v0.4.34"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.35",
+      "pins": [
+        "v0.4.35"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.36",
+      "pins": [
+        "v0.4.36"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.37",
+      "pins": [
+        "v0.4.37"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.38",
+      "pins": [
+        "v0.4.38"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": null,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    },
+    {
+      "version": "0.4.39",
+      "pins": [
+        "v0.4.39"
+      ],
+      "verdict": "clean",
+      "registryReadmePins": null,
+      "pageAgreesWithTarball": true,
+      "pinnedTagExists": true,
+      "npmPackageLevelReadmePins": [
+        "v0.4.39"
+      ],
+      "pageIsPackageLevel": true
+    }
+  ],
+  "packageLevelPageReadme": {
+    "note": "npm keeps ONE package-level readme and serves it for every version; this is what the npm page shows for the package, compared with the newest tarball",
+    "pins": [
+      "v0.4.39"
+    ],
+    "agreesWithNewestTarball": true,
+    "newestVersion": "0.4.39"
+  },
+  "thisTree": {
+    "version": "0.4.39",
+    "pins": [
+      "v0.4.39"
+    ],
+    "verdict": "clean"
+  },
+  "limits": [
+    "this measures the README bytes a stranger RECEIVES (registry tarball + registry readme), not whether any stranger read it — zero external users, one machine, no audit",
+    "an npm version and a git tag are immutable: a published two-pin README cannot be repaired, only named",
+    "the registry README is what npm renders on the package page; the tarball README is what lands in node_modules — both are measured because a stranger can read either"
+  ]
+}

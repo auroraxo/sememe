@@ -49,7 +49,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
-const ARTIFACT = path.join(ROOT, 'research', 'shipped-readme-pin-2026-11-18.json');
+const ARTIFACT = path.join(ROOT, 'research', 'shipped-readme-pin-2026-11-19.json');
 const TOOL = path.join(ROOT, 'tools', 'measure-shipped-readme-pin.mjs');
 const GATE = path.join(ROOT, 'tools', 'gate-shipped-readme-pin.mjs');
 
