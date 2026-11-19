@@ -84,5 +84,6 @@
   "limits": [
     "this is my own user-zero against the published channel, not a foreign user; zero external users, one machine, no audit",
     "the store, sample and witness bytes are LOCAL FIXTURE DATA from this checkout — the install channel is the registry, the evidence is committed"
-  ]
+  ],
+  "note": "Run during PULS BA (2026-11-19 04:15Z) on the freshly published 0.4.39 channel. The user-zero faces hold on 0.4.39 too (install, readme example, count header, live witness, unique pin)."
 }
